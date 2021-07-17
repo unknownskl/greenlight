@@ -13,13 +13,14 @@ class MessageChannel extends BaseChannel {
         })
         this.send(data)
 
-        console.log('xSDK channels/message.js - Sending message:', data)
+        console.log('xSDK channels/message.js - Sending handshake:', data)
 
         var data4 = JSON.stringify(this.generateMessage('/streaming/systemUi/configuration', {
             "version": [0,1,0],
             "systemUis":[10,19,31,27,32]
         }))
         this.send(data4)
+        console.log('xSDK channels/message.js - Setup custom web UI Dialog configuration:', data4)
 
 
         // var data5 = JSON.stringify(this.generateMessage('/streaming/properties/clientappinstallidchanged', {
@@ -84,7 +85,8 @@ class MessageChannel extends BaseChannel {
 
         } else if(jsonMessage.target === '/streaming/sessionLifetimeManagement/serverInitiatedDisconnect') {
             var disconnectMessage = JSON.parse(jsonMessage.content)
-            alert('Kicked from streaming session. Reason:', disconnectMessage.reason);
+            console.log('Kicked from streaming session. Reason:', disconnectMessage.reason);
+            alert('Kicked from streaming session. Reason: '+disconnectMessage.reason);
 
         } else {
             console.log('xSDK channels/message.js - Received JSON:', jsonMessage)

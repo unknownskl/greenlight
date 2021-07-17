@@ -10,15 +10,20 @@ class InputChannel extends BaseChannel {
 
     #events = {
         'queue': [],
+        'fps': [],
     }
 
     onOpen(event) {
         setInterval(() => {
             // console.log('xSDK channels/input.js - [performance] sequence:', this.#inputSequenceNum, 'gamepadQueue size:', Object.keys(this.#gamepadQueue).length)
+            var fps = this.#frameCounter
             this.emitEvent('queue', { sequenceNum: this.#inputSequenceNum, sendCounter: this.#sendCounter, frameCounter: this.#frameCounter, gamepadCounter: this.#gamepadCounter, gamepadQueue: this.#gamepadQueue.length})
             this.#sendCounter = 0
             this.#frameCounter = 0
             this.#gamepadCounter = 0
+
+            this.emitEvent('fps', { fps: fps })
+            
         }, 1000)
 
         this.#inputSequenceNum++ 

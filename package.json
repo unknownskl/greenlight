@@ -5,12 +5,28 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
+    "electron": "electron electron/app.js",
+    "buildosx": "electron-builder --dir --mac",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "UnknownSKL <info@jimkroon.nl>",
   "license": "MIT",
+  "build": {
+    "appId": "unknownskl.xcloud-client",
+    "icon": "assets/icon.png",
+    "mac": {
+      "icon": "assets/icon.icns"
+    },
+    "win": {
+      "icon": "assets/icon.png"
+    }
+  },
   "dependencies": {
     "body-parser": "^1.19.0",
     "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "electron": "^13.1.7",
+    "electron-builder": "^22.11.7"
   }
 }
