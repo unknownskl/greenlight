@@ -53,9 +53,10 @@ window.addEventListener('load', (event) => {
 
                 // Resize UI
                 document.getElementById('loadingScreen').style.display = 'none'
-                document.getElementById('actionBar').style.width = '70px'
-                document.getElementById('actionBar').style.height = '70px'
-                document.getElementById('actionBar').style.right = 'auto'
+                // document.getElementById('actionBar').style.width = '70px'
+                // document.getElementById('actionBar').style.height = '70px'
+                // document.getElementById('actionBar').style.right = 'auto'
+                document.getElementById('actionBar').classList.add("small")
                 document.getElementById('streamingBar').style.display = 'block'
 
                 var streamStatus = document.getElementById('streamStatus')
