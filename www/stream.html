@@ -1,0 +1,188 @@
+<!-- <script src="webrtc.js"></script> -->
+
+<script src="xsdk/client.js"></script>
+<script src="xsdk/gamepad.js"></script>
+<script src="xsdk/channels/base.js"></script>
+<script src="xsdk/channels/video.js"></script>
+<script src="xsdk/channels/audio.js"></script>
+<script src="xsdk/channels/input.js"></script>
+<script src="xsdk/channels/control.js"></script>
+<script src="xsdk/channels/message.js"></script>
+<script src="xsdk/channels/chat.js"></script>
+
+<script type="text/javascript">
+ var client;
+
+ window.addEventListener('load', (event) => {
+
+    client = new xCloudClient()
+
+    client.getConsoles().then((consoles) => {
+        var consoleDiv = document.getElementById('consolesList')
+        var consolesHtml = '';
+
+        for(var device in consoles) {
+            consolesHtml += consoles[device].deviceName+' ('+consoles[device].consoleType+') - '+consoles[device].serverId+' isSameNetwork:'+!consoles[device].outOfHomeWarning+' <button>'+consoles[device].powerState+'</button> <button onclick="client.startSession(\'xhome\', \''+consoles[device].serverId+'\')">Start session</button> <br />'
+        }
+        consoleDiv.innerHTML = consolesHtml
+
+    }).catch((error) => {
+        console.log(error)
+    })
+
+    client.addEventListener('connect', (event) => {
+        // console.log('Connecting to', event.serverId)
+        var streamStatus = document.getElementById('streamStatus')
+        console.log(streamStatus)
+        streamStatus.innerHTML = 'Connecting to '+ event.serverId
+    })
+
+    client.addEventListener('openstream', (event) => {
+        // console.log('Stream is open...')
+
+        var streamStatus = document.getElementById('streamStatus')
+        streamStatus.innerHTML = 'Connected'
+
+        // FPS Counter
+        client.getChannelProcessor('video').addEventListener('fps', (event) => {
+            // console.log('FPS Event:', event)
+            document.getElementById('fpsCounter').innerHTML = event.fps
+        })
+        client.getChannelProcessor('audio').addEventListener('fps', (event) => {
+            // console.log('FPS Event:', event)
+            document.getElementById('audioFpsCounter').innerHTML = event.fps
+        })
+
+        // Performance debug
+        client.getChannelProcessor('video').addEventListener('queue', (event) => {
+            document.getElementById('videoPerformance').innerHTML = JSON.stringify(event)
+        })
+        client.getChannelProcessor('audio').addEventListener('queue', (event) => {
+            document.getElementById('audioPerformance').innerHTML = JSON.stringify(event)
+        })
+        client.getChannelProcessor('input').addEventListener('queue', (event) => {
+            document.getElementById('inputPerformance').innerHTML = JSON.stringify(event)
+        })
+
+        // Load controls
+        document.getElementById('currentBitrate').innerHTML = client.getChannelProcessor('control').getBitrate()
+
+        client.getChannelProcessor('message').addEventListener('dialog', (event) => {
+            console.log('Got dialog event:', event)
+
+            document.getElementById('dialogTitle').innerHTML = event.TitleText
+            document.getElementById('dialogText').innerHTML = event.ContentText
+            document.getElementById('dialogButton1').innerHTML = event.CommandLabel1
+            document.getElementById('dialogButton2').innerHTML = event.CommandLabel2
+            document.getElementById('dialogButton3').innerHTML = event.CommandLabel3
+
+            document.getElementById('dialogButton1').onclick = function(clickEvent){
+                client.getChannelProcessor('message').sendTransaction(event.id, { Result: 0 })
+                client.resetDialog()
+            }
+            document.getElementById('dialogButton2').onclick = function(clickEvent){
+                client.getChannelProcessor('message').sendTransaction(event.id, { Result: 1 })
+                client.resetDialog()
+            }
+            document.getElementById('dialogButton3').onclick = function(clickEvent){
+                client.getChannelProcessor('message').sendTransaction(event.id, { Result: 2 })
+                client.resetDialog()
+            }
+        })
+
+    })
+
+    client.setBitrate = function(bitrate){
+        document.getElementById('currentBitrate').innerHTML = bitrate
+        return this.getChannelProcessor('control').setBitrate(bitrate)
+    }
+
+    client.resetDialog = function(){
+        document.getElementById('dialogTitle').innerHTML = 'No active dialog'
+        document.getElementById('dialogText').innerHTML = ''
+        document.getElementById('dialogButton1').innerHTML = ''
+        document.getElementById('dialogButton2').innerHTML = ''
+        document.getElementById('dialogButton3').innerHTML = ''
+
+        document.getElementById('dialogButton1').onclick = function(){}
+        document.getElementById('dialogButton2').onclick = function(){}
+        document.getElementById('dialogButton3').onclick = function(){}
+    }
+
+ });
+</script>
+
+<div id="consolesList" style="line-height: 200%;">
+    Loading consoles...
+</div>
+
+<hr />
+
+Xbox XCloud POC - <strong>Status:</strong> <span id="streamStatus">Not connected</span> <strong>Video FPS:</strong> <span id="fpsCounter">0</span> <strong>Audio FPS:</strong> <span id="audioFpsCounter">0</span>
+<br />
+<br />
+
+<div class="container" style="display: flex;">
+    <div id="videoHolder" style="border: 1px solid #000000; height: 450px; width: 800px;"></div>
+
+    <div id="uiButtons" style="padding-left: 20px;">
+        <strong>Controls</strong> <br />
+
+        Current bitrate: <span id="currentBitrate">N/A</span> (min: 512, max: 12000) <br />
+        <button onclick="client.setBitrate(client.getChannelProcessor('control').getBitrate()+1000)">+ 1000</button> <button onclick="client.setBitrate(client.getChannelProcessor('control').getBitrate()-1000)">- 1000</button> <br />
+        <button onclick="client.setBitrate(512)">512</button> <button onclick="client.setBitrate(2700)">2700</button> <button onclick="client.setBitrate(5000)">5000</button> <button onclick="client.setBitrate(8000)">8000</button>  <button onclick="client.setBitrate(12000)">12000</button> <br />
+        <br />
+
+        <button onclick="client.reset()">Reset stream</button>
+        <br /><br />
+
+        <strong>Dialog</strong>
+
+        <div style="border: 1px solid #000; padding: 10px;">
+            <span id="dialogTitle">No active dialog</span><br />
+            <span id="dialogText"></span><br />
+
+            <button id="dialogButton1"></button>
+            <button id="dialogButton2"></button>
+            <button id="dialogButton3"></button>
+            
+        </div>
+
+        <br />
+        
+        <strong>Controls</strong>
+
+        <div style="border: 1px solid #000; padding: 10px;">
+            
+            <div style="display: flex;">
+            
+                <div class="dpad" style="text-align: center; padding: 10px;">
+                    <button onclick="client.getChannelProcessor('input').pressButton(0, { DPadUp: 1 })">Up</button> <br />
+                    <button onclick="client.getChannelProcessor('input').pressButton(0, { DPadLeft: 1 })">Left</button> <button onclick="client.getChannelProcessor('input').pressButton(0, { DPadRight: 1 })">Right</button> <br />
+                    <button onclick="client.getChannelProcessor('input').pressButton(0, { DPadDown: 1 })">Down</button> <br />
+                </div>
+
+                <div class="misc" style="text-align: center; padding: 10px;">
+                    <button onclick="client.getChannelProcessor('input').pressButton(0, { Nexus: 1 })">Nexus</button> <br />
+                    <button onclick="client.getChannelProcessor('input').pressButton(0, { View: 1 })">View</button> <button onclick="client.getChannelProcessor('input').pressButton(0, { Menu: 1 })">Menu</button> <br />
+                </div>
+
+                <div class="buttons" style="text-align: center; padding: 10px;">
+                    <button onclick="client.getChannelProcessor('input').pressButton(0, { Y: 1 })">Y</button> <br />
+                    <button onclick="client.getChannelProcessor('input').pressButton(0, { X: 1 })">X</button> <button onclick="client.getChannelProcessor('input').pressButton(0, { B: 1 })">B</button> <br />
+                    <button onclick="client.getChannelProcessor('input').pressButton(0, { A: 1 })">A</button> <br />
+                </div>
+
+            </div>
+            
+        </div>
+
+    </div>
+</div>
+<hr />
+
+<div class="debug">
+    Video: <span id="videoPerformance"></span><br />
+    Audio: <span id="audioPerformance"></span><br />
+    Input: <span id="inputPerformance"></span>
+</div>

@@ -1,0 +1,16 @@
+{
+  "name": "xbox-xcloud-client",
+  "version": "0.1.0",
+  "description": "Xbox XCloud client POC",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "UnknownSKL <info@jimkroon.nl>",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1"
+  }
+}
