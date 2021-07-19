@@ -46,7 +46,11 @@
         // FPS Counter
         client.getChannelProcessor('video').addEventListener('fps', (event) => {
             // console.log('FPS Event:', event)
-            document.getElementById('fpsCounter').innerHTML = event.fps
+            document.getElementById('videoFpsCounter').innerHTML = event.fps
+        })
+        client.getChannelProcessor('video').addEventListener('latency', (event) => {
+            // console.log('FPS Event:', event)
+            document.getElementById('videoLatencyCounter').innerHTML = '(min: '+event.minLatency+'ms/avg: '+event.avgLatency+'ms/max: '+event.maxLatency+'ms)'
         })
         client.getChannelProcessor('audio').addEventListener('fps', (event) => {
             // console.log('FPS Event:', event)
@@ -56,6 +60,9 @@
         // Performance debug
         client.getChannelProcessor('video').addEventListener('queue', (event) => {
             document.getElementById('videoPerformance').innerHTML = JSON.stringify(event)
+        })
+        client.getChannelProcessor('video').addEventListener('latency', (event) => {
+            document.getElementById('videoLatency').innerHTML = JSON.stringify(event)
         })
         client.getChannelProcessor('audio').addEventListener('queue', (event) => {
             document.getElementById('audioPerformance').innerHTML = JSON.stringify(event)
@@ -118,7 +125,7 @@
 
 <hr />
 
-Xbox XCloud POC - <strong>Status:</strong> <span id="streamStatus">Not connected</span> <strong>Video FPS:</strong> <span id="fpsCounter">0</span> <strong>Audio FPS:</strong> <span id="audioFpsCounter">0</span>
+Xbox XCloud POC - <strong>Status:</strong> <span id="streamStatus">Not connected</span> <strong>Video FPS:</strong> <span id="videoFpsCounter">0</span> <span id="videoLatencyCounter">(min: 0ms/avg: 0ms/max: 0ms)</span> <strong>Audio FPS:</strong> <span id="audioFpsCounter">0</span>
 <br />
 <br />
 
@@ -183,6 +190,7 @@ Xbox XCloud POC - <strong>Status:</strong> <span id="streamStatus">Not connected
 
 <div class="debug">
     Video: <span id="videoPerformance"></span><br />
+    Video Latency: <span id="videoLatency"></span><br />
     Audio: <span id="audioPerformance"></span><br />
     Input: <span id="inputPerformance"></span>
 </div>

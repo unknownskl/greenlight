@@ -9,15 +9,61 @@ class VideoChannel extends BaseChannel {
     #frameCounter = 0
     #packetCounter = 0
 
+    #bitrateCounter = []
+    #bitrateTimeNum = 0
+
+    #minVideoLatency = 0
+    #maxVideoLatency = 0
+    #videoLatency = []
+
     #events = {
         'fps': [],
         'queue': [],
+        'bitrate': [],
+        'latency': [],
     }
 
     onOpen(event) {
         setInterval(() => {
+            // calc latency
+            var latencyCount = 0;
+            for(var latencyTime in this.#videoLatency){
+
+                if(this.#videoLatency[latencyTime] !== undefined){
+                    latencyCount += this.#videoLatency[latencyTime]
+                }
+            }
+            // console.log('PROCESS LATENCY:', latencyCount, '/', this.#videoLatency.length, '=', (latencyCount/this.#videoLatency.length))
+            if(this.#videoLatency.length > 0){
+                latencyCount = (latencyCount/this.#videoLatency.length)
+            }
+
+            this.emitEvent('latency', { minLatency: Math.round(this.#minVideoLatency*100)/100, avgLatency: Math.round(latencyCount*100)/100, maxLatency: Math.round(this.#maxVideoLatency*100)/100 })
+            this.#maxVideoLatency = 0
+            this.#minVideoLatency = 0
+            this.#videoLatency = []
+
             var fps = this.#frameCounter
-            this.emitEvent('queue', { videoQueue: Object.keys(this.#frameQueue).length, frameMetadataQueue: this.#frameMetadataQueue.length, frameCounter: fps, packetCounter: this.#packetCounter })
+
+            // Calc actual bitrate
+            var bitrateStable = false
+            var bitrateDataCount = 0
+            var bytesCount = 0
+            for(var bitrateTime in this.#bitrateCounter){
+
+                if(this.#bitrateCounter[bitrateTime] !== undefined){
+                    bytesCount += this.#bitrateCounter[bitrateTime]
+                    bitrateDataCount++
+                }
+            }
+            if(bitrateDataCount == 60) {
+                bitrateStable = true
+            }
+            var bitrate = (bytesCount/1000) // filesize / (minutes* 0.0075)
+
+            // Emit event
+            this.emitEvent('queue', { videoQueue: Object.keys(this.#frameQueue).length, frameMetadataQueue: this.#frameMetadataQueue.length, frameCounter: fps, packetCounter: this.#packetCounter, bitrate: bitrate+' KBps', bitrateStable: bitrateStable })
+            this.emitEvent('bitrate', { bitrate: bitrate+' KBps', bitrateStable: bitrateStable })
             
             this.#packetCounter = 0
             this.#frameCounter = 0
@@ -75,7 +121,12 @@ class VideoChannel extends BaseChannel {
                 frameData: frameDataBuffer,
                 bytesReceived: bytesReceived,
                 serverDataKey: frameData.serverDataKey,
-                fullFrame: false
+                fullFrame: false,
+
+                firstFramePacketArrivalTimeMs: performance.now(),
+                frameSubmittedTimeMs: performance.now(), // performance.now();
+                frameDecodedTimeMs: performance.now(),
+                frameRenderedTimeMs: performance.now(), // Move to render and then add data
             }
         }
 
@@ -83,24 +134,21 @@ class VideoChannel extends BaseChannel {
         if(this.#frameQueue[frameId].bytesReceived === this.#frameQueue[frameId].frameSize){
             this.#frameQueue[frameId].fullFrame = true
             this.#frameCounter++
-            // console.log('xSDK channels/video.js - FrameId '+frameId+' completed. Sending to videobuffer...')
 
-            // Save frame metadata
-            if(this.#currentWidth !== 0 && this.#currentHeight !== 0) {
-                this.#frameMetadataQueue.push({
-                    timestamp: +frameData.timestamp / 10,
-                    frameId: frameData.frameId,
-                    // isKeyframe: false, // this.#frameQueue[frameId].isKeyFrame
-                    serverDataKey: frameData.serverDataKey,
-                    firstFramePacketArrivalTimeMs: performance.now(),
-                    frameSubmittedTimeMs: performance.now(), // performance.now();
-                    frameDecodedTimeMs: performance.now(),
-                    frameRenderedTimeMs: performance.now(),
-                })
-
-                // console.log('xSDK channels/video.js - save frame metadata:', this.#frameMetadataQueue)
+            // Create bitrate array with values
+            if(this.#bitrateTimeNum < 59){
+                this.#bitrateTimeNum++
+            } else {
+                this.#bitrateTimeNum = 0;
+            }
+            if(this.#bitrateCounter[this.#bitrateTimeNum] !== undefined){
+                this.#bitrateCounter[this.#bitrateTimeNum] = this.#frameQueue[frameId].frameData.length
+            } else {
+                // console.log(this.#bitrateCounter)
+                this.#bitrateCounter.push(this.#frameQueue[frameId].frameData.length)
             }
 
+            // console.log('xSDK channels/video.js - FrameId '+frameId+' completed. Sending to videobuffer...')
             this.sendToMediasource()
         }
     }
@@ -122,7 +170,27 @@ class VideoChannel extends BaseChannel {
 
                     delete this.#frameQueue[nextFrame]
                     frameData = this.mergeFrames(frameData, frame.frameData)
+
+                    // We have processed the frames. Queue frames for confirmation
+                    if(this.#currentWidth !== 0 && this.#currentHeight !== 0) {
+                        frame.frameRenderedTimeMs = performance.now()
+                        this.#frameMetadataQueue.push(frame)
+
+                        // Set latency data
+                        if(frame.firstFramePacketArrivalTimeMs !== frame.frameRenderedTimeMs) {
+                            var frameLatency = (frame.frameRenderedTimeMs - frame.firstFramePacketArrivalTimeMs)
+
+                            this.#videoLatency.push(frameLatency)
+                            if(frameLatency > this.#maxVideoLatency){
+                                this.#maxVideoLatency = frameLatency
+                            }
+                            if(frameLatency < this.#minVideoLatency){
+                                this.#minVideoLatency = frameLatency
+                            }
+                        }
+                    }
                 }
+
                 client.getVideoSource().appendBuffer(frameData);
             }
         }
