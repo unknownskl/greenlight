@@ -92,7 +92,7 @@ class AudioChannel extends BaseChannel {
 
         setInterval(() => {
             this.sendToMediasource()
-        }, 10)
+        }, 30)
 
         // var gainNode = this.#audioContext.createGain()
         // gainNode.connect(this.audioContext.destination)
@@ -270,7 +270,7 @@ class AudioChannel extends BaseChannel {
                 // }
 
                 this.#audioFrames += frameCount
-                this.#audioOffset += (frameCount * 0.02) // one frame is 20ms
+                this.#audioOffset += (frameCount * 0.03) // one frame is 20ms
 
                 // console.log(outputBuffer);
                 // outputBuffer = this.str2ab(outputBuffer)
@@ -309,9 +309,11 @@ class AudioChannel extends BaseChannel {
                 source.buffer = audioBuffer
                 source.connect(this.#gainNode)
                 
-                // console.log('AudioContext:', this.#audioContext.currentTime, this.#audioOffset)
+                console.log('AudioContext:', this.#audioContext.currentTime, this.#audioOffset)
                 // source.start(this.#audioOffset)
                 source.start()
+
+                this.sendToMediasource()
                 // console.log('aaaaand play source!')
                 
             } else {
