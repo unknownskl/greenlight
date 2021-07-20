@@ -1,16 +1,3 @@
-// window.addEventListener('load', (event) => {
-//     // Init new OPUS worker
-//     // var myWorker = new Worker('assets/opus/opusworker.js');
-
-//     myWorker.postMessage('xbox opus');
-
-//     myWorker.onmessage = function(e) {
-//         console.log('Message received from worker:', e.data);
-//     }
-
-//     // myWorker.terminate();
-// })
-
 class AudioChannel extends BaseChannel {
 
     #frameQueue = {}
@@ -18,8 +5,6 @@ class AudioChannel extends BaseChannel {
     #audioContext = null
 
     #packetCounter = 0
-
-    #opusDecoder = null
 
     #events = {
         'fps': [],
@@ -44,15 +29,6 @@ class AudioChannel extends BaseChannel {
             latencyHint: 'interactive',
             sampleRate: 48000, //def = 44100,
         });
-        console.log(this.#audioContext)
-
-        // var audioBuffer = this.#audioContext.createBuffer(2, 960, 48000)
-
-        // Init new OPUS worker
-        this.#opusDecoder = new Worker('assets/opus/opusworker.js');
-        this.#opusDecoder.onmessage = function(e) {
-            // console.log('Message received from worker:', e.data);
-        }
 
         // var gainNode = this.#audioContext.createGain()
         // gainNode.connect(this.audioContext.destination)
@@ -61,7 +37,7 @@ class AudioChannel extends BaseChannel {
     onMessage(event) {
         this.#packetCounter++
 
-        if(this.getQueueLength() < 25) {
+        if(this.getQueueLength() < 50) {
 
             var messageBuffer = new DataView(event.data);
             var frameId = messageBuffer.getUint32(0, true);
@@ -86,7 +62,7 @@ class AudioChannel extends BaseChannel {
 
     processFrame(frameData) {
         var frameId = frameData.frameId
-        // console.log('xSDK channels/audio.js - Create frameId '+frameId+' and insert data:', frameData)
+        console.log('xSDK channels/audio.js - Create frameId '+frameId+' and insert data:', frameData)
 
         if(this.#frameQueue[frameId] !== undefined){
             throw 'This should not happen!! pikachu :O'
@@ -99,8 +75,8 @@ class AudioChannel extends BaseChannel {
                 frameData: frameData.frameData
             }
 
-            // this.sendToMediasource()
-            var audio = this.decodeStream(frameData.frameData)
+            this.sendToMediasource()
+            // var audio = this.decodeStream(frameData.frameData)
         }
 
     }
@@ -108,13 +84,6 @@ class AudioChannel extends BaseChannel {
     decodeStream(data) {
         // var worker = this.worker()
         // console.log('worker:', worker)
-
-        // Things we know:
-        // - Codec is opus
-        // - SampleRateHz is 24000 (20000+4000)
-        // - Each frame we get is 20ms of sound
-
-        this.#opusDecoder.postMessage(data);
 
         // this.#audioContext.decodeAudioData(data.buffer, (event) => {
         //     console.log('DECODE:', event)
