@@ -53,9 +53,6 @@ window.addEventListener('load', (event) => {
 
                 // Resize UI
                 document.getElementById('loadingScreen').style.display = 'none'
-                // document.getElementById('actionBar').style.width = '70px'
-                // document.getElementById('actionBar').style.height = '70px'
-                // document.getElementById('actionBar').style.right = 'auto'
                 document.getElementById('actionBar').classList.add("small")
                 document.getElementById('streamingBar').style.display = 'block'
 
@@ -65,7 +62,11 @@ window.addEventListener('load', (event) => {
                 // FPS Counter
                 this.client.getChannelProcessor('video').addEventListener('fps', (event) => {
                     // console.log('FPS Event:', event)
-                    document.getElementById('fpsCounter').innerHTML = event.fps
+                    document.getElementById('videoFpsCounter').innerHTML = event.fps
+                })
+                this.client.getChannelProcessor('video').addEventListener('latency', (event) => {
+                    // console.log('FPS Event:', event)
+                    document.getElementById('videoLatencyCounter').innerHTML = 'min: '+event.minLatency+'ms / avg: '+event.avgLatency+'ms / max: '+event.maxLatency+'ms'
                 })
                 this.client.getChannelProcessor('audio').addEventListener('fps', (event) => {
                     // console.log('FPS Event:', event)
@@ -75,6 +76,9 @@ window.addEventListener('load', (event) => {
                 // Performance debug
                 this.client.getChannelProcessor('video').addEventListener('queue', (event) => {
                     document.getElementById('videoPerformance').innerHTML = JSON.stringify(event)
+                })
+                this.client.getChannelProcessor('video').addEventListener('latency', (event) => {
+                    document.getElementById('videoLatency').innerHTML = JSON.stringify(event)
                 })
                 this.client.getChannelProcessor('audio').addEventListener('queue', (event) => {
                     document.getElementById('audioPerformance').innerHTML = JSON.stringify(event)

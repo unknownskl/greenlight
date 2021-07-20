@@ -75,14 +75,16 @@
 
                 <div id="debugRightTop" style="display: none;">
                     <p>
-                        <strong>Video FPS:</strong> <span id="fpsCounter">0</span><br />
+                        <strong>Video FPS:</strong> <span id="videoFpsCounter">0</span> (<span id="videoLatencyCounter">N/A</span>)<br />
                         <strong>Audio FPS:</strong> <span id="audioFpsCounter">0</span>
                     </p>
                 </div>
 
                 <div id="debugRightBottom" style="display: none;">
+                    <strong>Debug output:</strong>
                     <p>
                         <strong>Video:</strong> <span id="videoPerformance"></span><br />
+                        <strong>Video Latency:</strong> <span id="videoLatency"></span><br />
                         <strong>Audio:</strong> <span id="audioPerformance"></span><br />
                         <strong>Input:</strong> <span id="inputPerformance"></span>
                     </p>
@@ -91,7 +93,6 @@
                 <div id="debugLeftBottom" style="display: none;">
                     <p>
                         <strong>Connection status:</strong> <span id="streamStatus">Not connected</span><br />
-                        
                     </p>
                 </div>
             </div>

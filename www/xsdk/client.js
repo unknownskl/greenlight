@@ -3,34 +3,31 @@ class xCloudClient {
     #activeSessionId = null
 
     #webrtcClient = null
-    #webrtcConfiguration = {
-        iceServers: [{
-            urls: "stun:stun.l.google.com:19302"
-        }, {
-            urls: "stun:stun1.l.google.com:19302"
-        }]
-    }
+    // #webrtcConfiguration = {
+    //     iceServers: [{
+    //         urls: "stun:stun.l.google.com:19302"
+    //     }, {
+    //         urls: "stun:stun1.l.google.com:19302"
+    //     }]
+    // }
+    #webrtcConfiguration = {} // Removed ICE Configuration since update 16/07/2021
+
     #webrtcDataChannels = {};
     #webrtcChannelProcessors = {};
     #webrtcDataChannelsConfig = {
         'video': {
             id: 1,
-            maxPacketLifeTime: undefined,
-            maxRetransmits: undefined,
             ordered: true,
             protocol: '1.0'
         },
         'audio': {
             id: 2,
-            maxPacketLifeTime: undefined,
             maxRetransmits: 0,
             ordered: true,
             protocol: 'audioV1'
         },
         'input': {
             id: 3,
-            maxPacketLifeTime: undefined,
-            maxRetransmits: undefined,
             ordered: true,
             protocol: '1.0'
         },
@@ -43,6 +40,7 @@ class xCloudClient {
             protocol: 'messageV1'
         },
         'chat': {
+            id: 6,
             protocol: "chatV1"
         }
     }
