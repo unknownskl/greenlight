@@ -9,11 +9,13 @@ class AudioChannel extends BaseChannel {
 
     #frameBuffer = ''
     #frameBufferQueue = []
-    #frameBufferSize = 1440 //1440 = 0.2 - 4800 = 1 - 7200 = 1.5
+    #frameBufferSize = 48000 //960 = 20ms/0.02, 1440 = 30ms/0.03, 4800 = 100ms/0.1, 9600 = 200ms/0.2, 48000 = 1000ms/1
+    #frameBufferDuration = 1000 // in MS
 
     #audioContext = null
     #gainNode = null
     #audioOffset = null
+    #audioTimeOffset = 0
     #audioFrames = 0
 
     #packetCounter = 0
@@ -256,7 +258,7 @@ class AudioChannel extends BaseChannel {
                 // Set audio offset
                 if(this.#audioOffset === null){
                     // this.#audioOffset = this.#audioContext.currentTime
-                    this.#audioOffset = 0
+                    this.#audioOffset = this.#audioContext.currentTime
                 }
                 
                 var outputBuffer = this.#frameBufferQueue.shift()
@@ -270,7 +272,9 @@ class AudioChannel extends BaseChannel {
                 // }
 
                 this.#audioFrames += frameCount
-                this.#audioOffset += (frameCount * 0.03) // one frame is 20ms
+                // console.log('audioOffset before:', this.#audioOffset)
+                // this.#audioOffset += (frameCount * (this.#frameBufferDuration/1000)) // one frame is 20ms
+                // console.log('audioOffset after:', this.#audioOffset)
 
                 // console.log(outputBuffer);
                 // outputBuffer = this.str2ab(outputBuffer)
@@ -279,41 +283,48 @@ class AudioChannel extends BaseChannel {
                 // console.log('outputBuffer:', outputBuffer)
 
                 // Create audiostream
-                var audioBuffer = this.#audioContext.createBuffer(2, (this.#frameBufferSize*frameCount), 48000) // 1440? (targetAudioBufferSize) (960 * 1.5)
+                // console.log('targetAudioBufferSize', (this.#frameBufferSize*frameCount))
+                // console.log('targetAudioBufferSize outputBuffer', (outputBuffer.length*frameCount))
+                // var audioBuffer = this.#audioContext.createBuffer(2, (this.#frameBufferSize*frameCount), 48000) // 1440? (targetAudioBufferSize) (960 * 1.5)
 
-                if(audioBuffer.numberOfChannels != 2){
-                    throw 'audioBuffer.numberOfChannels is not 2.. Cannot process audio...'
-                }
+                // if(audioBuffer.numberOfChannels != 2){
+                //     throw 'audioBuffer.numberOfChannels is not 2.. Cannot process audio...'
+                // }
 
-                var leftChannel = audioBuffer.getChannelData(0);
-                var rightChannel = audioBuffer.getChannelData(0);
+                // var leftChannel = audioBuffer.getChannelData(0);
+                // var rightChannel = audioBuffer.getChannelData(0);
 
-                // console.log('play audio: raw', outputBuffer)
-                outputBuffer = Int16Array.from(outputBuffer)
-                // console.log('play audio: int16', outputBuffer)
-                var outputBuffer = this.arrayIntToFloat(outputBuffer)
-                // console.log('play audio: float', outputBuffer)
-                this.#processedCounter++;
+                // // console.log('play audio: raw', outputBuffer)
+                // outputBuffer = Int16Array.from(outputBuffer)
+                // // console.log('play audio: int16', outputBuffer)
+                // var outputBuffer = this.arrayIntToFloat(outputBuffer)
+                // // console.log('play audio: float', outputBuffer)
+                // this.#processedCounter++;
 
-                for (var i = 0; i < outputBuffer.length; i++) {
-                    if(! (i % 2)) {
-                        var channel = leftChannel
-                    } else {
-                        var channel = rightChannel
-                    }
+                // for (var i = 0; i < outputBuffer.length; i++) {
+                //     if(! (i % 2)) {
+                //         var channel = leftChannel
+                //     } else {
+                //         var channel = rightChannel
+                //     }
                     
-                    channel[i] = outputBuffer[i]
-                }
+                //     channel[i] = outputBuffer[i]
+                // }
 
-                var source = this.#audioContext.createBufferSource()
-                source.buffer = audioBuffer
-                source.connect(this.#gainNode)
+                // var source = this.#audioContext.createBufferSource()
+                // source.buffer = audioBuffer
+                // source.connect(this.#gainNode)
                 
-                console.log('AudioContext:', this.#audioContext.currentTime, this.#audioOffset)
-                // source.start(this.#audioOffset)
-                source.start()
+                // console.log('AudioContext:', this.#audioContext.currentTime, (this.#audioContext.currentTime - this.#audioOffset), performance.now())
+                // // source.start(this.#audioOffset)
+                // source.start()
 
-                this.sendToMediasource()
+                this.playFrameBuffer(outputBuffer, (this.#audioOffset +this.#audioTimeOffset))
+                this.#audioTimeOffset = this.#audioTimeOffset + (this.#frameBufferDuration/1000)
+
+                if(this.#frameBufferQueue.length > 0){
+                    this.sendToMediasource()
+                }
                 // console.log('aaaaand play source!')
                 
             } else {
@@ -323,6 +334,40 @@ class AudioChannel extends BaseChannel {
         } else {
             // console.log('AudioSource is not running:', this.#audioContext.state)
         }
+    }
+
+    playFrameBuffer(outputBuffer, timing) {
+        // console.log('Play frame at timing:', timing)
+        var audioBuffer = this.#audioContext.createBuffer(2, outputBuffer.length, 48000) // 1440? (targetAudioBufferSize) (960 * 1.5)
+
+        if(audioBuffer.numberOfChannels != 2){
+            throw 'audioBuffer.numberOfChannels is not 2.. Cannot process audio...'
+        }
+
+        var leftChannel = audioBuffer.getChannelData(0);
+        var rightChannel = audioBuffer.getChannelData(1);
+
+        outputBuffer = Int16Array.from(outputBuffer)
+        var outputBuffer = this.arrayIntToFloat(outputBuffer)
+        this.#processedCounter++;
+
+        for (var i = 0; i < outputBuffer.length; i++) {
+            if(! (i % 2)) {
+                leftChannel[i] = outputBuffer[i]
+            } else {
+                rightChannel[i] = outputBuffer[i]
+            }
+        }
+
+        var source = this.#audioContext.createBufferSource()
+        source.buffer = audioBuffer
+        source.connect(this.#gainNode)
+        
+        console.log('AudioContext:', (this.#audioContext.currentTime-timing)+'ms', this.#audioContext.currentTime, timing)
+        // console.log('audio buffer:', audioBuffer, leftChannel)
+        // source.start(this.#audioOffset)
+        // source.start(timing)
+        source.start()
     }
 
     arrayIntToFloat(intArray){
