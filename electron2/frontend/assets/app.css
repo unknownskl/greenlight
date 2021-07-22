@@ -1,0 +1,353 @@
+body {
+    background: rgb(26, 27, 30);
+    font-family: "Segoe UI",SegoeUI,"Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
+#actionBar {
+    backdrop-filter: blur(20px);
+
+    background: rgba(0, 0, 0, 0.55);
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    height: 70px;
+    overflow: hidden;
+    z-index: 80;
+    
+    /* -webkit-transition: all 1s linear;
+    -moz-transition: all 1s linear;
+    -o-transition: all 1s linear;
+    transition: all 1s linear; */
+}
+#actionBar.small {
+    right: auto;
+    width: 70px;
+
+    /* -webkit-transition: all 1s linear;
+    -moz-transition: all 1s linear;
+    -o-transition: all 1s linear;
+    transition: all 1s linear; */
+}
+
+#actionBar a#logo {
+    float: left;
+    color: #ffffff;
+}
+#actionBar a#logo svg {
+    fill: #ffffff;
+    padding: 19px;
+    opacity: 0.5;
+}
+
+#actionBar a#logo img {
+    padding: 15px;
+    opacity: 0.5;
+    border-radius: 20px;
+}
+
+#actionBar a#logo:hover img, #actionBar a#logo:hover svg {
+    opacity: 0.75;
+}
+
+
+
+#actionBar ul {
+    float: left;
+    margin: 0px;
+    padding: 0px;
+    padding-top: 14px;
+}
+
+#actionBar ul li {
+    display: inline-block;
+    padding-right: 10px;
+}
+
+#actionBar ul li a {
+    display: inline-block;
+    color: #ffffff;
+    text-decoration: none;
+    padding: 10px;
+    opacity: 0.5;
+}
+
+#actionBar ul li a:hover {
+    opacity: 0.75;
+}
+
+
+
+
+#appContent {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    overflow-y: scroll;
+    z-index: 50;
+}
+
+#consolesListView {
+    padding-top: 70px;
+}
+
+#consolesList {
+    display: flex;
+}
+
+#consolesList div.consoleItem {
+    background: #000000;
+    width: 30%;
+    margin: 48px;
+    text-align: center;
+    color: #ffffff;
+    padding-top: 40px;
+    padding-bottom: 40px;
+}
+
+#consolesList div.consoleItem h1 {
+    font-size: 28px;
+}
+
+#consolesList div.consoleItem h2 {
+    font-size: 14px;
+    font-weight: normal;
+    opacity: 0.3;
+}
+
+#consolesList div.consoleItem p {
+    padding-top: 10px;
+    padding-bottom: 15px;
+}
+
+
+.btn {
+    height: 48px;
+    font-size: 14px;
+    color: #ffffff;
+    background-color: rgb(26, 27, 30);  
+    border: 0px;
+    border-radius: 5px;
+    text-transform: uppercase;
+    font-weight: bold;
+    padding-top: 0px;
+    padding-left: 16px;
+    padding-right: 16px;
+    min-width: 140px;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background-color: green;
+}
+
+.btn-cancel {
+    background-color: red;
+}
+
+
+
+#consolesList div.consoleItem .btn {
+    padding-top: 16px;
+}
+
+
+
+/* #streamingView {
+
+} */
+
+#streamingView div#loadingScreen {
+    background: #000000;
+    width: 30%;
+    text-align: center;
+    color: #ffffff;
+    padding-top: 40px;
+    padding-bottom: 40px;
+    margin: 118px auto;
+}
+
+#streamingView div#loadingScreen p {
+    opacity: 0.5;
+}
+
+#streamingView #videoHolder {
+    position: fixed;
+    top: 0px;
+    left: 70px;
+    right: 0px;
+    bottom: 0px;
+}
+
+.lds-ring {
+    display: inline-block;
+    position: relative;
+    width: 80px;
+    height: 80px;
+}
+.lds-ring div {
+    box-sizing: border-box;
+    display: block;
+    position: absolute;
+    width: 64px;
+    height: 64px;
+    margin: 8px;
+    border: 8px solid green;
+    border-radius: 50%;
+    animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    border-color: green transparent transparent transparent;
+}
+.lds-ring div:nth-child(1) {
+    animation-delay: -0.45s;
+}
+.lds-ring div:nth-child(2) {
+    animation-delay: -0.3s;
+}
+.lds-ring div:nth-child(3) {
+    animation-delay: -0.15s;
+}
+@keyframes lds-ring {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+  
+#streamingView #streamingBar {
+    backdrop-filter: blur(20px);
+
+    background: rgba(0, 0, 0, 0.55);
+    position: fixed;
+    top: 70px;
+    left: 0px;
+    width: 70px;
+    /* height: 70px; */
+    overflow: hidden;
+    z-index: 80;
+}
+
+#streamingView #streamingBar ul {
+    margin: 0px;
+    padding: 0px;
+}
+
+#streamingView #streamingBar ul li {
+    display: block;
+}
+
+#streamingView #streamingBar ul li img {
+    fill: #ffffff;
+    color: #ffffff;
+    padding: 19px;
+    opacity: 0.5;
+}
+
+#streamingView #streamingBar ul li a:hover img {
+    opacity: 0.75;
+}
+
+
+
+
+#streamingView #debugLeftBottom {
+    backdrop-filter: blur(20px);
+    background-color: #000000;
+    color: #ffffff;
+    position: fixed;
+    left: 0px;
+    bottom: 0px;
+    padding: 20px;   
+    z-index: 90;
+    opacity: 0.5;
+}
+
+#streamingView #debugRightBottom {
+    backdrop-filter: blur(20px);
+    background-color: #000000;
+    color: #ffffff;
+    position: fixed;
+    right: 0px;
+    bottom: 0px;
+    padding: 20px;
+    z-index: 90;
+    opacity: 0.5;
+}
+
+#streamingView #debugRightTop {
+    backdrop-filter: blur(20px);
+    background-color: #000000;
+    color: #ffffff;
+    position: fixed;
+    right: 0px;
+    top: 0px;
+    padding: 20px;
+    z-index: 90;
+    opacity: 0.5;
+}
+
+#streamingView #debugLeftBottom:hover, #streamingView #debugRightBottom:hover, #streamingView #debugRightTop:hover {
+    opacity: 1;
+}
+
+#streamingView #debugLeftBottom p, #streamingView #debugRightBottom p, #streamingView #debugRightTop p {
+    font-size: 12px;
+    padding: 0px;
+    margin: 0px;
+}
+
+#streamingView #modalDialog {
+    position: fixed;
+    overflow: hidden;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    z-index: 85;
+}
+#streamingView .modalDialogBg {
+    backdrop-filter: blur(20px);
+    background-color: #000000;
+    position: fixed;
+    overflow: hidden;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    opacity: 0.5;
+    z-index: 86;
+}
+
+#streamingView .modalDialogBox {
+    position: absolute;
+    background-color: #000000;
+    top: 25%;
+    left: 0px;
+    right: 0px;
+    z-index: 87;
+    opacity: 1;
+    color: #ffffff; 
+    box-shadow: 0px 0px 100px rgba(0, 95, 0, 0.1)
+}
+
+#streamingView .modalDialogContainer {
+    width: 70%;
+    margin: 50px auto;
+}
+
+#streamingView .modalDialogContainer h1 {
+    font-size: 36px;
+    margin-bottom: 30px;
+}
+
+#streamingView .modalDialogContainer p {
+    font-size: 16px;
+    margin-bottom: 40px;
+}
+
+#streamingView .modalDialogContainer button.btn {
+    margin-right: 20px;
+}

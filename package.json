@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node app.js",
     "electron": "electron electron/app.js",
+    "electron2": "electron electron2/app.js",
     "buildosx": "electron-builder --dir --mac",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
