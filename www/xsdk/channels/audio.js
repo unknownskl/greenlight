@@ -18,7 +18,7 @@ class AudioChannel extends BaseChannel {
     #audioOffset = null
     #audioTimeOffset = 0
     #audioFrames = 0
-    #audioDelay = 20 // in MS
+    #audioDelay = 30 // in MS
     #audioBuffers = {
         num: 0,
         buffers: []
@@ -64,6 +64,7 @@ class AudioChannel extends BaseChannel {
 
         // For volume? See https://developer.mozilla.org/en-US/docs/Web/API/GainNode
         this.#gainNode = this.#audioContext.createGain(),
+        this.#gainNode.gain.value = 2 // 200 %
         this.#gainNode.connect(this.#audioContext.destination)
 
         // Init new OPUS worker
@@ -147,7 +148,8 @@ class AudioChannel extends BaseChannel {
 
                 // Set audio offset
                 if(this.#audioOffset === null){
-                    this.#audioOffset = this.#audioContext.currentTime
+                    this.#audioOffset = Math.round(this.#audioContext.currentTime * 100) / 100
+                    // this.#audioOffset = this.#audioContext.currentTime
                 }
                 
                 // Single frame
@@ -252,8 +254,28 @@ class AudioChannel extends BaseChannel {
         // }
         // console.log('play audio frame: framecount:', this.#audioFrames, 'now():', performance.now(),'this.#audioOffset', this.#audioOffset, 'start at:', this.#audioTimeOffset, 'media currentTime:', this.#audioContext.currentTime, 'media start at:', (this.#audioOffset+this.#audioTimeOffset+(this.#audioDelay/1000)))
         // console.log('play audio frame: framecount:', this.#audioFrames, 'now():', performance.now(), 'media currentTime:', this.#audioContext.currentTime, 'media start at:', (this.#audioOffset+this.#audioTimeOffset+(this.#audioDelay/1000)))
-                
-        source.start((this.#audioOffset+this.#audioTimeOffset+(this.#audioDelay/1000)));
+        
+        var startTime = (this.#audioOffset+this.#audioTimeOffset+(this.#audioDelay/1000)) // in MS
+        var delay = (startTime-this.#audioContext.currentTime) // in MS
+        // console.log('delay:', delay, 'startTime:', startTime) // Delay should always > 0. If it drops < 0, increase the delay, or drop sound buffer packet maybe?
+        
+        var delaySteps = 3
+        if(delay < 0.03) {
+            // var newLength = (this.#frameBufferDuration - (-delay*1000)) // New length in ms
+            console.log('Drop audio packet because the timing are off. Audio should have played ', delay, 'ms ago... Increasing audio delay:', this.#audioDelay, '=>', this.#audioDelay+delaySteps)
+            this.#audioDelay += delaySteps
+            // if(newLength < 29) {
+            //     var playbackRate = 
+            // }
+            // source.playbackRate.value = (newLength / this.#frameBufferDuration)
+            // source.start(startTime);
+        } else if(delay > 10) {
+            console.log('Drop audio packet because the timing are off. Audio should have played ', delay, 'ms ago... Decreasing audio delay:', this.#audioDelay, '=>', this.#audioDelay+delaySteps)
+            this.#audioDelay -= delaySteps
+        } else {
+            // source.playbackRate.value = 1.0
+            source.start(startTime);
+        }
     }
 
     arrayIntToFloat(intArray){
