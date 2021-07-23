@@ -4,11 +4,58 @@
     <meta charset="UTF-8">
     <title>Xbox xHome Streaming</title>
 
+    <script>
+      function setWebTokens(uhs, userToken){
+        document.getElementById('token_web_uhs').value = uhs
+        document.getElementById('token_web_usertoken').value = userToken
+      }
+      function setStreamingToken(streamingToken){
+        document.getElementById('token_streaming_token').value = streamingToken
+      }
+    </script>
+
   </head>
   <body>
-    <h1>💖 Hello World!</h1>
-    <p>Welcome to your Electron application.</p>
+    <input id="token_web_uhs" value="" type="hidden" />
+    <input id="token_web_usertoken" value="" type="hidden" />
+    <input id="token_streaming_token" value="" type="hidden" />
 
-    <a href="#"  onclick="window.open('https://account.xbox.com/account/signin?returnUrl=https%3A%2F%2Fwww.xbox.com%2Fen-US%2Fplay&ru=https%3A%2F%2Fwww.xbox.com%2Fen-US%2Fplay', '_blank', 'top=500,left=200,frame=true,nodeIntegration=no')">Start</a>
+    <div id="appRoot">
+      
+      <div id="authView" style="display:none;">
+        <!--
+          Authentication View
+        -->
+        <div class="authBox">
+          <h1>Login to Xbox</h1>
+
+          <p>
+            Please authenticate below to access xHome Streaming
+          </p>
+          <br />
+
+          <center>
+            <a href="#" class="btn btn-primary" onclick="window.open('https://account.xbox.com/account/signin?returnUrl=https%3A%2F%2Fwww.xbox.com%2Fen-US%2Fplay&ru=https%3A%2F%2Fwww.xbox.com%2Fen-US%2Fplay', '_blank', 'top=500,left=200,frame=true,nodeIntegration=no')">Login</a>
+          </center>
+        </div>
+      </div>
+
+      <!--
+        Application View
+      -->
+
+      <div id="appView" style="display:none;">
+        <h1>Application View</h1>
+      </div>
+
+      <!--
+        Streaming View
+      -->
+      <div id="streamingView" style="display:none;">
+        <h1>Streaming View</h1>
+      </div>
+
+    </div>
+
   </body>
 </html>

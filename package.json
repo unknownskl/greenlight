@@ -4,7 +4,7 @@
   "description": "Xbox XCloud client POC",
   "main": ".webpack/main",
   "scripts": {
-    "start": "electron-forge start",
+    "start": "ISDEV=true electron-forge start",
     "electron2": "electron electron2/app.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "package": "electron-forge package",
@@ -17,7 +17,8 @@
   "dependencies": {
     "body-parser": "^1.19.0",
     "electron-squirrel-startup": "^1.0.0",
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "xbox-webapi": "^1.2.0"
   },
   "devDependencies": {
     "@electron-forge/cli": "^6.0.0-beta.58",

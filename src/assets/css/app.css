@@ -1,0 +1,90 @@
+body, * {
+    padding: 0px;
+    margin: 0px;
+}
+
+body {
+    background: rgb(26, 27, 30);
+    font-family: "Segoe UI",SegoeUI,"Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
+#appRoot {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    overflow-y: scroll;
+}
+
+#authView, #appView, #streamingView {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    overflow-y: scroll;
+}
+
+#authView .authBox {
+    background: #000000;
+    margin: 70px auto;
+    width: 50%;
+    max-width: 600px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+#authView .authBox h1 {
+    color: #ffffff;
+    text-align: center;
+    display: block;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    font-weight: normal;
+}
+
+#authView .authBox p {
+    color: #ffffff;
+    text-align: center;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 20px;
+    font-size: 14px;
+}
+
+
+/** Button classes **/
+
+.btn {
+    height: 48px;
+    font-size: 14px;
+    color: #ffffff;
+    background-color: rgb(26, 27, 30);  
+    border: 0px;
+    border-radius: 5px;
+    text-transform: uppercase;
+    font-weight: bold;
+    padding-top: 0px;
+    padding-left: 16px;
+    padding-right: 16px;
+    min-width: 140px;
+    cursor: pointer;
+    display: inline-block;
+    margin-bottom: 20px;
+}
+
+a.btn {
+    padding-top: 16px;
+    height: 32px;
+    text-decoration: none;
+    text-align: center;
+}
+
+.btn-primary {
+    background-color: green;
+}
+
+.btn-cancel {
+    background-color: red;
+}
