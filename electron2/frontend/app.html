@@ -1,0 +1,185 @@
+<html>
+    <head>
+        <title>xCloud Homestreaming</title>
+
+        <link rel="stylesheet" href="assets/app.css">
+
+        <script type="text/javascript">
+            LIBOPUS_WASM_URL = "assets/opus/libopus.wasm";
+        </script>
+        <script type="text/javascript" src="assets/opus/libopus.wasm.js"></script>
+
+        <script src="assets/app.js"></script>
+
+        <script src="xsdk/client.js"></script>
+        <script src="xsdk/gamepad.js"></script>
+        <script src="xsdk/channels/base.js"></script>
+        <script src="xsdk/channels/video.js"></script>
+        <script src="xsdk/channels/audio.js"></script>
+        <script src="xsdk/channels/input.js"></script>
+        <script src="xsdk/channels/control.js"></script>
+        <script src="xsdk/channels/message.js"></script>
+        <script src="xsdk/channels/chat.js"></script>
+    </head>
+    <body>
+
+        <header id="actionBar">
+            <a href="app.html" id="logo" title="Home">
+                <!-- <img src="assets/icon.png" alt="Home" width="40" height="40"> -->
+                <svg viewBox="0 0 2048 2048" width="30" height="30" class="Button-module__buttonIcon___RpBoa Button-module__noMargin___3ENP7 Buttons-module__xenonIcon___2B2nv Icon-module__icon___2qpA9"><path d="M492 158q-4 0-5-1v-2l2-3Q614 77 746 39t278-39q143 0 277 38t256 113l3 2q-3 5-6 5-8 0-17-2t-17-4q-9-1-18-1t-18 0q-47 0-95 9t-96 24-92 34-88 39q-22 11-44 21t-43 25h-5q-43-27-100-54t-120-49-123-36-113-14q-19 0-39 4t-34 4zm251 412q-44 53-101 128T525 862t-117 184-102 189-72 180-28 156q0 17 2 37t8 36l-1 2-2 1-4-2q-103-139-156-293T0 1024q0-98 20-199t60-196 96-180 130-153q5-4 15-5t15-2q30 0 66 14t75 38 76 53 74 60 65 59 51 50l1 4-1 3zm968-281q7 0 16 1t15 6q73 71 130 155t96 178 59 194 21 201q0 173-53 328t-156 293l-6 1-2-3q3-4 5-14t3-21 2-22 1-16q0-69-27-155t-72-180-102-190-117-184-117-163-102-129l-1-3 1-3q21-21 50-49t65-58 73-61 77-53 75-38 66-15zm-687 533q29 18 56 42t54 47q42 37 102 94t127 128 131 149 117 155 84 149 32 129q0 23-6 43t-23 37q-31 31-69 57t-76 49q-120 72-254 109t-275 38q-141 0-274-37t-255-110q-17-10-43-26t-51-37-47-40-27-39q-7-20-7-45 0-54 30-122t78-142 110-149 123-142 118-123 97-92q34-30 72-64t76-58z"></path></svg>
+            </a>
+
+            <ul class="menu">
+                <li><a href="#" onclick="app.openConsoleView()" title="List your available consoles">My Consoles</a></li>
+                <li><a href="#" onclick="app.switchView('streamingView');document.getElementById('loadingScreen').style.display='block';document.getElementById('streamingBar').style.display = 'block';" title="Debug view to test Streaming View">Streaming View</a></li>
+                <li><a href="stream.html">Debug Page</a></li>
+            </ul>
+        </header>
+
+        <div id="appContent">
+
+            <div id="consolesListView" style="display:none;">
+                <div id="consolesList">
+                    
+                </div>
+            </div>
+
+            <div id="streamingView" style="display:none;">
+                <div id="loadingScreen" style="display:none;">
+                    <h1>Loading...</h1>
+
+                    <div class="lds-ring"><div></div><div></div><div></div><div></div></div><br />
+
+                    <p>We are getting your stream ready...</p>
+                </div>
+
+                <div id="streamingBar" style="display: none;">
+                    <ul>
+                        <li><a href="#" onclick="app.openControls()" title="Show on-screen controls"><img src="assets/icons/gamepad.svg" width="30" height="30" alt="Show controls"></a></li>
+                        <li><a href="#" onclick="app.openSettingsMenu()" title="Settings"><img src="assets/icons/settings.svg" width="30" height="30" alt="Settings"></a></li>
+                        <li><a href="#" onclick="app.openDebugStats()" title="Debug stats"><img src="assets/icons/stats.svg" width="30" height="30" alt="Stats"></a></li>
+                    </ul>
+                </div>
+                
+                <div id="videoHolder"></div>
+
+                <div id="modalDialog" style="display: none;">
+                    <div class="modalDialogBg"></div>
+                    <div class="modalDialogBox">
+                        <div class="modalDialogContainer">
+                            <h1 id="dialogTitle">No active dialog</h1>
+
+                            <p id="dialogText">There is no active dialog. This is an error. Please try gain.</p>
+
+                            <button class="btn" id="dialogButton1">Button1</button>
+                            <button class="btn" id="dialogButton2">Button2</button>
+                            <button class="btn" id="dialogButton3">Button3</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="debugRightTop" style="display: none;">
+                    <p>
+                        <strong>Video FPS:</strong> <span id="videoFpsCounter">0</span> (<span id="videoLatencyCounter">N/A</span>)<br />
+                        <strong>Audio FPS:</strong> <span id="audioFpsCounter">0</span>
+                    </p>
+                </div>
+
+                <div id="debugRightBottom" style="display: none;">
+                    <strong>Debug output:</strong>
+                    <p>
+                        <strong>Video:</strong> <span id="videoPerformance"></span><br />
+                        <strong>Video Latency:</strong> <span id="videoLatency"></span><br />
+                        <strong>Audio:</strong> <span id="audioPerformance"></span><br />
+                        <strong>Input:</strong> <span id="inputPerformance"></span>
+                    </p>
+                </div>
+
+                <div id="debugLeftBottom" style="display: none;">
+                    <p>
+                        <strong>Connection status:</strong> <span id="streamStatus">Not connected</span><br />
+                    </p>
+                </div>
+            </div>
+        
+
+            <div id="testView" style="display:none;">
+                <!-- <div id="consolesList" style="line-height: 200%;">
+                    Loading consoles...
+                </div> -->
+
+                <hr />
+
+                <!-- Xbox XCloud POC - <strong>Status:</strong> <span id="streamStatus">Not connected</span> <strong>Video FPS:</strong> <span id="fpsCounter">0</span> <strong>Audio FPS:</strong> <span id="audioFpsCounter">0</span> -->
+                <br />
+                <br />
+
+                <div class="container" style="display: flex;">
+                    <!-- <div id="videoHolder" style="border: 1px solid #000000; height: 450px; width: 800px;"></div> -->
+
+                    <div id="uiButtons" style="padding-left: 20px;">
+                        <strong>Controls</strong> <br />
+
+                        Current bitrate: <span id="currentBitrate">N/A</span> (min: 512, max: 12000) <br />
+                        <button onclick="client.setBitrate(client.getChannelProcessor('control').getBitrate()+1000)">+ 1000</button> <button onclick="client.setBitrate(client.getChannelProcessor('control').getBitrate()-1000)">- 1000</button> <br />
+                        <button onclick="client.setBitrate(512)">512</button> <button onclick="client.setBitrate(2700)">2700</button> <button onclick="client.setBitrate(5000)">5000</button> <button onclick="client.setBitrate(8000)">8000</button>  <button onclick="client.setBitrate(12000)">12000</button> <br />
+                        <br />
+
+                        <button onclick="client.reset()">Reset stream</button>
+                        <br /><br />
+
+                        <!-- <strong>Dialog</strong>
+
+                        <div style="border: 1px solid #000; padding: 10px;">
+                            <span id="dialogTitle">No active dialog</span><br />
+                            <span id="dialogText"></span><br />
+
+                            <button id="dialogButton1"></button>
+                            <button id="dialogButton2"></button>
+                            <button id="dialogButton3"></button>
+                            
+                        </div>
+
+                        <br /> -->
+                        
+                        <strong>Controls</strong>
+
+                        <div style="border: 1px solid #000; padding: 10px;">
+                            
+                            <div style="display: flex;">
+                            
+                                <div class="dpad" style="text-align: center; padding: 10px;">
+                                    <button onclick="client.getChannelProcessor('input').pressButton(0, { DPadUp: 1 })">Up</button> <br />
+                                    <button onclick="client.getChannelProcessor('input').pressButton(0, { DPadLeft: 1 })">Left</button> <button onclick="client.getChannelProcessor('input').pressButton(0, { DPadRight: 1 })">Right</button> <br />
+                                    <button onclick="client.getChannelProcessor('input').pressButton(0, { DPadDown: 1 })">Down</button> <br />
+                                </div>
+
+                                <div class="misc" style="text-align: center; padding: 10px;">
+                                    <button onclick="client.getChannelProcessor('input').pressButton(0, { Nexus: 1 })">Nexus</button> <br />
+                                    <button onclick="client.getChannelProcessor('input').pressButton(0, { View: 1 })">View</button> <button onclick="client.getChannelProcessor('input').pressButton(0, { Menu: 1 })">Menu</button> <br />
+                                </div>
+
+                                <div class="buttons" style="text-align: center; padding: 10px;">
+                                    <button onclick="client.getChannelProcessor('input').pressButton(0, { Y: 1 })">Y</button> <br />
+                                    <button onclick="client.getChannelProcessor('input').pressButton(0, { X: 1 })">X</button> <button onclick="client.getChannelProcessor('input').pressButton(0, { B: 1 })">B</button> <br />
+                                    <button onclick="client.getChannelProcessor('input').pressButton(0, { A: 1 })">A</button> <br />
+                                </div>
+
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+                <hr />
+
+                <!-- <div class="debug">
+                    Video: <span id="videoPerformance"></span><br />
+                    Audio: <span id="audioPerformance"></span><br />
+                    Input: <span id="inputPerformance"></span>
+                </div> -->
+            </div>
+        
+        </div>
+
+    </body>
+</html>
