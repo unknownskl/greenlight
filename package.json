@@ -1,33 +1,88 @@
 {
   "name": "xbox-xcloud-client",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Xbox XCloud client POC",
-  "main": "app.js",
+  "main": ".webpack/main",
   "scripts": {
-    "start": "node app.js",
-    "electron": "electron electron/app.js",
+    "start": "electron-forge start",
     "electron2": "electron electron2/app.js",
-    "buildosx": "electron-builder --dir --mac",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "publish": "electron-forge publish",
+    "lint": "eslint --ext .ts ."
   },
   "author": "UnknownSKL <info@jimkroon.nl>",
   "license": "MIT",
-  "build": {
-    "appId": "unknownskl.xcloud-client",
-    "icon": "assets/icon.png",
-    "mac": {
-      "icon": "assets/icon.icns"
-    },
-    "win": {
-      "icon": "assets/icon.png"
-    }
-  },
   "dependencies": {
     "body-parser": "^1.19.0",
+    "electron-squirrel-startup": "^1.0.0",
     "express": "^4.17.1"
   },
   "devDependencies": {
-    "electron": "^13.1.7",
-    "electron-builder": "^22.11.7"
+    "@electron-forge/cli": "^6.0.0-beta.58",
+    "@electron-forge/maker-deb": "^6.0.0-beta.58",
+    "@electron-forge/maker-rpm": "^6.0.0-beta.58",
+    "@electron-forge/maker-squirrel": "^6.0.0-beta.58",
+    "@electron-forge/maker-zip": "^6.0.0-beta.58",
+    "@electron-forge/plugin-webpack": "^6.0.0-beta.58",
+    "@typescript-eslint/eslint-plugin": "^4.28.4",
+    "@typescript-eslint/parser": "^4.28.4",
+    "@vercel/webpack-asset-relocator-loader": "^1.6.0",
+    "css-loader": "^6.2.0",
+    "electron": "13.1.7",
+    "eslint": "^7.31.0",
+    "eslint-plugin-import": "^2.23.4",
+    "fork-ts-checker-webpack-plugin": "^6.2.12",
+    "node-loader": "^2.0.0",
+    "style-loader": "^3.2.1",
+    "ts-loader": "^9.2.3",
+    "typescript": "^4.3.5"
+  },
+  "config": {
+    "forge": {
+      "packagerConfig": {},
+      "makers": [
+        {
+          "name": "@electron-forge/maker-squirrel",
+          "config": {
+            "name": "xbox_xcloud_client"
+          }
+        },
+        {
+          "name": "@electron-forge/maker-zip",
+          "platforms": [
+            "darwin"
+          ]
+        },
+        {
+          "name": "@electron-forge/maker-deb",
+          "config": {}
+        },
+        {
+          "name": "@electron-forge/maker-rpm",
+          "config": {}
+        }
+      ],
+      "plugins": [
+        [
+          "@electron-forge/plugin-webpack",
+          {
+            "mainConfig": "./webpack.main.config.js",
+            "renderer": {
+              "config": "./webpack.renderer.config.js",
+              "entryPoints": [
+                {
+                  "html": "./src/index.html",
+                  "js": "./src/renderer.ts",
+                  "name": "main_window"
+                }
+              ]
+            },
+            "devContentSecurityPolicy": "default-src 'self' 'unsafe-inline' data:; script-src 'self' 'unsafe-eval' 'unsafe-inline' data:"
+          }
+        ]
+      ]
+    }
   }
 }

@@ -1,0 +1,15 @@
+{
+  "configurations": [
+  {
+    "type": "node",
+    "request": "launch",
+    "name": "xbox-xcloud-client",
+    "runtimeExecutable": "npm",
+    // runtimeArgs will be passed directly to your Electron application
+    "runtimeArgs": [
+      "start"
+    ],
+    "cwd": "${workspaceFolder}",
+  }
+  ]
+}
