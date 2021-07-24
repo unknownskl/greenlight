@@ -186,11 +186,22 @@ body {
     height: 70px;
     overflow: hidden;
     z-index: 80;
+    opacity: 1;
+
+    -webkit-transition: opacity 0.3s ease-in-out;
+    -moz-transition: opacity 0.3s ease-in-out;
+    -ms-transition: opacity 0.3s ease-in-out;
+    -o-transition: opacity 0.3s ease-in-out;
+    transition: opacity 0.3s ease-in-out;
     
     /* -webkit-transition: all 1s linear;
     -moz-transition: all 1s linear;
     -o-transition: all 1s linear;
     transition: all 1s linear; */
+}
+
+#actionBar.hidden {
+    opacity: 0;
 }
 
 #actionBar.small {
@@ -478,6 +489,16 @@ body {
     z-index: 98;
     border-radius: 50px;
     opacity: 0.75;
+
+    -webkit-transition: opacity 1s ease-in-out;
+    -moz-transition: opacity 1s ease-in-out;
+    -ms-transition: opacity 1s ease-in-out;
+    -o-transition: opacity 1s ease-in-out;
+    transition: opacity 1s ease-in-out;
+}
+
+#streamingView #networkIndicator.hidden {
+    opacity: 0;
 }
 
 #streamingView #networkIndicator span.icon {

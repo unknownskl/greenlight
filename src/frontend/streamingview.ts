@@ -120,11 +120,17 @@ export default class StreamingView {
 
             const actionBar = (<HTMLInputElement>document.getElementById('networkIndicator'))
             if(overallQuality === 'low' || overallQuality === 'bad'){
-                actionBar.style.display = 'block'
+                // actionBar.style.display = 'block'
+                if(actionBar.classList.contains('hidden'))
+                    actionBar.classList.remove('hidden')
+
                 this._networkIndicatorLastToggle = Math.floor(Date.now() / 1000)
             } else {
                 if((Math.floor(Date.now() / 1000) - this._networkIndicatorLastToggle) > 3){
-                    actionBar.style.display = 'none'
+                    // actionBar.style.display = 'none'
+                    if(! actionBar.classList.contains('hidden'))
+                        actionBar.classList.add('hidden')
+
                     this._networkIndicatorLastToggle = Math.floor(Date.now() / 1000)
                 }
             }
@@ -365,14 +371,18 @@ export default class StreamingView {
             const lastMovement = (Date.now()-this._lastMouseMovement)/1000
             // console.log('last Movement:', lastMovement)
 
-            if(lastMovement > 5){
+            if(lastMovement > 3){
                 const actionBar = (<HTMLInputElement>document.getElementById('actionBar'))
-                actionBar.style.display = 'none'
+                // actionBar.style.display = 'none'
+                if(! actionBar.classList.contains('hidden'))
+                        actionBar.classList.add('hidden')
             } else {
                 const actionBar = (<HTMLInputElement>document.getElementById('actionBar'))
-                actionBar.style.display = 'block'
+                // actionBar.style.display = 'block'
+                if(actionBar.classList.contains('hidden'))
+                        actionBar.classList.remove('hidden')
             }
-        }, 1000)
+        }, 250)
     }
 
     updateDebugLayer(){
