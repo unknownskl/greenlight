@@ -68,7 +68,7 @@ class AudioChannel extends BaseChannel {
                 this.softReset()
                 setTimeout(() => {
                     this.softReset()
-                }, 1000)
+                }, 300)
             }
 
             // Calc queue
@@ -299,7 +299,7 @@ class AudioChannel extends BaseChannel {
                 this.softReset()
                 setTimeout(() => {
                     this.softReset()
-                }, 1000)
+                }, 300)
             }
 
             
