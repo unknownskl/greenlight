@@ -20,6 +20,10 @@
     },
     "win": {
       "icon": "src/assets/icon.ico"
+    },
+    "nsis": {
+      "shortcutName": "xHome Streaming",
+      "runAfterFinish": true
     }
   },
   "author": "UnknownSKL <info@jimkroon.nl>",
