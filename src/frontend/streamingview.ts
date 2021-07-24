@@ -66,6 +66,9 @@ export default class StreamingView {
                     case 78:
                         this._application._StreamingView._streamClient._webrtcClient.getChannelProcessor('input').pressButton(0, { Nexus: 1 })
                         break;
+                    case 48:
+                        this._application._StreamingView._streamClient._webrtcClient.getChannelProcessor('audio').softReset()
+                        break;
                 }
             }
         };
@@ -145,6 +148,10 @@ export default class StreamingView {
                 // console.log('FPS Event:', event)
                 document.getElementById('audioFpsCounter').innerHTML = event.fps
             })
+            this._streamClient._webrtcClient.getChannelProcessor('audio').addEventListener('latency', (event:any) => {
+                // console.log('FPS Event:', event)
+                document.getElementById('audioLatencyCounter').innerHTML = 'min: '+event.minLatency+'ms / avg: '+event.avgLatency+'ms / max: '+event.maxLatency+'ms'
+            })
 
             // Debug: Performance
             this._streamClient._webrtcClient.getChannelProcessor('video').addEventListener('queue', (event:any) => {
@@ -155,6 +162,9 @@ export default class StreamingView {
             })
             this._streamClient._webrtcClient.getChannelProcessor('audio').addEventListener('queue', (event:any) => {
                 document.getElementById('audioPerformance').innerHTML = JSON.stringify(event)
+            })
+            this._streamClient._webrtcClient.getChannelProcessor('audio').addEventListener('latency', (event:any) => {
+                document.getElementById('audioLatency').innerHTML = JSON.stringify(event)
             })
             this._streamClient._webrtcClient.getChannelProcessor('input').addEventListener('queue', (event:any) => {
                 document.getElementById('inputPerformance').innerHTML = JSON.stringify(event)
@@ -271,18 +281,20 @@ export default class StreamingView {
         return new Promise((resolve, reject) => {
             console.log('StreamingView.js: Loaded view')
 
-            this._mouseInterval = setInterval(() => {
-                const lastMovement = (Date.now()-this._lastMouseMovement)/1000
-                // console.log('last Movement:', lastMovement)
+            if(this._mouseInterval != undefined){
+                this._mouseInterval = setInterval(() => {
+                    const lastMovement = (Date.now()-this._lastMouseMovement)/1000
+                    // console.log('last Movement:', lastMovement)
 
-                if(lastMovement > 5){
-                    const actionBar = (<HTMLInputElement>document.getElementById('actionBar'))
-                    actionBar.style.display = 'none'
-                } else {
-                    const actionBar = (<HTMLInputElement>document.getElementById('actionBar'))
-                    actionBar.style.display = 'block'
-                }
-            }, 1000)
+                    if(lastMovement > 5){
+                        const actionBar = (<HTMLInputElement>document.getElementById('actionBar'))
+                        actionBar.style.display = 'none'
+                    } else {
+                        const actionBar = (<HTMLInputElement>document.getElementById('actionBar'))
+                        actionBar.style.display = 'block'
+                    }
+                }, 1000)
+            }
 
             resolve(true)
         })

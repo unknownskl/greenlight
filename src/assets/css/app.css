@@ -367,7 +367,7 @@ body {
 }
 
 #streamingView #debugLeftBottom {
-    backdrop-filter: blur(20px);
+    /* backdrop-filter: blur(20px); */
     background-color: #000000;
     color: #ffffff;
     position: fixed;
@@ -375,11 +375,11 @@ body {
     bottom: 0px;
     padding: 20px;   
     z-index: 90;
-    opacity: 0.5;
+    opacity: 0.7;
 }
 
 #streamingView #debugRightBottom {
-    backdrop-filter: blur(20px);
+    /* backdrop-filter: blur(20px); */
     background-color: #000000;
     color: #ffffff;
     position: fixed;
@@ -387,11 +387,11 @@ body {
     bottom: 0px;
     padding: 20px;
     z-index: 90;
-    opacity: 0.5;
+    opacity: 0.7;
 }
 
 #streamingView #debugRightTop {
-    backdrop-filter: blur(20px);
+    /* backdrop-filter: blur(20px); */
     background-color: #000000;
     color: #ffffff;
     position: fixed;
@@ -399,7 +399,7 @@ body {
     top: 0px;
     padding: 20px;
     z-index: 90;
-    opacity: 0.5;
+    opacity: 0.7;
 }
 
 #streamingView #debugLeftBottom:hover, #streamingView #debugRightBottom:hover, #streamingView #debugRightTop:hover {
