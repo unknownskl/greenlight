@@ -1,4 +1,5 @@
 import { app, BrowserWindow, session } from 'electron';
+import https from 'https'
 // import path from 'path';
 import interceptToken from './backend/cookieIntercept'
 import TokenStore from './backend/TokenStore';
@@ -20,14 +21,15 @@ let mainWindow:BrowserWindow
 const createWindow = (): void => {
   // Create the browser window.
     mainWindow = new BrowserWindow({
-    height: 600,
-    width: 800,
+    width: 1500,
+    height: 900,
 
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
       enableRemoteModule: true,
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
+      webSecurity: false,
       devTools: (process.env.ISDEV !== undefined) ? true : false
     }
   });
@@ -57,6 +59,7 @@ app.on('ready', () => {
     ]
   }, interceptToken.bind(tokenStore))
 
+  // Handle login
   tokenStore.addEventListener('onwebtoken', (tokens:any) => {
     mainWindow.webContents.executeJavaScript("setWebTokens('"+tokens.uhs+"', '"+tokens.userToken+"');");
   })
@@ -66,6 +69,75 @@ app.on('ready', () => {
   })
 
   createWindow()
+
+  // Check for existing cookies on load
+  mainWindow.webContents.on('did-finish-load', (e:Event) => {
+
+    session.defaultSession.cookies.get({ url: 'https://www.xbox.com' }).then((cookies) => {
+      for(const cookie in cookies){
+        if(cookies[cookie].name === 'XBXXtkhttp://xboxlive.com'){
+          // Process streaming token
+          const cookieValue = decodeURIComponent(cookies[cookie].value)
+          const cookieJson = JSON.parse(cookieValue)
+          
+          tokenStore.setWebTokens(cookieJson.UserClaims.uhs, cookieJson.Token)
+
+        } else if(cookies[cookie].name === 'XBXXtkhttp://gssv.xboxlive.com/'){
+          // Process streaming token
+          const cookieValue = decodeURIComponent(cookies[cookie].value)
+          const cookieJson = JSON.parse(cookieValue)
+          
+          // tokenStore.setStreamingToken(cookieJson.Token) // @TODO: Retrieve gamestreaming token and replace with this one.
+
+          // Retrieve GSToken
+          const data = JSON.stringify({
+              "token": cookieJson.Token,
+              "offeringId": "xhome"
+          })
+
+          const options = {
+              hostname: 'xhome.gssv-play-prod.xboxlive.com',
+              port: 443,
+              path: '/v2/login/user',
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'Content-Length': data.length
+              }
+          }
+          const req = https.request(options, (res) => {
+              let responseData = ''
+              
+              res.on('data', (data) => {
+                  responseData += data
+              })
+
+              res.on('close', () => {
+                  if(res.statusCode == 200){
+                      const jsonHomeToken = JSON.parse(responseData.toString())
+                      tokenStore.setStreamingToken(jsonHomeToken.gsToken)
+                  } else {
+                      console.log('- Error while retrieving from url: ...')
+                      console.log('  statuscode:', res.statusCode)
+                      console.log('  body:', responseData.toString())
+                  }
+              })
+          })
+          
+          req.on('error', (error) => {
+              console.log('- Error while retrieving from url: ...')
+              console.log('  Error:', error)
+          })
+
+          req.write(data)
+          req.end()
+        }
+      }
+
+    }).catch((error) => {
+      console.log(error)
+    })
+  });
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common

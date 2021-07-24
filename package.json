@@ -80,7 +80,7 @@
                 }
               ]
             },
-            "devContentSecurityPolicy": "default-src 'self' 'unsafe-inline' data:; script-src 'self' 'unsafe-eval' 'unsafe-inline' data:"
+            "devContentSecurityPolicy": "connect-src 'self' https://*.xbox.com https://*.xboxlive.com; default-src 'self' 'unsafe-inline' data:; script-src 'self' 'unsafe-eval' 'unsafe-inline' data:"
           }
         ]
       ]
