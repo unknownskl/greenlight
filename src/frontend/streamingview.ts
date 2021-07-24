@@ -23,10 +23,50 @@ export default class StreamingView {
         }
         document.onkeypress = (e:any) => {
             e = e || window.event;
+
+            switch(e.keyCode){
+                case 126:
+                    this._showDebug = (this._showDebug === false) ? true : false
+                    this.updateDebugLayer()
+                    break;
+            }
+        };
+        document.onkeydown = (e:any) => {
+            e = e || window.event;
             console.log('pressed key:', e.keyCode)
-            if(e.keyCode === 126) { // This is the tidle (~)
-                this._showDebug = (this._showDebug === false) ? true : false
-                this.updateDebugLayer()
+
+            if(this._application._StreamingView._streamClient !== undefined){
+                switch(e.keyCode){
+                    case 38:
+                        this._application._StreamingView._streamClient._webrtcClient.getChannelProcessor('input').pressButton(0, { DPadUp: 1 })
+                        break;
+                    case 40:
+                        this._application._StreamingView._streamClient._webrtcClient.getChannelProcessor('input').pressButton(0, { DPadDown: 1 })
+                        break;
+                    case 37:
+                        this._application._StreamingView._streamClient._webrtcClient.getChannelProcessor('input').pressButton(0, { DPadLeft: 1 })
+                        break;
+                    case 39:
+                        this._application._StreamingView._streamClient._webrtcClient.getChannelProcessor('input').pressButton(0, { DPadRight: 1 })
+                        break;
+                    case 13:
+                    case 65:
+                        this._application._StreamingView._streamClient._webrtcClient.getChannelProcessor('input').pressButton(0, { A: 1 })
+                        break;
+                    case 8:
+                    case 66:
+                        this._application._StreamingView._streamClient._webrtcClient.getChannelProcessor('input').pressButton(0, { B: 1 })
+                        break;
+                    case 88:
+                        this._application._StreamingView._streamClient._webrtcClient.getChannelProcessor('input').pressButton(0, { X: 1 })
+                        break;
+                    case 89:
+                        this._application._StreamingView._streamClient._webrtcClient.getChannelProcessor('input').pressButton(0, { Y: 1 })
+                        break;
+                    case 78:
+                        this._application._StreamingView._streamClient._webrtcClient.getChannelProcessor('input').pressButton(0, { Nexus: 1 })
+                        break;
+                }
             }
         };
 
