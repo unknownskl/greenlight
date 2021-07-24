@@ -21,6 +21,9 @@
     "win": {
       "icon": "src/assets/icon.ico"
     },
+    "linux": {
+      "target": "deb"
+    },
     "nsis": {
       "shortcutName": "xHome Streaming",
       "runAfterFinish": true
