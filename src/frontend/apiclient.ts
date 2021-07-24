@@ -46,4 +46,8 @@ export default class apiClient {
     getProfile() {
         return this.get('https://profile.xboxlive.com/users/me/profile/settings?settings=GameDisplayName,GameDisplayPicRaw,Gamerscore,Gamertag')
     }
+
+    getFriends() {
+        return this.get('https://peoplehub.xboxlive.com/users/me/people/social/decoration/preferredcolor,detail,multiplayersummary,presencedetail')
+    }
 }

@@ -98,6 +98,83 @@ body {
     background-size: cover;
 }
 
+#appView #appContent {
+    padding-top: 70px;
+}
+
+#appView #appContent #consolesList {
+    width: 70%;
+    position: absolute;
+    top: 70px;
+    left: 0px;
+}
+
+#appView #appContent #friendsList {
+    width: 30%;
+    backdrop-filter: blur(20px);
+
+    background: rgba(0, 0, 0, 0.55);
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    padding-top: 70px;
+    max-width: 400px;
+    overflow-y: auto;
+}
+
+#appView #appContent #friendsList p.center {
+    color: #ffffff;
+    padding: 20px;
+    text-align: center;
+}
+
+#appView #appContent #friendsList .lds-ring {
+    margin: 20px auto;
+}
+
+#appView #friendsList ul.people {
+    padding-top: 10px;
+}
+
+#appView #friendsList ul.people li {
+    display: block;
+    height: 55px;
+    padding-top: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#appView #friendsList ul.people li.offline {
+    opacity: 0.3;
+}
+#appView #friendsList ul.people li.offline:hover {
+    opacity: 0.7;
+}
+
+#appView #friendsList ul.people li .userimage {
+    display: block;
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+    float: left;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+#appView #friendsList ul.people div.userinfo p {
+    color: #ffffff;
+    font-size: 14px;
+    padding-bottom: 5px;
+}
+
+#appView #friendsList ul.people div.userinfo p.userstatus {
+    font-size: 12px;
+    opacity: 0.7;
+}
+
+
+/* Actionbar */
+
 #actionBar {
     backdrop-filter: blur(20px);
 
@@ -184,11 +261,11 @@ body {
     color: #ffffff;
     text-decoration: none;
     padding: 10px;
-    opacity: 0.5;
+    opacity: 0.7;
 }
 
 #actionBar ul li a:hover {
-    opacity: 0.75;
+    opacity: 1;
 }
 
 
@@ -203,9 +280,9 @@ body {
     font-weight: bold;
 }
 
-#actionBar ul.userProfile li {
-    opacity: 0.5;
-}
+/* #actionBar ul.userProfile li {
+    opacity: 0.7;
+} */
 
 #actionBar ul.userProfile li span#actionBarUserGamerscore {
     color: #ffffff;
