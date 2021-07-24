@@ -31,6 +31,7 @@ const createWindow = (): void => {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
       webSecurity: false,
       devTools: (process.env.ISDEV !== undefined) ? true : false
+      // devTools:true
     }
   });
 

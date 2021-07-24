@@ -29,6 +29,10 @@ export default class Application {
             }
         }, 1000)
 
+        const debugStreamingView = (<HTMLInputElement>document.getElementById('actionBarStreamingView'))
+        debugStreamingView.style.display = (process.env.ISDEV !== undefined) ? 'block': 'none'
+        
+
         this._router.addEventListener('onviewshow', (event:any) => {
             // Check if we need the actionbar
             if(event.view === 'app' || event.view === 'streaming'){
@@ -57,7 +61,7 @@ export default class Application {
                 if(this._StreamingView === undefined){
                     this._StreamingView = new StreamingView(this)
                 }
-                this._AppView.load()
+                this._StreamingView.load()
                 
             } else if(event.previousView === 'streaming'){
                 // Unload appview
@@ -72,6 +76,9 @@ export default class Application {
             this._router.setView('app')
         })
         document.getElementById('actionBarStreamingView').addEventListener('click', (e:Event) => {
+            this._router.setView('streaming')
+        })
+        document.getElementById('actionBarStreamingViewActive').addEventListener('click', (e:Event) => {
             this._router.setView('streaming')
         })
     }
@@ -114,6 +121,13 @@ export default class Application {
                 this._router.setView('app')
             }
         })
+    }
+
+    startStream(type: string, serverId:string):void {
+        this._router.setView('streaming')
+        if(this._StreamingView !== undefined){
+            this._StreamingView.startStream(type, serverId)
+        }
     }
 
     addEventListener(name: string, callback: EventCallback):void{

@@ -1,9 +1,11 @@
 import Application from "./application";
 // import https from 'https'
+import apiClient from "./apiclient";
 
 export default class AppView {
 
     _application:Application;
+    _apiClient;
 
     constructor(application:Application){
         this._application = application
@@ -39,42 +41,62 @@ export default class AppView {
             console.log('ERROR retrieve consoles',  error)
         });
 
-        // const options = {
-        //     host: 'uks.gssv-play-prodxhome.xboxlive.com',
-        //     path: '/v6/servers/home',
-        //     headers: {
-        //         'Authorization': 'Bearer '+this._application._tokenStore._streamingToken,
-        //         'Content-Type': 'application/json; charset=utf-8'
-        //     }
-        // };
-          
-        // const req = https.request(options, (res) => {
-        //     console.log('statusCode:', res.statusCode);
-        //     console.log('headers:', res.headers);
-            
+        // this._apiClient = XboxApi({
+        //     uhs: this._application._tokenStore._web.uhs,
+        //     userToken: this._application._tokenStore._web.userToken
+        // })
 
-        //     // res.on('data', (d) => {
+        this._apiClient = new apiClient(this._application._tokenStore._web.uhs, this._application._tokenStore._web.userToken)
+        this._apiClient.getProfile().then((profile:any) => {
+            console.log(profile)
+
+            if(profile.profileUsers[0] !== undefined){
+
+                const userProfileName = (<HTMLInputElement>document.getElementById('actionBarUserProfile'))
+                const userProfileLogo = (<HTMLInputElement>document.getElementById('userProfileLogo'))
+                const userProfileGamerscore = (<HTMLInputElement>document.getElementById('actionBarUserGamerscore'))
                 
-        //     // });
 
-        //     let data = '';
-        //     res.on('data', chunk => {
-        //         data += chunk;
-        //     })
-        //     res.on('end', () => {
-        //         if(res.statusCode !== 200){
-        //             console.log('Error fetching consoles. Status:', res.statusCode, 'Body:', data)
-        //         } else {
-        //             const responseData = JSON.parse(data);
-        //             console.log('Got console status:',responseData)
-        //         }
-        //     })
-        // });
+                const settings = profile.profileUsers[0].settings
+                for(const setting in settings){
+                    
+                    switch(settings[setting].id){
+                        case 'GameDisplayName':
+                            // console.log('game name:', settings[setting].value)
+                            userProfileName.innerText = settings[setting].value
+                            break;
+                        case 'GameDisplayPicRaw':
+                            userProfileLogo.src = settings[setting].value
+                            break;
+                        case 'Gamerscore':
+                            userProfileGamerscore.innerText = settings[setting].value
+                            break;
+                        case 'GamerTag':
+                            console.log('game name:', settings[setting].value)
+                            break;
+                    }
+                }
+
+                // @TODO: Show user menu
+            }
+        }).catch((error) => {
+            console.log('error:', error)
+        })
+
+        // Load user profile
+        // this._apiClient.isAuthenticated().then(() => {
+        //     console.log('User is authenticated.')
         
-        // req.on('error', (e) => {
-        //     console.error(e);
-        // });
-        // req.end();
+        //     this._apiClient.getProvider('profile').getUserProfile().then((result:any) => {
+        //         console.log('resolve user profile:', result)
+        
+        //     }).catch(function(error:any){
+        //         console.log('reject', error)
+        //     })
+        
+        // }).catch(function(error:any){
+        //     console.log('User is not authenticated. Run authentication flow first.', error)
+        // })
           
     }
 
@@ -98,12 +120,18 @@ export default class AppView {
             consolesHtml += '   <h2>('+consoles[device].consoleType+': '+consoles[device].serverId+')</h2>'
             consolesHtml += '   <p>'+powerState+'</p>'
 
-            consolesHtml += '   <button class="btn btn-primary" onclick="app.openStreamingView(\'xhome\',\''+consoles[device].serverId+'\')">Connect</p>'
+            consolesHtml += '   <button class="btn btn-primary" id="console_connect_'+device+'">Connect</p>'
             
             // consolesHtml += consoles[device].deviceName+' ('+consoles[device].consoleType+') - '+consoles[device].serverId+' isSameNetwork:'+!consoles[device].outOfHomeWarning+' <button>'+consoles[device].powerState+'</button> <button onclick="client.startSession(\'xhome\', \''+consoles[device].serverId+'\')">Start session</button>'
             consolesHtml += '</div>'
         }
         consolesList.innerHTML = consolesHtml
+        
+        for(const device in consoles) {
+            document.getElementById('console_connect_'+device).addEventListener('click', (e:Event) => {
+                this._application.startStream('xhome', consoles[device].serverId)
+            })
+        }
     }
 
     load(){

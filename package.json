@@ -30,6 +30,7 @@
     "@typescript-eslint/eslint-plugin": "^4.28.4",
     "@typescript-eslint/parser": "^4.28.4",
     "@vercel/webpack-asset-relocator-loader": "^1.6.0",
+    "copy-webpack-plugin": "^9.0.1",
     "css-loader": "^6.2.0",
     "electron": "13.1.7",
     "eslint": "^7.31.0",
@@ -80,7 +81,7 @@
                 }
               ]
             },
-            "devContentSecurityPolicy": "connect-src 'self' https://*.xbox.com https://*.xboxlive.com; default-src 'self' 'unsafe-inline' data:; script-src 'self' 'unsafe-eval' 'unsafe-inline' data:"
+            "devContentSecurityPolicy": "img-src https://*.xboxlive.com data:; media-src 'unsafe-inline' blob:; connect-src 'self' https://*.xbox.com https://*.xboxlive.com; default-src 'self' 'unsafe-inline' data:; script-src 'self' 'unsafe-eval' 'unsafe-inline' data:"
           }
         ]
       ]

@@ -12,7 +12,30 @@
       function setStreamingToken(streamingToken){
         document.getElementById('token_streaming_token').value = streamingToken
       }
+      window.addEventListener('resize', () => {
+        if(document.getElementById('videoRender') !== null && document.getElementById('videoHolder') !== null) {
+          var videoRender = document.getElementById('videoRender')
+          var videoHolder = document.getElementById('videoHolder')
+          videoRender.width = videoHolder.clientWidth
+          videoRender.height = videoHolder.clientHeight
+        }
+      })
     </script>
+
+    <script type="text/javascript">
+      LIBOPUS_WASM_URL = "assets/opus/libopus.wasm";
+    </script>
+    <script type="text/javascript" src="assets/opus/libopus.wasm.js"></script>
+
+    <script src="assets/xsdk/client.js"></script>
+    <script src="assets/xsdk/gamepad.js"></script>
+    <script src="assets/xsdk/channels/base.js"></script>
+    <script src="assets/xsdk/channels/video.js"></script>
+    <script src="assets/xsdk/channels/audio.js"></script>
+    <script src="assets/xsdk/channels/input.js"></script>
+    <script src="assets/xsdk/channels/control.js"></script>
+    <script src="assets/xsdk/channels/message.js"></script>
+    <script src="assets/xsdk/channels/chat.js"></script>
 
   </head>
   <body>
@@ -60,8 +83,22 @@
 
         <ul class="menu">
             <li><a href="#" id="actionBarMyConsoles" title="List your available consoles">My Consoles</a></li>
-            <li><a href="#" id="actionBarStreamingView" title="Debug view to test Streaming View">Streaming View</a></li>
+            <li><a href="#" id="actionBarStreamingViewActive" title="Current open stream" style="display:none;">Active stream</a></li>
+            <li><a href="#" id="actionBarStreamingView" title="Debug view to test Streaming View"style="display:none;">Streaming View</a></li>
         </ul>
+
+        <a href="#" id="userProfileLogoLink" title="Home">
+          <img src="assets/icon.png" id="userProfileLogo" alt="Home" width="40" height="40">
+        </a>
+
+        <ul class="userProfile">
+          <li>
+            <span class="gamerscore">G</span>
+            <span id="actionBarUserGamerscore" title="Gamerscore"></span>
+          </li>
+          <li><a href="#" id="actionBarUserProfile" title="Profile">N/A</a></li>
+        </ul>
+
       </header>
 
       <!--
@@ -95,6 +132,46 @@
           <div class="lds-ring"><div></div><div></div><div></div><div></div></div><br />
 
           <p>We are getting your stream ready...</p>
+        </div>
+
+        <div id="videoHolder" style="display: none;"></div>
+
+        <div id="modalDialog" style="display: none;">
+            <div class="modalDialogBg"></div>
+            <div class="modalDialogBox">
+                <div class="modalDialogContainer">
+                    <h1 id="dialogTitle">No active dialog</h1>
+
+                    <p id="dialogText">There is no active dialog. This is an error. Please try gain.</p>
+
+                    <button class="btn" id="dialogButton1">Button1</button>
+                    <button class="btn" id="dialogButton2">Button2</button>
+                    <button class="btn" id="dialogButton3">Button3</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="debugRightTop" style="display: none;">
+            <p>
+                <strong>Video FPS:</strong> <span id="videoFpsCounter">0</span> (<span id="videoLatencyCounter">N/A</span>)<br />
+                <strong>Audio FPS:</strong> <span id="audioFpsCounter">0</span>
+            </p>
+        </div>
+
+        <div id="debugRightBottom" style="display: none;">
+            <strong>Debug output:</strong>
+            <p>
+                <strong>Video:</strong> <span id="videoPerformance"></span><br />
+                <strong>Video Latency:</strong> <span id="videoLatency"></span><br />
+                <strong>Audio:</strong> <span id="audioPerformance"></span><br />
+                <strong>Input:</strong> <span id="inputPerformance"></span>
+            </p>
+        </div>
+
+        <div id="debugLeftBottom" style="display: none;">
+            <p>
+                <strong>Connection status:</strong> <span id="streamStatus">Not connected</span><br />
+            </p>
         </div>
 
       </div>

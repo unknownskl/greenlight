@@ -129,10 +129,26 @@ body {
     opacity: 0.75;
 }
 
+/* User profile */
+#actionBar a#userProfileLogoLink {
+    float: right;
+    color: #ffffff;
+    margin-top: 15px;
+    margin-right: 20px;
+}
+
+
 
 
 #actionBar ul {
     float: left;
+    margin: 0px;
+    padding: 0px;
+    padding-top: 14px;
+}
+
+#actionBar ul.userProfile {
+    float: right;
     margin: 0px;
     padding: 0px;
     padding-top: 14px;
@@ -153,6 +169,27 @@ body {
 
 #actionBar ul li a:hover {
     opacity: 0.75;
+}
+
+
+#actionBar ul.userProfile span.gamerscore {
+    background: #ffcf40;
+    display: inline-block;
+    border-radius: 10px;
+    width: 20px;
+    height: 20px;
+    text-align: center;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+#actionBar ul.userProfile li {
+    opacity: 0.5;
+}
+
+#actionBar ul.userProfile li span#actionBarUserGamerscore {
+    color: #ffffff;
+    padding-top: 4px;
 }
 
 
@@ -197,6 +234,14 @@ body {
 /**
  Streaming View
 **/
+
+#streamingView #videoHolder {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+}
 
 #streamingView div#loadingScreen {
     background: #000000;
@@ -309,6 +354,7 @@ body {
 
 #streamingView .modalDialogContainer button.btn {
     margin-right: 20px;
+    padding-top: 0px;
 }
 
 /**
