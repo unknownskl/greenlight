@@ -15,9 +15,11 @@
   "build": {
     "appId": "unknownskl.xcloud-client",
     "mac": {
+      "target": "zip",
       "icon": "src/assets/icon.icns"
     },
-    "windows": {
+    "win": {
+      "target": "zip",
       "icon": "src/assets/icon.ico"
     }
   },
