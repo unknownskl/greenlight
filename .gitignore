@@ -4,3 +4,4 @@ docs.md
 out/
 old/
 .webpack/
+dist

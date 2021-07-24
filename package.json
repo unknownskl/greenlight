@@ -5,7 +5,7 @@
   "main": ".webpack/main",
   "scripts": {
     "start": "ISDEV=true electron-forge start",
-    "electron2": "electron electron2/app.js",
+    "compile": "electron-forge make",
     "test": "echo \"Error: no test specified\" && exit 1",
     "package": "electron-forge package",
     "make": "electron-forge make",
