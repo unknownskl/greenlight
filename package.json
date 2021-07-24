@@ -19,7 +19,6 @@
       "icon": "src/assets/icon.icns"
     },
     "win": {
-      "target": "zip",
       "icon": "src/assets/icon.ico"
     }
   },
