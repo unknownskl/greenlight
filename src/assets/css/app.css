@@ -466,6 +466,39 @@ body {
     padding-top: 0px;
 }
 
+
+#streamingView #networkIndicator {
+    /* backdrop-filter: blur(20px); */
+    background: #000000;
+    position: relative;
+    margin: 100px auto;
+    min-width: 100px;
+    max-width: 250px;
+    height: 100px;
+    z-index: 98;
+    border-radius: 50px;
+    opacity: 0.75;
+}
+
+#streamingView #networkIndicator span.icon {
+    position: relative;
+    top: 4px;
+    margin-left: 30px;
+    margin-right: 30px;
+    font-size: 40px;
+    color: #ffffff;
+    display: inline-block;
+}
+
+#streamingView #networkIndicator p {
+    font-size: 12px;
+    color: #ffffff;
+    display: inline-block;
+
+    position: relative;
+    top: 18px;
+}
+
 /**
  Button Classes
 **/
