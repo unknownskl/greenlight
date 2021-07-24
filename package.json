@@ -1,6 +1,6 @@
 {
   "name": "xbox-xcloud-client",
-  "version": "1.0.0",
+  "version": "1.0.0-beta1",
   "description": "Xbox XCloud client POC",
   "main": ".webpack/main",
   "scripts": {
