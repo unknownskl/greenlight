@@ -12,8 +12,8 @@ class VideoChannel extends BaseChannel {
     #bitrateCounter = []
     #bitrateTimeNum = 0
 
-    #minVideoLatency = 0
-    #maxVideoLatency = 0
+    #minVideoLatency
+    #maxVideoLatency
     #videoLatency = []
 
     #events = {
@@ -39,8 +39,8 @@ class VideoChannel extends BaseChannel {
             }
 
             this.emitEvent('latency', { minLatency: Math.round(this.#minVideoLatency*100)/100, avgLatency: Math.round(latencyCount*100)/100, maxLatency: Math.round(this.#maxVideoLatency*100)/100 })
-            this.#maxVideoLatency = 0
-            this.#minVideoLatency = 0
+            this.#maxVideoLatency = undefined
+            this.#minVideoLatency = undefined
             this.#videoLatency = []
 
             var fps = this.#frameCounter
@@ -181,10 +181,10 @@ class VideoChannel extends BaseChannel {
                             var frameLatency = (frame.frameRenderedTimeMs - frame.firstFramePacketArrivalTimeMs)
 
                             this.#videoLatency.push(frameLatency)
-                            if(frameLatency > this.#maxVideoLatency){
+                            if(frameLatency > this.#maxVideoLatency || this.#maxVideoLatency === undefined){
                                 this.#maxVideoLatency = frameLatency
                             }
-                            if(frameLatency < this.#minVideoLatency){
+                            if(frameLatency < this.#minVideoLatency|| this.#minVideoLatency === undefined){
                                 this.#minVideoLatency = frameLatency
                             }
                         }

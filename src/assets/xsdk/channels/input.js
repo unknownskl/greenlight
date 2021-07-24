@@ -8,14 +8,44 @@ class InputChannel extends BaseChannel {
     #gamepadCounter = 0
     #frameCounter = 0
 
+    #maxInputLatency
+    #minInputLatency
+    #inputLatency = []
+
     #events = {
         'queue': [],
         'fps': [],
+        'latency': []
     }
 
     onOpen(event) {
         setInterval(() => {
             // console.log('xSDK channels/input.js - [performance] sequence:', this.#inputSequenceNum, 'gamepadQueue size:', Object.keys(this.#gamepadQueue).length)
+            // calc latency
+            var latencyCount = 0;
+            for(var latencyTime in this.#inputLatency){
+
+                if(this.#inputLatency[latencyTime] !== undefined){
+                    latencyCount += this.#inputLatency[latencyTime]
+                }
+            }
+            
+            if(this.#inputLatency.length > 0){
+                latencyCount = (latencyCount/this.#inputLatency.length)
+            }
+
+            if(this.#minInputLatency === undefined)
+                this.#minInputLatency = 0
+            
+            if(this.#maxInputLatency === undefined)
+                this.#maxInputLatency = 0
+
+            this.emitEvent('latency', { minLatency: Math.round(this.#minInputLatency*100)/100, avgLatency: Math.round(latencyCount*100)/100, maxLatency: Math.round(this.#maxInputLatency*100)/100 })
+            this.#maxInputLatency = undefined
+            this.#minInputLatency = undefined
+            this.#inputLatency = []
+            
+            // Calc fps
             var fps = this.#frameCounter
             this.emitEvent('queue', { sequenceNum: this.#inputSequenceNum, sendCounter: this.#sendCounter, frameCounter: this.#frameCounter, gamepadCounter: this.#gamepadCounter, gamepadQueue: this.#gamepadQueue.length})
             this.#sendCounter = 0
@@ -107,6 +137,7 @@ class InputChannel extends BaseChannel {
 
                 if(gamepadMetadata.length > 0) {
                     try {
+                        console.log('input: gamepadMetadata', gamepadMetadata[0])
                         dataOffset = this.generateGamepadFrame(reportArrayView, gamepadMetadata, dataOffset)
                     } catch (error) {
                         console.log('ERROR generateGamepadFrame: reportArrayView, gamepadMetadata, dataOffset', reportArrayView, gamepadMetadata, dataOffset)
@@ -150,7 +181,8 @@ class InputChannel extends BaseChannel {
         state.GamepadIndex = index
         state.PhysicalPhysicality = 0
         state.VirtualPhysicality = 0
-        state.Dirty = true
+        state.Dirty = true,
+        state.timingGamepadState = performance.now()
 
         this.#gamepadQueue.push(state)
     }
@@ -225,6 +257,16 @@ class InputChannel extends BaseChannel {
             // console.log('RAINWAY WEBRTC: generateMetadataFrame values i', firstFramePacketArrivalTimeMs, 'r', frameSubmittedTimeMs, 'o', frameDecodedTimeMs, 'h', frameRenderedTimeMs, 'c', framePacketTime, 'd', frameDateNow, 'a.serverDataKey', frame.serverDataKey)
 
             offset += 28
+
+            // Measure latency
+            // const inputDelay = (performance.now()-frame.frameRenderedTimeMs)
+            // this.#inputLatency.push(inputDelay)
+            // if(inputDelay > this.#maxInputLatency || this.#maxInputLatency ===  undefined){
+            //     this.#maxInputLatency = inputDelay
+
+            // } else if(inputDelay < this.#minInputLatency || this.#minInputLatency ===  undefined){
+            //     this.#minInputLatency = inputDelay
+            // }
         }
 
         return offset
@@ -268,6 +310,16 @@ class InputChannel extends BaseChannel {
             dataView.setUint32(offset+14, 0, true) // PhysicalPhysicality
             dataView.setUint32(offset+18, 0, true) // VirtualPhysicality
             offset += 22
+
+            // Measure latency
+            const inputDelay = (performance.now()-input.timingGamepadState)
+            this.#inputLatency.push(inputDelay)
+            if(inputDelay > this.#maxInputLatency || this.#maxInputLatency === undefined){
+                this.#maxInputLatency = inputDelay
+
+            } else if(inputDelay < this.#minInputLatency || this.#minInputLatency === undefined){
+                this.#minInputLatency = inputDelay
+            }
         }
 
         return offset

@@ -42,12 +42,14 @@ class Gamepads {
 
                 if(! this.hasButtonStateChange(this.#gamepads[gamepad].buttons, gamepadState.buttons)){
                     this.#gamepads[gamepad].buttons = gamepadState.buttons
+                    // gamepadState.timingControllerActivity = performance.now()
                     this.emitEvent('buttonpress', gamepadState.buttons)
                     this.emitEvent('statechange', gamepadState)
                 }
 
                 if(! this.hasAxesStateChange(this.#gamepads[gamepad].axes, gamepadState.axes)){
                     this.#gamepads[gamepad].axes = gamepadState.axes
+                    // gamepadState.timingControllerActivity = performance.now()
                     this.emitEvent('axeschange', gamepadState.buttons)
                     this.emitEvent('statechange', gamepadState)
                 }
@@ -99,7 +101,7 @@ class Gamepads {
             LeftThumbXAxis: axes[0],
             LeftThumbYAxis: axes[1],
             RightThumbXAxis: axes[2],
-            RightThumbYAxis: axes[3],
+            RightThumbYAxis: axes[3]
         }
     }
 

@@ -24,8 +24,8 @@ class AudioChannel extends BaseChannel {
         buffers: []
     }
 
-    #maxAudioLatency = 0
-    #minAudioLatency = 0
+    #maxAudioLatency
+    #minAudioLatency
     #audioLatency = []
 
     // #performanceTestVar = 0
@@ -59,8 +59,8 @@ class AudioChannel extends BaseChannel {
             }
 
             this.emitEvent('latency', { minLatency: Math.round(this.#minAudioLatency*100)/100, avgLatency: Math.round(latencyCount*100)/100, maxLatency: Math.round(this.#maxAudioLatency*100)/100 })
-            this.#maxAudioLatency = 0
-            this.#minAudioLatency = 0
+            this.#maxAudioLatency = undefined
+            this.#minAudioLatency = undefined
             this.#audioLatency = []
 
             // Reset audio engine when the latency climbs
@@ -140,9 +140,9 @@ class AudioChannel extends BaseChannel {
         // Calc latency
         const frameProcessedMs = (processedFrame.frameDecoded-processedFrame.frameReceived)
 
-        if(frameProcessedMs > this.#maxAudioLatency){
+        if(frameProcessedMs > this.#maxAudioLatency || this.#maxAudioLatency === undefined){
             this.#maxAudioLatency = frameProcessedMs
-        } else if(frameProcessedMs < this.#minAudioLatency){
+        } else if(frameProcessedMs < this.#minAudioLatency || this.#minAudioLatency === undefined){
             this.#minAudioLatency = frameProcessedMs
         }
         this.#audioLatency.push(frameProcessedMs)
@@ -295,7 +295,7 @@ class AudioChannel extends BaseChannel {
             console.log('Drop audio packet because the timing are off. Audio should have played ', delay, 'ms ago... Increasing audio delay:', this.#audioDelay, '=>', this.#audioDelay+delaySteps)
             this.#audioDelay += delaySteps
 
-            if(this.#audioDelay > 50){
+            if(this.#audioDelay > 40){
                 this.softReset()
                 setTimeout(() => {
                     this.softReset()

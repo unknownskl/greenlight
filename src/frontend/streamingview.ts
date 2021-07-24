@@ -152,6 +152,10 @@ export default class StreamingView {
                 // console.log('FPS Event:', event)
                 document.getElementById('audioLatencyCounter').innerHTML = 'min: '+event.minLatency+'ms / avg: '+event.avgLatency+'ms / max: '+event.maxLatency+'ms'
             })
+            this._streamClient._webrtcClient.getChannelProcessor('input').addEventListener('latency', (event:any) => {
+                // console.log('FPS Event:', event)
+                document.getElementById('inputLatencyCounter').innerHTML = 'min: '+event.minLatency+'ms / avg: '+event.avgLatency+'ms / max: '+event.maxLatency+'ms'
+            })
 
             // Debug: Performance
             this._streamClient._webrtcClient.getChannelProcessor('video').addEventListener('queue', (event:any) => {
@@ -168,6 +172,9 @@ export default class StreamingView {
             })
             this._streamClient._webrtcClient.getChannelProcessor('input').addEventListener('queue', (event:any) => {
                 document.getElementById('inputPerformance').innerHTML = JSON.stringify(event)
+            })
+            this._streamClient._webrtcClient.getChannelProcessor('input').addEventListener('latency', (event:any) => {
+                document.getElementById('inputLatency').innerHTML = JSON.stringify(event)
             })
 
             // Dialogs
