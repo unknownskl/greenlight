@@ -43,6 +43,11 @@ export default class StreamingView {
         const streamStatus = (<HTMLInputElement>document.getElementById('streamStatus'))
         streamStatus.innerHTML = 'Connecting to: '+ serverId
 
+        const loadingStatus = (<HTMLInputElement>document.getElementById('loadingStatus'))
+        loadingStatus.innerHTML = 'Connecting to console: '+ serverId
+
+        
+
         this._streamClient.start(this._application, type, serverId).then(() => {
             // this._streamClient._webrtcClient.addEventListener('connect', (event:any) => {
             //     const streamStatus = (<HTMLInputElement>document.getElementById('streamStatus'))
@@ -58,19 +63,34 @@ export default class StreamingView {
 
             this.streamIsReady()
 
-            const loadingPage = (<HTMLInputElement>document.getElementById('loadingScreen'))
-            loadingPage.style.display = 'none'
+            // const streamStatus = (<HTMLInputElement>document.getElementById('streamStatus'))
+            streamStatus.innerHTML = 'Connected to: '+ serverId
+            loadingStatus.innerHTML = 'Connected to console: '+ serverId +'.<br /> Waiting for video stream...'
 
-            const videoHolder = (<HTMLInputElement>document.getElementById('videoHolder'))
-            videoHolder.style.display = 'block'
 
-            const videoRender = (<HTMLInputElement>document.getElementById('videoRender'))
-            videoRender.width = videoHolder.clientWidth
-            videoRender.height = videoHolder.clientHeight
+            setTimeout(() => {
+                const loadingPage = (<HTMLInputElement>document.getElementById('loadingScreen'))
+                loadingPage.style.display = 'none'
+
+                const videoHolder = (<HTMLInputElement>document.getElementById('videoHolder'))
+                videoHolder.style.display = 'block'
+
+                const videoRender = (<HTMLInputElement>document.getElementById('videoRender'))
+                videoRender.width = videoHolder.clientWidth
+                videoRender.height = videoHolder.clientHeight
+            }, 1000)
 
             // Show link in menubar
             const activeStreamingView = (<HTMLInputElement>document.getElementById('actionBarStreamingViewActive'))
+            const actionBarStreamingDisconnect = (<HTMLInputElement>document.getElementById('actionBarStreamingDisconnect'))
+            const actionBarStreamingDisconnectElem = (<HTMLInputElement>document.getElementById('actionBarStreamingDisconnect'))
             activeStreamingView.style.display = (this._streamActive === true) ? 'block': 'none'
+            actionBarStreamingDisconnectElem.style.display = (this._streamActive === true) ? 'block': 'none'
+            
+            actionBarStreamingDisconnect.addEventListener('click', () => {
+                // alert('Disconnect stream')
+                this._streamClient.disconnect()
+            })
 
             // FPS Counters
             this._streamClient._webrtcClient.getChannelProcessor('video').addEventListener('fps', (event:any) => {
@@ -172,8 +192,6 @@ export default class StreamingView {
                 document.getElementById('dialogButton3').onclick = function(){}
             }
 
-            // const streamStatus = (<HTMLInputElement>document.getElementById('streamStatus'))
-            streamStatus.innerHTML = 'Connected to: '+ serverId
         }).catch((error) => {
             console.log('StreamingView.js: Start stream error:', error)
         })

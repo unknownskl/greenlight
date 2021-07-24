@@ -1,6 +1,13 @@
 body, * {
     padding: 0px;
     margin: 0px;
+
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none;
 }
 
 body {
@@ -50,6 +57,12 @@ body {
  Auth View
 **/
 
+#authView {
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
 #authView .authBox {
     background: #000000;
     margin: 70px auto;
@@ -80,6 +93,12 @@ body {
 /**
  App View
 **/
+
+#appView {
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
 
 #actionBar {
     backdrop-filter: blur(20px);
@@ -135,6 +154,9 @@ body {
     color: #ffffff;
     margin-top: 15px;
     margin-right: 20px;
+}
+#actionBar img#userProfileLogo {
+    border-radius: 20px;
 }
 
 
@@ -253,8 +275,20 @@ body {
     margin: 118px auto;
 }
 
+#streamingView div#loadingScreen .lds-ring {
+    padding-top: 50px;
+    padding-bottom: 50px;
+}
+
 #streamingView div#loadingScreen p {
     opacity: 0.5;
+}
+
+#streamingView div#loadingScreen p#loadingStatus {
+    padding-top: 30px;
+    padding-left: 30px;
+    padding-right: 30px;
+    font-size: 14px;
 }
 
 #streamingView #debugLeftBottom {
@@ -392,7 +426,16 @@ button.btn {
 }
 
 .btn-cancel {
-    background-color: red;
+    background-color: rgb(155, 0, 0);
+}
+
+#actionBar .btn {
+    height: 15px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 5px;
+    min-width: auto;
+
 }
 
 /**

@@ -56,6 +56,7 @@ app.on('ready', () => {
 
   session.defaultSession.webRequest.onSendHeaders({
     urls: [
+      'https://www.xbox.com/*',
       'https://account.xbox.com/*'
     ]
   }, interceptToken.bind(tokenStore))

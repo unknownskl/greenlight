@@ -49,6 +49,25 @@ export default class StreamClient {
         })
     }
 
+    disconnect(){
+        //
+        this._application._router.setView('app')
+
+        this.destroy()
+    }
+
+    destroy(){
+        const actionBarStreamingViewActive = (<HTMLInputElement>document.getElementById('actionBarStreamingViewActive'))
+        const actionBarStreamingDisconnect = (<HTMLInputElement>document.getElementById('actionBarStreamingDisconnect'))
+        actionBarStreamingViewActive.style.display = 'none'
+        actionBarStreamingDisconnect.style.display = 'none'
+
+        this._webrtcClient.stopWebrtcConnection()
+
+        const videoHolder = (<HTMLInputElement>document.getElementById('videoHolder'))
+        videoHolder.innerHTML = ''
+    }
+
     startOrGetSession(serverId:string) {
         return new Promise((resolve, reject) => {
             const postData = {

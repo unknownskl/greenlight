@@ -1,4 +1,4 @@
-import { BrowserWindow } from 'electron';
+import { app, BrowserWindow, session } from 'electron';
 import https from 'https';
 // import path from 'path';
 // import TokenStore from './TokenStore';
@@ -10,7 +10,19 @@ interface CookieToken {
 
 export default function (details:any):void {
 
-    if(details.url.includes('/xbox/accountsignin?returnUrl=https%3a%2f%2fwww.xbox.com%2fen-US%2fplay')){
+    if(details.url === 'https://www.xbox.com/?lc=1033'){
+        // Catched logout action
+
+        // @TODO: Check why this part crashes when we open the devtools before
+        const window = BrowserWindow.fromId(details.webContentsId)
+        window.close()
+
+        session.defaultSession.clearStorageData()
+
+        app.relaunch()
+        app.exit()
+
+    } else if(details.url.includes('/xbox/accountsignin?returnUrl=https%3a%2f%2fwww.xbox.com%2fen-US%2fplay')){
         // We are already logged in..  Lets get the token..
 
         let cookieFound = false

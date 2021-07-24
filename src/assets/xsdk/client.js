@@ -170,6 +170,10 @@ module.exports = class xCloudClient {
     //     })
     // }
 
+    stopWebrtcConnection() {
+        this.#webrtcClient.close()
+    }
+
     startWebrtcConnection() {
         console.log('xSDK client.js - Start new session')
 

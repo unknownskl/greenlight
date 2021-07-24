@@ -84,19 +84,20 @@
         <ul class="menu">
             <li><a href="#" id="actionBarMyConsoles" title="List your available consoles">My Consoles</a></li>
             <li><a href="#" id="actionBarStreamingViewActive" title="Current open stream" style="display:none;">Active stream</a></li>
+            <li><a href="#" class="btn btn-cancel" id="actionBarStreamingDisconnect" title="Current open stream" style="display:none;">Disconnect</a></li>
             <li><a href="#" id="actionBarStreamingView" title="Debug view to test Streaming View"style="display:none;">Streaming View</a></li>
         </ul>
 
-        <a href="#" id="userProfileLogoLink" title="Home">
-          <img src="assets/icon.png" id="userProfileLogo" alt="Home" width="40" height="40">
+        <a href="#" id="userProfileLogoLink" title="Gamerpic">
+          <img id="userProfileLogo" alt="Gamerpic" width="40" height="40">
         </a>
 
         <ul class="userProfile">
           <li>
-            <span class="gamerscore">G</span>
+            <span class="gamerscore" title="Gamerscore">G</span>
             <span id="actionBarUserGamerscore" title="Gamerscore"></span>
           </li>
-          <li><a href="#" id="actionBarUserProfile" title="Profile">N/A</a></li>
+          <li><a href="#" id="actionBarUserProfile"  onclick="confirm('Do you want to log out?') ? window.open('https://account.xbox.com/Account/Signout?returnUrl=https%3A%2F%2Fwww.xbox.com%3A443%2Fen-US%2F&ru=https%3A%2F%2Fwww.xbox.com%2Fen-US%2F', '_blank', 'top=500,left=200,frame=true,nodeIntegration=no') : ''" title="Profile">N/A</a></li>
         </ul>
 
       </header>
@@ -132,6 +133,7 @@
           <div class="lds-ring"><div></div><div></div><div></div><div></div></div><br />
 
           <p>We are getting your stream ready...</p>
+          <p id="loadingStatus"></p>
         </div>
 
         <div id="videoHolder" style="display: none;"></div>

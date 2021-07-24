@@ -44,7 +44,20 @@ export default class Application {
             }
 
             // Load Appviews
-            if(event.view === 'app'){
+            if(event.view === 'auth'){
+                const backgrounds = [
+                    'linear-gradient(0deg, rgba(26,27,30,1) 0%, rgba(26,27,30,1) 50%, rgba(0,212,255,0) 100%), url(\'assets/images/background_1.jpg\')',
+                    'linear-gradient(0deg, rgba(26,27,30,1) 0%, rgba(26,27,30,1) 50%, rgba(0,212,255,0) 100%), url(\'assets/images/background_2.jpg\')',
+                    'linear-gradient(0deg, rgba(26,27,30,1) 0%, rgba(26,27,30,1) 50%, rgba(0,212,255,0) 100%), url(\'assets/images/background_3.jpg\')',
+                    'linear-gradient(0deg, rgba(26,27,30,1) 0%, rgba(26,27,30,1) 50%, rgba(0,212,255,0) 100%), url(\'assets/images/background_4.jpg\')',
+                ]
+        
+                const authView = (<HTMLInputElement>document.getElementById('authView'))
+                // appView.style.backgroundImage = "linear-gradient(0deg, rgba(26,27,30,1) 0%, rgba(26,27,30,1) 50%, rgba(0,212,255,0) 100%), url('assets/images/background_1.jpg')"
+                // appView.style.backgroundImage = "linear-gradient(0deg, rgba(26,27,30,1) 0%, rgba(26,27,30,1) 50%, rgba(0,212,255,0) 100%), url('assets/images/background_2.jpg')"
+                const randomSelect = backgrounds[Math.floor(Math.random()*backgrounds.length)];
+                authView.style.backgroundImage = randomSelect
+            } else  if(event.view === 'app'){
                 if(this._AppView === undefined){
                     this._AppView = new AppView(this)
                 }
