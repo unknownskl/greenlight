@@ -12,6 +12,17 @@
     "publish": "electron-forge publish",
     "lint": "eslint --ext .ts ."
   },
+  "build": {
+    "appId": "unknownskl.xcloud-client",
+    "mac": {
+      "target": "zip",
+      "icon": "src/assets/icon.icns"
+    },
+    "windows": {
+      "target": "zip",
+      "icon": "src/assets/icon.ico"
+    }
+  },
   "author": "UnknownSKL <info@jimkroon.nl>",
   "license": "MIT",
   "dependencies": {
