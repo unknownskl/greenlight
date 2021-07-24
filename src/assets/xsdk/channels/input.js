@@ -12,10 +12,15 @@ class InputChannel extends BaseChannel {
     #minInputLatency
     #inputLatency = []
 
+    #maxMetadataLatency
+    #minMetadataLatency
+    #metadataLatency = []
+
     #events = {
         'queue': [],
         'fps': [],
-        'latency': []
+        'latency': [],
+        'gamepadlatency': []
     }
 
     onOpen(event) {
@@ -23,7 +28,7 @@ class InputChannel extends BaseChannel {
             // console.log('xSDK channels/input.js - [performance] sequence:', this.#inputSequenceNum, 'gamepadQueue size:', Object.keys(this.#gamepadQueue).length)
             // calc latency
             var latencyCount = 0;
-            for(var latencyTime in this.#inputLatency){
+            for(const latencyTime in this.#inputLatency){
 
                 if(this.#inputLatency[latencyTime] !== undefined){
                     latencyCount += this.#inputLatency[latencyTime]
@@ -40,10 +45,34 @@ class InputChannel extends BaseChannel {
             if(this.#maxInputLatency === undefined)
                 this.#maxInputLatency = 0
 
-            this.emitEvent('latency', { minLatency: Math.round(this.#minInputLatency*100)/100, avgLatency: Math.round(latencyCount*100)/100, maxLatency: Math.round(this.#maxInputLatency*100)/100 })
+            this.emitEvent('gamepadlatency', { minLatency: Math.round(this.#minInputLatency*100)/100, avgLatency: Math.round(latencyCount*100)/100, maxLatency: Math.round(this.#maxInputLatency*100)/100 })
             this.#maxInputLatency = undefined
             this.#minInputLatency = undefined
             this.#inputLatency = []
+
+            // Gamepad latency
+            var metadataLatencyCount = 0;
+            for(const latencyTime in this.#metadataLatency){
+
+                if(this.#metadataLatency[latencyTime] !== undefined){
+                    metadataLatencyCount += this.#metadataLatency[latencyTime]
+                }
+            }
+            
+            if(this.#metadataLatency.length > 0){
+                metadataLatencyCount = (metadataLatencyCount/this.#metadataLatency.length)
+            }
+
+            if(this.#minMetadataLatency === undefined)
+                this.#minMetadataLatency = 0
+            
+            if(this.#maxMetadataLatency === undefined)
+                this.#maxMetadataLatency = 0
+
+            this.emitEvent('latency', { minLatency: Math.round(this.#minMetadataLatency*100)/100, avgLatency: Math.round(metadataLatencyCount*100)/100, maxLatency: Math.round(this.#maxMetadataLatency*100)/100 })
+            this.#maxMetadataLatency = undefined
+            this.#minMetadataLatency = undefined
+            this.#metadataLatency = []
             
             // Calc fps
             var fps = this.#frameCounter
@@ -70,7 +99,7 @@ class InputChannel extends BaseChannel {
         setInterval(() => {
             // Check if we already have gotten the metadata.
             var frameMetadataLength = this.getClient().getChannelProcessor('video').getFrameMetadataLength()
-            if(frameMetadataLength > 20 || this.#gamepadQueue.length > 0) {
+            if(frameMetadataLength > 5 || this.#gamepadQueue.length > 0) {
                 var frameMetadata = this.getClient().getChannelProcessor('video').getFrameMetadataQueue()
                 // console.log('PROCESSED INPUT PACKET: PRE frameMetadata.length', frameMetadata.length, 'gamepadMetadata.length', this.#gamepadQueue.length)
 
@@ -259,14 +288,14 @@ class InputChannel extends BaseChannel {
             offset += 28
 
             // Measure latency
-            // const inputDelay = (performance.now()-frame.frameRenderedTimeMs)
-            // this.#inputLatency.push(inputDelay)
-            // if(inputDelay > this.#maxInputLatency || this.#maxInputLatency ===  undefined){
-            //     this.#maxInputLatency = inputDelay
+            const metadataDelay = (performance.now()-frame.frameRenderedTimeMs)
+            this.#metadataLatency.push(metadataDelay)
+            if(metadataDelay > this.#maxMetadataLatency || this.#maxMetadataLatency ===  undefined){
+                this.#maxMetadataLatency = metadataDelay
 
-            // } else if(inputDelay < this.#minInputLatency || this.#minInputLatency ===  undefined){
-            //     this.#minInputLatency = inputDelay
-            // }
+            } else if(metadataDelay < this.#minMetadataLatency || this.#minMetadataLatency ===  undefined){
+                this.#minMetadataLatency = metadataDelay
+            }
         }
 
         return offset

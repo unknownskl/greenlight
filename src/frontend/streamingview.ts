@@ -156,6 +156,10 @@ export default class StreamingView {
                 // console.log('FPS Event:', event)
                 document.getElementById('inputLatencyCounter').innerHTML = 'min: '+event.minLatency+'ms / avg: '+event.avgLatency+'ms / max: '+event.maxLatency+'ms'
             })
+            this._streamClient._webrtcClient.getChannelProcessor('input').addEventListener('gamepadlatency', (event:any) => {
+                // console.log('FPS Event:', event)
+                document.getElementById('gamepadLatencyCounter').innerHTML = 'min: '+event.minLatency+'ms / avg: '+event.avgLatency+'ms / max: '+event.maxLatency+'ms'
+            })
 
             // Debug: Performance
             this._streamClient._webrtcClient.getChannelProcessor('video').addEventListener('queue', (event:any) => {

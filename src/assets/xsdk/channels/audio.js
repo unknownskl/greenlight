@@ -87,6 +87,10 @@ class AudioChannel extends BaseChannel {
             this.emitEvent('fps', { fps: fps })
         }, 1000)
 
+        setInterval(() => {
+            this.softReset()
+        }, 6000)
+
         var AudioContext = window.AudioContext || window.webkitAudioContext;
 
         this.#audioContext = new AudioContext({
@@ -290,17 +294,17 @@ class AudioChannel extends BaseChannel {
         // console.log('delay:', delay, 'startTime:', startTime) // Delay should always > 0. If it drops < 0, increase the delay, or drop sound buffer packet maybe?
         
         var delaySteps = 3
-        if(delay < 0.03) {
+        if(delay < 0) {
             // var newLength = (this.#frameBufferDuration - (-delay*1000)) // New length in ms
             console.log('Drop audio packet because the timing are off. Audio should have played ', delay, 'ms ago... Increasing audio delay:', this.#audioDelay, '=>', this.#audioDelay+delaySteps)
             this.#audioDelay += delaySteps
 
-            if(this.#audioDelay > 40){
-                this.softReset()
-                setTimeout(() => {
-                    this.softReset()
-                }, 300)
-            }
+            // if(this.#audioDelay > 40){
+            //     this.softReset()
+            //     setTimeout(() => {
+            //         this.softReset()
+            //     }, 300)
+            // }
 
             
 

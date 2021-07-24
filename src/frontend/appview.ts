@@ -115,7 +115,20 @@ export default class AppView {
                     friendsHtml += '    <div class="userinfo">'
                     friendsHtml += '        <p>'+profiles.people[person].displayName+'</p>'
 
-                    friendsHtml += '        <p class="userstatus">'+profiles.people[person].presenceText+'</p>'
+                    let isGame = false
+                    const presenceDetails = profiles.people[person].presenceDetails
+                    for(const detail in presenceDetails){
+                        if(presenceDetails[detail].IsGame === true && presenceDetails[detail].IsPrimary === true)
+                            isGame = true
+                    }
+
+                    if(profiles.people[person].presenceText !== '' && isGame === true)
+                        friendsHtml += '        <p class="userstatus"><img src="assets/icons/gamepad.svg" width="15 height="15 /> '+profiles.people[person].presenceText+'</p>'
+
+                    else if(profiles.people[person].presenceText !== '' && isGame === false)
+                        friendsHtml += '        <p class="userstatus">'+profiles.people[person].presenceText+'</p>'
+                    else
+                        friendsHtml += '        <p class="userstatus">'+profiles.people[person].presenceState+'</p>'
 
                     friendsHtml += '    </div>'
                     friendsHtml += '</li>'
