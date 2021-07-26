@@ -39,6 +39,7 @@ class AudioChannel extends BaseChannel {
     #events = {
         'fps': [],
         'queue': [],
+        'bitrate': [],
         'latency': [],
     }
 

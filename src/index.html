@@ -144,11 +144,12 @@
 
         <div id="networkIndicator" class="hidden">
           <span class="icon">&#9888;</span>
+
           <p class="checklist">
             <strong>Video:</strong> <sppan id="niVideo"></sppan> <br />
-            <strong>Audio:</strong>: <sppan id="niAudio"></sppan> <br />
-            <strong>Metadata:</strong>: <sppan id="niMetadata"></sppan> <br />
-            <strong>Gamepad:</strong>: <sppan id="niGamepad"></sppan> <br />
+            <strong>Audio:</strong> <sppan id="niAudio"></sppan> <br />
+            <strong>Metadata:</strong> <sppan id="niMetadata"></sppan> <br />
+            <strong>Gamepad:</strong> <sppan id="niGamepad"></sppan> <br />
           </p>
         </div>
 
@@ -177,15 +178,21 @@
         </div>
 
         <div id="debugRightBottom" style="display: none;">
-            <strong>Debug output:</strong>
-            <p>
-                <strong>Video:</strong> <span id="videoPerformance"></span><br />
-                <strong>Video Latency:</strong> <span id="videoLatency"></span><br />
-                <strong>Audio:</strong> <span id="audioPerformance"></span><br />
-                <strong>Audio Latency:</strong> <span id="audioLatency"></span><br />
-                <strong>Input:</strong> <span id="inputPerformance"></span> <br />
-                <strong>Input Latency:</strong> <span id="inputLatency"></span><br />
-            </p>
+          <strong>Bitrates:</strong>
+          <p>
+            Video: <span id="videoBitrate"></span><br />
+            Audio: <span id="audioBitrate"></span><br />
+          </p>
+          <br />
+          <strong>Debug output:</strong>
+          <p>
+              <strong>Video:</strong> <span id="videoPerformance"></span><br />
+              <strong>Video Latency:</strong> <span id="videoLatency"></span><br />
+              <strong>Audio:</strong> <span id="audioPerformance"></span><br />
+              <strong>Audio Latency:</strong> <span id="audioLatency"></span><br />
+              <strong>Input:</strong> <span id="inputPerformance"></span> <br />
+              <strong>Input Latency:</strong> <span id="inputLatency"></span><br />
+          </p>
         </div>
 
         <div id="debugLeftBottom" style="display: none;">

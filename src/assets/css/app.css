@@ -29,6 +29,7 @@ body {
     left: 0px;
     right: 0px;
     bottom: 0px;
+    overflow-y: auto;
 }
 
 /**
@@ -114,7 +115,7 @@ body {
     backdrop-filter: blur(20px);
 
     background: rgba(0, 0, 0, 0.55);
-    position: absolute;
+    position: fixed;
     top: 0px;
     right: 0px;
     bottom: 0px;

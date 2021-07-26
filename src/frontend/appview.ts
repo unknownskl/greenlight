@@ -137,23 +137,23 @@ export default class AppView {
                     }
                 }
 
-                // Query for offline people
-                for(const person in profiles.people){
-                    if(profiles.people[person].presenceState === 'Offline'){
-                        friendsHtml += '<li class="offline">'
-                        friendsHtml += '    <img class="userimage" src="'+profiles.people[person].displayPicRaw+'" />'
-                        friendsHtml += '    <div class="userinfo">'
-                        friendsHtml += '        <p>'+profiles.people[person].displayName+'</p>'
+                // // Query for offline people
+                // for(const person in profiles.people){
+                //     if(profiles.people[person].presenceState === 'Offline'){
+                //         friendsHtml += '<li class="offline">'
+                //         friendsHtml += '    <img class="userimage" src="'+profiles.people[person].displayPicRaw+'" />'
+                //         friendsHtml += '    <div class="userinfo">'
+                //         friendsHtml += '        <p>'+profiles.people[person].displayName+'</p>'
 
-                        if(profiles.people[person].presenceText === profiles.people[person].presenceState)
-                            friendsHtml += '        <p>'+profiles.people[person].presenceState+'</p>'
-                        else
-                            friendsHtml += '        <p class="userstatus">'+profiles.people[person].presenceState+' - '+profiles.people[person].presenceText+'</p>'
+                //         if(profiles.people[person].presenceText === profiles.people[person].presenceState)
+                //             friendsHtml += '        <p>'+profiles.people[person].presenceState+'</p>'
+                //         else
+                //             friendsHtml += '        <p class="userstatus">'+profiles.people[person].presenceState+' - '+profiles.people[person].presenceText+'</p>'
 
-                        friendsHtml += '    </div>'
-                        friendsHtml += '</li>'
-                    }
-                }
+                //         friendsHtml += '    </div>'
+                //         friendsHtml += '</li>'
+                //     }
+                // }
                 friendsHtml += '</ul>'
 
                 friendsList.innerHTML = friendsHtml
