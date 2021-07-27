@@ -213,8 +213,6 @@ class AudioChannel extends BaseChannel {
         while(output = this.#opusDecoder.output()){
             output = this.ab2str(output)
             this.#frameBuffer += output
-
-            delete output
         }
 
         // Check if we meet the minimum length for the buffer frame
