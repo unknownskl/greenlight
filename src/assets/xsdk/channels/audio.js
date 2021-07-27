@@ -24,11 +24,13 @@ class AudioChannel extends BaseChannel {
         buffers: []
     }
 
-    #maxAudioLatency
-    #minAudioLatency
-    #audioLatency = []
+    #frameCounter = 0
 
-    // #performanceTestVar = 0
+    #bitrateCounter = {
+        packets: [],
+        audio: []
+    }
+    #audioLatency = []
 
     #packetCounter = 0
     #processedCounter = 0
@@ -44,53 +46,55 @@ class AudioChannel extends BaseChannel {
     }
 
     onOpen(event) {
+        // @TODO: Move opus decoding to its own decoding thread using a web worker
+
+        setTimeout(() => {
+            this.softReset()
+        }, 3000)
+
         setInterval(() => {
             // console.log('xSDK channels/video.js - [performance] frameQueue size:', Object.keys(this.#frameQueue).length, 'frameMetadataQueue size:', this.#frameMetadataQueue.length)
-            // calc latency
-            var latencyCount = 0;
-            for(var latencyTime in this.#audioLatency){
+            // // calc latency
+            // var latencyCount = 0;
+            // for(var latencyTime in this.#audioLatency){
 
-                if(this.#audioLatency[latencyTime] !== undefined){
-                    latencyCount += this.#audioLatency[latencyTime]
-                }
-            }
-            // console.log('PROCESS LATENCY:', latencyCount, '/', this.#audioLatency.length, '=', (latencyCount/this.#audioLatency.length))
-            if(this.#audioLatency.length > 0){
-                latencyCount = (latencyCount/this.#audioLatency.length)
-            }
+            //     if(this.#audioLatency[latencyTime] !== undefined){
+            //         latencyCount += this.#audioLatency[latencyTime]
+            //     }
+            // }
+            // // console.log('PROCESS LATENCY:', latencyCount, '/', this.#audioLatency.length, '=', (latencyCount/this.#audioLatency.length))
+            // if(this.#audioLatency.length > 0){
+            //     latencyCount = (latencyCount/this.#audioLatency.length)
+            // }
 
-            this.emitEvent('latency', { minLatency: Math.round(this.#minAudioLatency*100)/100, avgLatency: Math.round(latencyCount*100)/100, maxLatency: Math.round(this.#maxAudioLatency*100)/100 })
-            this.#maxAudioLatency = undefined
-            this.#minAudioLatency = undefined
-            this.#audioLatency = []
-
-            // Reset audio engine when the latency climbs
-            if(Math.round(latencyCount*100)/100 > 60){
-                this.softReset()
-                setTimeout(() => {
-                    this.softReset()
-                }, 300)
-            }
+            // this.emitEvent('latency', { minLatency: Math.round(this.#minAudioLatency*100)/100, avgLatency: Math.round(latencyCount*100)/100, maxLatency: Math.round(this.#maxAudioLatency*100)/100 })
+            // this.#maxAudioLatency = undefined
+            // this.#minAudioLatency = undefined
+            // this.#audioLatency = []
+            this.calculateBitrate()
+            this.calculateLatency()
 
             // Calc queue
-            var fps = this.#processedCounter
+            // var fps = this.#processedCounter
             this.emitEvent('queue', {
                 frameBuffer: this.#frameBuffer.length,
                 frameBufferQueue: this.#frameBufferQueue.length,
                 packetCounter: this.#packetCounter,
-                fps: fps
+                // fps: fps
             })
             
             this.#packetCounter = 0
-            this.#processedCounter = 0
+            // this.#processedCounter = 0
             // this.#frameCounter = 0
 
-            this.emitEvent('fps', { fps: fps })
+            // this.emitEvent('fps', { fps: fps })
+
+            this.calculateFps()
         }, 1000)
 
         setInterval(() => {
             this.softReset()
-        }, 6000)
+        }, 3000)
 
         var AudioContext = window.AudioContext || window.webkitAudioContext;
 
@@ -99,16 +103,9 @@ class AudioChannel extends BaseChannel {
             sampleRate: 48000, //def = 44100,
         });
 
-        // For volume? See https://developer.mozilla.org/en-US/docs/Web/API/GainNode
         this.#gainNode = this.#audioContext.createGain(),
-        this.#gainNode.gain.value = 2 // 200 %
+        this.#gainNode.gain.value = 2 // 200 % volume
         this.#gainNode.connect(this.#audioContext.destination)
-
-        // Init new OPUS worker
-        this.#worker = new Worker('assets/opus/opusworker.js');
-        this.#worker.onmessage = function(e) {
-            // console.log('Message received from worker:', e.data);
-        }
 
         this.#opusDecoder = new libopus.Decoder(2, 48000);
 
@@ -119,8 +116,65 @@ class AudioChannel extends BaseChannel {
         }, 5)
     }
 
+    calculateLatency() {
+        var latencyCount = 0;
+        var minLatency = 999;
+        var maxLatency = 0;
+
+        for(var latencyTime in this.#audioLatency){
+            if(this.#audioLatency[latencyTime] !== undefined){
+                latencyCount += this.#audioLatency[latencyTime]
+            }
+
+            if(this.#audioLatency[latencyTime] < minLatency)
+                minLatency = this.#audioLatency[latencyTime]
+
+            if(this.#audioLatency[latencyTime] > maxLatency)
+                maxLatency = this.#audioLatency[latencyTime]
+        }
+        
+        if(this.#audioLatency.length > 0){
+            latencyCount = (latencyCount/this.#audioLatency.length)
+        }
+
+        this.emitEvent('latency', { minLatency: Math.round(minLatency*100)/100, avgLatency: Math.round(latencyCount*100)/100, maxLatency: Math.round(maxLatency*100)/100 })
+        this.#audioLatency = []
+    }
+
+    calculateBitrate() {
+        // Calculate bitrate
+        var bitratePacketsValue = 0
+        var bitrateAudioValue = 0
+
+        for(var frame in this.#bitrateCounter.packets){
+            if(this.#bitrateCounter.packets[frame] !== undefined){
+                bitratePacketsValue += this.#bitrateCounter.packets[frame]
+            }
+        }
+        for(var audio in this.#bitrateCounter.audio){
+            if(this.#bitrateCounter.audio[audio] !== undefined){
+                bitrateAudioValue += this.#bitrateCounter.audio[audio]
+            }
+        }
+
+        bitratePacketsValue = Math.round((bitratePacketsValue*8)/1000)
+        bitrateAudioValue = Math.round((bitrateAudioValue*8)/1000)
+
+        this.emitEvent('bitrate', { packetBitrate: Math.round(bitratePacketsValue*100)/100, audioBitrate: Math.round(bitrateAudioValue*100)/100 })
+        this.#bitrateCounter.audio = []
+        this.#bitrateCounter.packets = []
+    }
+
+    calculateFps() {
+        // Calculate fps
+        var fps = this.#frameCounter
+        this.emitEvent('fps', { fps: fps })
+        this.#frameCounter = 0
+    }
+
     onMessage(event) {
         this.#packetCounter++
+        this.#bitrateCounter.packets.push(event.data.byteLength)
 
         var messageBuffer = new DataView(event.data);
         var frameId = messageBuffer.getUint32(0, true);
@@ -144,25 +198,23 @@ class AudioChannel extends BaseChannel {
 
         // Calc latency
         const frameProcessedMs = (processedFrame.frameDecoded-processedFrame.frameReceived)
-
-        if(frameProcessedMs > this.#maxAudioLatency || this.#maxAudioLatency === undefined){
-            this.#maxAudioLatency = frameProcessedMs
-        } else if(frameProcessedMs < this.#minAudioLatency || this.#minAudioLatency === undefined){
-            this.#minAudioLatency = frameProcessedMs
-        }
         this.#audioLatency.push(frameProcessedMs)
     }
 
     processFrame(frameData) {
        
         // this.decodeStream(frameData.frameData)
+        this.#bitrateCounter.audio.push(frameData.frameData.byteLength)
 
         // Decode packet
         this.#opusDecoder.input(frameData.frameData)
+        // var output = this.#opusDecoder.output()
         var output = ''
         while(output = this.#opusDecoder.output()){
             output = this.ab2str(output)
             this.#frameBuffer += output
+
+            delete output
         }
 
         // Check if we meet the minimum length for the buffer frame
@@ -171,6 +223,7 @@ class AudioChannel extends BaseChannel {
             var outputBuffer = this.str2ab(this.#frameBuffer.slice(0, (this.#frameBufferSize*2)))
             outputBuffer = new Int16Array(outputBuffer)
             this.#frameBuffer = this.#frameBuffer.slice((this.#frameBufferSize*2))
+            frameData.frameData = outputBuffer;
 
             this.#frameBufferQueue.push(outputBuffer)
         }
@@ -181,26 +234,14 @@ class AudioChannel extends BaseChannel {
     }
 
     sendToMediasource() {
-        // console.log('sendToMediasource called. performance.now:', (performance.now()-this.#performanceTestVar) , performance.now())
-        // this.#performanceTestVar = performance.now()
-
-        // var client = this.getClient()
 
         if(this.#audioContext.state === 'running'){
-
-            // var timing = (this.#audioOffset + this.#audioTimeOffset)
-            // var delay = (timing-this.#audioContext.currentTime)*1000
-            // if(delay < 0){ delay = 1 }
-            // var audioTimeline = (this.#audioFrames * this.#frameBufferDuration)
-
-            // console.log('Check: ', audioTimeline, '<', delay)
 
             if(this.#frameBufferQueue.length > 0){
 
                 // Set audio offset
                 if(this.#audioOffset === null){
                     this.#audioOffset = Math.round(this.#audioContext.currentTime * 100) / 100
-                    // this.#audioOffset = this.#audioContext.currentTime
                 }
                 
                 // Single frame
@@ -217,15 +258,8 @@ class AudioChannel extends BaseChannel {
 
                 this.#audioFrames += frameCount
 
-                // console.log('play audio frame: framecount:', this.#audioFrames, 'now():', performance.now(),'this.#audioOffset', this.#audioOffset, 'start at:', this.#audioTimeOffset, 'media currentTime:', this.#audioContext.currentTime, 'media start at:', (this.#audioOffset+this.#audioTimeOffset))
-
-                this.playFrameBuffer(outputBuffer)
-                // console.log('add duration:', (this.#frameBufferDuration/1000))
                 this.#audioTimeOffset = this.#audioTimeOffset + (this.#frameBufferDuration/1000) // frameBufferDuration / 1000 = value in MS
-
-                // if(this.#frameBufferQueue.length > 0){
-                //     this.sendToMediasource()
-                // }
+                this.playFrameBuffer(outputBuffer)
                 
             } else {
                 // console.log('Framebuffer not filled yet. skipping...')
@@ -269,7 +303,9 @@ class AudioChannel extends BaseChannel {
 
         outputBuffer = Int16Array.from(outputBuffer)
         outputBuffer = this.arrayIntToFloat(outputBuffer)
-        this.#processedCounter++;
+
+        this.#frameCounter++;
+        // this.#bitrateCounter.audio.push(outputBuffer.length)
 
         // For stereo
         for (var i = 0; i < outputBuffer.length; i++) {
@@ -294,20 +330,13 @@ class AudioChannel extends BaseChannel {
         var delay = (startTime-this.#audioContext.currentTime) // in MS
         // console.log('delay:', delay, 'startTime:', startTime) // Delay should always > 0. If it drops < 0, increase the delay, or drop sound buffer packet maybe?
         
-        var delaySteps = 3
         if(delay < 0) {
             // var newLength = (this.#frameBufferDuration - (-delay*1000)) // New length in ms
-            console.log('Drop audio packet because the timing are off. Audio should have played ', delay, 'ms ago... Increasing audio delay:', this.#audioDelay, '=>', this.#audioDelay+delaySteps)
-            this.#audioDelay += delaySteps
+            console.log('Drop audio packet because the timing are off. Audio should have played ', delay, 'ms ago... Increasing audio delay to:', this.#audioDelay+30)
+            this.#audioDelay += 30
 
-            // if(this.#audioDelay > 40){
+            // if(delay < 0.03)
             //     this.softReset()
-            //     setTimeout(() => {
-            //         this.softReset()
-            //     }, 300)
-            // }
-
-            
 
         // } else if(delay > 10) {
         //     console.log('Drop audio packet because the timing are off. Audio should have played ', delay, 'ms ago... Decreasing audio delay:', this.#audioDelay, '=>', this.#audioDelay+delaySteps)
@@ -322,6 +351,7 @@ class AudioChannel extends BaseChannel {
         console.log('audio.js: Performing soft reset')
 
         this.#frameBufferQueue = []
+        this.frameBuffer = ''
 
         this.#audioOffset = Math.round(this.#audioContext.currentTime * 100) / 100
         this.#audioDelay = 30

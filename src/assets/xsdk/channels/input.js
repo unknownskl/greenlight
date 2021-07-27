@@ -173,13 +173,7 @@ class InputChannel extends BaseChannel {
                         throw error
                     }
                 }
-
-                // if(gamepadMetadata.length > 0) {
-                //     // this.generateGamepadFrame(reportArrayView, packetTimeNow, gamepadMetadata, dataOffset) // @TODO: Implement feature
-                // }
-
-                // console.log('PROCESSED INPUT PACKET: frameMetadata.length', frameMetadata.length, 'gamepadMetadata.length', gamepadMetadata.length)
-
+                
                 var inputPacket = reportArray.subarray(0, headerSize)
                 this.send(inputPacket)
                 this.#sendCounter++

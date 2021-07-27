@@ -179,10 +179,16 @@ class VideoChannel extends BaseChannel {
     }
 
     getFrameMetadataQueue() {
-        var queue = this.#frameMetadataQueue
-        this.#frameMetadataQueue = []
+        // var queue = this.#frameMetadataQueue
+        // var returnQueue = []
+        // for(var i = 0; i < 30; i++){
+        //     returnQueue.push(queue.shift())
+        // }
+        // this.#frameMetadataQueue = queue
 
-        return queue
+        // return returnQueue
+        
+        return this.#frameMetadataQueue
     }
     
     getFrameMetadataLength() {
