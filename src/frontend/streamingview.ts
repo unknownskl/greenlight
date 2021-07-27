@@ -270,7 +270,7 @@ export default class StreamingView {
                 document.getElementById('videoBitrate').innerHTML = (event.videoBitrate/8)+' KBps / '+(event.packetBitrate/8)+' KBps'
             })
             this._streamClient._webrtcClient.getChannelProcessor('audio').addEventListener('bitrate', (event:any) => {
-                document.getElementById('audioBitrate').innerHTML = JSON.stringify(event)
+                document.getElementById('audioBitrate').innerHTML = (event.audioBitrate/8)+' KBps / '+(event.packetBitrate/8)+' KBps'
                 // document.getElementById('audioBitrate').innerHTML = (event.audioBitrate/8)+' KBps'
             })
 
