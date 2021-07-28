@@ -65,9 +65,9 @@ class AudioChannel extends BaseChannel {
             action: 'startStream'
         })
 
-        setTimeout(() => {
+        setInterval(() => {
             this.softReset()
-        }, 300)
+        }, 2000) // try 160? (20*4)
 
         setInterval(() => {
             this.calculateBitrate()
@@ -75,9 +75,9 @@ class AudioChannel extends BaseChannel {
             this.calculateFps()
         }, 1000)
 
-        setInterval(() => {
-            this.softReset()
-        }, 6000)
+        // setInterval(() => {
+        //     this.softReset()
+        // }, 4000)
 
         var AudioContext = window.AudioContext || window.webkitAudioContext;
 
@@ -239,6 +239,7 @@ class AudioChannel extends BaseChannel {
             // var newLength = (this.#frameBufferDuration - (-delay*1000)) // New length in ms
             console.log('Drop audio packet because the timing are off. Audio should have played ', delay, 'ms ago... Increasing audio delay:', this.#audioDelay, '=>', this.#audioDelay+delaySteps)
             this.#audioDelay += delaySteps
+            this.softReset()
         } else {
             source.start(startTime);
         }
