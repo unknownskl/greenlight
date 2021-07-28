@@ -238,12 +238,12 @@ class AudioChannel extends BaseChannel {
         if(delay < 0) {
             // var newLength = (this.#frameBufferDuration - (-delay*1000)) // New length in ms
             console.log('Drop audio packet because the timing are off. Audio should have played ', delay, 'ms ago... Increasing audio delay:', this.#audioDelay, '=>', this.#audioDelay+delaySteps)
-            this.softReset()
-            startTime += 0.02
-        // } else {
-        //     source.start(startTime);
+            // this.softReset()
+            // startTime += 0.02
+        } else {
+            source.start(startTime);
         }
-        source.start(startTime);
+        // source.start(startTime);
     }
 
     softReset(){
