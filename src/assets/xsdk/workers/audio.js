@@ -19,7 +19,7 @@ var _opusDecoder = new OggOpusDecoder({
 
 var init = function() {
     return new Promise((resolve, reject) => {
-        console.log('LIBOPUS IN WORKER:', _opusDecoder)
+        // console.log('LIBOPUS IN WORKER:', _opusDecoder)
 
         setInterval(() => {
             console.log('xSDK workers/audio.js - [Performance] _frameQueue size:', Object.keys(_frameQueue).length)
