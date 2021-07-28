@@ -166,7 +166,7 @@ class InputChannel extends BaseChannel {
 
                 if(gamepadMetadata.length > 0) {
                     try {
-                        console.log('input: gamepadMetadata', gamepadMetadata[0])
+                        // console.log('input: gamepadMetadata', gamepadMetadata[0])
                         dataOffset = this.generateGamepadFrame(reportArrayView, gamepadMetadata, dataOffset)
                     } catch (error) {
                         console.log('ERROR generateGamepadFrame: reportArrayView, gamepadMetadata, dataOffset', reportArrayView, gamepadMetadata, dataOffset)
@@ -178,7 +178,7 @@ class InputChannel extends BaseChannel {
                 this.send(inputPacket)
                 this.#sendCounter++
             }
-        }, 5)
+        }, 10)
         
         
     }

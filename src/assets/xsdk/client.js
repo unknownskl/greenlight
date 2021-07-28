@@ -99,76 +99,14 @@ module.exports = class xCloudClient {
                 this.getChannelProcessor('input').processGamepadState(0, this.#gamepadProcessor.mapStateLabels(event.buttons, event.axes))
             }
         })
+
+        // setInterval(() => {
+        //     // Check if we have an active channelProcessor (aka open connection)
+        //     if(this.getChannelProcessor('input') !== undefined){
+        //         this.getChannelProcessor('input').processGamepadState(0, this.#gamepadProcessor.mapStateLabels(event.buttons, event.axes))
+        //     }
+        // }, 20)
     }
-
-    // getConsoles() {
-    //     return new Promise(function(resolve, reject) {
-    //         fetch('/api/consoles').then(response => {
-    //             if(response.status !== 200){
-    //                 reject({ error: 'xSDK client.js - /api/consoles statuscode is not 200' })
-    //             } else {
-    //                 response.json().then(data => {
-    //                     resolve(data.results)
-    //                 }).catch((error) => {
-    //                     reject({ error: error })
-    //                 })
-    //             }
-    //         })
-    //     })
-    // }
-
-    // startSession(type, serverId) {
-    //     console.log('Start session:', type, serverId)
-    //     this.emitEvent('connect', { type: type, serverId: serverId })
-
-    //     return new Promise((resolve, reject) => {
-
-    //         if(type === 'xhome') {
-    //             fetch('/api/start/'+serverId).then(response => {
-    //                 response.json().then(data => {
-    //                     console.log('xSDK client.js - /api/start - ok, got:', data)
-    //                     this.#activeSessionId = data.sessionId
-
-    //                     this.isSessionsReady().then((data) => {
-    //                         console.log('xSDK client.js - /api/start - Session is ready!', data)
-
-    //                         this.startWebrtcConnection()
-    //                     }).catch((error)  => {
-    //                         throw error;
-    //                         // console.log('/api/start - Could not start session. Error:', error)
-    //                     })
-    //                 })
-    //             })
-    //         } else {
-    //             reject({ error: 'Only xhome is supported as type to start a new session' })
-    //         }
-    //     })
-    // }
-
-    // isSessionsReady() {
-    //     return new Promise((resolve, reject) => {
-
-    //         fetch('/api/session').then(response => {
-    //             response.json().then(data => {
-    //                 if(data.state === 'Provisioned'){
-    //                     resolve(data)
-    //                 } else if(data.state === 'Failed'){
-    //                     reject({ error: 'Cannot provision stream. Reason: '+data.errorDetails.code+': '+data.errorDetails.message })
-    //                 } else {
-    //                     console.log('/api/session - state is:', data.state, 'Waiting...');
-
-    //                     setTimeout(() => {
-    //                         this.isSessionsReady().then((data ) => {
-    //                             resolve(data)
-    //                         }).catch((error)  => {
-    //                             reject(error)
-    //                         })
-    //                     }, 1000)
-    //                 }
-    //             })
-    //         })
-    //     })
-    // }
 
     stopWebrtcConnection() {
         this.#webrtcClient.close()
@@ -219,18 +157,6 @@ module.exports = class xCloudClient {
 
             this._application._StreamingView._streamClient.isExchangeReady('configuration').then((data) => {
                 console.log('Configuration:', data)
-
-                // Send sdp config
-                // fetch('/api/config/sdp', {
-                //     method: 'POST',
-                //     headers: {
-                //         'Content-Type': 'application/json'
-                //     },
-                //     body: JSON.stringify({
-                //         sdp: offer.sdp
-                //     })
-                // })
-
                 
                 this._application._StreamingView._streamClient.sendSdp(offer.sdp).then((data) => {
                     this._application._StreamingView._streamClient.isExchangeReady('sdp').then((data) => {
@@ -242,17 +168,6 @@ module.exports = class xCloudClient {
                             type: sdpDetails.sdpType,
                             sdp: sdpDetails.sdp
                         })
-
-                        // Send ice config
-                        // fetch('/api/config/ice', {
-                        //     method: 'POST',
-                        //     headers: {
-                        //         'Content-Type': 'application/json'
-                        //     },
-                        //     body: JSON.stringify({
-                        //         ice: this.#webrtcStates.iceCandidates[0]
-                        //     })
-                        // })
 
                         this._application._StreamingView._streamClient.sendIce(this.#webrtcStates.iceCandidates[0]).then((data) => {
 
@@ -402,7 +317,6 @@ module.exports = class xCloudClient {
 
         var videoHolder = document.getElementById('videoHolder');
         var videoRender = document.createElement('video');
-        // videoRender.duration = Number.POSITIVE_INFINITY
         videoRender.id = 'videoRender';
         videoRender.src = videoSourceUrl;
         videoRender.width = videoHolder.clientWidth;
@@ -450,11 +364,8 @@ module.exports = class xCloudClient {
 
         var audioHolder = document.getElementById('videoHolder');
         var audioRender = document.createElement('audio');
-        // videoRender.duration = Number.POSITIVE_INFINITY
         audioRender.id = 'audioRender';
         audioRender.src = audioSourceUrl;
-        // audioRender.width = audioHolder.clientWidth;
-        // audioRender.height = audioHolder.clientHeight;
         audioRender.play()
 
         this.#renderClient.audio.mediaSource = mediaSource
@@ -512,14 +423,14 @@ module.exports = class xCloudClient {
         return this.#webrtcChannelProcessors[name]
     }
 
-    reset(){
-        this.getChannelProcessor('control').requestKeyFrame()
-        document.getElementById('videoRender').pause()
-        document.getElementById('videoRender').src = ''
+    // reset(){
+    //     this.getChannelProcessor('control').requestKeyFrame()
+    //     document.getElementById('videoRender').pause()
+    //     document.getElementById('videoRender').src = ''
 
-        var mediaSource =this.#renderClient.video.mediaSource
-        var videoSourceUrl = window.URL.createObjectURL(mediaSource);
-        document.getElementById('videoRender').src = videoSourceUrl;
-        // document.getElementById('videoRender').play()
-    }
+    //     var mediaSource =this.#renderClient.video.mediaSource
+    //     var videoSourceUrl = window.URL.createObjectURL(mediaSource);
+    //     document.getElementById('videoRender').src = videoSourceUrl;
+    //     // document.getElementById('videoRender').play()
+    // }
 }

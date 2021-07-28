@@ -40,28 +40,33 @@ class Gamepads {
             for(var gamepad in this.#gamepads){
                 var gamepadState = navigator.getGamepads()[this.#gamepads[gamepad].index]
 
-                if(! this.hasButtonStateChange(this.#gamepads[gamepad].buttons, gamepadState.buttons)){
+                var buttonChange = this.hasButtonStateChange(this.#gamepads[gamepad].buttons, gamepadState.buttons)
+                var axesChange = this.hasAxesStateChange(this.#gamepads[gamepad].axes, gamepadState.axes)
+
+                if(buttonChange || axesChange){
+                    this.emitEvent('statechange', gamepadState)
+                }
+
+                if(buttonChange){
                     this.#gamepads[gamepad].buttons = gamepadState.buttons
                     // gamepadState.timingControllerActivity = performance.now()
                     this.emitEvent('buttonpress', gamepadState.buttons)
-                    this.emitEvent('statechange', gamepadState)
                 }
 
-                if(! this.hasAxesStateChange(this.#gamepads[gamepad].axes, gamepadState.axes)){
+                if(axesChange){
                     this.#gamepads[gamepad].axes = gamepadState.axes
                     // gamepadState.timingControllerActivity = performance.now()
                     this.emitEvent('axeschange', gamepadState.buttons)
-                    this.emitEvent('statechange', gamepadState)
                 }
             }
-        }, 10)
+        }, 50)
     }
 
     hasButtonStateChange(x, y) {
-        var objectsAreSame = true;
+        var objectsAreSame = false;
         for(var propertyName in x) {
             if(x[propertyName].value !== y[propertyName].value) {
-                objectsAreSame = false;
+                objectsAreSame = true;
                 break;
             }
         }
@@ -69,10 +74,10 @@ class Gamepads {
     }
 
     hasAxesStateChange(x, y) {
-        var objectsAreSame = true;
+        var objectsAreSame = false;
         for(var propertyName in x) {
             if(x[propertyName] !== y[propertyName]) {
-                objectsAreSame = false;
+                objectsAreSame = true;
                 break;
             }
         }
