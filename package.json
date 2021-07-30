@@ -32,9 +32,7 @@
   "author": "UnknownSKL <info@jimkroon.nl>",
   "license": "MIT",
   "dependencies": {
-    "body-parser": "^1.19.0",
     "electron-squirrel-startup": "^1.0.0",
-    "express": "^4.17.1",
     "xbox-webapi": "^1.2.0"
   },
   "devDependencies": {
