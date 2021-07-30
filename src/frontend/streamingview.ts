@@ -4,14 +4,28 @@ import StreamClient from "./streamclient";
 
 export default class StreamingView {
 
-    _application:Application;
-    _streamClient:StreamClient;
+    _application:Application
+    _streamClient:StreamClient
 
     _streamActive = false
-    _lastMouseMovement = 0;
-    _mouseInterval:any;
+    _lastMouseMovement = 0
+    _mouseInterval:any
+
+    _networkIndicatorLastToggle = 0
 
     _showDebug = false
+
+    // _quality = {
+    //     video: 'bad',
+    //     audio: 'unknown',
+    //     metadata: 'unknown',
+    //     gamepad: 'unknown',
+    // }
+
+    _qualityVideo = 'perfect'
+    _qualityAudio = 'perfect'
+    _qualityMetadata = 'perfect'
+    _qualityGamepad = 'perfect'
 
     constructor(application:Application){
         this._application = application
@@ -66,6 +80,9 @@ export default class StreamingView {
                     case 78:
                         this._application._StreamingView._streamClient._webrtcClient.getChannelProcessor('input').pressButton(0, { Nexus: 1 })
                         break;
+                    case 48:
+                        this._application._StreamingView._streamClient._webrtcClient.getChannelProcessor('audio').softReset()
+                        break;
                 }
             }
         };
@@ -73,6 +90,55 @@ export default class StreamingView {
         // Display loading screen...
         const actionBar = (<HTMLInputElement>document.getElementById('loadingScreen'))
         actionBar.style.display = 'block'
+
+        // Handle network indicator
+        const checkNetworkIndicator = () => {
+
+            let overallQuality = 'perfect'
+            if((this._qualityVideo === 'good' || this._qualityAudio === 'good' || this._qualityMetadata === 'good' || this._qualityGamepad === 'good') && overallQuality === 'perfect'){
+                overallQuality = 'good'
+            }
+            if((this._qualityVideo === 'low' || this._qualityAudio === 'low' || this._qualityMetadata === 'low' || this._qualityGamepad === 'low') && (overallQuality === 'good' || overallQuality === 'perfect')){
+                overallQuality = 'low'
+            }
+            if((this._qualityVideo === 'bad' || this._qualityAudio === 'bad' || this._qualityMetadata === 'bad' || this._qualityGamepad === 'bad') && (overallQuality === 'bad' || overallQuality === 'good' || overallQuality === 'perfect')){
+                overallQuality = 'bad'
+            }
+
+            const niVideo = (<HTMLInputElement>document.getElementById('niVideo'))
+            const niAudio = (<HTMLInputElement>document.getElementById('niAudio'))
+            const niMetadata = (<HTMLInputElement>document.getElementById('niMetadata'))
+            const niGamepad = (<HTMLInputElement>document.getElementById('niGamepad'))
+
+            niVideo.innerHTML = (this._qualityVideo === 'perfect' || this._qualityVideo === 'good') ? '&#x2713;' : this._qualityVideo
+            niAudio.innerHTML = (this._qualityAudio === 'perfect' || this._qualityAudio === 'good') ? '&#x2713;' : this._qualityAudio
+            niMetadata.innerHTML = (this._qualityMetadata === 'perfect' || this._qualityMetadata === 'good') ? '&#x2713;' : this._qualityMetadata
+            niGamepad.innerHTML = (this._qualityGamepad === 'perfect' || this._qualityGamepad === 'good') ? '&#x2713;' : this._qualityGamepad
+
+
+            console.log('stream quality is:', overallQuality)
+
+            const actionBar = (<HTMLInputElement>document.getElementById('networkIndicator'))
+            if(overallQuality === 'low' || overallQuality === 'bad'){
+                // actionBar.style.display = 'block'
+                if(actionBar.classList.contains('hidden'))
+                    actionBar.classList.remove('hidden')
+
+                this._networkIndicatorLastToggle = Math.floor(Date.now() / 1000)
+            } else {
+                if((Math.floor(Date.now() / 1000) - this._networkIndicatorLastToggle) > 3){
+                    // actionBar.style.display = 'none'
+                    if(! actionBar.classList.contains('hidden'))
+                        actionBar.classList.add('hidden')
+
+                    this._networkIndicatorLastToggle = Math.floor(Date.now() / 1000)
+                }
+            }
+            
+
+            setTimeout(checkNetworkIndicator, 500)
+        }
+        setTimeout(checkNetworkIndicator, 500)
     }
 
     startStream(type: string, serverId:string):void {
@@ -140,10 +206,72 @@ export default class StreamingView {
             this._streamClient._webrtcClient.getChannelProcessor('video').addEventListener('latency', (event:any) => {
                 // console.log('FPS Event:', event)
                 document.getElementById('videoLatencyCounter').innerHTML = 'min: '+event.minLatency+'ms / avg: '+event.avgLatency+'ms / max: '+event.maxLatency+'ms'
+                
+                if(event.maxLatency > 25 && event.maxLatency <= 50){
+                    this._qualityVideo = 'good'
+                } else if(event.maxLatency > 50 && event.maxLatency < 100){
+                    this._qualityVideo = 'low'
+                } else if(event.maxLatency > 100){
+                    this._qualityVideo = 'bad'
+                } else {
+                    this._qualityVideo = 'perfect'
+                }
             })
             this._streamClient._webrtcClient.getChannelProcessor('audio').addEventListener('fps', (event:any) => {
                 // console.log('FPS Event:', event)
                 document.getElementById('audioFpsCounter').innerHTML = event.fps
+            })
+            this._streamClient._webrtcClient.getChannelProcessor('audio').addEventListener('latency', (event:any) => {
+                // console.log('FPS Event:', event)
+                document.getElementById('audioLatencyCounter').innerHTML = 'min: '+event.minLatency+'ms / avg: '+event.avgLatency+'ms / max: '+event.maxLatency+'ms'
+                
+                if(event.maxLatency > 25 && event.maxLatency <= 50){
+                    this._qualityAudio = 'good'
+                } else if(event.maxLatency > 50 && event.maxLatency < 100){
+                    this._qualityAudio = 'low'
+                } else if(event.maxLatency > 100){
+                    this._qualityAudio = 'bad'
+                } else {
+                    this._qualityAudio = 'perfect'
+                }
+            })
+            this._streamClient._webrtcClient.getChannelProcessor('input').addEventListener('latency', (event:any) => {
+                // console.log('FPS Event:', event)
+                document.getElementById('inputLatencyCounter').innerHTML = 'min: '+event.minLatency+'ms / avg: '+event.avgLatency+'ms / max: '+event.maxLatency+'ms'
+                
+                if(event.maxLatency > 150 && event.maxLatency <= 300){
+                    this._qualityMetadata = 'good'
+                } else if(event.maxLatency > 300 && event.maxLatency <= 450){
+                    this._qualityMetadata = 'low'
+                } else if(event.maxLatency > 450){
+                    this._qualityMetadata = 'bad'
+                } else {
+                    this._qualityMetadata = 'perfect'
+                }
+            })
+            this._streamClient._webrtcClient.getChannelProcessor('input').addEventListener('gamepadlatency', (event:any) => {
+                // console.log('FPS Event:', event)
+                document.getElementById('gamepadLatencyCounter').innerHTML = 'min: '+event.minLatency+'ms / avg: '+event.avgLatency+'ms / max: '+event.maxLatency+'ms'
+                
+                if(event.maxLatency > 10 && event.maxLatency <= 25){
+                    this._qualityGamepad = 'good'
+                } else if(event.maxLatency > 25 && event.maxLatency < 100){
+                    this._qualityGamepad = 'low'
+                } else if(event.maxLatency > 100){
+                    this._qualityGamepad = 'bad'
+                } else {
+                    this._qualityGamepad = 'perfect'
+                }
+            })
+
+            // Debug: Bitrates:
+            this._streamClient._webrtcClient.getChannelProcessor('video').addEventListener('bitrate', (event:any) => {
+                // document.getElementById('videoBitrate').innerHTML = JSON.stringify(event)
+                document.getElementById('videoBitrate').innerHTML = (event.videoBitrate/8)+' KBps / '+(event.packetBitrate/8)+' KBps'
+            })
+            this._streamClient._webrtcClient.getChannelProcessor('audio').addEventListener('bitrate', (event:any) => {
+                document.getElementById('audioBitrate').innerHTML = (event.audioBitrate/8)+' KBps / '+(event.packetBitrate/8)+' KBps'
+                // document.getElementById('audioBitrate').innerHTML = (event.audioBitrate/8)+' KBps'
             })
 
             // Debug: Performance
@@ -156,8 +284,14 @@ export default class StreamingView {
             this._streamClient._webrtcClient.getChannelProcessor('audio').addEventListener('queue', (event:any) => {
                 document.getElementById('audioPerformance').innerHTML = JSON.stringify(event)
             })
+            this._streamClient._webrtcClient.getChannelProcessor('audio').addEventListener('latency', (event:any) => {
+                document.getElementById('audioLatency').innerHTML = JSON.stringify(event)
+            })
             this._streamClient._webrtcClient.getChannelProcessor('input').addEventListener('queue', (event:any) => {
                 document.getElementById('inputPerformance').innerHTML = JSON.stringify(event)
+            })
+            this._streamClient._webrtcClient.getChannelProcessor('input').addEventListener('latency', (event:any) => {
+                document.getElementById('inputLatency').innerHTML = JSON.stringify(event)
             })
 
             // Dialogs
@@ -247,14 +381,18 @@ export default class StreamingView {
             const lastMovement = (Date.now()-this._lastMouseMovement)/1000
             // console.log('last Movement:', lastMovement)
 
-            if(lastMovement > 5){
+            if(lastMovement > 3){
                 const actionBar = (<HTMLInputElement>document.getElementById('actionBar'))
-                actionBar.style.display = 'none'
+                // actionBar.style.display = 'none'
+                if(! actionBar.classList.contains('hidden'))
+                        actionBar.classList.add('hidden')
             } else {
                 const actionBar = (<HTMLInputElement>document.getElementById('actionBar'))
-                actionBar.style.display = 'block'
+                // actionBar.style.display = 'block'
+                if(actionBar.classList.contains('hidden'))
+                        actionBar.classList.remove('hidden')
             }
-        }, 1000)
+        }, 250)
     }
 
     updateDebugLayer(){
@@ -271,18 +409,20 @@ export default class StreamingView {
         return new Promise((resolve, reject) => {
             console.log('StreamingView.js: Loaded view')
 
-            this._mouseInterval = setInterval(() => {
-                const lastMovement = (Date.now()-this._lastMouseMovement)/1000
-                // console.log('last Movement:', lastMovement)
+            if(this._mouseInterval != undefined){
+                this._mouseInterval = setInterval(() => {
+                    const lastMovement = (Date.now()-this._lastMouseMovement)/1000
+                    // console.log('last Movement:', lastMovement)
 
-                if(lastMovement > 5){
-                    const actionBar = (<HTMLInputElement>document.getElementById('actionBar'))
-                    actionBar.style.display = 'none'
-                } else {
-                    const actionBar = (<HTMLInputElement>document.getElementById('actionBar'))
-                    actionBar.style.display = 'block'
-                }
-            }, 1000)
+                    if(lastMovement > 5){
+                        const actionBar = (<HTMLInputElement>document.getElementById('actionBar'))
+                        actionBar.style.display = 'none'
+                    } else {
+                        const actionBar = (<HTMLInputElement>document.getElementById('actionBar'))
+                        actionBar.style.display = 'block'
+                    }
+                }, 1000)
+            }
 
             resolve(true)
         })

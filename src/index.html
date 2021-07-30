@@ -21,12 +21,7 @@
         }
       })
     </script>
-
-    <script type="text/javascript">
-      LIBOPUS_WASM_URL = "assets/opus/libopus.wasm";
-    </script>
-    <script type="text/javascript" src="assets/opus/libopus.wasm.js"></script>
-
+    
     <script src="assets/xsdk/client.js"></script>
     <script src="assets/xsdk/gamepad.js"></script>
     <script src="assets/xsdk/channels/base.js"></script>
@@ -108,8 +103,6 @@
       <div id="appView" style="display:none;">
 
         <div id="appContent">
-          <h1>Application View</h1>
-
           <div id="consolesList">
 
             <div class="consoleItem">
@@ -118,6 +111,12 @@
               <div class="lds-ring"><div></div><div></div><div></div><div></div></div><br />
             </div>
 
+          </div>
+
+          <div id="friendsList">
+            <center>
+              <div class="lds-ring"><div></div><div></div><div></div><div></div></div><br />
+            </center>
           </div>
         </div>
       </div>
@@ -138,6 +137,17 @@
 
         <div id="videoHolder" style="display: none;"></div>
 
+        <div id="networkIndicator" class="hidden">
+          <span class="icon">&#9888;</span>
+
+          <p class="checklist">
+            <strong>Video:</strong> <sppan id="niVideo"></sppan> <br />
+            <strong>Audio:</strong> <sppan id="niAudio"></sppan> <br />
+            <strong>Metadata:</strong> <sppan id="niMetadata"></sppan> <br />
+            <strong>Gamepad:</strong> <sppan id="niGamepad"></sppan> <br />
+          </p>
+        </div>
+
         <div id="modalDialog" style="display: none;">
             <div class="modalDialogBg"></div>
             <div class="modalDialogBox">
@@ -156,18 +166,28 @@
         <div id="debugRightTop" style="display: none;">
             <p>
                 <strong>Video FPS:</strong> <span id="videoFpsCounter">0</span> (<span id="videoLatencyCounter">N/A</span>)<br />
-                <strong>Audio FPS:</strong> <span id="audioFpsCounter">0</span>
+                <strong>Audio FPS:</strong> <span id="audioFpsCounter">0</span> (<span id="audioLatencyCounter">N/A</span>)<br />
+                <strong>Metadata Input:</strong> <span id="inputLatencyCounter">N/A</span><br />
+                <strong>Gamepad Input:</strong> <span id="gamepadLatencyCounter">N/A</span>
             </p>
         </div>
 
         <div id="debugRightBottom" style="display: none;">
-            <strong>Debug output:</strong>
-            <p>
-                <strong>Video:</strong> <span id="videoPerformance"></span><br />
-                <strong>Video Latency:</strong> <span id="videoLatency"></span><br />
-                <strong>Audio:</strong> <span id="audioPerformance"></span><br />
-                <strong>Input:</strong> <span id="inputPerformance"></span>
-            </p>
+          <strong>Bitrates <small>(data/packet):</small></strong>
+          <p>
+            Video: <span id="videoBitrate"></span><br />
+            Audio: <span id="audioBitrate"></span><br />
+          </p>
+          <br />
+          <strong>Debug output:</strong>
+          <p>
+              <strong>Video:</strong> <span id="videoPerformance"></span><br />
+              <strong>Video Latency:</strong> <span id="videoLatency"></span><br />
+              <strong>Audio:</strong> <span id="audioPerformance"></span><br />
+              <strong>Audio Latency:</strong> <span id="audioLatency"></span><br />
+              <strong>Input:</strong> <span id="inputPerformance"></span> <br />
+              <strong>Input Latency:</strong> <span id="inputLatency"></span><br />
+          </p>
         </div>
 
         <div id="debugLeftBottom" style="display: none;">

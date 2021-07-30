@@ -14,9 +14,9 @@ export default class AppView {
 
         const backgrounds = [
             'linear-gradient(0deg, rgba(26,27,30,1) 0%, rgba(26,27,30,1) 50%, rgba(0,212,255,0) 100%), url(\'assets/images/background_1.jpg\')',
-            'linear-gradient(0deg, rgba(26,27,30,1) 0%, rgba(26,27,30,1) 50%, rgba(0,212,255,0) 100%), url(\'assets/images/background_2.jpg\')',
-            'linear-gradient(0deg, rgba(26,27,30,1) 0%, rgba(26,27,30,1) 50%, rgba(0,212,255,0) 100%), url(\'assets/images/background_3.jpg\')',
-            'linear-gradient(0deg, rgba(26,27,30,1) 0%, rgba(26,27,30,1) 50%, rgba(0,212,255,0) 100%), url(\'assets/images/background_4.jpg\')',
+            // 'linear-gradient(0deg, rgba(26,27,30,1) 0%, rgba(26,27,30,1) 50%, rgba(0,212,255,0) 100%), url(\'assets/images/background_2.jpg\')',
+            // 'linear-gradient(0deg, rgba(26,27,30,1) 0%, rgba(26,27,30,1) 50%, rgba(0,212,255,0) 100%), url(\'assets/images/background_3.jpg\')',
+            // 'linear-gradient(0deg, rgba(26,27,30,1) 0%, rgba(26,27,30,1) 50%, rgba(0,212,255,0) 100%), url(\'assets/images/background_4.jpg\')',
         ]
 
         const appView = (<HTMLInputElement>document.getElementById('appView'))
@@ -96,6 +96,84 @@ export default class AppView {
         }).catch((error) => {
             console.log('error:', error)
         })
+
+        // Load friends
+        this._apiClient = new apiClient(this._application._tokenStore._web.uhs, this._application._tokenStore._web.userToken)
+
+
+        const intervalFriendsHandler = () => {
+            this._apiClient.getFriends().then((profiles:any) => {
+                // console.log('Loaded friends:', profiles.people)
+                // console.log('User has '+profiles.people.length+' friends')
+
+                const friendsList = (<HTMLInputElement>document.getElementById('friendsList'))
+                let friendsHtml = '<ul class="people">'
+
+                // Query for online peopple
+                for(const person in profiles.people){
+                    if(profiles.people[person].presenceState === 'Online'){
+                        friendsHtml += '<li class="online">'
+                        friendsHtml += '    <img class="userimage" src="'+profiles.people[person].displayPicRaw+'" />'
+                        friendsHtml += '    <div class="userinfo">'
+                        friendsHtml += '        <p>'+profiles.people[person].displayName+'</p>'
+
+                        let isGame = false
+                        const presenceDetails = profiles.people[person].presenceDetails
+                        for(const detail in presenceDetails){
+                            if(presenceDetails[detail].IsGame === true && presenceDetails[detail].IsPrimary === true)
+                                isGame = true
+                        }
+
+                        if(profiles.people[person].presenceText !== '' && isGame === true)
+                            friendsHtml += '        <p class="userstatus"><img src="assets/icons/gamepad.svg" width="15 height="15 /> '+profiles.people[person].presenceText+'</p>'
+
+                        else if(profiles.people[person].presenceText !== '' && isGame === false)
+                            friendsHtml += '        <p class="userstatus">'+profiles.people[person].presenceText+'</p>'
+                        else
+                            friendsHtml += '        <p class="userstatus">'+profiles.people[person].presenceState+'</p>'
+
+                        friendsHtml += '    </div>'
+                        friendsHtml += '</li>'
+                    }
+                }
+
+                // // Query for offline people
+                // for(const person in profiles.people){
+                //     if(profiles.people[person].presenceState === 'Offline'){
+                //         friendsHtml += '<li class="offline">'
+                //         friendsHtml += '    <img class="userimage" src="'+profiles.people[person].displayPicRaw+'" />'
+                //         friendsHtml += '    <div class="userinfo">'
+                //         friendsHtml += '        <p>'+profiles.people[person].displayName+'</p>'
+
+                //         if(profiles.people[person].presenceText === profiles.people[person].presenceState)
+                //             friendsHtml += '        <p>'+profiles.people[person].presenceState+'</p>'
+                //         else
+                //             friendsHtml += '        <p class="userstatus">'+profiles.people[person].presenceState+' - '+profiles.people[person].presenceText+'</p>'
+
+                //         friendsHtml += '    </div>'
+                //         friendsHtml += '</li>'
+                //     }
+                // }
+                friendsHtml += '</ul>'
+
+                friendsList.innerHTML = friendsHtml
+
+                document.querySelectorAll('img.userimage').forEach(function(img){
+                    img = (<HTMLElement>img)
+                    img.addEventListener('error', (event) => {
+                        console.log('imgsrror:', event)
+                    })
+                    // img.onerror = function(){
+                    //     this.style.display='none';
+                    // };
+                })
+
+            }).catch((error) => {
+                console.log('error:', error)
+            })
+        }
+        setInterval(intervalFriendsHandler, 60000)
+        intervalFriendsHandler()
 
         // Load user profile
         // this._apiClient.isAuthenticated().then(() => {

@@ -29,6 +29,7 @@ body {
     left: 0px;
     right: 0px;
     bottom: 0px;
+    overflow-y: auto;
 }
 
 /**
@@ -98,6 +99,83 @@ body {
     background-size: cover;
 }
 
+#appView #appContent {
+    padding-top: 70px;
+}
+
+#appView #appContent #consolesList {
+    width: 70%;
+    position: absolute;
+    top: 70px;
+    left: 0px;
+}
+
+#appView #appContent #friendsList {
+    width: 30%;
+    backdrop-filter: blur(20px);
+
+    background: rgba(0, 0, 0, 0.55);
+    position: fixed;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    padding-top: 70px;
+    max-width: 400px;
+    overflow-y: auto;
+}
+
+#appView #appContent #friendsList p.center {
+    color: #ffffff;
+    padding: 20px;
+    text-align: center;
+}
+
+#appView #appContent #friendsList .lds-ring {
+    margin: 20px auto;
+}
+
+#appView #friendsList ul.people {
+    padding-top: 10px;
+}
+
+#appView #friendsList ul.people li {
+    display: block;
+    height: 55px;
+    padding-top: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#appView #friendsList ul.people li.offline {
+    opacity: 0.3;
+}
+#appView #friendsList ul.people li.offline:hover {
+    opacity: 0.7;
+}
+
+#appView #friendsList ul.people li .userimage {
+    display: block;
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+    float: left;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+#appView #friendsList ul.people div.userinfo p {
+    color: #ffffff;
+    font-size: 14px;
+    padding-bottom: 5px;
+}
+
+#appView #friendsList ul.people div.userinfo p.userstatus {
+    font-size: 12px;
+    opacity: 0.7;
+}
+
+
+/* Actionbar */
+
 #actionBar {
     backdrop-filter: blur(20px);
 
@@ -109,11 +187,22 @@ body {
     height: 70px;
     overflow: hidden;
     z-index: 80;
+    opacity: 1;
+
+    -webkit-transition: opacity 0.3s ease-in-out;
+    -moz-transition: opacity 0.3s ease-in-out;
+    -ms-transition: opacity 0.3s ease-in-out;
+    -o-transition: opacity 0.3s ease-in-out;
+    transition: opacity 0.3s ease-in-out;
     
     /* -webkit-transition: all 1s linear;
     -moz-transition: all 1s linear;
     -o-transition: all 1s linear;
     transition: all 1s linear; */
+}
+
+#actionBar.hidden {
+    opacity: 0;
 }
 
 #actionBar.small {
@@ -184,11 +273,11 @@ body {
     color: #ffffff;
     text-decoration: none;
     padding: 10px;
-    opacity: 0.5;
+    opacity: 0.7;
 }
 
 #actionBar ul li a:hover {
-    opacity: 0.75;
+    opacity: 1;
 }
 
 
@@ -203,9 +292,9 @@ body {
     font-weight: bold;
 }
 
-#actionBar ul.userProfile li {
-    opacity: 0.5;
-}
+/* #actionBar ul.userProfile li {
+    opacity: 0.7;
+} */
 
 #actionBar ul.userProfile li span#actionBarUserGamerscore {
     color: #ffffff;
@@ -290,7 +379,7 @@ body {
 }
 
 #streamingView #debugLeftBottom {
-    backdrop-filter: blur(20px);
+    /* backdrop-filter: blur(20px); */
     background-color: #000000;
     color: #ffffff;
     position: fixed;
@@ -298,11 +387,11 @@ body {
     bottom: 0px;
     padding: 20px;   
     z-index: 90;
-    opacity: 0.5;
+    opacity: 0.7;
 }
 
 #streamingView #debugRightBottom {
-    backdrop-filter: blur(20px);
+    /* backdrop-filter: blur(20px); */
     background-color: #000000;
     color: #ffffff;
     position: fixed;
@@ -310,11 +399,11 @@ body {
     bottom: 0px;
     padding: 20px;
     z-index: 90;
-    opacity: 0.5;
+    opacity: 0.7;
 }
 
 #streamingView #debugRightTop {
-    backdrop-filter: blur(20px);
+    /* backdrop-filter: blur(20px); */
     background-color: #000000;
     color: #ffffff;
     position: fixed;
@@ -322,7 +411,7 @@ body {
     top: 0px;
     padding: 20px;
     z-index: 90;
-    opacity: 0.5;
+    opacity: 0.7;
 }
 
 #streamingView #debugLeftBottom:hover, #streamingView #debugRightBottom:hover, #streamingView #debugRightTop:hover {
@@ -387,6 +476,49 @@ body {
 #streamingView .modalDialogContainer button.btn {
     margin-right: 20px;
     padding-top: 0px;
+}
+
+
+#streamingView #networkIndicator {
+    /* backdrop-filter: blur(20px); */
+    background: #000000;
+    position: relative;
+    margin: 100px auto;
+    min-width: 100px;
+    max-width: 250px;
+    height: 100px;
+    z-index: 98;
+    border-radius: 50px;
+    opacity: 0.75;
+
+    -webkit-transition: opacity 1s ease-in-out;
+    -moz-transition: opacity 1s ease-in-out;
+    -ms-transition: opacity 1s ease-in-out;
+    -o-transition: opacity 1s ease-in-out;
+    transition: opacity 1s ease-in-out;
+}
+
+#streamingView #networkIndicator.hidden {
+    opacity: 0;
+}
+
+#streamingView #networkIndicator span.icon {
+    position: relative;
+    top: 4px;
+    margin-left: 30px;
+    margin-right: 30px;
+    font-size: 40px;
+    color: #ffffff;
+    display: inline-block;
+}
+
+#streamingView #networkIndicator p {
+    font-size: 12px;
+    color: #ffffff;
+    display: inline-block;
+
+    position: relative;
+    top: 18px;
 }
 
 /**

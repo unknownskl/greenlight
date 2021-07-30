@@ -8,14 +8,73 @@ class InputChannel extends BaseChannel {
     #gamepadCounter = 0
     #frameCounter = 0
 
+    #maxInputLatency
+    #minInputLatency
+    #inputLatency = []
+
+    #maxMetadataLatency
+    #minMetadataLatency
+    #metadataLatency = []
+
     #events = {
         'queue': [],
         'fps': [],
+        'latency': [],
+        'gamepadlatency': []
     }
 
     onOpen(event) {
         setInterval(() => {
             // console.log('xSDK channels/input.js - [performance] sequence:', this.#inputSequenceNum, 'gamepadQueue size:', Object.keys(this.#gamepadQueue).length)
+            // calc latency
+            var latencyCount = 0;
+            for(const latencyTime in this.#inputLatency){
+
+                if(this.#inputLatency[latencyTime] !== undefined){
+                    latencyCount += this.#inputLatency[latencyTime]
+                }
+            }
+            
+            if(this.#inputLatency.length > 0){
+                latencyCount = (latencyCount/this.#inputLatency.length)
+            }
+
+            if(this.#minInputLatency === undefined)
+                this.#minInputLatency = 0
+            
+            if(this.#maxInputLatency === undefined)
+                this.#maxInputLatency = 0
+
+            this.emitEvent('gamepadlatency', { minLatency: Math.round(this.#minInputLatency*100)/100, avgLatency: Math.round(latencyCount*100)/100, maxLatency: Math.round(this.#maxInputLatency*100)/100 })
+            this.#maxInputLatency = undefined
+            this.#minInputLatency = undefined
+            this.#inputLatency = []
+
+            // Gamepad latency
+            var metadataLatencyCount = 0;
+            for(const latencyTime in this.#metadataLatency){
+
+                if(this.#metadataLatency[latencyTime] !== undefined){
+                    metadataLatencyCount += this.#metadataLatency[latencyTime]
+                }
+            }
+            
+            if(this.#metadataLatency.length > 0){
+                metadataLatencyCount = (metadataLatencyCount/this.#metadataLatency.length)
+            }
+
+            if(this.#minMetadataLatency === undefined)
+                this.#minMetadataLatency = 0
+            
+            if(this.#maxMetadataLatency === undefined)
+                this.#maxMetadataLatency = 0
+
+            this.emitEvent('latency', { minLatency: Math.round(this.#minMetadataLatency*100)/100, avgLatency: Math.round(metadataLatencyCount*100)/100, maxLatency: Math.round(this.#maxMetadataLatency*100)/100 })
+            this.#maxMetadataLatency = undefined
+            this.#minMetadataLatency = undefined
+            this.#metadataLatency = []
+            
+            // Calc fps
             var fps = this.#frameCounter
             this.emitEvent('queue', { sequenceNum: this.#inputSequenceNum, sendCounter: this.#sendCounter, frameCounter: this.#frameCounter, gamepadCounter: this.#gamepadCounter, gamepadQueue: this.#gamepadQueue.length})
             this.#sendCounter = 0
@@ -40,7 +99,7 @@ class InputChannel extends BaseChannel {
         setInterval(() => {
             // Check if we already have gotten the metadata.
             var frameMetadataLength = this.getClient().getChannelProcessor('video').getFrameMetadataLength()
-            if(frameMetadataLength > 20 || this.#gamepadQueue.length > 0) {
+            if(frameMetadataLength > 5 || this.#gamepadQueue.length > 0) {
                 var frameMetadata = this.getClient().getChannelProcessor('video').getFrameMetadataQueue()
                 // console.log('PROCESSED INPUT PACKET: PRE frameMetadata.length', frameMetadata.length, 'gamepadMetadata.length', this.#gamepadQueue.length)
 
@@ -107,24 +166,19 @@ class InputChannel extends BaseChannel {
 
                 if(gamepadMetadata.length > 0) {
                     try {
+                        // console.log('input: gamepadMetadata', gamepadMetadata[0])
                         dataOffset = this.generateGamepadFrame(reportArrayView, gamepadMetadata, dataOffset)
                     } catch (error) {
                         console.log('ERROR generateGamepadFrame: reportArrayView, gamepadMetadata, dataOffset', reportArrayView, gamepadMetadata, dataOffset)
                         throw error
                     }
                 }
-
-                // if(gamepadMetadata.length > 0) {
-                //     // this.generateGamepadFrame(reportArrayView, packetTimeNow, gamepadMetadata, dataOffset) // @TODO: Implement feature
-                // }
-
-                // console.log('PROCESSED INPUT PACKET: frameMetadata.length', frameMetadata.length, 'gamepadMetadata.length', gamepadMetadata.length)
-
+                
                 var inputPacket = reportArray.subarray(0, headerSize)
                 this.send(inputPacket)
                 this.#sendCounter++
             }
-        }, 5)
+        }, 10)
         
         
     }
@@ -150,7 +204,8 @@ class InputChannel extends BaseChannel {
         state.GamepadIndex = index
         state.PhysicalPhysicality = 0
         state.VirtualPhysicality = 0
-        state.Dirty = true
+        state.Dirty = true,
+        state.timingGamepadState = performance.now()
 
         this.#gamepadQueue.push(state)
     }
@@ -225,6 +280,16 @@ class InputChannel extends BaseChannel {
             // console.log('RAINWAY WEBRTC: generateMetadataFrame values i', firstFramePacketArrivalTimeMs, 'r', frameSubmittedTimeMs, 'o', frameDecodedTimeMs, 'h', frameRenderedTimeMs, 'c', framePacketTime, 'd', frameDateNow, 'a.serverDataKey', frame.serverDataKey)
 
             offset += 28
+
+            // Measure latency
+            const metadataDelay = (performance.now()-frame.frameRenderedTimeMs)
+            this.#metadataLatency.push(metadataDelay)
+            if(metadataDelay > this.#maxMetadataLatency || this.#maxMetadataLatency ===  undefined){
+                this.#maxMetadataLatency = metadataDelay
+
+            } else if(metadataDelay < this.#minMetadataLatency || this.#minMetadataLatency ===  undefined){
+                this.#minMetadataLatency = metadataDelay
+            }
         }
 
         return offset
@@ -268,6 +333,16 @@ class InputChannel extends BaseChannel {
             dataView.setUint32(offset+14, 0, true) // PhysicalPhysicality
             dataView.setUint32(offset+18, 0, true) // VirtualPhysicality
             offset += 22
+
+            // Measure latency
+            const inputDelay = (performance.now()-input.timingGamepadState)
+            this.#inputLatency.push(inputDelay)
+            if(inputDelay > this.#maxInputLatency || this.#maxInputLatency === undefined){
+                this.#maxInputLatency = inputDelay
+
+            } else if(inputDelay < this.#minInputLatency || this.#minInputLatency === undefined){
+                this.#minInputLatency = inputDelay
+            }
         }
 
         return offset
