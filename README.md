@@ -35,6 +35,8 @@ Run development build:
 ## Known Issues
 
 - Audio can get distorted when the audio is delayed or gets out of sync. This should recover within 3 seconds. You can also manually press `0` on your keyboard to reset the audio timings.
+- Video can get behind when the window is out of focus. To fix the issue, restart the application.
+- Starting a new stream after disconnecting from the old one can cause unexpected behaviour and performance issues. Restart the application to fix this problem.
 
 ## Changelog
 
