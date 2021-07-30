@@ -44,26 +44,26 @@ jobs:
           # release the app after building
           release: ${{ startsWith(github.ref, 'refs/tags/v') }}
 
-      - name: Publish artifacts on ubuntu
-        uses: actions/upload-artifact@v2
-        with:
-          name: xbox-xcloud-electron-linux.deb
-          path: |
-            dist/*.deb
-        if: matrix.os == 'ubuntu-latest' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+      # - name: Publish artifacts on ubuntu
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: xbox-xcloud-electron-linux.deb
+      #     path: |
+      #       dist/*.deb
+      #   if: matrix.os == 'ubuntu-latest' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
 
-      - name: Publish artifacts on osx
-        uses: actions/upload-artifact@v2
-        with:
-          name: xbox-xcloud-electron-osx.dmg
-          path: |
-            dist/*.dmg
-        if: matrix.os == 'macos-latest' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+      # - name: Publish artifacts on osx
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: xbox-xcloud-electron-osx.dmg
+      #     path: |
+      #       dist/*.dmg
+      #   if: matrix.os == 'macos-latest' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
 
-      - name: Publish artifacts on windows
-        uses: actions/upload-artifact@v2
-        with:
-          name: xbox-xcloud-electron-windows.zip
-          path: |
-            dist/*.exe
-        if: matrix.os == 'windows-latest' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+      # - name: Publish artifacts on windows
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: xbox-xcloud-electron-windows.zip
+      #     path: |
+      #       dist/*.exe
+      #   if: matrix.os == 'windows-latest' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
