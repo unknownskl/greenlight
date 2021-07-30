@@ -1,5 +1,7 @@
 # Xbox-xCloud-Client
 
+[![Build/release](https://github.com/unknownskl/xbox-xcloud-client/actions/workflows/build.yml/badge.svg)](https://github.com/unknownskl/xbox-xcloud-client/actions/workflows/build.yml)
+
 xbox-xcloud-client is an open-source client for Xbox home streaming made in Javascript and Typescript.
 
 _DISCLAIMER: Xbox-xCloud-Client is not affiliated with Microsoft or Xbox._
