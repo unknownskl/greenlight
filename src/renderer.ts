@@ -31,4 +31,23 @@ import './assets/css/app.css';
 import App from './frontend/application'
 const Application = new App()
 
-// console.log(Application)
+module.exports = {
+    overwriteGamepadState: function (state:any):boolean {
+      // console.log('Set state:', state);
+
+      if(Application._StreamingView !== undefined && Application._StreamingView._streamClient !== undefined && Application._StreamingView._streamClient._webrtcClient !== undefined){
+        const newState = {
+            RightThumbXAxis: state.RightThumbXAxis || 0,
+            RightThumbYAxis: state.RightThumbYAxis || 0,
+        }
+
+        Application._StreamingView._streamClient._webrtcClient.getChannelProcessor('input').overwriteGamepadState(0, newState)
+
+        return true
+      } else {
+          return false
+      }
+      
+    //   client.getChannelProcessor('input').pressButton(0, { Nexus: 1 })
+    }
+};

@@ -14,4 +14,10 @@ module.exports = {
   resolve: {
     extensions: ['.js', '.ts', '.jsx', '.tsx', '.css']
   },
+  output: {
+    // path: './lib',
+    // filename: 'yourlib.js',
+    // libraryTarget: 'var',
+    library: 'xApplication'
+  }
 };

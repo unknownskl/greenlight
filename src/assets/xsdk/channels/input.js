@@ -16,6 +16,8 @@ class InputChannel extends BaseChannel {
     #minMetadataLatency
     #metadataLatency = []
 
+    #gamepadInputOverwrite = {}
+
     #events = {
         'queue': [],
         'fps': [],
@@ -198,8 +200,87 @@ class InputChannel extends BaseChannel {
         }
     }
 
+    overwriteGamepadState(index, inputState) {
+        //
+        if(this.#gamepadInputOverwrite[index] !== undefined){
+            // Old state has not been processed yet because of no gamepad input. Lets process it...
+            var newState = {
+                A: this.#gamepadInputOverwrite[index].A || 0,
+                B: this.#gamepadInputOverwrite[index].B || 0,
+                X: this.#gamepadInputOverwrite[index].X || 0,
+                Y: this.#gamepadInputOverwrite[index].Y || 0,
+                LeftShoulder: this.#gamepadInputOverwrite[index].LeftShoulder || 0,
+                RightShoulder: this.#gamepadInputOverwrite[index].RightShoulder || 0,
+                LeftTrigger: this.#gamepadInputOverwrite[index].LeftTrigger || 0,
+                RightTrigger: this.#gamepadInputOverwrite[index].RightTrigger || 0,
+                View: this.#gamepadInputOverwrite[index].View || 0,
+                Menu: this.#gamepadInputOverwrite[index].Menu || 0,
+                LeftThumb: this.#gamepadInputOverwrite[index].LeftThumb || 0,
+                RightThumb: this.#gamepadInputOverwrite[index].RightThumb || 0,
+                DPadUp: this.#gamepadInputOverwrite[index].DPadUp || 0,
+                DPadDown: this.#gamepadInputOverwrite[index].DPadDown || 0,
+                DPadLeft: this.#gamepadInputOverwrite[index].DPadLeft || 0,
+                DPadRight: this.#gamepadInputOverwrite[index].DPadRight || 0,
+                Nexus: this.#gamepadInputOverwrite[index].Nexus || 0,
+                LeftThumbXAxis: this.#gamepadInputOverwrite[index].LeftThumbXAxis || 0,
+                LeftThumbYAxis: this.#gamepadInputOverwrite[index].LeftThumbYAxis || 0,
+                RightThumbXAxis: this.#gamepadInputOverwrite[index].RightThumbXAxis || 0,
+                RightThumbYAxis: this.#gamepadInputOverwrite[index].RightThumbYAxis || 0,
+            }
+
+            var hasInteraction = false
+            for(let input in newState){
+                if(newState[input] !== 0){
+                    hasInteraction = true
+                }
+            }
+
+            if(hasInteraction === true){
+                console.log('Send overwrite gamepad input...')
+                this.processGamepadState(index, newState)
+            } else {
+                console.log('Skip overwrite gamepad input...')
+            }
+        }
+
+        this.#gamepadInputOverwrite[index] = inputState
+    }
+
     processGamepadState(index, state) {
         // console.log('xSDK channels/input.js - Controller input['+index+']:', state)
+
+        // Check if we have a frame to overwrite
+        if(this.#gamepadInputOverwrite[index] !== undefined){
+
+            for(let input in this.#gamepadInputOverwrite[index]){
+
+                // Process buttons
+                if(this.#gamepadInputOverwrite[index][input] !== 0 && (! input.includes('Axis'))){
+                    // Process only if we have a value.
+                    state[input] = this.#gamepadInputOverwrite[index][input]
+
+                // Process axes
+                } else if(this.#gamepadInputOverwrite[index][input] !== 0 && input.includes('Axis')){
+                    // Process only if we have a value.
+                    // if(state[input] > this.#gamepadInputOverwrite[index][input] && this.#gamepadInputOverwrite[index][input] > 0.){
+                    //     state[input] = (state[input] > this.#gamepadInputOverwrite[index][input])? this.#gamepadInputOverwrite[index][input] : state[input]
+
+                    // } else if(state[input] > this.#gamepadInputOverwrite[index][input] && this.#gamepadInputOverwrite[index][input] < 0){
+                    //     state[input] = (state[input] < this.#gamepadInputOverwrite[index][input])? this.#gamepadInputOverwrite[index][input] : state[input]
+                    // }
+
+                    if(state[input] < 0.1 || state[input] > 0.1) {
+                        // If controller joystick is not used, lets overwrite
+                        state[input] = this.#gamepadInputOverwrite[index][input]
+                        console.log('Allow overwrite axis:', state[input])
+                    } else {
+                        console.log('Do not allow overwrite axis:', state[input])
+                    }
+                }
+            }
+
+            this.#gamepadInputOverwrite[index] = undefined
+        }
 
         state.GamepadIndex = index
         state.PhysicalPhysicality = 0
@@ -211,6 +292,7 @@ class InputChannel extends BaseChannel {
     }
 
     pressButton(index, state) {
+
         var newState = {
             A: state.A || 0,
             B: state.B || 0,
