@@ -13,8 +13,13 @@ export default function (details:any):void {
     if(details.url === 'https://www.xbox.com/?lc=1033'){
         // Catched logout action
 
-        // @TODO: Check why this part crashes when we open the devtools before
-        const window = BrowserWindow.fromId(details.webContentsId)
+        let windowId = 0
+        if(process.env.ISDEV !== undefined){
+            windowId = (details.webContentsId-1)
+        } else {
+            windowId = details.webContentsId
+        }
+        const window = BrowserWindow.fromId(windowId)
         window.close()
 
         session.defaultSession.clearStorageData()
@@ -65,8 +70,13 @@ export default function (details:any):void {
         if(cookieFound === true){
             this.setWebTokens(authToken.UserClaims.uhs, authToken.Token)
 
-            // @TODO: Check why this part crashes when we open the devtools before
-            const window = BrowserWindow.fromId(details.webContentsId)
+            let windowId = 0
+            if(process.env.ISDEV !== undefined){
+                windowId = (details.webContentsId-1)
+            } else {
+                windowId = details.webContentsId
+            }
+            const window = BrowserWindow.fromId(windowId)
             window.close()
 
             // Get xHomeStreaming Token
