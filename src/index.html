@@ -177,17 +177,15 @@
           <p>
             Video: <span id="videoBitrate"></span><br />
             Audio: <span id="audioBitrate"></span><br />
-
-            Current bitrate: <span id="currentBitrate">N/A</span> (min: 512, max: 12000) <br />
-            <button onclick="xApplication..setBitrate(client.getChannelProcessor('control').getBitrate()+1000)">+ 1000</button> <button onclick="client.setBitrate(client.getChannelProcessor('control').getBitrate()-1000)">- 1000</button> <br />
-            <button onclick="client.setBitrate(512)">512</button>
-            <button onclick="client.setBitrate(2700)">2700</button>
-            <button onclick="client.setBitrate(5000)">5000</button>
-            <button onclick="client.setBitrate(8000)">8000</button>
-            <button onclick="client.setBitrate(12000)">12000</button> <br />
-        
+          </p><br />
+          <p>
+            <strong>Set bitrate:</strong><br />
+            <button class="btn btn-small" id="control_bitrate_4000">4000</button>
+            <button class="btn btn-small" id="control_bitrate_8000">8000</button>
+            <button class="btn btn-small" id="control_bitrate_16000">16000</button>
+            <button class="btn btn-small" id="control_bitrate_20000">20000</button>
+            <button class="btn btn-small" id="control_bitrate_30000">30000</button> <br />
           </p>
-          <br />
           <strong>Debug output:</strong>
           <p>
               <!-- <strong>Video:</strong> <span id="videoPerformance"></span><br /> -->

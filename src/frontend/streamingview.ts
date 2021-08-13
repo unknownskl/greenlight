@@ -296,6 +296,28 @@ export default class StreamingView {
                 document.getElementById('inputLatency').innerHTML = JSON.stringify(event)
             })
 
+            // Bitrate control
+            document.getElementById('control_bitrate_4000').onclick = (event:any) => {
+                this._streamClient._webrtcClient.getChannelProcessor('control').setBitrate(4000)
+                console.log('streamingView.js: Set bitrate to 4000')
+            }
+            document.getElementById('control_bitrate_8000').onclick = (event:any) => {
+                this._streamClient._webrtcClient.getChannelProcessor('control').setBitrate(8000)
+                console.log('streamingView.js: Set bitrate to 8000')
+            }
+            document.getElementById('control_bitrate_16000').onclick = (event:any) => {
+                this._streamClient._webrtcClient.getChannelProcessor('control').setBitrate(16000)
+                console.log('streamingView.js: Set bitrate to 16000')
+            }
+            document.getElementById('control_bitrate_20000').onclick = (event:any) => {
+                this._streamClient._webrtcClient.getChannelProcessor('control').setBitrate(20000)
+                console.log('streamingView.js: Set bitrate to 20000')
+            }
+            document.getElementById('control_bitrate_30000').onclick = (event:any) => {
+                this._streamClient._webrtcClient.getChannelProcessor('control').setBitrate(30000)
+                console.log('streamingView.js: Set bitrate to 30000')
+            }
+
             // Dialogs
             this._streamClient._webrtcClient.getChannelProcessor('message').addEventListener('dialog', (event:any) => {
                 console.log('Got dialog event:', event)
