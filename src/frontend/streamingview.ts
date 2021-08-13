@@ -150,7 +150,7 @@ export default class StreamingView {
         streamStatus.innerHTML = 'Connecting to: '+ serverId
 
         const loadingStatus = (<HTMLInputElement>document.getElementById('loadingStatus'))
-        loadingStatus.innerHTML = 'Connecting to console: '+ serverId
+        loadingStatus.innerHTML = 'Connecting to console: '+ serverId +'<br /><span id="streamStatusDetailed">Provisioning...</span>'
 
         
 
@@ -171,7 +171,9 @@ export default class StreamingView {
 
             // const streamStatus = (<HTMLInputElement>document.getElementById('streamStatus'))
             streamStatus.innerHTML = 'Connected to: '+ serverId
-            loadingStatus.innerHTML = 'Connected to console: '+ serverId +'.<br /> Waiting for video stream...'
+
+            const streamStatusDetailed = (<HTMLInputElement>document.getElementById('streamStatusDetailed'))
+            streamStatusDetailed.innerHTML = 'Waiting for video stream...'
 
 
             setTimeout(() => {
@@ -368,6 +370,10 @@ export default class StreamingView {
 
         }).catch((error) => {
             console.log('StreamingView.js: Start stream error:', error)
+            // alert('Start stream error: '+ JSON.stringify(error))
+
+            const streamStatusDetailed = (<HTMLInputElement>document.getElementById('streamStatusDetailed'))
+            streamStatusDetailed.innerHTML = 'Error provisioning xbox: '+JSON.stringify(error)
         })
 
         // const client = new xCloudClient()

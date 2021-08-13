@@ -262,6 +262,10 @@ export default class StreamClient {
                                     })
                                 }, 1000)
                             } else if(data.state === 'Provisioned') {
+
+                                const streamStatusDetailed = (<HTMLInputElement>document.getElementById('streamStatusDetailed'))
+                                streamStatusDetailed.innerHTML = 'Provisioned. Opening connection...'
+
                                 resolve(data)
                             } else {
                                 reject(data)

@@ -174,7 +174,7 @@ module.exports = class xCloudClient {
                             // SDP Has been set, lets do ICE
                             this._application._StreamingView._streamClient.isExchangeReady('ice').then((data) => {
                                 // Got ICE Data. Lets add the candidates to webrtc client
-                                var iceDetails = JSON.parse(data.exchangeResponse)
+                                var iceDetails = JSON.parse(data.candidates)
                                 console.log('xSDK client.js - ICE Candidates:', iceDetails)
 
                                 for(var candidate in iceDetails){
