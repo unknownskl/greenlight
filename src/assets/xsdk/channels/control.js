@@ -12,7 +12,7 @@ class ControlChannel extends BaseChannel {
         // setTimeout(() => {
             var data = JSON.stringify({
                 "message":"rateControlBitrateUpdate",
-                "bitratebps": (12000*1000) // min = 512, max = 12000, default = 5000 (value = * 1000)
+                "bitratebps": (7500*1000) // min = 512, max = 12000, default = 5000 (value = * 1000)
             })
             this.send(data)
 
