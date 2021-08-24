@@ -297,25 +297,25 @@ export default class StreamingView {
             })
 
             // Bitrate control
-            document.getElementById('control_bitrate_4000').onclick = (event:any) => {
-                this._streamClient._webrtcClient.getChannelProcessor('control').setBitrate(4000)
-                console.log('streamingView.js: Set bitrate to 4000')
+            document.getElementById('control_bitrate_512').onclick = (event:any) => {
+                this._streamClient._webrtcClient.getChannelProcessor('control').setBitrate(512)
+                console.log('streamingView.js: Set bitrate to 512')
             }
-            document.getElementById('control_bitrate_8000').onclick = (event:any) => {
-                this._streamClient._webrtcClient.getChannelProcessor('control').setBitrate(8000)
-                console.log('streamingView.js: Set bitrate to 8000')
+            document.getElementById('control_bitrate_2500').onclick = (event:any) => {
+                this._streamClient._webrtcClient.getChannelProcessor('control').setBitrate(2500)
+                console.log('streamingView.js: Set bitrate to 2500')
             }
-            document.getElementById('control_bitrate_16000').onclick = (event:any) => {
-                this._streamClient._webrtcClient.getChannelProcessor('control').setBitrate(16000)
-                console.log('streamingView.js: Set bitrate to 16000')
+            document.getElementById('control_bitrate_5000').onclick = (event:any) => {
+                this._streamClient._webrtcClient.getChannelProcessor('control').setBitrate(5000)
+                console.log('streamingView.js: Set bitrate to 5000')
             }
-            document.getElementById('control_bitrate_20000').onclick = (event:any) => {
-                this._streamClient._webrtcClient.getChannelProcessor('control').setBitrate(20000)
-                console.log('streamingView.js: Set bitrate to 20000')
+            document.getElementById('control_bitrate_8500').onclick = (event:any) => {
+                this._streamClient._webrtcClient.getChannelProcessor('control').setBitrate(8500)
+                console.log('streamingView.js: Set bitrate to 8500')
             }
-            document.getElementById('control_bitrate_30000').onclick = (event:any) => {
-                this._streamClient._webrtcClient.getChannelProcessor('control').setBitrate(30000)
-                console.log('streamingView.js: Set bitrate to 30000')
+            document.getElementById('control_bitrate_12000').onclick = (event:any) => {
+                this._streamClient._webrtcClient.getChannelProcessor('control').setBitrate(12000)
+                console.log('streamingView.js: Set bitrate to 12000')
             }
 
             // Dialogs

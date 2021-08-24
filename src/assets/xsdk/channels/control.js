@@ -63,14 +63,14 @@ class ControlChannel extends BaseChannel {
 
         this.#bitrate = bitrate
 
-        // var data = JSON.stringify({
-        //     "message":"rateControlBitrateUpdate",
-        //     "bitratebps": this.#bitrate // min = 512, max = 12000, default = 5000 (value = * 1000)
-        // })
         var data = JSON.stringify({
-            "message":"videoChannelConfigUpdate",
-            "maxVideoSctpMessageSizeBytes": this.#bitrate // min = 512, max = 12000, default = 5000 (value = * 1000)
+            "message":"rateControlBitrateUpdate",
+            "bitratebps": this.#bitrate // min = 512, max = 12000, default = 5000 (value = * 1000)
         })
+        // var data = JSON.stringify({
+        //     "message":"videoChannelConfigUpdate",
+        //     "maxVideoSctpMessageSizeBytes": this.#bitrate // min = 512, max = 12000, default = 5000 (value = * 1000)
+        // })
         console.log('Set bitrate to:', this.#bitrate)
         this.send(data)
 
