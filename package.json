@@ -44,7 +44,7 @@
     "@electron-forge/plugin-webpack": "^6.0.0-beta.58",
     "@typescript-eslint/eslint-plugin": "^4.29.0",
     "@typescript-eslint/parser": "^4.29.0",
-    "@vercel/webpack-asset-relocator-loader": "^1.6.0",
+    "@vercel/webpack-asset-relocator-loader": "^1.7.0",
     "copy-webpack-plugin": "^9.0.1",
     "css-loader": "^6.2.0",
     "electron": "13.1.7",
@@ -54,7 +54,7 @@
     "fork-ts-checker-webpack-plugin": "^6.3.1",
     "node-loader": "^2.0.0",
     "style-loader": "^3.2.1",
-    "ts-loader": "^9.2.3",
+    "ts-loader": "^9.2.5",
     "typescript": "^4.3.5"
   },
   "config": {
