@@ -14,8 +14,13 @@ class ControlChannel extends BaseChannel {
                 "message":"rateControlBitrateUpdate",
                 "bitratebps": (7500*1000) // min = 512, max = 12000, default = 5000 (value = * 1000)
             })
-
             this.send(data)
+
+            var data4 = JSON.stringify({
+                "message":"videoChannelConfigUpdate",
+                "maxVideoSctpMessageSizeBytes": 16000 // min = 512, max = 12000, default = 5000 (value = * 1000)
+            })
+            this.send(data4)
 
             // Let system know we have added a gamepad (Unsure what this does though)
             var data2 = JSON.stringify({
@@ -50,19 +55,23 @@ class ControlChannel extends BaseChannel {
     }
 
     setBitrate(bitrate) {
-        if(bitrate < 512)
-            return false
+        // if(bitrate < 512)
+        //     return false
         
-        if(bitrate > 12000)
-            return false
+        // if(bitrate > 12000)
+        //     return false
 
-        this.#bitrate = bitrate * 1000
+        this.#bitrate = bitrate
 
+        // var data = JSON.stringify({
+        //     "message":"rateControlBitrateUpdate",
+        //     "bitratebps": this.#bitrate // min = 512, max = 12000, default = 5000 (value = * 1000)
+        // })
         var data = JSON.stringify({
-            "message":"rateControlBitrateUpdate",
-            "bitratebps": this.#bitrate // min = 512, max = 12000, default = 5000 (value = * 1000)
+            "message":"videoChannelConfigUpdate",
+            "maxVideoSctpMessageSizeBytes": this.#bitrate // min = 512, max = 12000, default = 5000 (value = * 1000)
         })
-        console.log('Set bitrate to:', this.#bitrate/1000)
+        console.log('Set bitrate to:', this.#bitrate)
         this.send(data)
 
         return true

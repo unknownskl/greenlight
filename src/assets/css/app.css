@@ -551,6 +551,12 @@ button.btn {
     height: 48px;
 }
 
+button.btn-small {
+    height: 30px;
+    padding-top: 4px;
+    min-width: 20px;
+}
+
 .btn-primary {
     background-color: green;
 }
