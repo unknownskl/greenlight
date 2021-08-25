@@ -150,7 +150,7 @@ export default class StreamingView {
         streamStatus.innerHTML = 'Connecting to: '+ serverId
 
         const loadingStatus = (<HTMLInputElement>document.getElementById('loadingStatus'))
-        loadingStatus.innerHTML = 'Connecting to console: '+ serverId
+        loadingStatus.innerHTML = 'Connecting to console: '+ serverId +'<br /><span id="streamStatusDetailed">Provisioning...</span>'
 
         
 
@@ -171,7 +171,9 @@ export default class StreamingView {
 
             // const streamStatus = (<HTMLInputElement>document.getElementById('streamStatus'))
             streamStatus.innerHTML = 'Connected to: '+ serverId
-            loadingStatus.innerHTML = 'Connected to console: '+ serverId +'.<br /> Waiting for video stream...'
+
+            const streamStatusDetailed = (<HTMLInputElement>document.getElementById('streamStatusDetailed'))
+            streamStatusDetailed.innerHTML = 'Waiting for video stream...'
 
 
             setTimeout(() => {
@@ -294,6 +296,28 @@ export default class StreamingView {
                 document.getElementById('inputLatency').innerHTML = JSON.stringify(event)
             })
 
+            // Bitrate control
+            document.getElementById('control_bitrate_512').onclick = (event:any) => {
+                this._streamClient._webrtcClient.getChannelProcessor('control').setBitrate(512)
+                console.log('streamingView.js: Set bitrate to 512')
+            }
+            document.getElementById('control_bitrate_2500').onclick = (event:any) => {
+                this._streamClient._webrtcClient.getChannelProcessor('control').setBitrate(2500)
+                console.log('streamingView.js: Set bitrate to 2500')
+            }
+            document.getElementById('control_bitrate_5000').onclick = (event:any) => {
+                this._streamClient._webrtcClient.getChannelProcessor('control').setBitrate(5000)
+                console.log('streamingView.js: Set bitrate to 5000')
+            }
+            document.getElementById('control_bitrate_8500').onclick = (event:any) => {
+                this._streamClient._webrtcClient.getChannelProcessor('control').setBitrate(8500)
+                console.log('streamingView.js: Set bitrate to 8500')
+            }
+            document.getElementById('control_bitrate_12000').onclick = (event:any) => {
+                this._streamClient._webrtcClient.getChannelProcessor('control').setBitrate(12000)
+                console.log('streamingView.js: Set bitrate to 12000')
+            }
+
             // Dialogs
             this._streamClient._webrtcClient.getChannelProcessor('message').addEventListener('dialog', (event:any) => {
                 console.log('Got dialog event:', event)
@@ -368,6 +392,10 @@ export default class StreamingView {
 
         }).catch((error) => {
             console.log('StreamingView.js: Start stream error:', error)
+            // alert('Start stream error: '+ JSON.stringify(error))
+
+            const streamStatusDetailed = (<HTMLInputElement>document.getElementById('streamStatusDetailed'))
+            streamStatusDetailed.innerHTML = 'Error provisioning xbox: '+JSON.stringify(error)
         })
 
         // const client = new xCloudClient()

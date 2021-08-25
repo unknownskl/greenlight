@@ -23,8 +23,9 @@ var onPacket = function(eventData, timePerformanceNow){
         var frameSize = messageBuffer.getUint32(8, true);
         var frameOffset = messageBuffer.getUint32(12, true);
         var serverDataKey = messageBuffer.getUint32(16, true);
+        var isKeyFrame = messageBuffer.getUint8(20, true);
 
-        var offset = 20; //@TODO: Check if isKeyFrame. if true => 21, else 20.
+        var offset = 21; //@TODO: Check if isKeyFrame. if true => 21, else 20.
 
         var frameData = new Uint8Array(eventData.data, offset)
 
@@ -34,6 +35,7 @@ var onPacket = function(eventData, timePerformanceNow){
             frameSize: frameSize,
             frameOffset: frameOffset,
             serverDataKey: serverDataKey,
+            isKeyFrame: isKeyFrame,
             frameData: frameData
         }
 

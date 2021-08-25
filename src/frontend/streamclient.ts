@@ -27,7 +27,7 @@ export default class StreamClient {
             this._serverId = serverId
 
             // Starting session
-            this.startOrGetSession(this._serverId).then((data:any) => {
+            this.startOrGetSession(this._serverId, true).then((data:any) => {
                 this._sessionId = data.sessionId
                 this._sessionPath = data.sessionPath
 
@@ -68,7 +68,7 @@ export default class StreamClient {
         videoHolder.innerHTML = ''
     }
 
-    startOrGetSession(serverId:string) {
+    startOrGetSession(serverId:string, firstStart: boolean) {
         return new Promise((resolve, reject) => {
             const postData = {
                 "titleId":"",
@@ -89,7 +89,7 @@ export default class StreamClient {
             
             const streamClient = this
 
-            fetch('https://uks.gssv-play-prodxhome.xboxlive.com/v5/sessions/home/play', {
+            fetch('https://uks.gssv-play-prodxhome.xboxlive.com/v4/sessions/home/play', {
                 method: 'POST', // *GET, POST, PUT, DELETE, etc.
                 cache: 'no-cache',
                 headers: {
@@ -106,13 +106,14 @@ export default class StreamClient {
 
                         
                         if(data.state === 'Provisioning'){
-                            setTimeout(() => {
-                                streamClient.startOrGetSession(serverId).then((data:any) => {
-                                    resolve(data)
-                                }).catch((error) => {
-                                    reject(error)
-                                })
-                            }, 1000)
+                            // setTimeout(() => {
+                            //     streamClient.startOrGetSession(serverId).then((data:any) => {
+                            //         resolve(data)
+                            //     }).catch((error) => {
+                            //         reject(error)
+                            //     })
+                            // }, 1000)
+                            resolve(data)
                         } else {
                             resolve(data)
                         }
@@ -177,7 +178,7 @@ export default class StreamClient {
             
             // const streamClient = this
 
-            fetch('https://uks.gssv-play-prodxhome.xboxlive.com/v5/sessions/home/'+ this._sessionId +'/sdp', {
+            fetch('https://uks.gssv-play-prodxhome.xboxlive.com/v4/sessions/home/'+ this._sessionId +'/sdp', {
                 method: 'POST', // *GET, POST, PUT, DELETE, etc.
                 cache: 'no-cache',
                 headers: {
@@ -206,7 +207,7 @@ export default class StreamClient {
             
             // const streamClient = this
 
-            fetch('https://uks.gssv-play-prodxhome.xboxlive.com/v5/sessions/home/'+ this._sessionId +'/ice', {
+            fetch('https://uks.gssv-play-prodxhome.xboxlive.com/v4/sessions/home/'+ this._sessionId +'/ice', {
                 method: 'POST', // *GET, POST, PUT, DELETE, etc.
                 cache: 'no-cache',
                 headers: {
@@ -229,7 +230,7 @@ export default class StreamClient {
     isExchangeReady(path:string) {
         return new Promise((resolve, reject) => {
 
-            const url = "https://uks.gssv-play-prodxhome.xboxlive.com/v5/sessions/home/"+this._sessionId+'/'+path
+            const url = "https://uks.gssv-play-prodxhome.xboxlive.com/v4/sessions/home/"+this._sessionId+'/'+path
 
             fetch(url, {
                 method: 'GET',
@@ -249,10 +250,33 @@ export default class StreamClient {
                         })
                     }, 1000)
                 } else {
-                    response.json().then(data => {
-                        console.log('StreamClient.js: '+url+' - Ready! Got data:', data)
-                        resolve(data)
-                    })
+                    if(path == 'state'){
+                        response.json().then(data => {
+                            if(data.state === 'Provisioning'){
+                                console.log('StreamClient.js: '+url+' - Waiting... State:', data.state)
+                                setTimeout(() => {
+                                    this.isExchangeReady(path).then((data) => {
+                                        resolve(data)
+                                    }).catch((error)  => {
+                                        reject(error)
+                                    })
+                                }, 1000)
+                            } else if(data.state === 'Provisioned') {
+
+                                const streamStatusDetailed = (<HTMLInputElement>document.getElementById('streamStatusDetailed'))
+                                streamStatusDetailed.innerHTML = 'Provisioned. Opening connection...'
+
+                                resolve(data)
+                            } else {
+                                reject(data)
+                            }
+                        })
+                    } else {
+                        response.json().then(data => {
+                            console.log('StreamClient.js: '+url+' - Ready! Got data:', data)
+                            resolve(data)
+                        })
+                    }
                 }
             })
         })
