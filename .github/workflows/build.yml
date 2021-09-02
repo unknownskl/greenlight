@@ -27,7 +27,7 @@ jobs:
         with:
           node-version: 14
 
-      - name: Install snapd
+      - name: Install snapcraft
         run: sudo snap install snapcraft --classic
         if: matrix.os == 'ubuntu-latest'
 
