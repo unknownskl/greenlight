@@ -39,6 +39,7 @@
     "@electron-forge/cli": "^6.0.0-beta.58",
     "@electron-forge/maker-deb": "^6.0.0-beta.58",
     "@electron-forge/maker-rpm": "^6.0.0-beta.58",
+    "@electron-forge/maker-snap": "^6.0.0-beta.60",
     "@electron-forge/maker-squirrel": "^6.0.0-beta.58",
     "@electron-forge/maker-zip": "^6.0.0-beta.58",
     "@electron-forge/plugin-webpack": "^6.0.0-beta.58",
@@ -79,6 +80,10 @@
         },
         {
           "name": "@electron-forge/maker-rpm",
+          "config": {}
+        },
+        {
+          "name": "@electron-forge/maker-snap",
           "config": {}
         }
       ],
