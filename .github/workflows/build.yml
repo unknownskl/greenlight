@@ -27,6 +27,10 @@ jobs:
         with:
           node-version: 14
 
+      - name: Install snapd
+        run: apt install snapd -y
+        if: matrix.os == 'ubuntu-latest'
+
       - name: Install dependencies
         run: npm ci
 
