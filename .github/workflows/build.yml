@@ -27,8 +27,8 @@ jobs:
         with:
           node-version: 14
 
-      - name: Install snapd and multipass
-        run: sudo snap install snapd && sudo snap install multipass
+      - name: Install snapcraft and multipass
+        run: sudo snap install snapcraft && sudo snap install multipass
         if: matrix.os == 'ubuntu-latest'
 
       - name: Install dependencies
