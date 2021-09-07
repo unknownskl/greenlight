@@ -2,6 +2,7 @@ import TokenStore from '../backend/TokenStore'
 import Router from './router'
 import AppView from './appview'
 import StreamingView from './streamingview'
+import xCloudView from './xcloudview'
 
 interface EventCallback {
     (data: string): void;
@@ -17,6 +18,7 @@ export default class Application {
 
     _AppView:AppView
     _StreamingView:StreamingView
+    _xCloudView:xCloudView
 
     constructor(){
         this.listenForTokens()
@@ -35,7 +37,7 @@ export default class Application {
 
         this._router.addEventListener('onviewshow', (event:any) => {
             // Check if we need the actionbar
-            if(event.view === 'app' || event.view === 'streaming'){
+            if(event.view === 'app' || event.view === 'streaming' || event.view === 'xCloud'){
                 const actionBar = (<HTMLInputElement>document.getElementById('actionBar'))
                 actionBar.style.display = 'block'
             } else {
@@ -82,11 +84,27 @@ export default class Application {
                     this._StreamingView.unload()
                 }
             }
+
+            if(event.view === 'xCloud'){
+                if(this._xCloudView === undefined){
+                    this._xCloudView = new xCloudView(this)
+                }
+                this._xCloudView.load()
+                
+            } else if(event.previousView === 'xCloud'){
+                // Unload appview
+                if(this._xCloudView !== undefined){
+                    this._xCloudView.unload()
+                }
+            }
         })
 
         // Build nav
         document.getElementById('actionBarMyConsoles').addEventListener('click', (e:Event) => {
             this._router.setView('app')
+        })
+        document.getElementById('actionBarxCloud').addEventListener('click', (e:Event) => {
+            this._router.setView('xCloud')
         })
         document.getElementById('actionBarStreamingView').addEventListener('click', (e:Event) => {
             this._router.setView('streaming')

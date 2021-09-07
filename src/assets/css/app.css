@@ -23,7 +23,7 @@ body {
     bottom: 0px;
 }
 
-#splashView, #authView, #appView, #streamingView {
+#splashView, #authView, #appView, #xCloudView, #streamingView {
     position: absolute;
     top: 0px;
     left: 0px;
@@ -302,8 +302,6 @@ body {
 }
 
 
-
-
 #consolesList {
     display: flex;
 }
@@ -338,6 +336,30 @@ body {
 #consolesList div.consoleItem p {
     padding-top: 10px;
     padding-bottom: 15px;
+}
+
+/**
+ xCloud View
+**/
+
+
+#xCloud {
+    display: flex;
+
+    width: 100%;
+    position: absolute;
+    top: 70px;
+    left: 0px;
+    right: 0px;
+}
+
+#xCloudContent {
+    padding-top: 70px;
+}
+
+#xCloud .btn {
+    margin: 40px;
+    padding-top: 0px;
 }
 
 /**

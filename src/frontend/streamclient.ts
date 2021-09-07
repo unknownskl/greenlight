@@ -26,26 +26,86 @@ export default class StreamClient {
             this._application = application
             this._serverId = serverId
 
-            // Starting session
-            this.startOrGetSession(this._serverId, true).then((data:any) => {
-                this._sessionId = data.sessionId
-                this._sessionPath = data.sessionPath
+            if(type === 'xhome'){
+                // Starting session
+                this.startOrGetSession(this._serverId, true).then((data:any) => {
+                    this._sessionId = data.sessionId
+                    this._sessionPath = data.sessionPath
 
-                console.log('StreamClient.js: Console is provisioned. Lets connect...')
+                    console.log('StreamClient.js: Console is provisioned. Lets connect...')
 
-                this.isExchangeReady('state').then((data:any) => {
-                    this._webrtcClient = new xboxClient(this._application)
-                    this._webrtcClient.startWebrtcConnection()
+                    this.isExchangeReady('state').then((data:any) => {
+                        this._webrtcClient = new xboxClient(this._application)
+                        this._webrtcClient.startWebrtcConnection()
 
-                    this._webrtcClient.addEventListener('openstream', () => {
-                        resolve('ok')
+                        this._webrtcClient.addEventListener('openstream', () => {
+                            resolve('ok')
+                        })
+                    }).catch((error) => {
+                        reject(error)
                     })
                 }).catch((error) => {
                     reject(error)
                 })
+            } else if(type === 'xcloud') {
+                this.requestXCloudConsole(serverId).then((sessionId) => {
+                    console.log('sessionId:', sessionId)
+                }).catch((error) => {
+                    console.log(error)
+                })
+
+            }
+        })
+    }
+
+    requestXCloudConsole(titleId:string){
+        return new Promise((resolve, reject) => {
+            const postData = {
+                "titleId":titleId,
+                "systemUpdateGroup":"",
+                "settings": {
+                    "nanoVersion":"V3;RtcdcTransport.dll",
+                    "enableTextToSpeech":false,
+                    "highContrast":0,
+                    "locale":"en-US",
+                    "useIceConnection":false,
+                    "timezoneOffsetMinutes":120,
+                    "sdkType":"web",
+                    "osName":"windows"
+                },
+                "serverId": "",
+                "fallbackRegionNames": [Array]
+            }
+
+            fetch('https://weu.gssv-play-prod.xboxlive.com/v5/sessions/cloud/play', {
+                method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                cache: 'no-cache',
+                headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer '+this._application._tokenStore._streamingToken
+                },
+                body: JSON.stringify(postData)
+            }).then((response) => {
+                if(response.status !== 200 && response.status !== 202){
+                    console.log('Error fetching consoles. Status:', response.status, 'Body:', response.body)
+                } else {
+                    response.json().then((data) => {
+
+                        
+                        if(data.sessionPath !== undefined){
+                            resolve(data.sessionPath)
+                        } else {
+                            resolve(data)
+                        }
+
+                    }).catch((error) => {
+                        reject(error)
+                    })
+                    // const responseData = JSON.parse(response.body);
+                }
             }).catch((error) => {
                 reject(error)
-            })
+            });
         })
     }
 

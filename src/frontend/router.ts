@@ -10,6 +10,7 @@ export default class Router {
         'splash',
         'auth',
         'app',
+        'xCloud',
         'streaming'
     ]
 
