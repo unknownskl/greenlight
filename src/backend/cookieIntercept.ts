@@ -79,49 +79,102 @@ export default function (details:any):void {
             const window = BrowserWindow.fromId(windowId)
             window.close()
 
-            // Get xHomeStreaming Token
-            const data = JSON.stringify({
-                "token": streamingToken.Token,
-                "offeringId": "xhome"
-            })
-
-            const options = {
-                hostname: 'xhome.gssv-play-prod.xboxlive.com',
-                port: 443,
-                path: '/v2/login/user',
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Content-Length': data.length
-                }
-            }
-            const req = https.request(options, (res) => {
-                let responseData = ''
-                
-                res.on('data', (data) => {
-                    responseData += data
-                })
-
-                res.on('close', () => {
-                    if(res.statusCode == 200){
-                        const jsonHomeToken = JSON.parse(responseData.toString())
-
-                        this.setStreamingToken(jsonHomeToken.gsToken)
-                    } else {
-                        console.log('- Error while retrieving from url:', this.url)
-                        console.log('  statuscode:', res.statusCode)
-                        console.log('  body:', responseData.toString())
-                    }
-                })
-            })
+            requestStreamingToken(streamingToken)
+            requestxCloudStreamingToken(streamingToken)
             
-            req.on('error', (error) => {
-                console.log('- Error while retrieving from url:', this.url)
-                console.log('  Error:', error)
-            })
-
-            req.write(data)
-            req.end()
         }
     }
+}
+
+function requestStreamingToken(streamingToken:CookieToken){
+    // Get xHomeStreaming Token
+    const data = JSON.stringify({
+        "token": streamingToken.Token,
+        "offeringId": "xhome"
+    })
+
+    const options = {
+        hostname: 'xhome.gssv-play-prod.xboxlive.com',
+        port: 443,
+        path: '/v2/login/user',
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': data.length
+        }
+    }
+    const req = https.request(options, (res) => {
+        let responseData = ''
+        
+        res.on('data', (data) => {
+            responseData += data
+        })
+
+        res.on('close', () => {
+            if(res.statusCode == 200){
+                const jsonHomeToken = JSON.parse(responseData.toString())
+
+                this.setStreamingToken(jsonHomeToken.gsToken)
+            } else {
+                console.log('- Error while retrieving from url:', this.url)
+                console.log('  statuscode:', res.statusCode)
+                console.log('  body:', responseData.toString())
+            }
+        })
+    })
+    
+    req.on('error', (error) => {
+        console.log('- Error while retrieving from url:', this.url)
+        console.log('  Error:', error)
+    })
+
+    req.write(data)
+    req.end()
+}
+
+function requestxCloudStreamingToken(streamingToken:CookieToken){
+    // Get xHomeStreaming Token
+    const data = JSON.stringify({
+        "token": streamingToken.Token,
+        "offeringId": "xgpuweb"
+    })
+
+    const options = {
+        hostname: 'xgpuweb.gssv-play-prod.xboxlive.com',
+        port: 443,
+        path: '/v2/login/user',
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': data.length
+        }
+    }
+    const req = https.request(options, (res) => {
+        let responseData = ''
+        
+        res.on('data', (data) => {
+            responseData += data
+        })
+
+        res.on('close', () => {
+            if(res.statusCode == 200){
+                const xgpuToken = JSON.parse(responseData.toString())
+
+                console.log('RESPONSE:', xgpuToken)
+                // this.setxCloudStreamingToken(jsonHomeToken.gsToken)
+            } else {
+                console.log('- Error while retrieving from url:', this.url)
+                console.log('  statuscode:', res.statusCode)
+                console.log('  body:', responseData.toString())
+            }
+        })
+    })
+    
+    req.on('error', (error) => {
+        console.log('- Error while retrieving from url:', this.url)
+        console.log('  Error:', error)
+    })
+
+    req.write(data)
+    req.end()
 }

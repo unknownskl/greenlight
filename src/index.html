@@ -12,6 +12,10 @@
       function setStreamingToken(streamingToken){
         document.getElementById('token_streaming_token').value = streamingToken
       }
+      function setxCloudStreamingToken(streamingToken, host){
+        document.getElementById('token_xcloud_streaming_token').value = streamingToken
+        document.getElementById('token_xcloud_streaming_host').value = host
+      }
       window.addEventListener('resize', () => {
         if(document.getElementById('videoRender') !== null && document.getElementById('videoHolder') !== null) {
           var videoRender = document.getElementById('videoRender')
@@ -37,6 +41,8 @@
     <input id="token_web_uhs" value="" type="hidden" />
     <input id="token_web_usertoken" value="" type="hidden" />
     <input id="token_streaming_token" value="" type="hidden" />
+    <input id="token_xcloud_streaming_token" value="" type="hidden" />
+    <input id="token_xcloud_streaming_host" value="" type="hidden" />
 
     <div id="appRoot">
       
@@ -131,6 +137,7 @@
           <div id="xCloud">
 
             <button class="btn" id="startxCloudTestStream">Start Destiny 2 on xCloud</button>
+            <button class="btn" id="startxCloudTestStream2">Start Super Lucky Tail on xCloud</button>
 
           </div>
         </div>

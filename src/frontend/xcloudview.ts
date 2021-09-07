@@ -31,6 +31,13 @@ export default class xCloudView {
         startxCloudTestStream.onclick = (event: any) => {
             console.log('Starting xcloud stream...')
             this._application.startStream('xcloud', 'DESTINY2')
+
+            
+        }
+        const startxCloudTestStream2 = (<HTMLInputElement>document.getElementById('startxCloudTestStream2'))
+        startxCloudTestStream2.onclick = (event: any) => {
+            console.log('Starting xcloud stream...')
+            this._application.startStream('xcloud', 'NEWSUPERLUCKYSTALE')
         }
           
     }

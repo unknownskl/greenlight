@@ -141,7 +141,7 @@ export default class StreamingView {
         setTimeout(checkNetworkIndicator, 500)
     }
 
-    startStream(type: string, serverId:string):void {
+    startStream(type:string, serverId:string):void {
         console.log('StreamingView.js: Start stream for:', serverId)
 
         this._streamClient = new StreamClient()
@@ -155,6 +155,7 @@ export default class StreamingView {
         
 
         this._streamClient.start(this._application, type, serverId).then(() => {
+            console.log('StreamingView.js: Stream started for:', serverId)
             // this._streamClient._webrtcClient.addEventListener('connect', (event:any) => {
             //     const streamStatus = (<HTMLInputElement>document.getElementById('streamStatus'))
             //     streamStatus.innerHTML = 'Connecting to '+ event.serverId

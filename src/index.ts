@@ -73,6 +73,10 @@ app.on('ready', () => {
     mainWindow.webContents.executeJavaScript("setStreamingToken('"+token+"');");
   })
 
+  tokenStore.addEventListener('onxcloudstreamingtoken', (token:any) => {
+    mainWindow.webContents.executeJavaScript("setxCloudStreamingToken('"+token.token+"', '"+token.host+"');");
+  })
+
   createWindow()
 
   // Check for existing cookies on load
@@ -80,10 +84,13 @@ app.on('ready', () => {
 
     session.defaultSession.cookies.get({ url: 'https://www.xbox.com' }).then((cookies) => {
       for(const cookie in cookies){
+        console.log(cookies[cookie])
+        
         if(cookies[cookie].name === 'XBXXtkhttp://xboxlive.com'){
           // Process streaming token
           const cookieValue = decodeURIComponent(cookies[cookie].value)
           const cookieJson = JSON.parse(cookieValue)
+          console.log('cookieJson', cookieJson)
           
           tokenStore.setWebTokens(cookieJson.UserClaims.uhs, cookieJson.Token)
 
@@ -91,6 +98,7 @@ app.on('ready', () => {
           // Process streaming token
           const cookieValue = decodeURIComponent(cookies[cookie].value)
           const cookieJson = JSON.parse(cookieValue)
+          console.log('cookieJson gssv', cookieJson)
           
           // tokenStore.setStreamingToken(cookieJson.Token) // @TODO: Retrieve gamestreaming token and replace with this one.
 
@@ -136,6 +144,61 @@ app.on('ready', () => {
 
           req.write(data)
           req.end()
+
+          // Retrieve xCloudToken
+          const xCloudData = JSON.stringify({
+            "token": cookieJson.Token,
+            "offeringId": "xgpuweb"
+          })
+
+          const xCloudOptions = {
+              hostname: 'xgpuweb.gssv-play-prod.xboxlive.com',
+              port: 443,
+              path: '/v2/login/user',
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'Content-Length': xCloudData.length,
+                  'Authorization': 'Bearer '+cookieJson.Token
+              }
+          }
+          const xCloudReq = https.request(xCloudOptions, (res) => {
+              let responseData = ''
+              
+              res.on('data', (data) => {
+                  responseData += data
+              })
+
+              res.on('close', () => {
+                  if(res.statusCode == 200){
+                      const jsonHomeToken = JSON.parse(responseData.toString())
+                      // console.log('XGPU TOKEN:', jsonHomeToken)
+
+                      let regionHost
+                      for(const region in jsonHomeToken.offeringSettings.regions){
+                        // console.log(jsonHomeToken.offeringSettings.regions[region])
+                        if(jsonHomeToken.offeringSettings.regions[region].isDefault === true){
+                          regionHost = jsonHomeToken.offeringSettings.regions[region].baseUri.substr(8)
+                        }
+                      }
+
+                      // console.log('Set xcloud host:', regionHost, jsonHomeToken.gsToken)
+                      tokenStore.setxCloudStreamingToken(jsonHomeToken.gsToken, regionHost)
+                  } else {
+                      console.log('- Error while retrieving from url: ...')
+                      console.log('  statuscode:', res.statusCode)
+                      console.log('  body:', responseData.toString())
+                  }
+              })
+          })
+          
+          xCloudReq.on('error', (error) => {
+              console.log('- Error while retrieving from url: ...')
+              console.log('  Error:', error)
+          })
+
+          xCloudReq.write(xCloudData)
+          xCloudReq.end()
         }
       }
 

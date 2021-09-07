@@ -12,6 +12,7 @@ export default class Application {
 
     _eventOnWebToken: EventCallback[] = []
     _eventOnStreamingToken: EventCallback[] = []
+    _eventOnxCloudStreamingToken: EventCallback[] = []
 
     _tokenStore = new TokenStore()
     _router = new Router()
@@ -118,6 +119,8 @@ export default class Application {
         const inputWebUhs = document.getElementById('token_web_uhs')
         const inputWebUserToken = document.getElementById('token_web_usertoken')
         const inputStreamingToken = document.getElementById('token_streaming_token')
+        const inputxCloudStreamingToken = document.getElementById('token_xcloud_streaming_token')
+        const inputxCloudStreamingHost = document.getElementById('token_xcloud_streaming_host')
 
         const inputWebTokenInterval = setInterval(() => {
             const valueUhs  = (<HTMLInputElement>inputWebUhs).value
@@ -141,6 +144,18 @@ export default class Application {
             }
         }, 100)
 
+        const inputxCloudStreamingTokenInterval = setInterval(() => {
+            const value  = (<HTMLInputElement>inputxCloudStreamingToken).value
+            const host  = (<HTMLInputElement>inputxCloudStreamingHost).value
+            if(value !== '' && host !== ''){
+                clearInterval(inputxCloudStreamingTokenInterval)
+
+                this._tokenStore.setxCloudStreamingToken(value, host)
+                inputxCloudStreamingToken.remove()
+                inputxCloudStreamingHost.remove()
+            }
+        }, 100)
+
         this._tokenStore.addEventListener('onwebtoken', (tokens) => {
             if(this._tokenStore._web.uhs !== '' && this._tokenStore._streamingToken !== ''){
                 this._router.setView('app')
@@ -151,6 +166,10 @@ export default class Application {
             if(this._tokenStore._web.uhs !== '' && this._tokenStore._streamingToken !== ''){
                 this._router.setView('app')
             }
+        })
+
+        this._tokenStore.addEventListener('onxcloudstreamingtoken', (token) => {
+            // @TODO: Enable xCloud integration
         })
     }
 
@@ -166,6 +185,8 @@ export default class Application {
             this._eventOnWebToken.push(callback)
         } else if(name === 'onstreamingtoken'){
             this._eventOnStreamingToken.push(callback)
+        } else if(name === 'onxcloudstreamingtoken'){
+            this._eventOnxCloudStreamingToken.push(callback)
         }
     }
 
@@ -177,6 +198,10 @@ export default class Application {
         } else if(name === 'onstreamingtoken'){
             for(const eventCallback in this._eventOnStreamingToken){
                 this._eventOnStreamingToken[eventCallback](data)
+            }
+        } else if(name === 'onxcloudstreamingtoken'){
+            for(const eventCallback in this._eventOnxCloudStreamingToken){
+                this._eventOnxCloudStreamingToken[eventCallback](data)
             }
         }
     }

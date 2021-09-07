@@ -8,9 +8,12 @@ export default class TokenStore {
         userToken: ''
     };
     _streamingToken = '';
+    _xCloudStreamingToken = '';
+    _xCloudRegionHost = '';
 
     _eventOnWebToken: EventCallback[] = []
     _eventOnStreamingToken: EventCallback[] = []
+    _eventOnxCloudStreamingToken: EventCallback[] = []
 
     setWebTokens(uhs: string, userToken: string):boolean {
         this._web.uhs = uhs
@@ -27,11 +30,22 @@ export default class TokenStore {
         return true
     }
 
+    setxCloudStreamingToken(token: string, host: string):boolean {
+        this._xCloudStreamingToken = token
+        this._xCloudRegionHost = host
+        
+        this.emitEvent('onxcloudstreamingtoken', { token: this._xCloudStreamingToken, host: this._xCloudRegionHost })
+
+        return true
+    }
+
     addEventListener(name: string, callback: EventCallback):void{
         if(name === 'onwebtoken'){
             this._eventOnWebToken.push(callback)
         } else if(name === 'onstreamingtoken'){
             this._eventOnStreamingToken.push(callback)
+        } else if(name === 'onxcloudstreamingtoken'){
+            this._eventOnxCloudStreamingToken.push(callback)
         }
     }
 
@@ -43,6 +57,10 @@ export default class TokenStore {
         } else if(name === 'onstreamingtoken'){
             for(const eventCallback in this._eventOnStreamingToken){
                 this._eventOnStreamingToken[eventCallback](data)
+            }
+        } else if(name === 'onxcloudstreamingtoken'){
+            for(const eventCallback in this._eventOnxCloudStreamingToken){
+                this._eventOnxCloudStreamingToken[eventCallback](data)
             }
         }
     }

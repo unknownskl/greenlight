@@ -174,7 +174,13 @@ module.exports = class xCloudClient {
                             // SDP Has been set, lets do ICE
                             this._application._StreamingView._streamClient.isExchangeReady('ice').then((data) => {
                                 // Got ICE Data. Lets add the candidates to webrtc client
-                                var iceDetails = JSON.parse(data.candidates)
+                                var iceDetails
+                                if(data.candidates !== undefined){
+                                    iceDetails = JSON.parse(data.candidates)
+                                } else {
+                                    iceDetails = JSON.parse(data.exchangeResponse)
+                                }
+
                                 console.log('xSDK client.js - ICE Candidates:', iceDetails)
 
                                 for(var candidate in iceDetails){
@@ -374,28 +380,28 @@ module.exports = class xCloudClient {
         audioHolder.appendChild(audioRender);
     }
 
-    isExchangeReady(url) {
-        return new Promise((resolve, reject) => {
+    // isExchangeReady(url) {
+    //     return new Promise((resolve, reject) => {
 
-            fetch(url).then(response => {
-                if(response.status !== 200){
-                    console.log('xSDK client.js - '+url+' - Waiting...')
-                    setTimeout(() => {
-                        this.isExchangeReady(url).then((data) => {
-                            resolve(data)
-                        }).catch((error)  => {
-                            reject(error)
-                        })
-                    }, 1000)
-                } else {
-                    response.json().then(data => {
-                        console.log('xSDK client.js - '+url+' - Ready! Got data:', data)
-                        resolve(data)
-                    })
-                }
-            })
-        })
-    }
+    //         fetch(url).then(response => {
+    //             if(response.status !== 200){
+    //                 console.log('xSDK client.js - '+url+' - Waiting...')
+    //                 setTimeout(() => {
+    //                     this.isExchangeReady(url).then((data) => {
+    //                         resolve(data)
+    //                     }).catch((error)  => {
+    //                         reject(error)
+    //                     })
+    //                 }, 1000)
+    //             } else {
+    //                 response.json().then(data => {
+    //                     console.log('xSDK client.js - '+url+' - Ready! Got data:', data)
+    //                     resolve(data)
+    //                 })
+    //             }
+    //         })
+    //     })
+    // }
 
     addEventListener(name, callback) {
         this.#events[name].push(callback)

@@ -10,6 +10,7 @@ export default class StreamClient {
     _webrtcClient: any;
 
     _serverId: string;
+    _type: string;
 
     _sessionId: string;
     _sessionPath: string;
@@ -25,6 +26,7 @@ export default class StreamClient {
 
             this._application = application
             this._serverId = serverId
+            this._type = type
 
             if(type === 'xhome'){
                 // Starting session
@@ -49,9 +51,16 @@ export default class StreamClient {
                 })
             } else if(type === 'xcloud') {
                 this.requestXCloudConsole(serverId).then((sessionId) => {
-                    console.log('sessionId:', sessionId)
+
+                    // Console is provisioned. Lets continue device state flow auth
+                    this._webrtcClient = new xboxClient(this._application)
+                    this._webrtcClient.startWebrtcConnection()
+
+                    this._webrtcClient.addEventListener('openstream', () => {
+                        resolve('ok')
+                    })
                 }).catch((error) => {
-                    console.log(error)
+                    reject(error)
                 })
 
             }
@@ -77,12 +86,13 @@ export default class StreamClient {
                 "fallbackRegionNames": [Array]
             }
 
-            fetch('https://weu.gssv-play-prod.xboxlive.com/v5/sessions/cloud/play', {
+            // console.log('tokens set: ', this._application._tokenStore)
+            fetch('https://'+this._application._tokenStore._xCloudRegionHost+'/v5/sessions/cloud/play', {
                 method: 'POST', // *GET, POST, PUT, DELETE, etc.
                 cache: 'no-cache',
                 headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer '+this._application._tokenStore._streamingToken
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer '+ this._application._tokenStore._xCloudStreamingToken
                 },
                 body: JSON.stringify(postData)
             }).then((response) => {
@@ -90,12 +100,42 @@ export default class StreamClient {
                     console.log('Error fetching consoles. Status:', response.status, 'Body:', response.body)
                 } else {
                     response.json().then((data) => {
-
-                        
                         if(data.sessionPath !== undefined){
-                            resolve(data.sessionPath)
+                            const sessionSplit = data.sessionPath.split('/')
+                            const session = sessionSplit[sessionSplit.length-1]
+                            this._sessionId = session
+
+                            this.isExchangeReady('state', 'https://'+this._application._tokenStore._xCloudRegionHost+'/'+data.sessionPath+'/state').then((data2:any) => {
+                                if(data2.state === 'Provisioned'){
+                                    // Stream is already provisioned and ready to go
+                                    resolve(true)
+
+                                } else if(data2.state === 'ReadyToConnect') {
+                                    // Stream is already provisioned and ready to go
+                                    this.xcloudAuth('<MSALTokenHere>', data.sessionPath).then((data3:any) => {
+
+                                        this.isExchangeReady('state', 'https://'+this._application._tokenStore._xCloudRegionHost+'/'+data.sessionPath+'/state').then((data4) => {
+                                            resolve(true)
+
+                                        }).catch((error)  => {
+                                            reject(error)
+                                        })
+                                        // resolve(data3)
+
+                                    }).catch((error)  => {
+                                        reject(error)
+                                    })
+                                } else {
+                                    reject('Invalid state:'+ data2.state)
+                                }
+
+                            }).catch((error)  => {
+                                reject(error)
+                            })
+
+                            // resolve(data.sessionPath)
                         } else {
-                            resolve(data)
+                            reject('Failed too retrieve sessionPath from xCloud: '+ data.sessionPath)
                         }
 
                     }).catch((error) => {
@@ -146,8 +186,6 @@ export default class StreamClient {
                 "serverId": serverId,
                 "fallbackRegionNames": [Array]
             }
-            
-            const streamClient = this
 
             fetch('https://uks.gssv-play-prodxhome.xboxlive.com/v4/sessions/home/play', {
                 method: 'POST', // *GET, POST, PUT, DELETE, etc.
@@ -164,7 +202,6 @@ export default class StreamClient {
                 } else {
                     response.json().then((data) => {
 
-                        
                         if(data.state === 'Provisioning'){
                             // setTimeout(() => {
                             //     streamClient.startOrGetSession(serverId).then((data:any) => {
@@ -237,13 +274,20 @@ export default class StreamClient {
             }
             
             // const streamClient = this
+            let sdpUrl:string
 
-            fetch('https://uks.gssv-play-prodxhome.xboxlive.com/v4/sessions/home/'+ this._sessionId +'/sdp', {
+            if(this._type === 'xhome'){
+                sdpUrl = 'https://uks.gssv-play-prodxhome.xboxlive.com/v4/sessions/home/'+ this._sessionId +'/sdp'
+            } else {
+                sdpUrl = "https://"+this._application._tokenStore._xCloudRegionHost+"/v5/sessions/cloud/"+this._sessionId+"/sdp"
+            }
+
+            fetch(sdpUrl, {
                 method: 'POST', // *GET, POST, PUT, DELETE, etc.
                 cache: 'no-cache',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': 'Bearer '+this._application._tokenStore._streamingToken
+                    'Authorization': (this._type === 'xcloud') ? 'Bearer '+this._application._tokenStore._xCloudStreamingToken : 'Bearer '+this._application._tokenStore._streamingToken
                 },
                 body: JSON.stringify(postData)
             }).then((response) => {
@@ -266,13 +310,20 @@ export default class StreamClient {
             }
             
             // const streamClient = this
+            let iceUrl:string
 
-            fetch('https://uks.gssv-play-prodxhome.xboxlive.com/v4/sessions/home/'+ this._sessionId +'/ice', {
+            if(this._type === 'xhome'){
+                iceUrl = 'https://uks.gssv-play-prodxhome.xboxlive.com/v4/sessions/home/'+ this._sessionId +'/ice'
+            } else {
+                iceUrl = "https://"+this._application._tokenStore._xCloudRegionHost+"/v5/sessions/cloud/"+this._sessionId+"/ice"
+            }
+
+            fetch(iceUrl, {
                 method: 'POST', // *GET, POST, PUT, DELETE, etc.
                 cache: 'no-cache',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': 'Bearer '+this._application._tokenStore._streamingToken
+                    'Authorization': (this._type === 'xcloud') ? 'Bearer '+this._application._tokenStore._xCloudStreamingToken : 'Bearer '+this._application._tokenStore._streamingToken
                 },
                 body: JSON.stringify(postData)
             }).then((response) => {
@@ -287,24 +338,63 @@ export default class StreamClient {
         })
     }
 
-    isExchangeReady(path:string) {
+    xcloudAuth(userToken:string, sessionPath:string){
+        return new Promise((resolve, reject) => {
+            const postData = {
+                "userToken": userToken
+            }
+
+            // console.log('tokens set: ', this._application._tokenStore)
+            fetch('https://'+this._application._tokenStore._xCloudRegionHost+'/'+sessionPath+'/connect', {
+                method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                cache: 'no-cache',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer '+ this._application._tokenStore._xCloudStreamingToken
+                },
+                body: JSON.stringify(postData)
+            }).then((response) => {
+                if(response.status !== 200 && response.status !== 202){
+                    console.log('Error sending login command. Status:', response.status, 'Body:', response.body)
+                    reject('/connect call failed')
+                } else {
+                    // console.log('OK:', response.status, 'Body:', response.body)
+                    resolve(response.status)
+                }
+            }).catch((error) => {
+                reject(error)
+            })
+        })
+    }
+
+    isExchangeReady(path:string, fullPath?:string) {
         return new Promise((resolve, reject) => {
 
-            const url = "https://uks.gssv-play-prodxhome.xboxlive.com/v4/sessions/home/"+this._sessionId+'/'+path
+            let url:string
+
+            if(fullPath === undefined){
+                if(this._type === 'xhome'){
+                    url = "https://uks.gssv-play-prodxhome.xboxlive.com/v4/sessions/home/"+this._sessionId+'/'+path
+                } else {
+                    url = "https://"+this._application._tokenStore._xCloudRegionHost+"/v5/sessions/cloud/"+this._sessionId+"/"+path
+                }
+            } else {
+                url = fullPath
+            }
 
             fetch(url, {
                 method: 'GET',
                 cache: 'no-cache',
                 headers: {
                     'Content-Type': 'application/json; charset=utf-8',
-                    'Authorization': 'Bearer '+this._application._tokenStore._streamingToken
+                    'Authorization': (this._type === 'xcloud') ? 'Bearer '+this._application._tokenStore._xCloudStreamingToken : 'Bearer '+this._application._tokenStore._streamingToken
                 },
             }).then(response => {
                 if(response.status !== 200){
                     console.log('StreamClient.js: '+url+' - Waiting...')
                     setTimeout(() => {
-                        this.isExchangeReady(path).then((data) => {
-                            resolve(data)
+                        this.isExchangeReady(path, fullPath).then((data:any) => {
+                           resolve(data)
                         }).catch((error)  => {
                             reject(error)
                         })
@@ -312,16 +402,16 @@ export default class StreamClient {
                 } else {
                     if(path == 'state'){
                         response.json().then(data => {
-                            if(data.state === 'Provisioning'){
+                            if(data.state === 'Provisioning' || data.state === 'WaitingForResources'){
                                 console.log('StreamClient.js: '+url+' - Waiting... State:', data.state)
                                 setTimeout(() => {
-                                    this.isExchangeReady(path).then((data) => {
+                                    this.isExchangeReady(path, fullPath).then((data) => {
                                         resolve(data)
                                     }).catch((error)  => {
                                         reject(error)
                                     })
                                 }, 1000)
-                            } else if(data.state === 'Provisioned') {
+                            } else if(data.state === 'Provisioned' || data.state === 'ReadyToConnect') {
 
                                 const streamStatusDetailed = (<HTMLInputElement>document.getElementById('streamStatusDetailed'))
                                 streamStatusDetailed.innerHTML = 'Provisioned. Opening connection...'
