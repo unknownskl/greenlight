@@ -83,7 +83,7 @@ class AudioChannel extends BaseChannel {
 
         this.#audioContext = new AudioContext({
             latencyHint: 'interactive',
-            sampleRate: 48000,
+            sampleRate: 96000,
         });
 
         // For volume? See https://developer.mozilla.org/en-US/docs/Web/API/GainNode
