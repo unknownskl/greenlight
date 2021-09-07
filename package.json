@@ -1,6 +1,6 @@
 {
   "name": "Xbox-xHomestreaming",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "xbox-xcloud-client is an open-source client for Xbox home streaming made in Javascript and Typescript.",
   "main": ".webpack/main",
   "scripts": {

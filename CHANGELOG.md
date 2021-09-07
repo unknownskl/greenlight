@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.0.3 -  2021-09-07
+- Add AppImage format for Linux
+
 ## v1.0.2 -  2021-08-25
 - Improved feedback for connection errors
 - Added experimental bitrate control in the debug menu while streaming
