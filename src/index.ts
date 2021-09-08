@@ -84,13 +84,13 @@ app.on('ready', () => {
 
     session.defaultSession.cookies.get({ url: 'https://www.xbox.com' }).then((cookies) => {
       for(const cookie in cookies){
-        console.log(cookies[cookie])
+        // console.log(cookies[cookie])
         
         if(cookies[cookie].name === 'XBXXtkhttp://xboxlive.com'){
           // Process streaming token
           const cookieValue = decodeURIComponent(cookies[cookie].value)
           const cookieJson = JSON.parse(cookieValue)
-          console.log('cookieJson', cookieJson)
+          // console.log('cookieJson', cookieJson)
           
           tokenStore.setWebTokens(cookieJson.UserClaims.uhs, cookieJson.Token)
 
@@ -98,7 +98,7 @@ app.on('ready', () => {
           // Process streaming token
           const cookieValue = decodeURIComponent(cookies[cookie].value)
           const cookieJson = JSON.parse(cookieValue)
-          console.log('cookieJson gssv', cookieJson)
+          // console.log('cookieJson gssv', cookieJson)
           
           // tokenStore.setStreamingToken(cookieJson.Token) // @TODO: Retrieve gamestreaming token and replace with this one.
 

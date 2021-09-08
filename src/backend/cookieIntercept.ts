@@ -1,5 +1,6 @@
 import { app, BrowserWindow, session } from 'electron';
 import https from 'https';
+import TokenStore from './TokenStore';
 // import path from 'path';
 // import TokenStore from './TokenStore';
 
@@ -7,6 +8,8 @@ interface CookieToken {
     Token: string;
     UserClaims: any;
 }
+
+const tokenStore = new TokenStore()
 
 export default function (details:any):void {
 
@@ -114,7 +117,7 @@ function requestStreamingToken(streamingToken:CookieToken){
             if(res.statusCode == 200){
                 const jsonHomeToken = JSON.parse(responseData.toString())
 
-                this.setStreamingToken(jsonHomeToken.gsToken)
+                tokenStore.setStreamingToken(jsonHomeToken.gsToken)
             } else {
                 console.log('- Error while retrieving from url:', this.url)
                 console.log('  statuscode:', res.statusCode)
@@ -160,8 +163,15 @@ function requestxCloudStreamingToken(streamingToken:CookieToken){
             if(res.statusCode == 200){
                 const xgpuToken = JSON.parse(responseData.toString())
 
-                console.log('RESPONSE:', xgpuToken)
-                // this.setxCloudStreamingToken(jsonHomeToken.gsToken)
+                let regionHost
+                for(const region in xgpuToken.offeringSettings.regions){
+                    // console.log(jsonHomeToken.offeringSettings.regions[region])
+                    if(xgpuToken.offeringSettings.regions[region].isDefault === true){
+                        regionHost = xgpuToken.offeringSettings.regions[region].baseUri.substr(8)
+                    }
+                }
+
+                tokenStore.setxCloudStreamingToken(xgpuToken.gsToken, regionHost)
             } else {
                 console.log('- Error while retrieving from url:', this.url)
                 console.log('  statuscode:', res.statusCode)
