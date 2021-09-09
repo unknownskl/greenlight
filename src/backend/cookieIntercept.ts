@@ -80,7 +80,7 @@ export default function (details:any):void {
                 windowId = details.webContentsId
             }
             const window = BrowserWindow.fromId(windowId)
-            window.close()
+            // window.close()
 
             requestStreamingToken(streamingToken)
             requestxCloudStreamingToken(streamingToken)

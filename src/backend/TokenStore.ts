@@ -1,3 +1,5 @@
+import { UploadData } from "electron";
+
 interface EventCallback {
     (data: string): void;
 }
@@ -10,10 +12,14 @@ export default class TokenStore {
     _streamingToken = '';
     _xCloudStreamingToken = '';
     _xCloudRegionHost = '';
+    _msalData:Array<UploadData>;
+    _msalHeaders:Record<string,string>;
 
     _eventOnWebToken: EventCallback[] = []
     _eventOnStreamingToken: EventCallback[] = []
     _eventOnxCloudStreamingToken: EventCallback[] = []
+    _eventOnMSALData: EventCallback[] = []
+
 
     setWebTokens(uhs: string, userToken: string):boolean {
         this._web.uhs = uhs
@@ -35,7 +41,13 @@ export default class TokenStore {
         this._xCloudRegionHost = host
         
         this.emitEvent('onxcloudstreamingtoken', { token: this._xCloudStreamingToken, host: this._xCloudRegionHost })
-
+        return true
+    }
+    
+    setMSALData(data: any, headers: any):boolean {
+        this._msalData = data
+        this._msalHeaders = headers
+        this.emitEvent('onmsal', {data: this._msalData, headers: this._msalHeaders})
         return true
     }
 
@@ -44,8 +56,12 @@ export default class TokenStore {
             this._eventOnWebToken.push(callback)
         } else if(name === 'onstreamingtoken'){
             this._eventOnStreamingToken.push(callback)
+
         } else if(name === 'onxcloudstreamingtoken'){
             this._eventOnxCloudStreamingToken.push(callback)
+
+        } else if(name === 'onmsal'){
+            this._eventOnMSALData.push(callback)
         }
     }
 
@@ -58,9 +74,16 @@ export default class TokenStore {
             for(const eventCallback in this._eventOnStreamingToken){
                 this._eventOnStreamingToken[eventCallback](data)
             }
+
         } else if(name === 'onxcloudstreamingtoken'){
             for(const eventCallback in this._eventOnxCloudStreamingToken){
                 this._eventOnxCloudStreamingToken[eventCallback](data)
+            }
+
+        } else if(name === 'onmsal'){
+            for(const eventCallback in this._eventOnMSALData){
+                this._eventOnMSALData[eventCallback](data)
+
             }
         }
     }
