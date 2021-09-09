@@ -68,7 +68,7 @@ export default function (details:any):void {
             }
 
         } else {
-            throw 'Uh oh.. We could not get your token :/'
+            throw new Error('Uh oh.. We could not get your token :/')
         }
 
         if(cookieFound === true){
@@ -82,7 +82,7 @@ export default function (details:any):void {
             // }
             // const window = BrowserWindow.fromId(windowId)
             // window.close()
-            
+            console.log('Requesting xHome and xCloud tokens..')
             requestStreamingToken(streamingToken, this)
             requestxCloudStreamingToken(streamingToken, this)
             
@@ -120,7 +120,7 @@ function requestStreamingToken(streamingToken:CookieToken, tokenStore:TokenStore
 
                 tokenStore.setStreamingToken(jsonHomeToken.gsToken)
             } else {
-                console.log('- Error while retrieving from url:', this.url)
+                console.log('- Error while retrieving xHome token')
                 console.log('  statuscode:', res.statusCode)
                 console.log('  body:', responseData.toString())
             }
@@ -171,10 +171,10 @@ function requestxCloudStreamingToken(streamingToken:CookieToken, tokenStore:Toke
                         regionHost = xgpuToken.offeringSettings.regions[region].baseUri.substr(8)
                     }
                 }
-
+                console.log('debug: setting xcloud token')
                 tokenStore.setxCloudStreamingToken(xgpuToken.gsToken, regionHost)
             } else {
-                console.log('- Error while retrieving from url:', this.url)
+                console.log('- Error while retrieving xCloud token')
                 console.log('  statuscode:', res.statusCode)
                 console.log('  body:', responseData.toString())
             }

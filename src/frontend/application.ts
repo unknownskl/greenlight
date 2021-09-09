@@ -180,7 +180,9 @@ export default class Application {
         })
 
         this._tokenStore.addEventListener('onxcloudstreamingtoken', (token) => {
-            // @TODO: Enable xCloud integration
+            const xCloudMenuItem = document.getElementById('actionBarxCloud')
+            xCloudMenuItem.style.display = 'inline-block'
+
         })
 
         // this._tokenStore.addEventListener('onmsaltoken', (token) => {
