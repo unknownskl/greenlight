@@ -84,8 +84,21 @@ export default function (details:any):void {
             // window.close()
             console.log('Requesting xHome and xCloud tokens..')
             requestStreamingToken(streamingToken, this)
-            requestxCloudStreamingToken(streamingToken, this)
-            
+            requestxCloudStreamingToken(streamingToken, this).then((value)  => {
+                // do nothing
+                
+            }).catch((error) => {
+                //  Failed to retrieve xcloud Token. Lets close the login window.
+
+                let windowId = 0
+                if(process.env.ISDEV !== undefined){
+                    windowId = (details.webContentsId-1)
+                } else {
+                    windowId = details.webContentsId
+                }
+                const window = BrowserWindow.fromId(windowId)
+                window.close()
+            })
         }
     }
 }
@@ -137,55 +150,64 @@ function requestStreamingToken(streamingToken:CookieToken, tokenStore:TokenStore
 }
 
 function requestxCloudStreamingToken(streamingToken:CookieToken, tokenStore:TokenStore){
-    // Get xHomeStreaming Token
-    const data = JSON.stringify({
-        "token": streamingToken.Token,
-        "offeringId": "xgpuweb"
-    })
-
-    const options = {
-        hostname: 'xgpuweb.gssv-play-prod.xboxlive.com',
-        port: 443,
-        path: '/v2/login/user',
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': data.length
-        }
-    }
-    const req = https.request(options, (res) => {
-        let responseData = ''
-        
-        res.on('data', (data) => {
-            responseData += data
+    return new Promise((resolve, reject) => {
+        // Get xHomeStreaming Token
+        const data = JSON.stringify({
+            "token": streamingToken.Token,
+            "offeringId": "xgpuweb"
         })
 
-        res.on('close', () => {
-            if(res.statusCode == 200){
-                const xgpuToken = JSON.parse(responseData.toString())
-
-                let regionHost
-                for(const region in xgpuToken.offeringSettings.regions){
-                    // console.log(jsonHomeToken.offeringSettings.regions[region])
-                    if(xgpuToken.offeringSettings.regions[region].isDefault === true){
-                        regionHost = xgpuToken.offeringSettings.regions[region].baseUri.substr(8)
-                    }
-                }
-                console.log('debug: setting xcloud token')
-                tokenStore.setxCloudStreamingToken(xgpuToken.gsToken, regionHost)
-            } else {
-                console.log('- Error while retrieving xCloud token')
-                console.log('  statuscode:', res.statusCode)
-                console.log('  body:', responseData.toString())
+        const options = {
+            hostname: 'xgpuweb.gssv-play-prod.xboxlive.com',
+            port: 443,
+            path: '/v2/login/user',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': data.length
             }
-        })
-    })
-    
-    req.on('error', (error) => {
-        console.log('- Error while retrieving from url:', this.url)
-        console.log('  Error:', error)
-    })
+        }
+        const req = https.request(options, (res) => {
+            let responseData = ''
+            
+            res.on('data', (data) => {
+                responseData += data
+            })
 
-    req.write(data)
-    req.end()
+            res.on('close', () => {
+                if(res.statusCode == 200){
+                    const xgpuToken = JSON.parse(responseData.toString())
+
+                    let regionHost
+                    for(const region in xgpuToken.offeringSettings.regions){
+                        // console.log(jsonHomeToken.offeringSettings.regions[region])
+                        if(xgpuToken.offeringSettings.regions[region].isDefault === true){
+                            regionHost = xgpuToken.offeringSettings.regions[region].baseUri.substr(8)
+                        }
+                    }
+                    console.log('debug: setting xcloud token')
+                    tokenStore.setxCloudStreamingToken(xgpuToken.gsToken, regionHost)
+                    resolve(true)
+                } else {
+                    console.log('- Error while retrieving xCloud token')
+                    console.log('  statuscode:', res.statusCode)
+                    console.log('  body:', responseData.toString())
+
+                    reject({
+                        status: res.statusCode,
+                        body: responseData.toString()
+                    })
+                }
+            })
+        })
+        
+        req.on('error', (error) => {
+            console.log('- Error while retrieving from url:', this.url)
+            console.log('  Error:', error)
+            reject(error)
+        })
+
+        req.write(data)
+        req.end()
+    })
 }

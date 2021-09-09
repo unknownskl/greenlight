@@ -118,9 +118,10 @@ app.on('ready', () => {
 
         res.on('close', () => {
             if(res.statusCode == 200){
-                console.log('MSAL SUCESS!!!')
-                console.log('body: ', responseData.toString())
+                // console.log('MSAL SUCESS!!!')
+                // console.log('body: ', responseData.toString())
 
+                console.log('msal tokens set')
                 const msalBody = JSON.parse(responseData.toString())
                 tokenStore.setMSALToken(msalBody.access_token)
 
