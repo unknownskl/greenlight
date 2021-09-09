@@ -112,7 +112,7 @@ export default class StreamClient {
 
                                 } else if(data2.state === 'ReadyToConnect') {
                                     // Stream is already provisioned and ready to go
-                                    this.xcloudAuth('<MSALTokenHere>', data.sessionPath).then((data3:any) => {
+                                    this.xcloudAuth(this._application._tokenStore._msalToken, data.sessionPath).then((data3:any) => {
 
                                         this.isExchangeReady('state', 'https://'+this._application._tokenStore._xCloudRegionHost+'/'+data.sessionPath+'/state').then((data4) => {
                                             resolve(true)

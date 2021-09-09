@@ -16,6 +16,9 @@
         document.getElementById('token_xcloud_streaming_token').value = streamingToken
         document.getElementById('token_xcloud_streaming_host').value = host
       }
+      function setxCloudMSALToken(token){
+        document.getElementById('token_xcloud_msal_token').value = token
+      }
       window.addEventListener('resize', () => {
         if(document.getElementById('videoRender') !== null && document.getElementById('videoHolder') !== null) {
           var videoRender = document.getElementById('videoRender')
@@ -43,6 +46,7 @@
     <input id="token_streaming_token" value="" type="hidden" />
     <input id="token_xcloud_streaming_token" value="" type="hidden" />
     <input id="token_xcloud_streaming_host" value="" type="hidden" />
+    <input id="token_xcloud_msal_token" value="" type="hidden" />
 
     <div id="appRoot">
       

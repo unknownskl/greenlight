@@ -121,6 +121,7 @@ export default class Application {
         const inputStreamingToken = document.getElementById('token_streaming_token')
         const inputxCloudStreamingToken = document.getElementById('token_xcloud_streaming_token')
         const inputxCloudStreamingHost = document.getElementById('token_xcloud_streaming_host')
+        const inputxCloudMSALToken = document.getElementById('token_xcloud_msal_token')
 
         const inputWebTokenInterval = setInterval(() => {
             const valueUhs  = (<HTMLInputElement>inputWebUhs).value
@@ -156,6 +157,16 @@ export default class Application {
             }
         }, 100)
 
+        const inputxCloudMSALTokenInterval = setInterval(() => {
+            const value  = (<HTMLInputElement>inputxCloudMSALToken).value
+            if(value !== ''){
+                clearInterval(inputxCloudMSALTokenInterval)
+                
+                this._tokenStore.setMSALToken(value)
+                inputxCloudMSALToken.remove()
+            }
+        }, 100)
+
         this._tokenStore.addEventListener('onwebtoken', (tokens) => {
             if(this._tokenStore._web.uhs !== '' && this._tokenStore._streamingToken !== ''){
                 this._router.setView('app')
@@ -171,6 +182,10 @@ export default class Application {
         this._tokenStore.addEventListener('onxcloudstreamingtoken', (token) => {
             // @TODO: Enable xCloud integration
         })
+
+        // this._tokenStore.addEventListener('onmsaltoken', (token) => {
+        //     // @TODO: Enable xCloud integration
+        // })
     }
 
     startStream(type: string, serverId:string):void {

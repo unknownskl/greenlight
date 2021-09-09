@@ -1,6 +1,7 @@
 import { app, BrowserWindow, session } from 'electron';
 import https from 'https';
 import TokenStore from './TokenStore';
+// import TokenStore from './TokenStore';
 // import path from 'path';
 // import TokenStore from './TokenStore';
 
@@ -9,7 +10,7 @@ interface CookieToken {
     UserClaims: any;
 }
 
-const tokenStore = new TokenStore()
+// const tokenStore = new TokenStore()
 
 export default function (details:any):void {
 
@@ -73,23 +74,23 @@ export default function (details:any):void {
         if(cookieFound === true){
             this.setWebTokens(authToken.UserClaims.uhs, authToken.Token)
 
-            let windowId = 0
-            if(process.env.ISDEV !== undefined){
-                windowId = (details.webContentsId-1)
-            } else {
-                windowId = details.webContentsId
-            }
-            const window = BrowserWindow.fromId(windowId)
+            // let windowId = 0
+            // if(process.env.ISDEV !== undefined){
+            //     windowId = (details.webContentsId-1)
+            // } else {
+            //     windowId = details.webContentsId
+            // }
+            // const window = BrowserWindow.fromId(windowId)
             // window.close()
-
-            requestStreamingToken(streamingToken)
-            requestxCloudStreamingToken(streamingToken)
+            
+            requestStreamingToken(streamingToken, this)
+            requestxCloudStreamingToken(streamingToken, this)
             
         }
     }
 }
 
-function requestStreamingToken(streamingToken:CookieToken){
+function requestStreamingToken(streamingToken:CookieToken, tokenStore:TokenStore){
     // Get xHomeStreaming Token
     const data = JSON.stringify({
         "token": streamingToken.Token,
@@ -135,7 +136,7 @@ function requestStreamingToken(streamingToken:CookieToken){
     req.end()
 }
 
-function requestxCloudStreamingToken(streamingToken:CookieToken){
+function requestxCloudStreamingToken(streamingToken:CookieToken, tokenStore:TokenStore){
     // Get xHomeStreaming Token
     const data = JSON.stringify({
         "token": streamingToken.Token,

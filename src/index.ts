@@ -75,14 +75,22 @@ app.on('ready', () => {
   // Handle login
   tokenStore.addEventListener('onwebtoken', (tokens:any) => {
     mainWindow.webContents.executeJavaScript("setWebTokens('"+tokens.uhs+"', '"+tokens.userToken+"');");
+    console.log('web tokens set')
   })
 
   tokenStore.addEventListener('onstreamingtoken', (token:any) => {
     mainWindow.webContents.executeJavaScript("setStreamingToken('"+token+"');");
+    console.log('xhome tokens set')
   })
 
   tokenStore.addEventListener('onxcloudstreamingtoken', (token:any) => {
     mainWindow.webContents.executeJavaScript("setxCloudStreamingToken('"+token.token+"', '"+token.host+"');");
+    console.log('xcloud tokens set')
+  })
+
+  tokenStore.addEventListener('onmsaltoken', (token:any) => {
+    mainWindow.webContents.executeJavaScript("setxCloudMSALToken('"+token+"');");
+    console.log('xcloud msal token set')
   })
 
   tokenStore.addEventListener('onmsal', (tuple:any) => {
@@ -110,8 +118,12 @@ app.on('ready', () => {
 
         res.on('close', () => {
             if(res.statusCode == 200){
-                console.log('OMG - SUCESS!!!')
+                console.log('MSAL SUCESS!!!')
                 console.log('body: ', responseData.toString())
+
+                const msalBody = JSON.parse(responseData.toString())
+                tokenStore.setMSALToken(msalBody.access_token)
+
             } else {
                 console.log('- Error while retrieving from url: ...')
                 console.log('  statuscode:', res.statusCode)
@@ -131,133 +143,133 @@ app.on('ready', () => {
 
   createWindow()
 
-  // Check for existing cookies on load
-  mainWindow.webContents.on('did-finish-load', (e:Event) => {
+  // // Check for existing cookies on load
+  // mainWindow.webContents.on('did-finish-load', (e:Event) => {
 
-    session.defaultSession.cookies.get({ url: 'https://www.xbox.com' }).then((cookies) => {
-      for(const cookie in cookies){
-        // console.log(cookies[cookie])
+  //   // session.defaultSession.cookies.get({ url: 'https://www.xbox.com' }).then((cookies) => {
+  //   //   for(const cookie in cookies){
+  //   //     // console.log(cookies[cookie])
         
-        if(cookies[cookie].name === 'XBXXtkhttp://xboxlive.com'){
-          // Process streaming token
-          const cookieValue = decodeURIComponent(cookies[cookie].value)
-          const cookieJson = JSON.parse(cookieValue)
-          // console.log('cookieJson', cookieJson)
+  //   //     if(cookies[cookie].name === 'XBXXtkhttp://xboxlive.com'){
+  //   //       // Process streaming token
+  //   //       const cookieValue = decodeURIComponent(cookies[cookie].value)
+  //   //       const cookieJson = JSON.parse(cookieValue)
+  //   //       // console.log('cookieJson', cookieJson)
           
-          tokenStore.setWebTokens(cookieJson.UserClaims.uhs, cookieJson.Token)
+  //   //       tokenStore.setWebTokens(cookieJson.UserClaims.uhs, cookieJson.Token)
 
-        } else if(cookies[cookie].name === 'XBXXtkhttp://gssv.xboxlive.com/'){
-          // Process streaming token
-          const cookieValue = decodeURIComponent(cookies[cookie].value)
-          const cookieJson = JSON.parse(cookieValue)
-          // console.log('cookieJson gssv', cookieJson)
+  //   //     } else if(cookies[cookie].name === 'XBXXtkhttp://gssv.xboxlive.com/'){
+  //   //       // Process streaming token
+  //   //       const cookieValue = decodeURIComponent(cookies[cookie].value)
+  //   //       const cookieJson = JSON.parse(cookieValue)
+  //   //       // console.log('cookieJson gssv', cookieJson)
           
-          // tokenStore.setStreamingToken(cookieJson.Token) // @TODO: Retrieve gamestreaming token and replace with this one.
+  //   //       // tokenStore.setStreamingToken(cookieJson.Token) // @TODO: Retrieve gamestreaming token and replace with this one.
 
-          // Retrieve GSToken
-          const data = JSON.stringify({
-              "token": cookieJson.Token,
-              "offeringId": "xhome"
-          })
+  //   //       // Retrieve GSToken
+  //   //       const data = JSON.stringify({
+  //   //           "token": cookieJson.Token,
+  //   //           "offeringId": "xhome"
+  //   //       })
 
-          const options = {
-              hostname: 'xhome.gssv-play-prod.xboxlive.com',
-              port: 443,
-              path: '/v2/login/user',
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json',
-                  'Content-Length': data.length
-              }
-          }
-          const req = https.request(options, (res) => {
-              let responseData = ''
+  //   //       const options = {
+  //   //           hostname: 'xhome.gssv-play-prod.xboxlive.com',
+  //   //           port: 443,
+  //   //           path: '/v2/login/user',
+  //   //           method: 'POST',
+  //   //           headers: {
+  //   //               'Content-Type': 'application/json',
+  //   //               'Content-Length': data.length
+  //   //           }
+  //   //       }
+  //   //       const req = https.request(options, (res) => {
+  //   //           let responseData = ''
               
-              res.on('data', (data) => {
-                  responseData += data
-              })
+  //   //           res.on('data', (data) => {
+  //   //               responseData += data
+  //   //           })
 
-              res.on('close', () => {
-                  if(res.statusCode == 200){
-                      const jsonHomeToken = JSON.parse(responseData.toString())
-                      tokenStore.setStreamingToken(jsonHomeToken.gsToken)
-                  } else {
-                      console.log('- Error while retrieving from url: ...')
-                      console.log('  statuscode:', res.statusCode)
-                      console.log('  body:', responseData.toString())
-                  }
-              })
-          })
+  //   //           res.on('close', () => {
+  //   //               if(res.statusCode == 200){
+  //   //                   const jsonHomeToken = JSON.parse(responseData.toString())
+  //   //                   tokenStore.setStreamingToken(jsonHomeToken.gsToken)
+  //   //               } else {
+  //   //                   console.log('- Error while retrieving from url: ...')
+  //   //                   console.log('  statuscode:', res.statusCode)
+  //   //                   console.log('  body:', responseData.toString())
+  //   //               }
+  //   //           })
+  //   //       })
           
-          req.on('error', (error) => {
-              console.log('- Error while retrieving from url: ...')
-              console.log('  Error:', error)
-          })
+  //   //       req.on('error', (error) => {
+  //   //           console.log('- Error while retrieving from url: ...')
+  //   //           console.log('  Error:', error)
+  //   //       })
 
-          req.write(data)
-          req.end()
+  //   //       req.write(data)
+  //   //       req.end()
 
-          // Retrieve xCloudToken
-          const xCloudData = JSON.stringify({
-            "token": cookieJson.Token,
-            "offeringId": "xgpuweb"
-          })
+  //   //       // Retrieve xCloudToken
+  //   //       const xCloudData = JSON.stringify({
+  //   //         "token": cookieJson.Token,
+  //   //         "offeringId": "xgpuweb"
+  //   //       })
 
-          const xCloudOptions = {
-              hostname: 'xgpuweb.gssv-play-prod.xboxlive.com',
-              port: 443,
-              path: '/v2/login/user',
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json',
-                  'Content-Length': xCloudData.length,
-                  'Authorization': 'Bearer '+cookieJson.Token
-              }
-          }
-          const xCloudReq = https.request(xCloudOptions, (res) => {
-              let responseData = ''
+  //   //       const xCloudOptions = {
+  //   //           hostname: 'xgpuweb.gssv-play-prod.xboxlive.com',
+  //   //           port: 443,
+  //   //           path: '/v2/login/user',
+  //   //           method: 'POST',
+  //   //           headers: {
+  //   //               'Content-Type': 'application/json',
+  //   //               'Content-Length': xCloudData.length,
+  //   //               'Authorization': 'Bearer '+cookieJson.Token
+  //   //           }
+  //   //       }
+  //   //       const xCloudReq = https.request(xCloudOptions, (res) => {
+  //   //           let responseData = ''
               
-              res.on('data', (data) => {
-                  responseData += data
-              })
+  //   //           res.on('data', (data) => {
+  //   //               responseData += data
+  //   //           })
 
-              res.on('close', () => {
-                  if(res.statusCode == 200){
-                      const jsonHomeToken = JSON.parse(responseData.toString())
-                      // console.log('XGPU TOKEN:', jsonHomeToken)
+  //   //           res.on('close', () => {
+  //   //               if(res.statusCode == 200){
+  //   //                   const jsonHomeToken = JSON.parse(responseData.toString())
+  //   //                   // console.log('XGPU TOKEN:', jsonHomeToken)
 
-                      let regionHost
-                      for(const region in jsonHomeToken.offeringSettings.regions){
-                        // console.log(jsonHomeToken.offeringSettings.regions[region])
-                        if(jsonHomeToken.offeringSettings.regions[region].isDefault === true){
-                          regionHost = jsonHomeToken.offeringSettings.regions[region].baseUri.substr(8)
-                        }
-                      }
+  //   //                   let regionHost
+  //   //                   for(const region in jsonHomeToken.offeringSettings.regions){
+  //   //                     // console.log(jsonHomeToken.offeringSettings.regions[region])
+  //   //                     if(jsonHomeToken.offeringSettings.regions[region].isDefault === true){
+  //   //                       regionHost = jsonHomeToken.offeringSettings.regions[region].baseUri.substr(8)
+  //   //                     }
+  //   //                   }
 
-                      // console.log('Set xcloud host:', regionHost, jsonHomeToken.gsToken)
-                      tokenStore.setxCloudStreamingToken(jsonHomeToken.gsToken, regionHost)
-                  } else {
-                      console.log('- Error while retrieving from url: ...')
-                      console.log('  statuscode:', res.statusCode)
-                      console.log('  body:', responseData.toString())
-                  }
-              })
-          })
+  //   //                   // console.log('Set xcloud host:', regionHost, jsonHomeToken.gsToken)
+  //   //                   tokenStore.setxCloudStreamingToken(jsonHomeToken.gsToken, regionHost)
+  //   //               } else {
+  //   //                   console.log('- Error while retrieving from url: ...')
+  //   //                   console.log('  statuscode:', res.statusCode)
+  //   //                   console.log('  body:', responseData.toString())
+  //   //               }
+  //   //           })
+  //   //       })
           
-          xCloudReq.on('error', (error) => {
-              console.log('- Error while retrieving from url: ...')
-              console.log('  Error:', error)
-          })
+  //   //       xCloudReq.on('error', (error) => {
+  //   //           console.log('- Error while retrieving from url: ...')
+  //   //           console.log('  Error:', error)
+  //   //       })
 
-          xCloudReq.write(xCloudData)
-          xCloudReq.end()
-        }
-      }
+  //   //       xCloudReq.write(xCloudData)
+  //   //       xCloudReq.end()
+  //   //     }
+  //   //   }
 
-    }).catch((error) => {
-      console.log(error)
-    })
-  });
+  //   // }).catch((error) => {
+  //   //   console.log(error)
+  //   // })
+  // });
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common

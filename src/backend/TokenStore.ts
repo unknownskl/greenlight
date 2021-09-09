@@ -14,10 +14,12 @@ export default class TokenStore {
     _xCloudRegionHost = '';
     _msalData:Array<UploadData>;
     _msalHeaders:Record<string,string>;
+    _msalToken = '';
 
     _eventOnWebToken: EventCallback[] = []
     _eventOnStreamingToken: EventCallback[] = []
     _eventOnxCloudStreamingToken: EventCallback[] = []
+    _eventOnMSALToken: EventCallback[] = []
     _eventOnMSALData: EventCallback[] = []
 
 
@@ -51,6 +53,13 @@ export default class TokenStore {
         return true
     }
 
+    setMSALToken(token: string):boolean {
+        this._msalToken = token
+        this.emitEvent('onmsaltoken', this._msalToken)
+
+        return true
+    }
+
     addEventListener(name: string, callback: EventCallback):void{
         if(name === 'onwebtoken'){
             this._eventOnWebToken.push(callback)
@@ -62,6 +71,9 @@ export default class TokenStore {
 
         } else if(name === 'onmsal'){
             this._eventOnMSALData.push(callback)
+
+        } else if(name === 'onmsaltoken'){
+            this._eventOnMSALToken.push(callback)
         }
     }
 
@@ -83,6 +95,11 @@ export default class TokenStore {
         } else if(name === 'onmsal'){
             for(const eventCallback in this._eventOnMSALData){
                 this._eventOnMSALData[eventCallback](data)
+
+            }
+        } else if(name === 'onmsaltoken'){
+            for(const eventCallback in this._eventOnMSALData){
+                this._eventOnMSALToken[eventCallback](data)
 
             }
         }
