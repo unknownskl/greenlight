@@ -2,6 +2,7 @@ import { app, BrowserWindow, session } from 'electron';
 import https from 'https'
 // import path from 'path';
 import interceptToken from './backend/cookieIntercept'
+import interceptRequest from './backend/requestIntercept'
 import TokenStore from './backend/TokenStore';
 
 
@@ -64,6 +65,13 @@ app.on('ready', () => {
     ]
   }, interceptToken.bind(tokenStore))
 
+
+  session.defaultSession.webRequest.onBeforeSendHeaders({
+    urls: [
+      'https://login.microsoftonline.com/consumers/oauth2/v2.0/token'
+    ]
+  }, interceptRequest.bind(tokenStore))
+
   // Handle login
   tokenStore.addEventListener('onwebtoken', (tokens:any) => {
     mainWindow.webContents.executeJavaScript("setWebTokens('"+tokens.uhs+"', '"+tokens.userToken+"');");
@@ -71,6 +79,51 @@ app.on('ready', () => {
 
   tokenStore.addEventListener('onstreamingtoken', (token:any) => {
     mainWindow.webContents.executeJavaScript("setStreamingToken('"+token+"');");
+  })
+
+  tokenStore.addEventListener('onmsal', (tuple:any) => {
+    const data = tokenStore._msalData[0].bytes
+
+    const headers:Record<string,string> = tokenStore._msalHeaders
+    headers['Content-Length'] = data.byteLength.toString()
+
+    const options = {
+        hostname: 'login.microsoftonline.com',
+        port: 443,
+        path: '/consumers/oauth2/v2.0/token',
+        method: 'POST',
+        headers: {
+          'Origin': 'https://www.xbox.com',
+          ...tokenStore._msalHeaders,
+        }
+    }
+    const req = https.request(options, (res) => {
+        let responseData = ''
+        
+        res.on('data', (data) => {
+            responseData += data
+        })
+
+        res.on('close', () => {
+            if(res.statusCode == 200){
+                console.log('OMG - SUCESS!!!')
+                console.log('body: ', responseData.toString())
+            } else {
+                console.log('- Error while retrieving from url: ...')
+                console.log('  statuscode:', res.statusCode)
+                console.log('  body:', responseData.toString())
+            }
+        })
+    })
+    
+    req.on('error', (error) => {
+        console.log('- Error while retrieving from url: ...')
+        console.log('  Error:', error)
+    })
+
+    req.write(data)
+    req.end()
+
   })
 
   createWindow()

@@ -77,7 +77,7 @@ export default function (details:any):void {
                 windowId = details.webContentsId
             }
             const window = BrowserWindow.fromId(windowId)
-            window.close()
+            // window.close()
 
             // Get xHomeStreaming Token
             const data = JSON.stringify({
