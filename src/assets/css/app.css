@@ -351,6 +351,7 @@ body {
     top: 70px;
     left: 0px;
     right: 0px;
+    flex-wrap: wrap;
 }
 
 #xCloudContent {
@@ -360,6 +361,25 @@ body {
 #xCloud .btn {
     margin: 40px;
     padding-top: 0px;
+}
+
+#xCloud div.titleWrap {
+    width: 25%;
+    padding-top: 40px;
+    padding-bottom: 40px;
+}
+
+#xCloud div.titleItem {
+    background: #000000;
+    color: #ffffff;
+    margin-left: 48px;
+    margin-right: 48px;
+}
+
+#xCloud img.titleImage {
+    max-width: 25%;
+    float: left;
+    margin-right: 10px;
 }
 
 /**
