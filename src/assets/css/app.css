@@ -344,13 +344,31 @@ body {
 
 
 #xCloud {
-    display: flex;
-
     width: 100%;
     position: absolute;
     top: 70px;
     left: 0px;
     right: 0px;
+}
+
+#xCloudSearch {
+    /* */
+    padding-top: 24px;
+    padding-left: 24px;
+    padding-right: 24px;
+}
+
+#xCloudSearch input#xCloudSearchInput {
+    background:rgba(0, 0, 0, 0.55);
+    color: #ffffff;
+    padding: 10px;
+    border-radius: 10px;
+    width: 99%;
+    outline: none;
+}
+
+#xCloudGames {
+    display: flex;
     flex-wrap: wrap;
 }
 
@@ -358,28 +376,43 @@ body {
     padding-top: 70px;
 }
 
-#xCloud .btn {
+/* #xCloud .btn {
     margin: 40px;
     padding-top: 0px;
-}
+} */
 
-#xCloud div.titleWrap {
+#xCloudGames div.titleWrap {
     width: 25%;
     padding-top: 40px;
     padding-bottom: 40px;
 }
 
-#xCloud div.titleItem {
+#xCloudGames div.titleItem {
     background: #000000;
     color: #ffffff;
-    margin-left: 48px;
-    margin-right: 48px;
+    margin-left: 24px;
+    margin-right: 24px;
+    position: relative;
 }
 
-#xCloud img.titleImage {
+#xCloudGames span.titleName {
+    position: relative;
+    top: 5px;
+    padding-bottom: 5px;
+}
+
+#xCloudGames img.titleImage {
     max-width: 25%;
     float: left;
     margin-right: 10px;
+}
+
+#xCloudGames .btn-xcloud-start {
+    margin: 5px;
+    display: block;
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
 }
 
 /**

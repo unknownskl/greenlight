@@ -55,74 +55,96 @@ export default class xCloudView {
             // We got all xCloud titles. Lets add the rest of the details from the store
 
             const retrieveTitleIds = ():any => {
-                console.log('Unprocessed title count:', this._unprocessedTitles.length)
-                // console.log('keys:', this._unprocessedTitles.splice(0, 30))
-                // console.log('New unprocessed title count:', this._unprocessedTitles.length)
+                return new Promise((resolve, reject) => {
+                    console.log('Unprocessed title count:', this._unprocessedTitles.length)
+                    // console.log('keys:', this._unprocessedTitles.splice(0, 30))
+                    // console.log('New unprocessed title count:', this._unprocessedTitles.length)
 
-                if(this._unprocessedTitles.length === 0){
-                    return;
-                }
-
-                const titles = this._unprocessedTitles.splice(0, 30)
-                const ids = []
-                for(const title in titles){
-                    ids.push(titles[title].details.productId)
-                }
-
-                this._apiClient.getProducts(ids.join(',')).then((data:any) => {
-                    for(const product in data.Products){
-                        // console.log(data.Products[product].ProductId)
-                        // console.log(data.Products[product].LocalizedProperties[0].ProductTitle)
-                        // console.log(data.Products[product].LocalizedProperties[0].Images) // We need "Logo"
-                        let gameImage = ''
-                        for(const image in data.Products[product].LocalizedProperties[0].Images){
-                            // console.log(data.Products[product].LocalizedProperties[0].Images[image].ImagePurpose)
-                            // console.log(data.Products[product].LocalizedProperties[0].Images[image].Uri)
-                            if(data.Products[product].LocalizedProperties[0].Images[image].ImagePurpose === 'Logo'){
-                                gameImage = 'https:' + data.Products[product].LocalizedProperties[0].Images[image].Uri
-                            }
-                            if(gameImage === '' && data.Products[product].LocalizedProperties[0].Images[image].ImagePurpose === 'BoxArt'){
-                                gameImage = 'https:' + data.Products[product].LocalizedProperties[0].Images[image].Uri
-                            }
-                        }
-
-                        console.log(gameImage)
-
-                        if(this._titles[data.Products[product].ProductId.toUpperCase()] !== undefined){
-                            this._titles[data.Products[product].ProductId.toUpperCase()]['name'] = data.Products[product].LocalizedProperties[0].ProductTitle
-                            this._titles[data.Products[product].ProductId.toUpperCase()]['image'] = gameImage
-                            this._titles[data.Products[product].ProductId.toUpperCase()]['storeDetails'] = data.Products[product]
-                        } else {
-                            console.log('No product found in memory:', data.Products[product].ProductId.toUpperCase())
-                        }
-
-                        // for(const title in titles){
-                        //     if(data.Products[product].ProductId === titles[title].details.productId){
-                        //         // We match the product id. Lets insert the title
-
-                        //         // this._titles.push({
-                        //         //     ...titles[title],
-                        //         //     name: data.Products[product].LocalizedProperties[0].ProductTitle,
-                        //         //     image: gameImage,
-                        //         //     storeDetails: data.Products[product],
-                        //         // })
-                                
-                        //         break;
-                        //     }
-                        // }
+                    // Check if we still need to get titles from the api. If not, lets resolve it so we render the titles.
+                    if(this._unprocessedTitles.length === 0){
+                        resolve(true)
+                        return;
                     }
 
-                    this.renderTitles()
-                })
-                // @TODO: Check if there are any left
-                return retrieveTitleIds()
+                    const titles = this._unprocessedTitles.splice(0, 30)
+                    const ids = []
+                    for(const title in titles){
+                        ids.push(titles[title].details.productId.toUpperCase())
+                    }
 
-                // this.renderTitles()
+                    console.log(ids)
+
+                    this._apiClient.getProducts(ids.join(',')).then((data:any) => {
+                        for(const product in data.Products){
+                            // console.log(data.Products[product].ProductId)
+                            // console.log(data.Products[product].LocalizedProperties[0].ProductTitle)
+                            // console.log(data.Products[product].LocalizedProperties[0].Images) // We need "Logo"
+                            let gameImage = ''
+                            for(const image in data.Products[product].LocalizedProperties[0].Images){
+                                // console.log(data.Products[product].LocalizedProperties[0].Images[image].ImagePurpose)
+                                // console.log(data.Products[product].LocalizedProperties[0].Images[image].Uri)
+                                if(data.Products[product].LocalizedProperties[0].Images[image].ImagePurpose === 'Logo'){
+                                    gameImage = 'https:' + data.Products[product].LocalizedProperties[0].Images[image].Uri
+                                }
+                                if(gameImage === '' && data.Products[product].LocalizedProperties[0].Images[image].ImagePurpose === 'BoxArt'){
+                                    gameImage = 'https:' + data.Products[product].LocalizedProperties[0].Images[image].Uri
+                                }
+                            }
+
+                            // console.log(gameImage)
+
+                            if(this._titles[data.Products[product].ProductId.toUpperCase()] !== undefined){
+                                this._titles[data.Products[product].ProductId.toUpperCase()]['name'] = data.Products[product].LocalizedProperties[0].ProductTitle
+                                this._titles[data.Products[product].ProductId.toUpperCase()]['image'] = gameImage
+                                this._titles[data.Products[product].ProductId.toUpperCase()]['storeDetails'] = data.Products[product]
+                            } else {
+                                console.log('No product found in memory:', data.Products[product].ProductId.toUpperCase())
+                            }
+
+                            // for(const title in titles){
+                            //     if(data.Products[product].ProductId === titles[title].details.productId){
+                            //         // We match the product id. Lets insert the title
+
+                            //         // this._titles.push({
+                            //         //     ...titles[title],
+                            //         //     name: data.Products[product].LocalizedProperties[0].ProductTitle,
+                            //         //     image: gameImage,
+                            //         //     storeDetails: data.Products[product],
+                            //         // })
+                                    
+                            //         break;
+                            //     }
+                            // }
+                        }
+
+                        retrieveTitleIds().then(() => {
+                            resolve(true)
+                        }).catch((error:any) => {
+                            reject(error)
+                        })
+
+                        // this.renderTitles()
+                    })
+                    
+                })
             }
 
-            retrieveTitleIds()
+            retrieveTitleIds().then(() => {
+                this.renderTitles()
+            }).catch((error:any) => {
+                alert(error)
+            })
             
         })
+
+        const xCloudSearchInput = (<HTMLInputElement>document.getElementById('xCloudSearchInput'))
+
+        xCloudSearchInput.onkeyup = (event: any) => {
+            const inputValue = event.target.value
+            // console.log('xCloud title search:', inputValue)
+
+            this.renderTitles(inputValue)
+        }
 
 
         // // Bind test button
@@ -155,25 +177,31 @@ export default class xCloudView {
         })
     }
 
-    renderTitles(){
+    renderTitles(searchTitle=''){
         console.log(this._titles)
 
         let renderHtml = ''
-        document.getElementById('xCloud').innerHTML = ''
+        document.getElementById('xCloudGames').innerHTML = ''
+
+        const renderTitles:Array<string> = []
 
         for(const title in this._titles){
-            renderHtml += '<div class="titleWrap"><div class="titleItem">'
-            renderHtml += ' <img class="titleImage" src="'+this._titles[title].image+'" />'
-            renderHtml += ' '+this._titles[title].name+''
-            renderHtml += ' <button class="btn btn-primary" id="xcloud_stream_'+this._titles[title].titleId+'">Play!</button>'
-            renderHtml += '</div></div>'
+            if(searchTitle === '' || (this._titles[title].name !== undefined && this._titles[title].name.toUpperCase().includes(searchTitle.toUpperCase()))){
+                renderHtml += '<div class="titleWrap"><div class="titleItem">'
+                renderHtml += ' <img class="titleImage" src="'+this._titles[title].image+'" />'
+                renderHtml += ' <span class="titleName">'+this._titles[title].name+'</span>'
+                renderHtml += ' <button class="btn btn-primary btn-small btn-xcloud-start" id="xcloud_stream_'+this._titles[title].titleId+'">Play!</button>'
+                renderHtml += '<br style="clear: both;"></div></div>'
+
+                renderTitles.push(this._titles[title].titleId)
+            }
         }
 
-        document.getElementById('xCloud').innerHTML = renderHtml
+        document.getElementById('xCloudGames').innerHTML = renderHtml
 
-        for(const title in this._titles) {
-            document.getElementById('xcloud_stream_'+this._titles[title].titleId).addEventListener('click', (e:Event) => {
-                this._application.startStream('xcloud', this._titles[title].titleId)
+        for(const title in renderTitles) {
+            document.getElementById('xcloud_stream_'+renderTitles[title]).addEventListener('click', (e:Event) => {
+                this._application.startStream('xcloud', renderTitles[title])
             })
         }
     }
