@@ -25,7 +25,7 @@ var onPacket = function(eventData, timePerformanceNow){
         var serverDataKey = messageBuffer.getUint32(16, true);
         var isKeyFrame = messageBuffer.getUint8(20, true);
 
-        var offset = 21; //@TODO: Check if isKeyFrame. if true => 21, else 20.
+        var offset = 21;
 
         var frameData = new Uint8Array(eventData.data, offset)
 
@@ -61,6 +61,7 @@ var onPacket = function(eventData, timePerformanceNow){
                 frameData: frameDataBuffer,
                 bytesReceived: bytesReceived,
                 serverDataKey: frameData.serverDataKey,
+                isKeyFrame: frameData.isKeyFrame,
                 fullFrame: false,
 
                 firstFramePacketArrivalTimeMs: timePerformanceNow,
@@ -82,7 +83,6 @@ var onPacket = function(eventData, timePerformanceNow){
             resolve(_frameQueue[frameId])
 
             delete _frameQueue[frameId]
-            // this.sendToMediasource()
         } else {
             resolve(_frameQueue[frameId])
         }

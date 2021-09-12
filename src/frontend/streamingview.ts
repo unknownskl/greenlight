@@ -319,6 +319,12 @@ export default class StreamingView {
                 console.log('streamingView.js: Set bitrate to 12000')
             }
 
+
+            document.getElementById('request_videoframe').onclick = (event:any) => {
+                this._streamClient._webrtcClient.getChannelProcessor('control').requestKeyFrame()
+                console.log('streamingView.js: Requested videokeyframe')
+            }
+
             // Dialogs
             this._streamClient._webrtcClient.getChannelProcessor('message').addEventListener('dialog', (event:any) => {
                 console.log('Got dialog event:', event)
