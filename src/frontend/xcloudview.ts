@@ -176,7 +176,7 @@ export default class xCloudView {
                 renderHtml += '<div class="titleWrap"><div class="titleItem">'
                 renderHtml += ' <img class="titleImage" src="'+this._titles[title].image+'" />'
                 renderHtml += ' <span class="titleName">'+this._titles[title].name+'</span>'
-                renderHtml += ' <button class="btn btn-primary btn-small btn-xcloud-start" id="xcloud_stream_'+this._titles[title].titleId+'">Play!</button>'
+                renderHtml += ' <button class="btn btn-primary btn-small btn-xcloud-start" id="xcloud_stream_'+this._titles[title].titleId+'">Play</button>'
                 renderHtml += '<br style="clear: both;"></div></div>'
 
                 renderTitles.push(this._titles[title].titleId)

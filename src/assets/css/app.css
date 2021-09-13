@@ -370,6 +370,7 @@ body {
 #xCloudGames {
     display: flex;
     flex-wrap: wrap;
+    padding-bottom: 40px;
 }
 
 #xCloudContent {
@@ -384,7 +385,7 @@ body {
 #xCloudGames div.titleWrap {
     width: 25%;
     padding-top: 40px;
-    padding-bottom: 40px;
+    /* padding-bottom: 40px; */
 }
 
 #xCloudGames div.titleItem {
@@ -400,8 +401,8 @@ body {
     padding-bottom: 5px;
     font-size: 14px;
     opacity: 0.7;
-    top: 8px;
-    left: 8px;
+    top: 5px;
+    left: 5px;
 }
 
 #xCloudGames img.titleImage {
@@ -630,8 +631,8 @@ button.btn {
 }
 
 button.btn-small {
-    height: 30px;
-    padding-top: 4px;
+    height: 24px;
+    padding-top: 0px;
     min-width: 20px;
 }
 
