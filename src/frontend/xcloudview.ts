@@ -72,21 +72,22 @@ export default class xCloudView {
                         ids.push(titles[title].details.productId.toUpperCase())
                     }
 
-                    console.log(ids)
+                    // console.log(ids)
 
                     this._apiClient.getProducts(ids.join(',')).then((data:any) => {
                         for(const product in data.Products){
                             // console.log(data.Products[product].ProductId)
-                            // console.log(data.Products[product].LocalizedProperties[0].ProductTitle)
+                            // console.log('::', data.Products[product].LocalizedProperties[0].ProductTitle)
                             // console.log(data.Products[product].LocalizedProperties[0].Images) // We need "Logo"
                             let gameImage = ''
                             for(const image in data.Products[product].LocalizedProperties[0].Images){
-                                // console.log(data.Products[product].LocalizedProperties[0].Images[image].ImagePurpose)
-                                // console.log(data.Products[product].LocalizedProperties[0].Images[image].Uri)
-                                if(data.Products[product].LocalizedProperties[0].Images[image].ImagePurpose === 'Logo'){
+
+                                // console.log(data.Products[product].LocalizedProperties[0].ProductTitle, data.Products[product].LocalizedProperties[0].Images[image].ImagePurpose, ':', data.Products[product].LocalizedProperties[0].Images[image].Uri)
+
+                                if(gameImage === '' && data.Products[product].LocalizedProperties[0].Images[image].ImagePurpose === 'Logo'){
                                     gameImage = 'https:' + data.Products[product].LocalizedProperties[0].Images[image].Uri
                                 }
-                                if(gameImage === '' && data.Products[product].LocalizedProperties[0].Images[image].ImagePurpose === 'BoxArt'){
+                                if(data.Products[product].LocalizedProperties[0].Images[image].ImagePurpose === 'BoxArt'){
                                     gameImage = 'https:' + data.Products[product].LocalizedProperties[0].Images[image].Uri
                                 }
                             }
@@ -100,21 +101,6 @@ export default class xCloudView {
                             } else {
                                 console.log('No product found in memory:', data.Products[product].ProductId.toUpperCase())
                             }
-
-                            // for(const title in titles){
-                            //     if(data.Products[product].ProductId === titles[title].details.productId){
-                            //         // We match the product id. Lets insert the title
-
-                            //         // this._titles.push({
-                            //         //     ...titles[title],
-                            //         //     name: data.Products[product].LocalizedProperties[0].ProductTitle,
-                            //         //     image: gameImage,
-                            //         //     storeDetails: data.Products[product],
-                            //         // })
-                                    
-                            //         break;
-                            //     }
-                            // }
                         }
 
                         retrieveTitleIds().then(() => {

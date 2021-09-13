@@ -201,6 +201,8 @@ export default class StreamingView {
             actionBarStreamingDisconnect.addEventListener('click', () => {
                 // alert('Disconnect stream')
                 this._streamClient.disconnect()
+
+                clearInterval(this._keepAliveInterval)
             })
 
             // FPS Counters
