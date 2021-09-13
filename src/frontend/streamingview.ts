@@ -10,6 +10,7 @@ export default class StreamingView {
     _streamActive = false
     _lastMouseMovement = 0
     _mouseInterval:any
+    _keepAliveInterval:any
 
     _networkIndicatorLastToggle = 0
 
@@ -135,8 +136,9 @@ export default class StreamingView {
                 }
             }
             
-
-            setTimeout(checkNetworkIndicator, 500)
+            if(this._streamActive === false){
+                setTimeout(checkNetworkIndicator, 500)
+            }
         }
         setTimeout(checkNetworkIndicator, 500)
     }
@@ -412,6 +414,10 @@ export default class StreamingView {
     streamIsReady():void {
         this._streamActive = true
 
+        this._keepAliveInterval = setInterval(() => {
+            this._streamClient.sendKeepalive()
+        }, 60000)
+
         this._mouseInterval = setInterval(() => {
             const lastMovement = (Date.now()-this._lastMouseMovement)/1000
             // console.log('last Movement:', lastMovement)
@@ -451,10 +457,12 @@ export default class StreamingView {
 
                     if(lastMovement > 5){
                         const actionBar = (<HTMLInputElement>document.getElementById('actionBar'))
-                        actionBar.style.display = 'none'
+                        if(actionBar.classList.contains('hidden'))
+                            actionBar.classList.add('hidden')
                     } else {
                         const actionBar = (<HTMLInputElement>document.getElementById('actionBar'))
-                        actionBar.style.display = 'block'
+                        if(actionBar.classList.contains('hidden'))
+                            actionBar.classList.remove('hidden')
                     }
                 }, 1000)
             }
@@ -468,6 +476,11 @@ export default class StreamingView {
 
             console.log('StreamingView.js: Unloaded view')
             clearInterval(this._mouseInterval)
+
+            const actionBar = (<HTMLInputElement>document.getElementById('actionBar'))
+            // actionBar.style.display = 'block'
+            if(actionBar.classList.contains('hidden'))
+                actionBar.classList.remove('hidden')
 
             resolve(true)
 

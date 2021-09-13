@@ -89,4 +89,8 @@ class ControlChannel extends BaseChannel {
         })
         this.send(data)
     }
+
+    destroy() {
+        // this.#worker.terminate()
+    }
 }

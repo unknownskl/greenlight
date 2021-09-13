@@ -238,6 +238,7 @@ export default class AppView {
     load(){
         return new Promise((resolve, reject) => {
             console.log('AppView.js: Loaded view')
+
             resolve(true)
         })
     }

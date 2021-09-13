@@ -109,6 +109,11 @@ module.exports = class xCloudClient {
     }
 
     stopWebrtcConnection() {
+        // Close workers
+        for(const processor in this.#webrtcChannelProcessors){
+            this.#webrtcChannelProcessors[processor].destroy()
+        }
+
         this.#webrtcClient.close()
     }
 

@@ -379,4 +379,8 @@ class InputChannel extends BaseChannel {
             this.#events[name][callback](event)
         }
     }
+
+    destroy() {
+        // this.#worker.terminate()
+    }
 }

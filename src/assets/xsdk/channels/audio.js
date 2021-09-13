@@ -25,6 +25,8 @@ class AudioChannel extends BaseChannel {
     #audioLatency = []
 
     #worker = null
+    #softResetInterval = null
+    #detailsInterval = null
 
     #events = {
         'fps': [],
@@ -65,11 +67,11 @@ class AudioChannel extends BaseChannel {
             action: 'startStream'
         })
 
-        setInterval(() => {
+        this.#softResetInterval = setInterval(() => {
             this.softReset()
         }, 2000) // try 160? (20*4)
 
-        setInterval(() => {
+        this.#detailsInterval = setInterval(() => {
             this.calculateBitrate()
             this.calculateLatency()
             this.calculateFps()
@@ -264,6 +266,13 @@ class AudioChannel extends BaseChannel {
         for(var callback in this.#events[name]){
             this.#events[name][callback](event)
         }
+    }
+
+    destroy() {
+        this.#worker.terminate()
+
+        clearInterval(this.#softResetInterval)
+        clearInterval(this.#detailsInterval)
     }
     
 }

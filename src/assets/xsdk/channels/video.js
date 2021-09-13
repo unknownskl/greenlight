@@ -39,7 +39,7 @@ class VideoChannel extends BaseChannel {
                 if(workerMessage.data.status !== 200){
                     console.log('xSDK channels/video.js - Worker onPacket failed:', workerMessage.data)
                 } else {
-                    console.log('isKeyFrame:', workerMessage.data.data.isKeyFrame)
+                    // console.log('isKeyFrame:', workerMessage.data.data.isKeyFrame)
                     if(workerMessage.data.data.isKeyFrame === 1){
                         // Restart video and re-queue..
                         console.log('@TODO: Implement video source restart...')
@@ -208,5 +208,9 @@ class VideoChannel extends BaseChannel {
         for(var callback in this.#events[name]){
             this.#events[name][callback](event)
         }
+    }
+
+    destroy() {
+        this.#worker.terminate()
     }
 }

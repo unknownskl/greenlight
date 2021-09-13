@@ -124,4 +124,8 @@ class MessageChannel extends BaseChannel {
             this.#events[name][callback](event)
         }
     }
+    
+    destroy() {
+        //
+    }
 }
