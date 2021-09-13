@@ -302,6 +302,37 @@ export default class StreamClient {
         })
     }
 
+    sendKeepalive(){
+        return new Promise((resolve, reject) => {
+            
+            // const streamClient = this
+            let iceUrl:string
+
+            if(this._type === 'xhome'){
+                iceUrl = 'https://uks.gssv-play-prodxhome.xboxlive.com/v4/sessions/home/'+ this._sessionId +'/keepalive'
+            } else {
+                iceUrl = "https://"+this._application._tokenStore._xCloudRegionHost+"/v5/sessions/cloud/"+this._sessionId+"/keepalive"
+            }
+
+            fetch(iceUrl, {
+                method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                cache: 'no-cache',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': (this._type === 'xcloud') ? 'Bearer '+this._application._tokenStore._xCloudStreamingToken : 'Bearer '+this._application._tokenStore._streamingToken
+                }
+            }).then((response) => {
+                if(response.status !== 200){
+                    console.log('StreamClient.js: Error sending ICE candidates. Status:', response.status, 'Body:', response.body)
+                } else {
+                    resolve('ok')
+                }
+            }).catch((error) => {
+                reject(error)
+            });
+        })
+    }
+
     sendIce(ice: string){
         return new Promise((resolve, reject) => {
             const postData = {
