@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.1.0 - 2021-09-14
+- xCloud support!
+- Cleanup stream timers and intervals when disconnecting from a stream
+- Fixed left and right audio channels #30 (Fix credits: @tuxuser)
+
 ## v1.0.3 -  2021-09-07
 - Add AppImage format for Linux
 
