@@ -1,6 +1,10 @@
 # Changelog
 
-## v1.1.0 - 2021-09-14
+## v1.1.0-beta2 - TBA
+- Improved gamepad responsiveness
+- Updated xCloud UI with a better looking library
+
+## v1.1.0-beta1 - 2021-09-14
 - xCloud support!
 - Cleanup stream timers and intervals when disconnecting from a stream
 - Fixed left and right audio channels #30 (Fix credits: @tuxuser)

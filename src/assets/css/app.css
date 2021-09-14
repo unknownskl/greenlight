@@ -383,7 +383,7 @@ body {
 } */
 
 #xCloudGames div.titleWrap {
-    width: 25%;
+    width: 12%;
     padding-top: 40px;
     /* padding-bottom: 40px; */
 }
@@ -394,29 +394,29 @@ body {
     margin-left: 24px;
     margin-right: 24px;
     position: relative;
+    border-radius: 8px;
+    padding: 8px;
 }
 
 #xCloudGames span.titleName {
     position: relative;
-    padding-bottom: 5px;
     font-size: 14px;
     opacity: 0.7;
-    top: 5px;
-    left: 5px;
+    text-align: center;
+    display: block;
+    padding-top: 8px;
+    padding-bottom: 8px;
 }
 
 #xCloudGames img.titleImage {
-    max-width: 25%;
-    float: left;
+    max-width: 100%;
     margin-right: 10px;
+    border-radius: 8px;
 }
 
 #xCloudGames .btn-xcloud-start {
-    margin: 5px;
+    margin: 5px auto;
     display: block;
-    position: absolute;
-    bottom: 5px;
-    right: 5px;
 }
 
 /**
