@@ -257,6 +257,10 @@ class InputChannel extends BaseChannel {
         dataView.setUint8(offset, frameMetadata.length)
         offset += 1
 
+        if(offset >= 4294967295){
+            offset = 0
+        }
+
         var dateNow = performance.now();
 
         for (; frameMetadata.length > 0;) {
@@ -296,8 +300,12 @@ class InputChannel extends BaseChannel {
     }
 
     generateGamepadFrame(dataView, gamepadInput, offset) {
-        dataView.setUint8(offset, 1)
+        dataView.setUint8(offset, gamepadInput.length)
         offset += 1
+
+        if(offset >= 4294967295){
+            offset = 0
+        }
 
         for(; gamepadInput.length > 0;) {
             var input = gamepadInput.shift()
