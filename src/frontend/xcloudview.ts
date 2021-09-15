@@ -31,7 +31,7 @@ export default class xCloudView {
         appView.style.backgroundImage = randomSelect
         
         // Load titles
-        this._xCloudClient = new xCloudClient(this._application._tokenStore._xCloudRegionHost, this._application._tokenStore._xCloudStreamingToken)
+        this._xCloudClient = new xCloudClient(this._application, this._application._tokenStore._xCloudRegionHost, this._application._tokenStore._xCloudStreamingToken)
         this._apiClient = new apiClient(this._application._tokenStore._web.uhs, this._application._tokenStore._web.userToken)
 
         this._xCloudClient.getTitles().then((titles:any) => {

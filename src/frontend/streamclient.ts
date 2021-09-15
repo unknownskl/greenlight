@@ -1,19 +1,25 @@
 import Application from "./application";
 const xboxClient = require('../assets/xsdk/client.js')
 
+import {Client as xCloudPlayer} from 'xbox-xcloud-player'
+import xCloudClient from './xcloudclient';
+
 // interface EmptyArray {
 // }
 
 export default class StreamClient {
 
-    _application: Application;
-    _webrtcClient: any;
+    _application:Application;
+    _webrtcClient:xCloudPlayer
+    _xCloudClient:xCloudClient
 
-    _serverId: string;
-    _type: string;
+    _serverId:string
+    _type:string
 
-    _sessionId: string;
-    _sessionPath: string;
+    _host:string
+
+    _sessionId:string
+    _sessionPath:string
 
     constructor(){
         return this
@@ -29,41 +35,93 @@ export default class StreamClient {
             this._type = type
 
             if(type === 'xhome'){
-                // Starting session
-                this.startOrGetSession(this._serverId, true).then((data:any) => {
-                    this._sessionId = data.sessionId
-                    this._sessionPath = data.sessionPath
+                this._host = 'uks.gssv-play-prodxhome.xboxlive.com'
+                this._xCloudClient = new xCloudClient(this._application, this._host, this._application._tokenStore._streamingToken, 'home')
+            } else {
+                this._host = this._application._tokenStore._xCloudRegionHost
+                this._xCloudClient = new xCloudClient(this._application, this._host, this._application._tokenStore._xCloudStreamingToken, 'cloud')
+            }
 
-                    console.log('StreamClient.js: Console is provisioned. Lets connect...')
+            console.log('xCloudClient:', this._xCloudClient)
 
-                    this.isExchangeReady('state').then((data:any) => {
-                        this._webrtcClient = new xboxClient(this._application)
-                        this._webrtcClient.startWebrtcConnection()
+            this._xCloudClient.startSession(serverId).then((response) => {
+                console.log('xCloudClient: startSession resolved:', response)
 
-                        this._webrtcClient.addEventListener('openstream', () => {
-                            resolve('ok')
+                // Console is provisioned and ready to be used. 
+                // Lets load the xCloudPlayer
+                this._webrtcClient = new xCloudPlayer('videoHolder')
+                this._webrtcClient.createOffer().then((offer:any) => {
+                    console.log('SDP Client:', offer)
+
+                    this._xCloudClient.sendSdp(offer.sdp).then((sdpAnswer:any) => {
+                        console.log('SDP Server:', sdpAnswer)
+
+                        this._webrtcClient.setRemoteOffer(sdpAnswer.sdp)
+
+                        // Continue with ICE
+                        const candidates = this._webrtcClient.getIceCandidates()
+                        this._xCloudClient.sendIce(candidates[0].candidate).then((iceAnswer:any) => {
+                            console.log('ICE Server:', iceAnswer)
+    
+                            this._webrtcClient.setIceCandidates(iceAnswer)
+    
+                            // Are we done?
+                            resolve(true)
+    
+                        }).catch((error) => {
+                            reject(error)
                         })
+
                     }).catch((error) => {
                         reject(error)
                     })
-                }).catch((error) => {
-                    reject(error)
-                })
-            } else if(type === 'xcloud') {
-                this.requestXCloudConsole(serverId).then((sessionId) => {
 
-                    // Console is provisioned. Lets continue device state flow auth
-                    this._webrtcClient = new xboxClient(this._application)
-                    this._webrtcClient.startWebrtcConnection()
-
-                    this._webrtcClient.addEventListener('openstream', () => {
-                        resolve('ok')
-                    })
                 }).catch((error) => {
                     reject(error)
                 })
 
-            }
+            }).catch((error) => {
+                reject(error)
+            })
+
+
+            // if(type === 'xhome'){
+            //     // Starting session
+            //     this.startOrGetSession(this._serverId, true).then((data:any) => {
+            //         this._sessionId = data.sessionId
+            //         this._sessionPath = data.sessionPath
+
+            //         console.log('StreamClient.js: Console is provisioned. Lets connect...')
+
+            //         this.isExchangeReady('state').then((data:any) => {
+            //             // this._webrtcClient = new xboxClient(this._application)
+            //             this._webrtcClient = new xCloudPlayer('videoHolder')
+            //             // this._webrtcClient.startWebrtcConnection()
+
+            //             this._webrtcClient.addEventListener('openstream', () => {
+            //                 resolve('ok')
+            //             })
+            //         }).catch((error) => {
+            //             reject(error)
+            //         })
+            //     }).catch((error) => {
+            //         reject(error)
+            //     })
+            // } else if(type === 'xcloud') {
+            //     this.requestXCloudConsole(serverId).then((sessionId) => {
+
+            //         // Console is provisioned. Lets continue device state flow auth
+            //         this._webrtcClient = new xCloudPlayer('videoHolder')
+            //         // this._webrtcClient.startWebrtcConnection()
+
+            //         this._webrtcClient.addEventListener('openstream', () => {
+            //             resolve('ok')
+            //         })
+            //     }).catch((error) => {
+            //         reject(error)
+            //     })
+
+            // }
         })
     }
 
@@ -120,7 +178,6 @@ export default class StreamClient {
                                         }).catch((error)  => {
                                             reject(error)
                                         })
-                                        // resolve(data3)
 
                                     }).catch((error)  => {
                                         reject(error)
@@ -132,8 +189,6 @@ export default class StreamClient {
                             }).catch((error)  => {
                                 reject(error)
                             })
-
-                            // resolve(data.sessionPath)
                         } else {
                             reject('Failed too retrieve sessionPath from xCloud: '+ data.sessionPath)
                         }
@@ -162,7 +217,7 @@ export default class StreamClient {
         actionBarStreamingViewActive.style.display = 'none'
         actionBarStreamingDisconnect.style.display = 'none'
 
-        this._webrtcClient.stopWebrtcConnection()
+        // this._webrtcClient.stopWebrtcConnection()
 
         const videoHolder = (<HTMLInputElement>document.getElementById('videoHolder'))
         videoHolder.innerHTML = ''

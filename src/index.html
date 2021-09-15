@@ -20,8 +20,8 @@
         document.getElementById('token_xcloud_msal_token').value = token
       }
       window.addEventListener('resize', () => {
-        if(document.getElementById('videoRender') !== null && document.getElementById('videoHolder') !== null) {
-          var videoRender = document.getElementById('videoRender')
+        if(document.getElementById('videoHolder') !== null && document.querySelector("#videoHolder video") !== null) {
+          var videoRender = document.querySelector("#videoHolder video")
           var videoHolder = document.getElementById('videoHolder')
           videoRender.width = videoHolder.clientWidth
           videoRender.height = videoHolder.clientHeight

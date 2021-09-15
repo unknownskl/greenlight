@@ -186,7 +186,7 @@ export default class StreamingView {
                 const videoHolder = (<HTMLInputElement>document.getElementById('videoHolder'))
                 videoHolder.style.display = 'block'
 
-                const videoRender = (<HTMLInputElement>document.getElementById('videoRender'))
+                const videoRender = (<HTMLInputElement>document.querySelector("#videoHolder video"))
                 videoRender.width = videoHolder.clientWidth
                 videoRender.height = videoHolder.clientHeight
             }, 1000)
