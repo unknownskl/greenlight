@@ -82,7 +82,7 @@ export default class StreamingView {
                         this._application._StreamingView._streamClient._webrtcClient.getChannelProcessor('input').pressButton(0, { Nexus: 1 })
                         break;
                     case 48:
-                        this._application._StreamingView._streamClient._webrtcClient.getChannelProcessor('audio').softReset()
+                        this._application._StreamingView._streamClient._webrtcClient.getChannelProcessor('audio')._softReset()
                         break;
                 }
             }
@@ -183,6 +183,13 @@ export default class StreamingView {
                 document.getElementById('audioFpsCounter').innerHTML = event.fps
             })
 
+            this._streamClient._webrtcClient.getEventBus().on('fps_metadata', (event:any) => {
+                document.getElementById('metadataFpsCounter').innerHTML = event.fps
+            })
+            this._streamClient._webrtcClient.getEventBus().on('fps_input', (event:any) => {
+                document.getElementById('inputFpsCounter').innerHTML = event.fps
+            })
+
             this._streamClient._webrtcClient.getEventBus().on('bitrate_video', (event:any) => {
                 // document.getElementById('videoBitrate').innerHTML = JSON.stringify(event)
                 document.getElementById('videoBitrate').innerHTML = (event.data/8)+' KBps / '+(event.packets/8)+' KBps'
@@ -195,30 +202,10 @@ export default class StreamingView {
             this._streamClient._webrtcClient.getEventBus().on('latency_audio', (event:any) => {
                 // console.log('FPS Event:', event)
                 document.getElementById('audioLatencyCounter').innerHTML = 'min: '+event.min+'ms / avg: '+event.avg+'ms / max: '+event.max+'ms'
-                
-                if(event.max > 25 && event.max <= 50){
-                    this._qualityAudio = 'good'
-                } else if(event.max > 50 && event.max < 100){
-                    this._qualityAudio = 'low'
-                } else if(event.max > 100){
-                    this._qualityAudio = 'bad'
-                } else {
-                    this._qualityAudio = 'perfect'
-                }
             })
             this._streamClient._webrtcClient.getEventBus().on('latency_video', (event:any) => {
                 // console.log('FPS Event:', event)
                 document.getElementById('videoLatencyCounter').innerHTML = 'min: '+event.min+'ms / avg: '+event.avg+'ms / max: '+event.max+'ms'
-                
-                if(event.max > 25 && event.max <= 50){
-                    this._qualityVideo = 'good'
-                } else if(event.max > 50 && event.max < 100){
-                    this._qualityVideo = 'low'
-                } else if(event.max > 100){
-                    this._qualityVideo = 'bad'
-                } else {
-                    this._qualityVideo = 'perfect'
-                }
             })
             
             //
@@ -333,76 +320,76 @@ export default class StreamingView {
             }
 
             // Dialogs
-            this._streamClient._webrtcClient.getChannelProcessor('message').addEventListener('dialog', (event:any) => {
-                console.log('Got dialog event:', event)
+            // this._streamClient._webrtcClient.getChannelProcessor('message').addEventListener('dialog', (event:any) => {
+            //     console.log('Got dialog event:', event)
 
-                document.getElementById('modalDialog').style.display = 'block'
+            //     document.getElementById('modalDialog').style.display = 'block'
 
-                document.getElementById('dialogTitle').innerHTML = event.TitleText
-                document.getElementById('dialogText').innerHTML = event.ContentText
+            //     document.getElementById('dialogTitle').innerHTML = event.TitleText
+            //     document.getElementById('dialogText').innerHTML = event.ContentText
 
-                if(event.CommandLabel1 !== '')
-                    document.getElementById('dialogButton1').innerHTML = event.CommandLabel1
-                else 
-                    document.getElementById('dialogButton1').style.display = 'none'
+            //     if(event.CommandLabel1 !== '')
+            //         document.getElementById('dialogButton1').innerHTML = event.CommandLabel1
+            //     else 
+            //         document.getElementById('dialogButton1').style.display = 'none'
                 
-                if(event.CommandLabel2 !== '')
-                    document.getElementById('dialogButton2').innerHTML = event.CommandLabel2
-                else 
-                    document.getElementById('dialogButton2').style.display = 'none'
+            //     if(event.CommandLabel2 !== '')
+            //         document.getElementById('dialogButton2').innerHTML = event.CommandLabel2
+            //     else 
+            //         document.getElementById('dialogButton2').style.display = 'none'
 
-                if(event.CommandLabel3 !== '')
-                    document.getElementById('dialogButton3').innerHTML = event.CommandLabel3
-                else 
-                    document.getElementById('dialogButton3').style.display = 'none'
+            //     if(event.CommandLabel3 !== '')
+            //         document.getElementById('dialogButton3').innerHTML = event.CommandLabel3
+            //     else 
+            //         document.getElementById('dialogButton3').style.display = 'none'
 
-                // if(event.CancelIndex != event.DefaultIndex){
-                    const primaryIndex = (event.DefaultIndex+1)
-                    console.log('prim index', primaryIndex)
-                    document.getElementById('dialogButton'+primaryIndex).classList.add("btn-primary")
-                // }
+            //     // if(event.CancelIndex != event.DefaultIndex){
+            //         const primaryIndex = (event.DefaultIndex+1)
+            //         console.log('prim index', primaryIndex)
+            //         document.getElementById('dialogButton'+primaryIndex).classList.add("btn-primary")
+            //     // }
 
-                // var cancelIndex = (event.CancelIndex+1)
-                // document.getElementById('dialogButton'+cancelIndex).classList.add("btn-cancel")
+            //     // var cancelIndex = (event.CancelIndex+1)
+            //     // document.getElementById('dialogButton'+cancelIndex).classList.add("btn-cancel")
 
-                document.getElementById('dialogButton1').onclick = (clickEvent) =>{
-                    this._streamClient._webrtcClient.getChannelProcessor('message').sendTransaction(event.id, { Result: 0 })
-                    resetDialog()
-                }
-                document.getElementById('dialogButton2').onclick = (clickEvent) => {
-                    this._streamClient._webrtcClient.getChannelProcessor('message').sendTransaction(event.id, { Result: 1 })
-                    resetDialog()
-                }
-                document.getElementById('dialogButton3').onclick = (clickEvent) => {
-                    this._streamClient._webrtcClient.getChannelProcessor('message').sendTransaction(event.id, { Result: 2 })
-                    resetDialog()
-                }
-            })
+            //     document.getElementById('dialogButton1').onclick = (clickEvent) =>{
+            //         this._streamClient._webrtcClient.getChannelProcessor('message').sendTransaction(event.id, { Result: 0 })
+            //         resetDialog()
+            //     }
+            //     document.getElementById('dialogButton2').onclick = (clickEvent) => {
+            //         this._streamClient._webrtcClient.getChannelProcessor('message').sendTransaction(event.id, { Result: 1 })
+            //         resetDialog()
+            //     }
+            //     document.getElementById('dialogButton3').onclick = (clickEvent) => {
+            //         this._streamClient._webrtcClient.getChannelProcessor('message').sendTransaction(event.id, { Result: 2 })
+            //         resetDialog()
+            //     }
+            // })
 
-            const resetDialog = function(){
-                document.getElementById('modalDialog').style.display = 'none'
+            // const resetDialog = function(){
+            //     document.getElementById('modalDialog').style.display = 'none'
 
-                document.getElementById('dialogTitle').innerHTML = 'No active dialog'
-                document.getElementById('dialogText').innerHTML = 'There is no active dialog. This is an error. Please try gain.'
-                document.getElementById('dialogButton1').innerHTML = 'Button1'
-                document.getElementById('dialogButton2').innerHTML = 'Button2'
-                document.getElementById('dialogButton3').innerHTML = 'Button3'
+            //     document.getElementById('dialogTitle').innerHTML = 'No active dialog'
+            //     document.getElementById('dialogText').innerHTML = 'There is no active dialog. This is an error. Please try gain.'
+            //     document.getElementById('dialogButton1').innerHTML = 'Button1'
+            //     document.getElementById('dialogButton2').innerHTML = 'Button2'
+            //     document.getElementById('dialogButton3').innerHTML = 'Button3'
 
-                document.getElementById('dialogButton1').style.display = 'inline-block'
-                document.getElementById('dialogButton2').style.display = 'inline-block'
-                document.getElementById('dialogButton3').style.display = 'inline-block'
+            //     document.getElementById('dialogButton1').style.display = 'inline-block'
+            //     document.getElementById('dialogButton2').style.display = 'inline-block'
+            //     document.getElementById('dialogButton3').style.display = 'inline-block'
 
-                document.getElementById('dialogButton1').classList.remove("btn-primary")
-                document.getElementById('dialogButton2').classList.remove("btn-primary")
-                document.getElementById('dialogButton3').classList.remove("btn-primary")
-                document.getElementById('dialogButton1').classList.remove("btn-cancel")
-                document.getElementById('dialogButton2').classList.remove("btn-cancel")
-                document.getElementById('dialogButton3').classList.remove("btn-cancel")
+            //     document.getElementById('dialogButton1').classList.remove("btn-primary")
+            //     document.getElementById('dialogButton2').classList.remove("btn-primary")
+            //     document.getElementById('dialogButton3').classList.remove("btn-primary")
+            //     document.getElementById('dialogButton1').classList.remove("btn-cancel")
+            //     document.getElementById('dialogButton2').classList.remove("btn-cancel")
+            //     document.getElementById('dialogButton3').classList.remove("btn-cancel")
 
-                document.getElementById('dialogButton1').onclick = function(){}
-                document.getElementById('dialogButton2').onclick = function(){}
-                document.getElementById('dialogButton3').onclick = function(){}
-            }
+            //     document.getElementById('dialogButton1').onclick = function(){}
+            //     document.getElementById('dialogButton2').onclick = function(){}
+            //     document.getElementById('dialogButton3').onclick = function(){}
+            // }
 
         }).catch((error) => {
             console.log('StreamingView.js: Start stream error:', error)

@@ -108,7 +108,6 @@ export default class xCloudClient {
 
                         this.isProvisioningReady('/'+data.sessionPath+'/state').then((state:any) => {
                             this._sessionPath = data.sessionPath
-                            // resolve(state)
 
                             // Console can be in 2 states now: Provisioned and ReadyToConnect
                             if(state.state === 'ReadyToConnect'){

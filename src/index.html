@@ -28,16 +28,6 @@
         }
       })
     </script>
-    
-    <script src="assets/xsdk/client.js"></script>
-    <script src="assets/xsdk/gamepad.js"></script>
-    <script src="assets/xsdk/channels/base.js"></script>
-    <script src="assets/xsdk/channels/video.js"></script>
-    <script src="assets/xsdk/channels/audio.js"></script>
-    <script src="assets/xsdk/channels/input.js"></script>
-    <script src="assets/xsdk/channels/control.js"></script>
-    <script src="assets/xsdk/channels/message.js"></script>
-    <script src="assets/xsdk/channels/chat.js"></script>
 
   </head>
   <body>
@@ -204,8 +194,8 @@
             <p>
                 <strong>Video FPS:</strong> <span id="videoFpsCounter">0</span> (<span id="videoLatencyCounter">N/A</span>)<br />
                 <strong>Audio FPS:</strong> <span id="audioFpsCounter">0</span> (<span id="audioLatencyCounter">N/A</span>)<br />
-                <strong>Metadata Input:</strong> <span id="inputLatencyCounter">N/A</span><br />
-                <strong>Gamepad Input:</strong> <span id="gamepadLatencyCounter">N/A</span>
+                <strong>Metadata Input:</strong> <span id="metadataFpsCounter">0</span> <span id="inputLatencyCounter">N/A</span><br />
+                <strong>Gamepad Input:</strong> <span id="inputFpsCounter">0</span> <span id="gamepadLatencyCounter">N/A</span>
             </p>
         </div>
 
@@ -215,21 +205,21 @@
             Video: <span id="videoBitrate"></span><br />
             Audio: <span id="audioBitrate"></span><br />
           </p><br />
-          <p>
+          <!-- <p>
             <strong>Set bitrate:</strong><br />
             <button class="btn btn-small" id="control_bitrate_512">512</button>
             <button class="btn btn-small" id="control_bitrate_2500">2500</button>
             <button class="btn btn-small" id="control_bitrate_5000">5000</button>
             <button class="btn btn-small" id="control_bitrate_8500">8500</button>
             <button class="btn btn-small" id="control_bitrate_12000">12000</button> <br />
-          </p>
+          </p> -->
           <button class="btn btn-small" id="request_videoframe">Request VideoFrame</button> <br />
           <strong>Debug output:</strong>
           <p>
               <!-- <strong>Video:</strong> <span id="videoPerformance"></span><br /> -->
-              <strong>Video Latency:</strong> <span id="videoLatency"></span><br />
+              <!-- <strong>Video Latency:</strong> <span id="videoLatency"></span><br /> -->
               <!-- <strong>Audio:</strong> <span id="audioPerformance"></span><br /> -->
-              <strong>Audio Latency:</strong> <span id="audioLatency"></span><br />
+              <!-- <strong>Audio Latency:</strong> <span id="audioLatency"></span><br /> -->
               <strong>Input:</strong> <span id="inputPerformance"></span> <br />
               <strong>Input Latency:</strong> <span id="inputLatency"></span><br />
           </p>

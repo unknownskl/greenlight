@@ -23,6 +23,8 @@ export default class StreamClient {
 
     _keepAliveInterval:any
 
+    _modalHelper:ModalHelper
+
     constructor(){
         return this
     }
@@ -51,7 +53,9 @@ export default class StreamClient {
 
                 // Console is provisioned and ready to be used. 
                 // Lets load the xCloudPlayer
-                this._webrtcClient = new xCloudPlayer('videoHolder')
+                this._webrtcClient = new xCloudPlayer('videoHolder', {
+                    ui_systemui: [10,19,31,27,32]
+                })
                 this._webrtcClient.createOffer().then((offer:any) => {
                     // console.log('SDP Client:', offer)
 
@@ -71,8 +75,27 @@ export default class StreamClient {
                             this._keepAliveInterval = setInterval(() => {
                                 this._xCloudClient.sendKeepalive()
                             }, 60000)
-    
-                            // Are we done?
+
+                            this._webrtcClient.getEventBus().on('connectionstate', (event) => {
+                                console.log(':: Connection state updated:', event)
+
+                                if(event.state === 'connected'){
+                                    // We are connected
+                                    console.log(':: We are connected!')
+
+                                    this._streamStarted()
+
+                                } else if(event.state === 'closing'){
+                                    // Connection is closing
+                                    console.log(':: We are going to disconnect!')
+
+                                } else if(event.state === 'closed'){
+                                    // Connection has been closed. We have to cleanup here
+                                    console.log(':: We are disconnected!')
+                                    this._streamStopped()
+                                }
+                            })
+
                             resolve(true)
     
                         }).catch((error) => {
@@ -117,4 +140,96 @@ export default class StreamClient {
         clearInterval(this._keepAliveInterval)
     }
 
+    _streamStarted() {
+        //
+        this._modalHelper = new ModalHelper(this._webrtcClient)
+        this._modalHelper.start()
+    }
+
+    _streamStopped() {
+        this._modalHelper.stop()
+    }
+
+}
+
+export class ModalHelper {
+
+    _application:xCloudPlayer
+    _activeId = ''
+
+    constructor(application:xCloudPlayer) {
+        this._application = application
+    }
+
+    start() {
+        this._application.getEventBus().on('message', (event) => {
+            if(event.target === '/streaming/systemUi/messages/ShowMessageDialog') {
+                // Show Modal
+                this._activeId = event.id
+                const modalContent = JSON.parse(event.content)
+                console.log('modal:', modalContent)
+
+                this.setModal(modalContent.TitleText, modalContent.ContentText, modalContent.CommandLabel1, modalContent.CommandLabel2, modalContent.CommandLabel3)
+
+            } else if(event.type === 'SenderCancel') {
+                // Cancel transaction and reset Modal
+                this._activeId = ''
+                this.resetModal()
+            }
+            console.log('ModalHelper event', event)
+        })
+    }
+
+    stop() {
+        //
+    }
+
+    setModal(title:string, text:string, option1:string, option2:string, option3:string) {
+        console.log('modalContext:', title, text, option1, option2, option3)
+        document.getElementById('modalDialog').style.display = 'block'
+
+        document.getElementById('dialogTitle').innerHTML = title
+        document.getElementById('dialogText').innerHTML = text
+
+        if(option1 === ''){
+            document.getElementById('dialogButton1').style.display = 'none'
+        } else {
+            document.getElementById('dialogButton1').innerHTML = option1
+            document.getElementById('dialogButton1').style.display = 'inline-block'
+        }
+        
+        if(option2 === ''){
+            document.getElementById('dialogButton2').style.display = 'none'
+        } else {
+            document.getElementById('dialogButton2').innerHTML = option2
+            document.getElementById('dialogButton2').style.display = 'inline-block'
+        }
+
+        if(option3 === ''){
+            document.getElementById('dialogButton3').style.display = 'none'
+        } else {
+            document.getElementById('dialogButton3').innerHTML = option3
+            document.getElementById('dialogButton3').style.display = 'inline-block'
+        }
+
+        document.getElementById('dialogButton1').onclick = () => {
+            this._application.getChannelProcessor('message').sendTransaction(this._activeId, JSON.stringify({ Result: 0 }))
+            this.resetModal()
+        }
+
+        document.getElementById('dialogButton2').onclick = () => {
+            this._application.getChannelProcessor('message').sendTransaction(this._activeId, JSON.stringify({ Result: 1 }))
+            this.resetModal()
+        }
+
+        document.getElementById('dialogButton3').onclick = () => {
+            this._application.getChannelProcessor('message').sendTransaction(this._activeId, JSON.stringify({ Result: 2 }))
+            this.resetModal()
+        }
+    }
+
+    resetModal() {
+        this.setModal('No active dialog', 'There is no active dialog. This is an error. Please try gain.', '', '', '')
+        document.getElementById('modalDialog').style.display = 'none'
+    }
 }
