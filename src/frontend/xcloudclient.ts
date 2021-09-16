@@ -354,4 +354,28 @@ export default class xCloudClient {
             });
         })
     }
+
+    sendKeepalive(){
+        return new Promise((resolve, reject) => {
+            fetch('https://' + this._host + '/' + this._sessionPath + '/keepalive', {
+                method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                cache: 'no-cache',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer '+this._token
+                }
+            }).then((response) => {
+                if(response.status !== 200){
+                    console.log('StreamClient.js: Error sending keepalive signal. Status:', response.status, 'Body:', response.body)
+                    reject({
+                        status: response.status
+                    })
+                } else {
+                    resolve('ok')
+                }
+            }).catch((error) => {
+                reject(error)
+            });
+        })
+    }
 }

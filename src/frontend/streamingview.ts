@@ -170,6 +170,61 @@ export default class StreamingView {
             //     console.log('STREAM CONNECTED')
             // })
 
+            document.getElementById('request_videoframe').onclick = (event:any) => {
+                console.log('streamingView.js: Requesting videokeyframe')
+                this._streamClient._webrtcClient.getChannelProcessor('video').resetBuffer()
+                console.log('streamingView.js: Requested videokeyframe')
+            }
+
+            this._streamClient._webrtcClient.getEventBus().on('fps_video', (event:any) => {
+                document.getElementById('videoFpsCounter').innerHTML = event.fps
+            })
+            this._streamClient._webrtcClient.getEventBus().on('fps_audio', (event:any) => {
+                document.getElementById('audioFpsCounter').innerHTML = event.fps
+            })
+
+            this._streamClient._webrtcClient.getEventBus().on('bitrate_video', (event:any) => {
+                // document.getElementById('videoBitrate').innerHTML = JSON.stringify(event)
+                document.getElementById('videoBitrate').innerHTML = (event.data/8)+' KBps / '+(event.packets/8)+' KBps'
+            })
+            this._streamClient._webrtcClient.getEventBus().on('bitrate_audio', (event:any) => {
+                document.getElementById('audioBitrate').innerHTML = (event.data/8)+' KBps / '+(event.packets/8)+' KBps'
+                // document.getElementById('audioBitrate').innerHTML = (event.audioBitrate/8)+' KBps'
+            })
+
+            this._streamClient._webrtcClient.getEventBus().on('latency_audio', (event:any) => {
+                // console.log('FPS Event:', event)
+                document.getElementById('audioLatencyCounter').innerHTML = 'min: '+event.min+'ms / avg: '+event.avg+'ms / max: '+event.max+'ms'
+                
+                if(event.max > 25 && event.max <= 50){
+                    this._qualityAudio = 'good'
+                } else if(event.max > 50 && event.max < 100){
+                    this._qualityAudio = 'low'
+                } else if(event.max > 100){
+                    this._qualityAudio = 'bad'
+                } else {
+                    this._qualityAudio = 'perfect'
+                }
+            })
+            this._streamClient._webrtcClient.getEventBus().on('latency_video', (event:any) => {
+                // console.log('FPS Event:', event)
+                document.getElementById('videoLatencyCounter').innerHTML = 'min: '+event.min+'ms / avg: '+event.avg+'ms / max: '+event.max+'ms'
+                
+                if(event.max > 25 && event.max <= 50){
+                    this._qualityVideo = 'good'
+                } else if(event.max > 50 && event.max < 100){
+                    this._qualityVideo = 'low'
+                } else if(event.max > 100){
+                    this._qualityVideo = 'bad'
+                } else {
+                    this._qualityVideo = 'perfect'
+                }
+            })
+            
+            //
+            // OLD FUNCTIONS BELOW
+            //
+
             this.streamIsReady()
 
             // const streamStatus = (<HTMLInputElement>document.getElementById('streamStatus'))
@@ -202,46 +257,10 @@ export default class StreamingView {
                 // alert('Disconnect stream')
                 this._streamClient.disconnect()
 
-                clearInterval(this._keepAliveInterval)
+                // clearInterval(this._keepAliveInterval)
             })
 
-            // FPS Counters
-            this._streamClient._webrtcClient.getChannelProcessor('video').addEventListener('fps', (event:any) => {
-                // console.log('FPS Event:', event)
-                document.getElementById('videoFpsCounter').innerHTML = event.fps
-            })
-            this._streamClient._webrtcClient.getChannelProcessor('video').addEventListener('latency', (event:any) => {
-                // console.log('FPS Event:', event)
-                document.getElementById('videoLatencyCounter').innerHTML = 'min: '+event.minLatency+'ms / avg: '+event.avgLatency+'ms / max: '+event.maxLatency+'ms'
-                
-                if(event.maxLatency > 25 && event.maxLatency <= 50){
-                    this._qualityVideo = 'good'
-                } else if(event.maxLatency > 50 && event.maxLatency < 100){
-                    this._qualityVideo = 'low'
-                } else if(event.maxLatency > 100){
-                    this._qualityVideo = 'bad'
-                } else {
-                    this._qualityVideo = 'perfect'
-                }
-            })
-            this._streamClient._webrtcClient.getChannelProcessor('audio').addEventListener('fps', (event:any) => {
-                // console.log('FPS Event:', event)
-                document.getElementById('audioFpsCounter').innerHTML = event.fps
-            })
-            this._streamClient._webrtcClient.getChannelProcessor('audio').addEventListener('latency', (event:any) => {
-                // console.log('FPS Event:', event)
-                document.getElementById('audioLatencyCounter').innerHTML = 'min: '+event.minLatency+'ms / avg: '+event.avgLatency+'ms / max: '+event.maxLatency+'ms'
-                
-                if(event.maxLatency > 25 && event.maxLatency <= 50){
-                    this._qualityAudio = 'good'
-                } else if(event.maxLatency > 50 && event.maxLatency < 100){
-                    this._qualityAudio = 'low'
-                } else if(event.maxLatency > 100){
-                    this._qualityAudio = 'bad'
-                } else {
-                    this._qualityAudio = 'perfect'
-                }
-            })
+            
             this._streamClient._webrtcClient.getChannelProcessor('input').addEventListener('latency', (event:any) => {
                 // console.log('FPS Event:', event)
                 document.getElementById('inputLatencyCounter').innerHTML = 'min: '+event.minLatency+'ms / avg: '+event.avgLatency+'ms / max: '+event.maxLatency+'ms'
@@ -269,16 +288,6 @@ export default class StreamingView {
                 } else {
                     this._qualityGamepad = 'perfect'
                 }
-            })
-
-            // Debug: Bitrates:
-            this._streamClient._webrtcClient.getChannelProcessor('video').addEventListener('bitrate', (event:any) => {
-                // document.getElementById('videoBitrate').innerHTML = JSON.stringify(event)
-                document.getElementById('videoBitrate').innerHTML = (event.videoBitrate/8)+' KBps / '+(event.packetBitrate/8)+' KBps'
-            })
-            this._streamClient._webrtcClient.getChannelProcessor('audio').addEventListener('bitrate', (event:any) => {
-                document.getElementById('audioBitrate').innerHTML = (event.audioBitrate/8)+' KBps / '+(event.packetBitrate/8)+' KBps'
-                // document.getElementById('audioBitrate').innerHTML = (event.audioBitrate/8)+' KBps'
             })
 
             // Debug: Performance
@@ -321,12 +330,6 @@ export default class StreamingView {
             document.getElementById('control_bitrate_12000').onclick = (event:any) => {
                 this._streamClient._webrtcClient.getChannelProcessor('control').setBitrate(12000)
                 console.log('streamingView.js: Set bitrate to 12000')
-            }
-
-
-            document.getElementById('request_videoframe').onclick = (event:any) => {
-                this._streamClient._webrtcClient.getChannelProcessor('control').requestKeyFrame()
-                console.log('streamingView.js: Requested videokeyframe')
             }
 
             // Dialogs
@@ -408,17 +411,14 @@ export default class StreamingView {
             const streamStatusDetailed = (<HTMLInputElement>document.getElementById('streamStatusDetailed'))
             streamStatusDetailed.innerHTML = 'Error provisioning xbox: '+JSON.stringify(error)
         })
-
-        // const client = new xCloudClient()
-        // console.log(client)
     }
 
     streamIsReady():void {
         this._streamActive = true
 
-        this._keepAliveInterval = setInterval(() => {
-            this._streamClient.sendKeepalive()
-        }, 60000)
+        // this._keepAliveInterval = setInterval(() => {
+        //     this._streamClient.sendKeepalive()
+        // }, 60000)
 
         this._mouseInterval = setInterval(() => {
             const lastMovement = (Date.now()-this._lastMouseMovement)/1000
