@@ -1,5 +1,6 @@
 import appMenu from '../../backend/appMenu'
 import express from 'express'
+import http from 'http'
 import xCloudClient from '../../frontend/xcloudclient'
 import TokenStore from '../../backend/TokenStore';
 import Application from '../../frontend/application';
@@ -64,32 +65,67 @@ export class WebuiPluginBackend {
     startServer(port = 8080) {
         console.log('Starting WebUI Webserver...', MAIN_WINDOW_WEBPACK_ENTRY)
 
-        this._server = express()
+        // this._server = express()
+        const requestListener = (req:any, res:any) => {
+            if(req.url == '/api/consoles'){
+                this._xCloudClient.getConsoles().then((consoles:any) => {
+                    console.log('consoles', consoles)
+
+                    res.writeHead(200);
+                    res.end(JSON.stringify(consoles))
+    
+                }).catch((error:any) => {
+                    console.log('consoles error', error)
+
+                    res.writeHead(error.status);
+                    res.end('API returned http status: ' + error.status)
+                })
+
+            } else if(req.url.includes('/api/xcloud/play/')) {
+                const title = req.url.slice(17)
+                this._xCloudClient = new xCloudClient({ _tokenStore: this._tokenStore } as Application, this._tokenStore._xCloudRegionHost, this._tokenStore._xCloudStreamingToken, 'cloud')
+                
+                this._xCloudClient.startSession(title).then((config:any) => {
+                    res.writeHead(200);
+                    res.end(JSON.stringify(config));
+
+                }).catch((error:any) => {
+                    res.writeHead(500);
+                    res.end('Error in starting stream: '+error);
+                })
+            } else {
+                res.writeHead(404);
+                res.end('Not found: '+req.url);
+            }
+        }
+
+        this._server = http.createServer(requestListener);
         this._xCloudClient = new xCloudClient({ _tokenStore: this._tokenStore } as Application, 'uks.gssv-play-prodxhome.xboxlive.com', this._tokenStore._streamingToken, 'home')
 
-        this._server.get('/', (req:any, res:any) => {
-            console.log('GET /')
-            res.send('Hello World!')
-        })
+        this._server.listen(8080);
+        // this._server.get('/', (req:any, res:any) => {
+        //     console.log('GET /')
+        //     res.send('Hello World!')
+        // })
 
-        this._server.get('/api/consoles', (req:any, res:any) => {
-            console.log('GET /api/consoles')
+        // this._server.get('/api/consoles', (req:any, res:any) => {
+        //     console.log('GET /api/consoles')
 
-            this._xCloudClient.getConsoles().then((consoles:any) => {
-                console.log('consoles', consoles)
-                res.send(consoles)
+        //     this._xCloudClient.getConsoles().then((consoles:any) => {
+        //         console.log('consoles', consoles)
+        //         res.send(consoles)
 
-            }).catch((error:any) => {
-                console.log('consoles error', error)
-                res.send(error)
-            })
+        //     }).catch((error:any) => {
+        //         console.log('consoles error', error)
+        //         res.send(error)
+        //     })
             
-        })
+        // })
 
-        this._serverStatus.port = port
-        this._server.listen(port, () => {
-            console.log(`WebUI listening at http://localhost:${port}`)
-        })
+        // this._serverStatus.port = port
+        // this._server.listen(port, () => {
+        //     console.log(`WebUI listening at http://localhost:${port}`)
+        // })
     }
 
     stopServer() {
@@ -97,10 +133,10 @@ export class WebuiPluginBackend {
         clearInterval(this._syncInterval)
         this._serverStatus.port = -1
 
-        this._server.stop()
+        // this._server.stop()
         this._xCloudClient = undefined
 
-        // this._server.close();
+        this._server.close()
         console.log('WebUI Webserver stopped.')
     }
 

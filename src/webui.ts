@@ -1,7 +1,7 @@
 import Application from "./frontend/application"
 import xCloudClient from "./frontend/xcloudclient"
 
-export class xCloudWeb {
+export default class xCloudWeb {
 
     _test = 'test'
 
