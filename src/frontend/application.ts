@@ -21,8 +21,12 @@ export default class Application {
     _StreamingView:StreamingView
     _xCloudView:xCloudView
 
+    _ipc:any
+
     constructor(){
         this.listenForTokens()
+
+        this._ipc = window.require('electron').ipcRenderer
 
         // Load splashscreen for one second to let the application to lookup existing cookies.
         setTimeout(() => {

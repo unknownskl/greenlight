@@ -280,6 +280,17 @@ body {
     opacity: 1;
 }
 
+#actionBar ul li a#plugins_menulink {
+    padding: 4px;
+    margin-right: 8px;
+}
+
+#actionBar ul li a#plugins_menulink img {
+    height: 20px;
+    position: relative;
+    top: 4px;
+}
+
 
 #actionBar ul.userProfile span.gamerscore {
     background: #ffcf40;

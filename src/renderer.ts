@@ -29,6 +29,10 @@
 import './assets/css/app.css';
 
 import App from './frontend/application'
+import Plugins from './frontend/plugins'
+import { OpentrackPluginFrontend as OpentrackPlugin } from './plugins/frontend/opentrack'
+
 const Application = new App()
 
-// console.log(Application)
+const plugins = new Plugins(Application)
+plugins.load('opentrack', OpentrackPlugin)
