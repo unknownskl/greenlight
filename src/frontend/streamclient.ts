@@ -1,19 +1,29 @@
 import Application from "./application";
-const xboxClient = require('../assets/xsdk/client.js')
+// const xboxClient = require('../assets/xsdk/client.js')
+
+import xCloudPlayer from 'xbox-xcloud-player'
+import xCloudClient from './xcloudclient';
 
 // interface EmptyArray {
 // }
 
 export default class StreamClient {
 
-    _application: Application;
-    _webrtcClient: any;
+    _application:Application;
+    _webrtcClient:xCloudPlayer
+    _xCloudClient:xCloudClient
 
-    _serverId: string;
-    _type: string;
+    _serverId:string
+    _type:string
 
-    _sessionId: string;
-    _sessionPath: string;
+    _host:string
+
+    _sessionId:string
+    _sessionPath:string
+
+    _keepAliveInterval:any
+
+    _modalHelper:ModalHelper
 
     constructor(){
         return this
@@ -29,123 +39,80 @@ export default class StreamClient {
             this._type = type
 
             if(type === 'xhome'){
-                // Starting session
-                this.startOrGetSession(this._serverId, true).then((data:any) => {
-                    this._sessionId = data.sessionId
-                    this._sessionPath = data.sessionPath
-
-                    console.log('StreamClient.js: Console is provisioned. Lets connect...')
-
-                    this.isExchangeReady('state').then((data:any) => {
-                        this._webrtcClient = new xboxClient(this._application)
-                        this._webrtcClient.startWebrtcConnection()
-
-                        this._webrtcClient.addEventListener('openstream', () => {
-                            resolve('ok')
-                        })
-                    }).catch((error) => {
-                        reject(error)
-                    })
-                }).catch((error) => {
-                    reject(error)
-                })
-            } else if(type === 'xcloud') {
-                this.requestXCloudConsole(serverId).then((sessionId) => {
-
-                    // Console is provisioned. Lets continue device state flow auth
-                    this._webrtcClient = new xboxClient(this._application)
-                    this._webrtcClient.startWebrtcConnection()
-
-                    this._webrtcClient.addEventListener('openstream', () => {
-                        resolve('ok')
-                    })
-                }).catch((error) => {
-                    reject(error)
-                })
-
-            }
-        })
-    }
-
-    requestXCloudConsole(titleId:string){
-        return new Promise((resolve, reject) => {
-            const postData = {
-                "titleId":titleId,
-                "systemUpdateGroup":"",
-                "settings": {
-                    "nanoVersion":"V3;RtcdcTransport.dll",
-                    "enableTextToSpeech":false,
-                    "highContrast":0,
-                    "locale":"en-US",
-                    "useIceConnection":false,
-                    "timezoneOffsetMinutes":120,
-                    "sdkType":"web",
-                    "osName":"windows"
-                },
-                "serverId": "",
-                "fallbackRegionNames": [Array]
+                this._host = 'uks.gssv-play-prodxhome.xboxlive.com'
+                this._xCloudClient = new xCloudClient(this._application, this._host, this._application._tokenStore._streamingToken, 'home')
+            } else {
+                this._host = this._application._tokenStore._xCloudRegionHost
+                this._xCloudClient = new xCloudClient(this._application, this._host, this._application._tokenStore._xCloudStreamingToken, 'cloud')
             }
 
-            // console.log('tokens set: ', this._application._tokenStore)
-            fetch('https://'+this._application._tokenStore._xCloudRegionHost+'/v5/sessions/cloud/play', {
-                method: 'POST', // *GET, POST, PUT, DELETE, etc.
-                cache: 'no-cache',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer '+ this._application._tokenStore._xCloudStreamingToken
-                },
-                body: JSON.stringify(postData)
-            }).then((response) => {
-                if(response.status !== 200 && response.status !== 202){
-                    console.log('Error fetching consoles. Status:', response.status, 'Body:', response.body)
-                } else {
-                    response.json().then((data) => {
-                        if(data.sessionPath !== undefined){
-                            const sessionSplit = data.sessionPath.split('/')
-                            const session = sessionSplit[sessionSplit.length-1]
-                            this._sessionId = session
+            console.log('xCloudClient:', this._xCloudClient)
 
-                            this.isExchangeReady('state', 'https://'+this._application._tokenStore._xCloudRegionHost+'/'+data.sessionPath+'/state').then((data2:any) => {
-                                if(data2.state === 'Provisioned'){
-                                    // Stream is already provisioned and ready to go
-                                    resolve(true)
+            this._xCloudClient.startSession(serverId).then((response) => {
+                console.log('xCloudClient: startSession resolved:', response)
 
-                                } else if(data2.state === 'ReadyToConnect') {
-                                    // Stream is already provisioned and ready to go
-                                    this.xcloudAuth(this._application._tokenStore._msalToken, data.sessionPath).then((data3:any) => {
+                // Console is provisioned and ready to be used. 
+                // Lets load the xCloudPlayer
+                this._webrtcClient = new xCloudPlayer('videoHolder', {
+                    ui_systemui: [10,19,31,27,32]
+                })
+                this._webrtcClient.createOffer().then((offer:any) => {
+                    // console.log('SDP Client:', offer)
 
-                                        this.isExchangeReady('state', 'https://'+this._application._tokenStore._xCloudRegionHost+'/'+data.sessionPath+'/state').then((data4) => {
-                                            resolve(true)
+                    this._xCloudClient.sendSdp(offer.sdp).then((sdpAnswer:any) => {
+                        // console.log('SDP Server:', sdpAnswer)
 
-                                        }).catch((error)  => {
-                                            reject(error)
-                                        })
-                                        // resolve(data3)
+                        this._webrtcClient.setRemoteOffer(sdpAnswer.sdp)
 
-                                    }).catch((error)  => {
-                                        reject(error)
-                                    })
-                                } else {
-                                    reject('Invalid state:'+ data2.state)
+                        // Continue with ICE
+                        const candidates = this._webrtcClient.getIceCandidates()
+                        this._xCloudClient.sendIce(candidates[0].candidate).then((iceAnswer:any) => {
+                            // console.log('ICE Server:', iceAnswer)
+    
+                            this._webrtcClient.setIceCandidates(iceAnswer)
+
+                            // Setup keepAlive timer
+                            this._keepAliveInterval = setInterval(() => {
+                                this._xCloudClient.sendKeepalive()
+                            }, 60000)
+
+                            this._webrtcClient.getEventBus().on('connectionstate', (event) => {
+                                console.log(':: Connection state updated:', event)
+
+                                if(event.state === 'connected'){
+                                    // We are connected
+                                    console.log(':: We are connected!')
+
+                                    this._streamStarted()
+
+                                } else if(event.state === 'closing'){
+                                    // Connection is closing
+                                    console.log(':: We are going to disconnect!')
+
+                                } else if(event.state === 'closed'){
+                                    // Connection has been closed. We have to cleanup here
+                                    console.log(':: We are disconnected!')
+                                    this._streamStopped()
                                 }
-
-                            }).catch((error)  => {
-                                reject(error)
                             })
 
-                            // resolve(data.sessionPath)
-                        } else {
-                            reject('Failed too retrieve sessionPath from xCloud: '+ data.sessionPath)
-                        }
+                            resolve(true)
+    
+                        }).catch((error) => {
+                            reject(error)
+                        })
 
                     }).catch((error) => {
                         reject(error)
                     })
-                    // const responseData = JSON.parse(response.body);
-                }
+
+                }).catch((error) => {
+                    reject(error)
+                })
+
             }).catch((error) => {
                 reject(error)
-            });
+            })
         })
     }
 
@@ -159,308 +126,110 @@ export default class StreamClient {
     destroy(){
         const actionBarStreamingViewActive = (<HTMLInputElement>document.getElementById('actionBarStreamingViewActive'))
         const actionBarStreamingDisconnect = (<HTMLInputElement>document.getElementById('actionBarStreamingDisconnect'))
+        const loadingScreen = (<HTMLInputElement>document.getElementById('loadingScreen'))
         actionBarStreamingViewActive.style.display = 'none'
         actionBarStreamingDisconnect.style.display = 'none'
+        loadingScreen.style.display = 'block'
 
-        this._webrtcClient.stopWebrtcConnection()
+        // this._webrtcClient.stopWebrtcConnection()
+        this._webrtcClient.reset()
 
         const videoHolder = (<HTMLInputElement>document.getElementById('videoHolder'))
         videoHolder.innerHTML = ''
+
+        clearInterval(this._keepAliveInterval)
     }
 
-    startOrGetSession(serverId:string, firstStart: boolean) {
-        return new Promise((resolve, reject) => {
-            const postData = {
-                "titleId":"",
-                "systemUpdateGroup":"",
-                "settings": {
-                    "nanoVersion":"V3;RtcdcTransport.dll",
-                    "enableTextToSpeech":false,
-                    "highContrast":0,
-                    "locale":"en-US",
-                    "useIceConnection":false,
-                    "timezoneOffsetMinutes":120,
-                    "sdkType":"web",
-                    "osName":"windows"
-                },
-                "serverId": serverId,
-                "fallbackRegionNames": [Array]
+    _streamStarted() {
+        //
+        this._modalHelper = new ModalHelper(this._webrtcClient)
+        this._modalHelper.start()
+    }
+
+    _streamStopped() {
+        this._modalHelper.stop()
+    }
+
+}
+
+export class ModalHelper {
+
+    _application:xCloudPlayer
+    _activeId = ''
+
+    constructor(application:xCloudPlayer) {
+        this._application = application
+    }
+
+    start() {
+        this._application.getEventBus().on('message', (event) => {
+            if(event.target === '/streaming/systemUi/messages/ShowMessageDialog') {
+                // Show Modal
+                this._activeId = event.id
+                const modalContent = JSON.parse(event.content)
+                console.log('modal:', modalContent)
+
+                this.setModal(modalContent.TitleText, modalContent.ContentText, modalContent.CommandLabel1, modalContent.CommandLabel2, modalContent.CommandLabel3)
+
+            } else if(event.type === 'SenderCancel') {
+                // Cancel transaction and reset Modal
+                this._activeId = ''
+                this.resetModal()
             }
-
-            fetch('https://uks.gssv-play-prodxhome.xboxlive.com/v4/sessions/home/play', {
-                method: 'POST', // *GET, POST, PUT, DELETE, etc.
-                cache: 'no-cache',
-                headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer '+this._application._tokenStore._streamingToken
-                // 'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: JSON.stringify(postData)
-            }).then((response) => {
-                if(response.status !== 200 && response.status !== 202){
-                    console.log('Error fetching consoles. Status:', response.status, 'Body:', response.body)
-                } else {
-                    response.json().then((data) => {
-
-                        if(data.state === 'Provisioning'){
-                            // setTimeout(() => {
-                            //     streamClient.startOrGetSession(serverId).then((data:any) => {
-                            //         resolve(data)
-                            //     }).catch((error) => {
-                            //         reject(error)
-                            //     })
-                            // }, 1000)
-                            resolve(data)
-                        } else {
-                            resolve(data)
-                        }
-
-                        // this.showConsoles(data.results)
-
-                    }).catch((error) => {
-                        reject(error)
-                    })
-                    // const responseData = JSON.parse(response.body);
-                }
-            }).catch((error) => {
-                reject(error)
-            });
+            console.log('ModalHelper event', event)
         })
     }
 
-    sendSdp(sdp: string){
-        return new Promise((resolve, reject) => {
-            const postData = {
-                "messageType":"offer",
-                "sdp": sdp,
-                "configuration":{
-                   "containerizeVideo":true,
-                   "requestedH264Profile":2,
-                   "chatConfiguration":{
-                      "bytesPerSample":2,
-                      "expectedClipDurationMs":100,
-                      "format":{
-                         "codec":"opus",
-                         "container":"webm"
-                      },
-                      "numChannels":1,
-                      "sampleFrequencyHz":24000
-                   },
-                   "audio":{
-                      "minVersion":1,
-                      "maxVersion":1
-                   },
-                   "chat":{
-                      "minVersion":1,
-                      "maxVersion":1
-                   },
-                   "control":{
-                      "minVersion":1,
-                      "maxVersion":1
-                   },
-                   "input":{
-                      "minVersion":1,
-                      "maxVersion":4
-                   },
-                   "message":{
-                      "minVersion":1,
-                      "maxVersion":1
-                   },
-                   "video":{
-                      "minVersion":1,
-                      "maxVersion":2
-                   }
-                }
-            }
-            
-            // const streamClient = this
-            let sdpUrl:string
-
-            if(this._type === 'xhome'){
-                sdpUrl = 'https://uks.gssv-play-prodxhome.xboxlive.com/v4/sessions/home/'+ this._sessionId +'/sdp'
-            } else {
-                sdpUrl = "https://"+this._application._tokenStore._xCloudRegionHost+"/v5/sessions/cloud/"+this._sessionId+"/sdp"
-            }
-
-            fetch(sdpUrl, {
-                method: 'POST', // *GET, POST, PUT, DELETE, etc.
-                cache: 'no-cache',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': (this._type === 'xcloud') ? 'Bearer '+this._application._tokenStore._xCloudStreamingToken : 'Bearer '+this._application._tokenStore._streamingToken
-                },
-                body: JSON.stringify(postData)
-            }).then((response) => {
-                if(response.status !== 202){
-                    console.log('StreamClient.js: Error sending SDP state. Status:', response.status, 'Body:', response.body)
-                } else {
-                    resolve('ok')
-                }
-            }).catch((error) => {
-                reject(error)
-            });
-        })
+    stop() {
+        //
     }
 
-    sendKeepalive(){
-        return new Promise((resolve, reject) => {
-            
-            // const streamClient = this
-            let iceUrl:string
+    setModal(title:string, text:string, option1:string, option2:string, option3:string) {
+        console.log('modalContext:', title, text, option1, option2, option3)
+        document.getElementById('modalDialog').style.display = 'block'
 
-            if(this._type === 'xhome'){
-                iceUrl = 'https://uks.gssv-play-prodxhome.xboxlive.com/v4/sessions/home/'+ this._sessionId +'/keepalive'
-            } else {
-                iceUrl = "https://"+this._application._tokenStore._xCloudRegionHost+"/v5/sessions/cloud/"+this._sessionId+"/keepalive"
-            }
+        document.getElementById('dialogTitle').innerHTML = title
+        document.getElementById('dialogText').innerHTML = text
 
-            fetch(iceUrl, {
-                method: 'POST', // *GET, POST, PUT, DELETE, etc.
-                cache: 'no-cache',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': (this._type === 'xcloud') ? 'Bearer '+this._application._tokenStore._xCloudStreamingToken : 'Bearer '+this._application._tokenStore._streamingToken
-                }
-            }).then((response) => {
-                if(response.status !== 200){
-                    console.log('StreamClient.js: Error sending ICE candidates. Status:', response.status, 'Body:', response.body)
-                } else {
-                    resolve('ok')
-                }
-            }).catch((error) => {
-                reject(error)
-            });
-        })
+        if(option1 === ''){
+            document.getElementById('dialogButton1').style.display = 'none'
+        } else {
+            document.getElementById('dialogButton1').innerHTML = option1
+            document.getElementById('dialogButton1').style.display = 'inline-block'
+        }
+        
+        if(option2 === ''){
+            document.getElementById('dialogButton2').style.display = 'none'
+        } else {
+            document.getElementById('dialogButton2').innerHTML = option2
+            document.getElementById('dialogButton2').style.display = 'inline-block'
+        }
+
+        if(option3 === ''){
+            document.getElementById('dialogButton3').style.display = 'none'
+        } else {
+            document.getElementById('dialogButton3').innerHTML = option3
+            document.getElementById('dialogButton3').style.display = 'inline-block'
+        }
+
+        document.getElementById('dialogButton1').onclick = () => {
+            this._application.getChannelProcessor('message').sendTransaction(this._activeId, JSON.stringify({ Result: 0 }))
+            this.resetModal()
+        }
+
+        document.getElementById('dialogButton2').onclick = () => {
+            this._application.getChannelProcessor('message').sendTransaction(this._activeId, JSON.stringify({ Result: 1 }))
+            this.resetModal()
+        }
+
+        document.getElementById('dialogButton3').onclick = () => {
+            this._application.getChannelProcessor('message').sendTransaction(this._activeId, JSON.stringify({ Result: 2 }))
+            this.resetModal()
+        }
     }
 
-    sendIce(ice: string){
-        return new Promise((resolve, reject) => {
-            const postData = {
-                "messageType": "iceCandidate",
-                "candidate": ice
-            }
-            
-            // const streamClient = this
-            let iceUrl:string
-
-            if(this._type === 'xhome'){
-                iceUrl = 'https://uks.gssv-play-prodxhome.xboxlive.com/v4/sessions/home/'+ this._sessionId +'/ice'
-            } else {
-                iceUrl = "https://"+this._application._tokenStore._xCloudRegionHost+"/v5/sessions/cloud/"+this._sessionId+"/ice"
-            }
-
-            fetch(iceUrl, {
-                method: 'POST', // *GET, POST, PUT, DELETE, etc.
-                cache: 'no-cache',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': (this._type === 'xcloud') ? 'Bearer '+this._application._tokenStore._xCloudStreamingToken : 'Bearer '+this._application._tokenStore._streamingToken
-                },
-                body: JSON.stringify(postData)
-            }).then((response) => {
-                if(response.status !== 202){
-                    console.log('StreamClient.js: Error sending ICE candidates. Status:', response.status, 'Body:', response.body)
-                } else {
-                    resolve('ok')
-                }
-            }).catch((error) => {
-                reject(error)
-            });
-        })
+    resetModal() {
+        this.setModal('No active dialog', 'There is no active dialog. This is an error. Please try gain.', '', '', '')
+        document.getElementById('modalDialog').style.display = 'none'
     }
-
-    xcloudAuth(userToken:string, sessionPath:string){
-        return new Promise((resolve, reject) => {
-            const postData = {
-                "userToken": userToken
-            }
-
-            // console.log('tokens set: ', this._application._tokenStore)
-            fetch('https://'+this._application._tokenStore._xCloudRegionHost+'/'+sessionPath+'/connect', {
-                method: 'POST', // *GET, POST, PUT, DELETE, etc.
-                cache: 'no-cache',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer '+ this._application._tokenStore._xCloudStreamingToken
-                },
-                body: JSON.stringify(postData)
-            }).then((response) => {
-                if(response.status !== 200 && response.status !== 202){
-                    console.log('Error sending login command. Status:', response.status, 'Body:', response.body)
-                    reject('/connect call failed')
-                } else {
-                    // console.log('OK:', response.status, 'Body:', response.body)
-                    resolve(response.status)
-                }
-            }).catch((error) => {
-                reject(error)
-            })
-        })
-    }
-
-    isExchangeReady(path:string, fullPath?:string) {
-        return new Promise((resolve, reject) => {
-
-            let url:string
-
-            if(fullPath === undefined){
-                if(this._type === 'xhome'){
-                    url = "https://uks.gssv-play-prodxhome.xboxlive.com/v4/sessions/home/"+this._sessionId+'/'+path
-                } else {
-                    url = "https://"+this._application._tokenStore._xCloudRegionHost+"/v5/sessions/cloud/"+this._sessionId+"/"+path
-                }
-            } else {
-                url = fullPath
-            }
-
-            fetch(url, {
-                method: 'GET',
-                cache: 'no-cache',
-                headers: {
-                    'Content-Type': 'application/json; charset=utf-8',
-                    'Authorization': (this._type === 'xcloud') ? 'Bearer '+this._application._tokenStore._xCloudStreamingToken : 'Bearer '+this._application._tokenStore._streamingToken
-                },
-            }).then(response => {
-                if(response.status !== 200){
-                    console.log('StreamClient.js: '+url+' - Waiting...')
-                    setTimeout(() => {
-                        this.isExchangeReady(path, fullPath).then((data:any) => {
-                           resolve(data)
-                        }).catch((error)  => {
-                            reject(error)
-                        })
-                    }, 1000)
-                } else {
-                    if(path == 'state'){
-                        response.json().then(data => {
-                            if(data.state === 'Provisioning' || data.state === 'WaitingForResources'){
-                                console.log('StreamClient.js: '+url+' - Waiting... State:', data.state)
-                                setTimeout(() => {
-                                    this.isExchangeReady(path, fullPath).then((data) => {
-                                        resolve(data)
-                                    }).catch((error)  => {
-                                        reject(error)
-                                    })
-                                }, 1000)
-                            } else if(data.state === 'Provisioned' || data.state === 'ReadyToConnect') {
-
-                                const streamStatusDetailed = (<HTMLInputElement>document.getElementById('streamStatusDetailed'))
-                                streamStatusDetailed.innerHTML = 'Provisioned. Opening connection...'
-
-                                resolve(data)
-                            } else {
-                                reject(data)
-                            }
-                        })
-                    } else {
-                        response.json().then(data => {
-                            console.log('StreamClient.js: '+url+' - Ready! Got data:', data)
-                            resolve(data)
-                        })
-                    }
-                }
-            })
-        })
-    }
-
 }

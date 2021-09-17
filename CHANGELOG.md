@@ -1,6 +1,7 @@
 # Changelog
 
-## v1.1.0-beta2 - TBA
+## v1.1.0-beta3 - TBA
+- Implemented xbox-xcloud-player for improved rendering performance
 - Improved gamepad responsiveness
 - Updated xCloud UI with a better looking library
 
