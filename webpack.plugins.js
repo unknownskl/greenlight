@@ -14,6 +14,15 @@ module.exports = [
             to: 'main_window/assets/',
         },
         {
+            from: path.join(__dirname, 'src/plugins/backend/www/'),
+            to: 'stream_ui/',
+        },
+        // {
+        //     from: path.join(__dirname, '.webpack/main/webui.js'),
+        //     to: 'stream_ui/webui.js',
+        // },
+
+        {
             from: path.join(__dirname, 'node_modules/xbox-xcloud-player/src/Opus'),
             to: 'opus/',
         },{

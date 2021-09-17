@@ -32,7 +32,18 @@ import App from './frontend/application'
 import Plugins from './frontend/plugins'
 import { OpentrackPluginFrontend as OpentrackPlugin } from './plugins/frontend/opentrack'
 
-const Application = new App()
+// console.log(window.location.pathname)
 
-const plugins = new Plugins(Application)
-plugins.load('opentrack', OpentrackPlugin)
+// if(window.location.pathname === '/stream_ui'){
+//     alert('Web ui from render?')
+
+// } else {
+    const Application = new App()
+    
+    const plugins = new Plugins(Application)
+    plugins.load('opentrack', OpentrackPlugin)
+// }
+
+// import './assets/css/app.css';
+
+

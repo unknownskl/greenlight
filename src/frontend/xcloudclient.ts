@@ -2,6 +2,7 @@
 // }
 
 import Application from "./application"
+import https from 'https'
 
 export default class xCloudClient {
 
@@ -46,6 +47,42 @@ export default class xCloudClient {
 
     getTitles() {
         return this.get('https://' + this._host + '/v1/titles')
+    }
+
+    getConsoles() {
+        return new Promise((resolve, reject) => {
+            let responseData = ''
+
+            const req = https.request({
+                host: this._host,
+                path: '/v6/servers/home',
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer '+this._token
+                },
+            }, (response:any) => {
+                response.on('data', (data:any) => {
+                    console.log('data', data)
+                    responseData += data
+                });
+
+                response.on('end', (data:any) => {
+                    if(response.statusCode === 200){
+                        resolve(JSON.parse(responseData))
+                    } else {
+                        reject({
+                            status: response.statusCode
+                        })
+                    }
+                });
+            })
+
+            req.on('error', (error) => {
+                reject(error)
+            });
+            req.end();
+        })
     }
 
     startSession(inputId:string){

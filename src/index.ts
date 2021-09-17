@@ -7,6 +7,7 @@ import appMenu from './backend/appMenu'
 import Plugins from './backend/plugins'
 
 import { OpentrackPluginBackend as OpentrackPlugin } from './plugins/backend/opentrack'
+import { WebuiPluginBackend as WebuiPlugin } from './plugins/backend/webui'
 
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
@@ -17,6 +18,7 @@ if (require('electron-squirrel-startup')) { // eslint-disable-line global-requir
 }
 
 let mainWindow:BrowserWindow
+const tokenStore = new TokenStore()
 
 const createWindow = (): void => {
   // Create the browser window.
@@ -44,7 +46,6 @@ const createWindow = (): void => {
 };
 
 app.on('ready', () => {
-  const tokenStore = new TokenStore()
 
   session.defaultSession.webRequest.onBeforeRedirect({
     urls: [
@@ -155,8 +156,9 @@ app.on('activate', () => {
 const menu = new appMenu()
 
 // Create plugin instance and load plugins
-const plugins = new Plugins(menu)
+const plugins = new Plugins(menu, tokenStore)
 plugins.load('opentrack', OpentrackPlugin)
+plugins.load('webui', WebuiPlugin)
 
 // Render initial menu
 menu.renderMenu()

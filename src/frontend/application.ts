@@ -4,6 +4,7 @@ import AppView from './appview'
 import StreamingView from './streamingview'
 import xCloudView from './xcloudview'
 
+
 interface EventCallback {
     (data: string): void;
 }
@@ -116,6 +117,15 @@ export default class Application {
         })
         document.getElementById('actionBarStreamingViewActive').addEventListener('click', (e:Event) => {
             this._router.setView('streaming')
+        })
+
+        document.getElementById('pluginsMenulink').addEventListener('click', (e:Event) => {
+            // Show debug panel?
+            if(document.getElementById('pluginsTooltip').style.display === 'none'){
+                document.getElementById('pluginsTooltip').style.display = 'block'
+            } else {
+                document.getElementById('pluginsTooltip').style.display = 'none'
+            }
         })
     }
 

@@ -81,7 +81,7 @@
           <li id="actionBarxCloud" style="display:none;"><a href="#" title="xCloud Library">xCloud Library</a></li>
           <li><a href="#" id="actionBarStreamingViewActive" title="Current open stream" style="display:none;">Active stream</a></li>
           <li><a href="#" class="btn btn-cancel" id="actionBarStreamingDisconnect" title="Current open stream" style="display:none;">Disconnect</a></li>
-          <li><a href="#" id="actionBarStreamingView" title="Debug view to test Streaming View"style="display:none;">Streaming View</a></li>
+          <li><a href="#" id="actionBarStreamingView" title="Debug view to test Streaming View" style="display:none;">Streaming View</a></li>
         </ul>
 
         <a href="#" id="userProfileLogoLink" title="Gamerpic">
@@ -94,10 +94,17 @@
             <span id="actionBarUserGamerscore" title="Gamerscore"></span>
           </li>
           <li><a href="#" id="actionBarUserProfile"  onclick="confirm('Do you want to log out?') ? window.open('https://account.xbox.com/Account/Signout?returnUrl=https%3A%2F%2Fwww.xbox.com%3A443%2Fen-US%2F&ru=https%3A%2F%2Fwww.xbox.com%2Fen-US%2F', '_blank', 'top=500,left=200,frame=true,nodeIntegration=no') : ''" title="Profile">N/A</a></li>
-          <li><a id="plugins_menulink" href="javascript:alert('Opentrack settings clicked!');"><img class="pluginIcon" src="assets/icons/plugins.svg" /></a></li>
+          <li><a id="pluginsMenulink"><img class="pluginIcon" src="assets/icons/plugins.svg" /></a></li>
         </ul>
 
       </header>
+
+      <div id="pluginsTooltip" style="display:none;">
+        <h1>Plugins</h1>
+
+        <div id="pluginsContent">
+        </div>
+      </div>
 
       <!--
         Application View
