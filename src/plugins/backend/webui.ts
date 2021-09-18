@@ -4,12 +4,15 @@ import http from 'http'
 import xCloudClient from '../../frontend/xcloudclient'
 import TokenStore from '../../backend/TokenStore';
 import Application from '../../frontend/application';
+import fs from 'fs'
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
+declare const WEBUI_PRELOAD_WEBPACK_ENTRY: string;
+declare const WEBUI_WEBPACK_ENTRY: string;
 
-interface OpentrackPosition {
-    [key: string]: number;
-}
+// interface OpentrackPosition {
+//     [key: string]: number;
+// }
 
 export class WebuiPluginBackend {
 
@@ -63,11 +66,37 @@ export class WebuiPluginBackend {
     }
 
     startServer(port = 8080) {
-        console.log('Starting WebUI Webserver...', MAIN_WINDOW_WEBPACK_ENTRY)
+        console.log('Starting WebUI Webserver...', WEBUI_WEBPACK_ENTRY)
 
         // this._server = express()
         const requestListener = (req:any, res:any) => {
-            if(req.url == '/api/consoles'){
+            console.log('GET', req.url)
+
+            if(req.url == '/'){
+                res.writeHead(200);
+                let htmlFile:Buffer = Buffer.from(WEBUI_WEBPACK_ENTRY)
+                if(WEBUI_WEBPACK_ENTRY.slice(0, 4) == 'file'){
+                    console.log('load file:', WEBUI_WEBPACK_ENTRY.slice(7))
+                    htmlFile = fs.readFileSync(WEBUI_WEBPACK_ENTRY.slice(7))
+                } else {
+                    // We assume that wehave an http url (from webpack)
+                    htmlFile = fs.readFileSync('.webpack/renderer/webui/index.html')
+                }
+                res.end(htmlFile)
+
+            } else if(req.url == '/webui/index.js'){
+                res.writeHead(200);
+                let htmlFile:Buffer = Buffer.from(WEBUI_WEBPACK_ENTRY)
+                if(WEBUI_WEBPACK_ENTRY.slice(0, 4) == 'file'){
+                    console.log('load file:', WEBUI_WEBPACK_ENTRY.slice(7).replace('index.html', 'index.js'))
+                    htmlFile = fs.readFileSync(WEBUI_WEBPACK_ENTRY.slice(7).replace('index.html', 'index.js'))
+                } else {
+                    // We assume that wehave an http url (from webpack)
+                    htmlFile = fs.readFileSync('.webpack/renderer/webui/index.js')
+                }
+                res.end(htmlFile)
+
+            } else if(req.url == '/api/consoles'){
                 this._xCloudClient.getConsoles().then((consoles:any) => {
                     console.log('consoles', consoles)
 

@@ -10,8 +10,15 @@ export default class xCloudWeb {
     constructor() {
         console.log('xCloud Web UI constructor called')
 
-        this._xCloudClient = new xCloudClient({ _tokenStore: undefined } as Application, 'host', 'token', 'home')
+        fetch('/api/consoles').then(response => response.json()).then((data) => {
+            const consoleListElement = document.getElementById('xHomeConsoleList')
+            consoleListElement.innerHTML = ''
 
-        return this
+            for(const console in data.results){
+                consoleListElement.innerHTML += ''+JSON.stringify(data.results[console])+' <br />'
+            }
+        })
     }
 }
+
+new xCloudWeb()

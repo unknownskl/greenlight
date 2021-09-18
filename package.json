@@ -102,6 +102,11 @@
                   "html": "./src/index.html",
                   "js": "./src/renderer.ts",
                   "name": "main_window"
+                },
+                {
+                  "html": "./src/webui.html",
+                  "js": "./src/webui.ts",
+                  "name": "webui"
                 }
               ]
             },
