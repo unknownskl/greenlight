@@ -204,30 +204,45 @@ export default class xCloudClient {
     isExchangeReady(url:string) {
         return new Promise((resolve, reject) => {
 
-            fetch('https://'+this._host+''+url, {
+            // fetch('https://'+this._host+''+url, {
+            const req = https.request({
+                host: this._host,
+                path: url,
                 method: 'GET',
-                cache: 'no-cache',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': 'Bearer '+this._token
                 },
-            }).then(response => {
-                if(response.status !== 200){
-                    console.log('xCloudPlayer Client - '+url+' - Waiting...')
-                    setTimeout(() => {
-                        this.isExchangeReady(url).then((data) => {
-                            resolve(data)
-                        }).catch((error)  => {
-                            reject(error)
-                        })
-                    }, 1000)
-                } else {
-                    response.json().then(data => {
-                        console.log('xCloudPlayer Client - '+url+' - Ready! Got data:', data)
+            }, response => {
+                let body = ''
+
+                response.on('data', (chunk) => {
+                    body += chunk
+                });
+
+                response.on('end', () => {
+                    if(response.statusCode !== 200){
+                        console.log('StreamClient.js - '+url+' - Waiting...')
+                        setTimeout(() => {
+                            this.isExchangeReady(url).then((data) => {
+                                resolve(data)
+                            }).catch((error)  => {
+                                reject(error)
+                            })
+                        }, 1000)
+                    } else {
+                        const data = JSON.parse(body)
+                        console.log('StreamClient.js - '+url+' - Ready! Got data:', data)
                         resolve(data)
-                    })
-                }
+                    }
+                })
             })
+
+            req.on('error', (error) => {
+                reject(error)
+            });
+
+            req.end()
         })
     }
 
@@ -378,32 +393,41 @@ export default class xCloudClient {
                 }
             }
 
-            fetch('https://'+this._host+'/'+this._sessionPath+'/sdp', {
+            // fetch('https://'+this._host+'/'+this._sessionPath+'/sdp', {
+            const req = https.request({
+                host: this._host,
+                path: '/'+this._sessionPath+'/sdp',
                 method: 'POST', // *GET, POST, PUT, DELETE, etc.
-                cache: 'no-cache',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': 'Bearer '+this._token
                 },
-                body: JSON.stringify(postData)
-            }).then((response) => {
-                if(response.status !== 202){
-                    console.log('StreamClient.js: Error sending SDP state. Status:', response.status, 'Body:', response.body)
+            }, (response) => {
+                if(response.statusCode !== 202){
+                    console.log('StreamClient.js: Error sending SDP state. Status:', response.statusCode)
                     reject({
-                        status: response.status,
-                        body: response.body
+                        status: response.statusCode
                     })
                 } else {
+                    console.log('StreamClient.js: SDP State send ok. Status:', response.statusCode)
+                    
                     this.isExchangeReady('/'+this._sessionPath+'/sdp').then((data:any) => {
+                        console.log('StreamClient.js: Loop done? resolve now...')
                         const response = JSON.parse(data.exchangeResponse)
                         resolve(response)
                     }).catch((error) => {
                         reject(error)
                     })
                 }
-            }).catch((error) => {
+            })
+
+            req.on('error', (error:any) => {
                 reject(error)
             });
+
+            req.write(JSON.stringify(postData))
+
+            req.end()
         })
     }
 
@@ -414,20 +438,21 @@ export default class xCloudClient {
                 "candidate": ice
             }
 
-            fetch('https://'+this._host+'/'+this._sessionPath+'/ice', {
+            // fetch('https://'+this._host+'/'+this._sessionPath+'/ice', {
+            const req = https.request({
+                host: this._host,
+                path: '/'+this._sessionPath+'/ice',
                 method: 'POST', // *GET, POST, PUT, DELETE, etc.
-                cache: 'no-cache',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': 'Bearer '+this._token
                 },
-                body: JSON.stringify(postData)
-            }).then((response) => {
-                if(response.status !== 202){
-                    console.log('StreamClient.js: Error sending ICE candidate. Status:', response.status, 'Body:', response.body)
+                // body: JSON.stringify(postData)
+            }, (response) => {
+                if(response.statusCode !== 202){
+                    console.log('StreamClient.js: Error sending ICE candidate. Status:', response.statusCode)
                     reject({
-                        status: response.status,
-                        body: response.body
+                        status: response.statusCode,
                     })
                 } else {
                     this.isExchangeReady('/'+this._sessionPath+'/ice').then((data:any) => {
@@ -437,9 +462,15 @@ export default class xCloudClient {
                         reject(error)
                     })
                 }
-            }).catch((error) => {
+            })
+
+            req.on('error', (error:any) => {
                 reject(error)
             });
+
+            req.write(JSON.stringify(postData))
+
+            req.end()
         })
     }
 
