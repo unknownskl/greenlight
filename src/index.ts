@@ -5,6 +5,7 @@ import interceptRequest from './backend/requestIntercept'
 import TokenStore from './backend/TokenStore'
 import appMenu from './backend/appMenu'
 import Plugins from './backend/plugins'
+import Updater from './backend/updater'
 
 import { OpentrackPluginBackend as OpentrackPlugin } from './plugins/backend/opentrack'
 import { WebuiPluginBackend as WebuiPlugin } from './plugins/backend/webui'
@@ -46,6 +47,8 @@ const createWindow = (): void => {
 };
 
 app.on('ready', () => {
+
+  new Updater().check()
 
   session.defaultSession.webRequest.onBeforeRedirect({
     urls: [
