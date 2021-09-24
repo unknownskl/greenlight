@@ -1,4 +1,4 @@
-import './assets/webui/app.css'
+// import './assets/webui/app.css'
 // import Application from "./frontend/application"
 // import xCloudClient from "./frontend/xcloudclient"
 import apiClient from './webui/apiClient'
