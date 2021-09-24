@@ -1,6 +1,6 @@
 import { app, ipcMain, Menu }  from 'electron'
 
-export default class appMmenu {
+export default class appMenu {
 
     _isMac = (process.platform === 'darwin')
 

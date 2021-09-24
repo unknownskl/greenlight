@@ -3,6 +3,11 @@ import Router from './router'
 import AppView from './appview'
 import StreamingView from './streamingview'
 import xCloudView from './xcloudview'
+import appMenu from '../backend/appMenu'
+import Plugins from '../frontend/plugins'
+
+// Plugins
+import { OpentrackPluginFrontend as OpentrackPlugin } from '../plugins/frontend/opentrack'
 
 
 interface EventCallback {
@@ -22,12 +27,23 @@ export default class Application {
     _StreamingView:StreamingView
     _xCloudView:xCloudView
 
+    _menu:appMenu
+    _plugins:Plugins
+
     _ipc:any
 
     constructor(){
         this.listenForTokens()
 
         this._ipc = window.require('electron').ipcRenderer
+        // this._menu = new appMenu()
+        // this._plugins = new Plugins(this._menu, this._tokenStore)
+        this._plugins = new Plugins(this)
+        this._plugins.load('opentrack', OpentrackPlugin)
+
+        // Load plugins here
+        // this._plugins.load('opentrack', OpentrackPlugin)
+        // this._plugins.load('webui', WebuiPlugin)
 
         // Load splashscreen for one second to let the application to lookup existing cookies.
         setTimeout(() => {
@@ -39,7 +55,9 @@ export default class Application {
 
         const debugStreamingView = (<HTMLInputElement>document.getElementById('actionBarStreamingView'))
         debugStreamingView.style.display = (process.env.ISDEV !== undefined) ? 'block': 'none'
-        
+
+        const debugPlugins = (<HTMLInputElement>document.getElementById('actionBarPlugins'))
+        debugPlugins.style.display = (process.env.ISDEV !== undefined) ? 'inline-block': 'none'
 
         this._router.addEventListener('onviewshow', (event:any) => {
             // Check if we need the actionbar

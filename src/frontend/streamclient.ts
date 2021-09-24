@@ -4,13 +4,19 @@ import Application from "./application";
 import xCloudPlayer from 'xbox-xcloud-player'
 import xCloudClient from './xcloudclient';
 
-// interface EmptyArray {
-// }
+interface xCloudPlayerConfig {
+    ui_systemui?:Array<number> // Default: [10,19,31,27,32,33]
+    ui_version?:Array<number> // Default: [0,1,0]
+    input_driver?:any // Default: GamepadDriver(), false to disable
+}
 
 export default class StreamClient {
 
     _application:Application;
-    _webrtcClient:xCloudPlayer
+    _xCloudPlayer:xCloudPlayer
+    _xCloudPlayerConfig:xCloudPlayerConfig = {
+        ui_systemui: [10,19,31,27,32]
+    }
     _xCloudClient:xCloudClient
 
     _serverId:string
@@ -46,6 +52,8 @@ export default class StreamClient {
                 this._xCloudClient = new xCloudClient(this._application, this._host, this._application._tokenStore._xCloudStreamingToken, 'cloud')
             }
 
+            this._application._plugins.onStreamStart()
+
             console.log('xCloudClient:', this._xCloudClient)
 
             this._xCloudClient.startSession(serverId).then((response) => {
@@ -53,30 +61,28 @@ export default class StreamClient {
 
                 // Console is provisioned and ready to be used. 
                 // Lets load the xCloudPlayer
-                this._webrtcClient = new xCloudPlayer('videoHolder', {
-                    ui_systemui: [10,19,31,27,32]
-                })
-                this._webrtcClient.createOffer().then((offer:any) => {
+                this._xCloudPlayer = new xCloudPlayer('videoHolder', this._xCloudPlayerConfig)
+                this._xCloudPlayer.createOffer().then((offer:any) => {
                     // console.log('SDP Client:', offer)
 
                     this._xCloudClient.sendSdp(offer.sdp).then((sdpAnswer:any) => {
                         // console.log('SDP Server:', sdpAnswer)
 
-                        this._webrtcClient.setRemoteOffer(sdpAnswer.sdp)
+                        this._xCloudPlayer.setRemoteOffer(sdpAnswer.sdp)
 
                         // Continue with ICE
-                        const candidates = this._webrtcClient.getIceCandidates()
+                        const candidates = this._xCloudPlayer.getIceCandidates()
                         this._xCloudClient.sendIce(candidates[0].candidate).then((iceAnswer:any) => {
                             // console.log('ICE Server:', iceAnswer)
     
-                            this._webrtcClient.setIceCandidates(iceAnswer)
+                            this._xCloudPlayer.setIceCandidates(iceAnswer)
 
                             // Setup keepAlive timer
                             this._keepAliveInterval = setInterval(() => {
                                 this._xCloudClient.sendKeepalive()
                             }, 60000)
 
-                            this._webrtcClient.getEventBus().on('connectionstate', (event) => {
+                            this._xCloudPlayer.getEventBus().on('connectionstate', (event) => {
                                 console.log(':: Connection state updated:', event)
 
                                 if(event.state === 'connected'){
@@ -131,8 +137,8 @@ export default class StreamClient {
         actionBarStreamingDisconnect.style.display = 'none'
         loadingScreen.style.display = 'block'
 
-        // this._webrtcClient.stopWebrtcConnection()
-        this._webrtcClient.reset()
+        // this._xCloudPlayer.stopWebrtcConnection()
+        this._xCloudPlayer.reset()
 
         const videoHolder = (<HTMLInputElement>document.getElementById('videoHolder'))
         videoHolder.innerHTML = ''
@@ -142,7 +148,7 @@ export default class StreamClient {
 
     _streamStarted() {
         //
-        this._modalHelper = new ModalHelper(this._webrtcClient)
+        this._modalHelper = new ModalHelper(this._xCloudPlayer)
         this._modalHelper.start()
     }
 

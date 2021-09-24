@@ -16,4 +16,12 @@ export default class Plugins {
         this._plugins[id].load()
     }
 
+    onStreamStart() {
+        for(const plugin in this._plugins){
+            if(this._plugins[plugin].onStreamStart !== undefined){
+                this._plugins[plugin].onStreamStart()
+            }
+        }
+    }
+
 }

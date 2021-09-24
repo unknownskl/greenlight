@@ -218,7 +218,7 @@ export class WebuiPluginBackend {
         }
 
         this._server = http.createServer(requestListener);
-        this._server.listen(8080);
+        this._server.listen(port);
         // this._server.get('/', (req:any, res:any) => {
         //     console.log('GET /')
         //     res.send('Hello World!')
@@ -238,7 +238,7 @@ export class WebuiPluginBackend {
             
         // })
 
-        // this._serverStatus.port = port
+        this._serverStatus.port = port
         // this._server.listen(port, () => {
         //     console.log(`WebUI listening at http://localhost:${port}`)
         // })
@@ -258,7 +258,7 @@ export class WebuiPluginBackend {
 
     getMenu() {
         return {
-            label: 'WebUI',
+            label: 'WebUI (beta)',
             submenu: [
                 {
                     label: (this._isRunning === true) ? 'Stop Webserver' : 'Start Webserver',
@@ -282,22 +282,6 @@ export class WebuiPluginBackend {
 
     getPositionsMenu():any {
         const menu:Array<any> = [
-            {
-                label: 'Open electron build',
-                enabled: this._isRunning,
-                click: async () => {
-                    const { shell } = require('electron')
-                    await shell.openExternal(MAIN_WINDOW_WEBPACK_ENTRY)
-                }
-            },
-            {
-                label: 'Open WebUI Stream',
-                enabled: this._isRunning,
-                click: async () => {
-                    const { shell } = require('electron')
-                    await shell.openExternal(MAIN_WINDOW_WEBPACK_ENTRY+'/../stream_ui/')
-                }
-            },
             {
                 label: 'Open WebUI in browser',
                 enabled: this._isRunning,
