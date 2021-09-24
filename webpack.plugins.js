@@ -13,6 +13,7 @@ module.exports = [
             from: path.join(__dirname, 'src/assets'),
             to: 'main_window/assets/',
         },
+
         {
             from: path.join(__dirname, 'node_modules/xbox-xcloud-player/src/Opus'),
             to: 'opus/',

@@ -53,36 +53,36 @@ export default class StreamingView {
             if(this._application._StreamingView._streamClient !== undefined){
                 switch(e.keyCode){
                     case 38:
-                        this._application._StreamingView._streamClient._webrtcClient.getChannelProcessor('input').pressButton(0, { DPadUp: 1 })
+                        this._application._StreamingView._streamClient._xCloudPlayer.getChannelProcessor('input').pressButton(0, { DPadUp: 1 })
                         break;
                     case 40:
-                        this._application._StreamingView._streamClient._webrtcClient.getChannelProcessor('input').pressButton(0, { DPadDown: 1 })
+                        this._application._StreamingView._streamClient._xCloudPlayer.getChannelProcessor('input').pressButton(0, { DPadDown: 1 })
                         break;
                     case 37:
-                        this._application._StreamingView._streamClient._webrtcClient.getChannelProcessor('input').pressButton(0, { DPadLeft: 1 })
+                        this._application._StreamingView._streamClient._xCloudPlayer.getChannelProcessor('input').pressButton(0, { DPadLeft: 1 })
                         break;
                     case 39:
-                        this._application._StreamingView._streamClient._webrtcClient.getChannelProcessor('input').pressButton(0, { DPadRight: 1 })
+                        this._application._StreamingView._streamClient._xCloudPlayer.getChannelProcessor('input').pressButton(0, { DPadRight: 1 })
                         break;
                     case 13:
                     case 65:
-                        this._application._StreamingView._streamClient._webrtcClient.getChannelProcessor('input').pressButton(0, { A: 1 })
+                        this._application._StreamingView._streamClient._xCloudPlayer.getChannelProcessor('input').pressButton(0, { A: 1 })
                         break;
                     case 8:
                     case 66:
-                        this._application._StreamingView._streamClient._webrtcClient.getChannelProcessor('input').pressButton(0, { B: 1 })
+                        this._application._StreamingView._streamClient._xCloudPlayer.getChannelProcessor('input').pressButton(0, { B: 1 })
                         break;
                     case 88:
-                        this._application._StreamingView._streamClient._webrtcClient.getChannelProcessor('input').pressButton(0, { X: 1 })
+                        this._application._StreamingView._streamClient._xCloudPlayer.getChannelProcessor('input').pressButton(0, { X: 1 })
                         break;
                     case 89:
-                        this._application._StreamingView._streamClient._webrtcClient.getChannelProcessor('input').pressButton(0, { Y: 1 })
+                        this._application._StreamingView._streamClient._xCloudPlayer.getChannelProcessor('input').pressButton(0, { Y: 1 })
                         break;
                     case 78:
-                        this._application._StreamingView._streamClient._webrtcClient.getChannelProcessor('input').pressButton(0, { Nexus: 1 })
+                        this._application._StreamingView._streamClient._xCloudPlayer.getChannelProcessor('input').pressButton(0, { Nexus: 1 })
                         break;
                     case 48:
-                        this._application._StreamingView._streamClient._webrtcClient.getChannelProcessor('audio')._softReset()
+                        this._application._StreamingView._streamClient._xCloudPlayer.getChannelProcessor('audio')._softReset()
                         break;
                 }
             }
@@ -158,13 +158,13 @@ export default class StreamingView {
 
         this._streamClient.start(this._application, type, serverId).then(() => {
             console.log('StreamingView.js: Stream started for:', serverId)
-            // this._streamClient._webrtcClient.addEventListener('connect', (event:any) => {
+            // this._streamClient._xCloudPlayer.addEventListener('connect', (event:any) => {
             //     const streamStatus = (<HTMLInputElement>document.getElementById('streamStatus'))
             //     streamStatus.innerHTML = 'Connecting to '+ event.serverId
             //     console.log('STREAM CONNECT')
             // })
     
-            // this._streamClient._webrtcClient.addEventListener('openstream', (event:any) => {
+            // this._streamClient._xCloudPlayer.addEventListener('openstream', (event:any) => {
             //     const streamStatus = (<HTMLInputElement>document.getElementById('streamStatus'))
             //     streamStatus.innerHTML = 'Connected to '+ event.serverId
             //     console.log('STREAM CONNECTED')
@@ -172,38 +172,38 @@ export default class StreamingView {
 
             document.getElementById('request_videoframe').onclick = (event:any) => {
                 console.log('streamingView.js: Requesting videokeyframe')
-                this._streamClient._webrtcClient.getChannelProcessor('video').resetBuffer()
+                this._streamClient._xCloudPlayer.getChannelProcessor('video').resetBuffer()
                 console.log('streamingView.js: Requested videokeyframe')
             }
 
-            this._streamClient._webrtcClient.getEventBus().on('fps_video', (event:any) => {
+            this._streamClient._xCloudPlayer.getEventBus().on('fps_video', (event:any) => {
                 document.getElementById('videoFpsCounter').innerHTML = event.fps
             })
-            this._streamClient._webrtcClient.getEventBus().on('fps_audio', (event:any) => {
+            this._streamClient._xCloudPlayer.getEventBus().on('fps_audio', (event:any) => {
                 document.getElementById('audioFpsCounter').innerHTML = event.fps
             })
 
-            this._streamClient._webrtcClient.getEventBus().on('fps_metadata', (event:any) => {
+            this._streamClient._xCloudPlayer.getEventBus().on('fps_metadata', (event:any) => {
                 document.getElementById('metadataFpsCounter').innerHTML = event.fps
             })
-            this._streamClient._webrtcClient.getEventBus().on('fps_input', (event:any) => {
+            this._streamClient._xCloudPlayer.getEventBus().on('fps_input', (event:any) => {
                 document.getElementById('inputFpsCounter').innerHTML = event.fps
             })
 
-            this._streamClient._webrtcClient.getEventBus().on('bitrate_video', (event:any) => {
+            this._streamClient._xCloudPlayer.getEventBus().on('bitrate_video', (event:any) => {
                 // document.getElementById('videoBitrate').innerHTML = JSON.stringify(event)
                 document.getElementById('videoBitrate').innerHTML = (event.data/8)+' KBps / '+(event.packets/8)+' KBps'
             })
-            this._streamClient._webrtcClient.getEventBus().on('bitrate_audio', (event:any) => {
+            this._streamClient._xCloudPlayer.getEventBus().on('bitrate_audio', (event:any) => {
                 document.getElementById('audioBitrate').innerHTML = (event.data/8)+' KBps / '+(event.packets/8)+' KBps'
                 // document.getElementById('audioBitrate').innerHTML = (event.audioBitrate/8)+' KBps'
             })
 
-            this._streamClient._webrtcClient.getEventBus().on('latency_audio', (event:any) => {
+            this._streamClient._xCloudPlayer.getEventBus().on('latency_audio', (event:any) => {
                 // console.log('FPS Event:', event)
                 document.getElementById('audioLatencyCounter').innerHTML = 'min: '+event.min+'ms / avg: '+event.avg+'ms / max: '+event.max+'ms'
             })
-            this._streamClient._webrtcClient.getEventBus().on('latency_video', (event:any) => {
+            this._streamClient._xCloudPlayer.getEventBus().on('latency_video', (event:any) => {
                 // console.log('FPS Event:', event)
                 document.getElementById('videoLatencyCounter').innerHTML = 'min: '+event.min+'ms / avg: '+event.avg+'ms / max: '+event.max+'ms'
             })
@@ -248,7 +248,7 @@ export default class StreamingView {
             })
 
             
-            this._streamClient._webrtcClient.getChannelProcessor('input').addEventListener('latency', (event:any) => {
+            this._streamClient._xCloudPlayer.getChannelProcessor('input').addEventListener('latency', (event:any) => {
                 // console.log('FPS Event:', event)
                 document.getElementById('inputLatencyCounter').innerHTML = 'min: '+event.minLatency+'ms / avg: '+event.avgLatency+'ms / max: '+event.maxLatency+'ms'
                 
@@ -262,7 +262,7 @@ export default class StreamingView {
                     this._qualityMetadata = 'perfect'
                 }
             })
-            this._streamClient._webrtcClient.getChannelProcessor('input').addEventListener('gamepadlatency', (event:any) => {
+            this._streamClient._xCloudPlayer.getChannelProcessor('input').addEventListener('gamepadlatency', (event:any) => {
                 // console.log('FPS Event:', event)
                 document.getElementById('gamepadLatencyCounter').innerHTML = 'min: '+event.minLatency+'ms / avg: '+event.avgLatency+'ms / max: '+event.maxLatency+'ms'
                 
@@ -278,49 +278,49 @@ export default class StreamingView {
             })
 
             // Debug: Performance
-            this._streamClient._webrtcClient.getChannelProcessor('video').addEventListener('queue', (event:any) => {
+            this._streamClient._xCloudPlayer.getChannelProcessor('video').addEventListener('queue', (event:any) => {
                 document.getElementById('videoPerformance').innerHTML = JSON.stringify(event)
             })
-            this._streamClient._webrtcClient.getChannelProcessor('video').addEventListener('latency', (event:any) => {
+            this._streamClient._xCloudPlayer.getChannelProcessor('video').addEventListener('latency', (event:any) => {
                 document.getElementById('videoLatency').innerHTML = JSON.stringify(event)
             })
-            this._streamClient._webrtcClient.getChannelProcessor('audio').addEventListener('queue', (event:any) => {
+            this._streamClient._xCloudPlayer.getChannelProcessor('audio').addEventListener('queue', (event:any) => {
                 document.getElementById('audioPerformance').innerHTML = JSON.stringify(event)
             })
-            this._streamClient._webrtcClient.getChannelProcessor('audio').addEventListener('latency', (event:any) => {
+            this._streamClient._xCloudPlayer.getChannelProcessor('audio').addEventListener('latency', (event:any) => {
                 document.getElementById('audioLatency').innerHTML = JSON.stringify(event)
             })
-            this._streamClient._webrtcClient.getChannelProcessor('input').addEventListener('queue', (event:any) => {
+            this._streamClient._xCloudPlayer.getChannelProcessor('input').addEventListener('queue', (event:any) => {
                 document.getElementById('inputPerformance').innerHTML = JSON.stringify(event)
             })
-            this._streamClient._webrtcClient.getChannelProcessor('input').addEventListener('latency', (event:any) => {
+            this._streamClient._xCloudPlayer.getChannelProcessor('input').addEventListener('latency', (event:any) => {
                 document.getElementById('inputLatency').innerHTML = JSON.stringify(event)
             })
 
             // Bitrate control
             document.getElementById('control_bitrate_512').onclick = (event:any) => {
-                this._streamClient._webrtcClient.getChannelProcessor('control').setBitrate(512)
+                this._streamClient._xCloudPlayer.getChannelProcessor('control').setBitrate(512)
                 console.log('streamingView.js: Set bitrate to 512')
             }
             document.getElementById('control_bitrate_2500').onclick = (event:any) => {
-                this._streamClient._webrtcClient.getChannelProcessor('control').setBitrate(2500)
+                this._streamClient._xCloudPlayer.getChannelProcessor('control').setBitrate(2500)
                 console.log('streamingView.js: Set bitrate to 2500')
             }
             document.getElementById('control_bitrate_5000').onclick = (event:any) => {
-                this._streamClient._webrtcClient.getChannelProcessor('control').setBitrate(5000)
+                this._streamClient._xCloudPlayer.getChannelProcessor('control').setBitrate(5000)
                 console.log('streamingView.js: Set bitrate to 5000')
             }
             document.getElementById('control_bitrate_8500').onclick = (event:any) => {
-                this._streamClient._webrtcClient.getChannelProcessor('control').setBitrate(8500)
+                this._streamClient._xCloudPlayer.getChannelProcessor('control').setBitrate(8500)
                 console.log('streamingView.js: Set bitrate to 8500')
             }
             document.getElementById('control_bitrate_12000').onclick = (event:any) => {
-                this._streamClient._webrtcClient.getChannelProcessor('control').setBitrate(12000)
+                this._streamClient._xCloudPlayer.getChannelProcessor('control').setBitrate(12000)
                 console.log('streamingView.js: Set bitrate to 12000')
             }
 
             // Dialogs
-            // this._streamClient._webrtcClient.getChannelProcessor('message').addEventListener('dialog', (event:any) => {
+            // this._streamClient._xCloudPlayer.getChannelProcessor('message').addEventListener('dialog', (event:any) => {
             //     console.log('Got dialog event:', event)
 
             //     document.getElementById('modalDialog').style.display = 'block'
@@ -353,15 +353,15 @@ export default class StreamingView {
             //     // document.getElementById('dialogButton'+cancelIndex).classList.add("btn-cancel")
 
             //     document.getElementById('dialogButton1').onclick = (clickEvent) =>{
-            //         this._streamClient._webrtcClient.getChannelProcessor('message').sendTransaction(event.id, { Result: 0 })
+            //         this._streamClient._xCloudPlayer.getChannelProcessor('message').sendTransaction(event.id, { Result: 0 })
             //         resetDialog()
             //     }
             //     document.getElementById('dialogButton2').onclick = (clickEvent) => {
-            //         this._streamClient._webrtcClient.getChannelProcessor('message').sendTransaction(event.id, { Result: 1 })
+            //         this._streamClient._xCloudPlayer.getChannelProcessor('message').sendTransaction(event.id, { Result: 1 })
             //         resetDialog()
             //     }
             //     document.getElementById('dialogButton3').onclick = (clickEvent) => {
-            //         this._streamClient._webrtcClient.getChannelProcessor('message').sendTransaction(event.id, { Result: 2 })
+            //         this._streamClient._xCloudPlayer.getChannelProcessor('message').sendTransaction(event.id, { Result: 2 })
             //         resetDialog()
             //     }
             // })

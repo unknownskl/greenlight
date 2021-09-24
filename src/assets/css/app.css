@@ -280,6 +280,17 @@ body {
     opacity: 1;
 }
 
+#actionBar ul li a#pluginsMenulink {
+    padding: 4px;
+    margin-right: 8px;
+}
+
+#actionBar ul li a#pluginsMenulink img {
+    height: 20px;
+    position: relative;
+    top: 4px;
+}
+
 
 #actionBar ul.userProfile span.gamerscore {
     background: #ffcf40;
@@ -290,6 +301,70 @@ body {
     text-align: center;
     font-size: 15px;
     font-weight: bold;
+}
+
+/*
+ Plugins tooltip
+*/
+
+#pluginsTooltip {
+    position: absolute;
+    top: 20px;
+    bottom: 20px;
+    right: 120px;
+    backdrop-filter: blur(20px);
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 99;
+    width: 400px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+}
+
+#pluginsTooltip #pluginsContent {
+    padding-bottom: 10px;
+    overflow-y: auto;
+    position: absolute;
+    top: 55px;
+    bottom: 1px;
+    left: 0px;
+    right: 0px;
+}
+
+#pluginsTooltip h1 {
+    color: #ffffff;
+    opacity: 0.5;
+    padding-top: 15px;
+    margin-left: 20px;
+    margin-right: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #505050;
+    font-size: 20px;
+}
+
+#pluginsTooltip h2 {
+    color: #ffffff;
+    opacity: 0.5;
+    padding-top: 10px;
+    margin-left: 25px;
+    margin-right: 15px;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #505050;
+    font-size: 14px;
+}
+
+#pluginsTooltip #pluginsContent p {
+    color: #ffffff;
+    opacity: 0.5;
+    padding-top: 5px;
+    margin-left: 30px;
+    margin-right: 20px;
+    padding-bottom: 10px;
+    font-size: 12px;
+}
+
+#pluginsTooltip #pluginsContent .settingValue {
+    float: right;
 }
 
 /* #actionBar ul.userProfile li {
