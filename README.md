@@ -2,7 +2,7 @@
 
 [![Build/release](https://github.com/unknownskl/xbox-xcloud-client/actions/workflows/build.yml/badge.svg)](https://github.com/unknownskl/xbox-xcloud-client/actions/workflows/build.yml)
 
-xbox-xcloud-client is an open-source client for Xbox home streaming made in Javascript and Typescript.
+xbox-xcloud-client is an open-source client for xCloud and xHome streaming made in Javascript and Typescript.
 
 _DISCLAIMER: Xbox-xCloud-Client is not affiliated with Microsoft or Xbox._
 
@@ -56,8 +56,7 @@ Run development build:
 
 - Audio can get distorted when the audio is delayed or gets out of sync. This should recover within 3 seconds. You can also manually press `0` on your keyboard to reset the audio timings.
 - Video can get behind when the window is out of focus. To fix the issue, restart the application.
-- Starting a new stream after disconnecting from the old one can cause unexpected behaviour and performance issues. Restart the application to fix this problem.
-- Streaming from the Xbox Series seems to be working much better then with the Xbox One. The application is tested on both the Xbox One and Xbox Series.
+- Streaming from the Xbox Series seems to be working much better commpared to the Xbox One. The application is tested on both the Xbox One and Xbox Series.
 
 ## Changelog
 
