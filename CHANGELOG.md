@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.1.0-beta3 - 2021-09-24
+- Added support for Opentrack
+- Added an option to expose a WebUI to start streams on other devices 
+
 ## v1.1.0-beta2 - 2021-09-17
 - Implemented xbox-xcloud-player for improved rendering performance
 - Improved gamepad responsiveness
