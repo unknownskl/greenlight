@@ -63,7 +63,7 @@
     "ts-loader": "^9.2.5",
     "typescript": "^4.3.5",
     "webpack-cli": "^4.8.0",
-    "xbox-xcloud-player": "^0.1.0-beta7"
+    "xbox-xcloud-player": "^0.1.0-beta8"
   },
   "config": {
     "forge": {

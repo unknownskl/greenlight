@@ -25,6 +25,7 @@ export class OpentrackPluginBackend {
         pitch: 0,
         roll: 0,
     }
+    _positionTimestamp = 0
 
     constructor(menu:appMenu = undefined) {
         this._menu = menu
@@ -37,13 +38,15 @@ export class OpentrackPluginBackend {
             // Backend is always in the lead of settings.
             event.reply('opentrack-sync', {
                 isRunning: this._isRunning,
-                position: this._position
+                position: this._position,
+                timestamp: this._positionTimestamp,
             })
         })
 
         this._menu._ipc.on('opentrack-position', (event:any, variables:any) => {
             event.reply('opentrack-position', {
-                position: this._position
+                position: this._position,
+                timestamp: this._positionTimestamp,
             })
         })
     }
@@ -129,6 +132,7 @@ export class OpentrackPluginBackend {
         }
 
         this._position = position
+        this._positionTimestamp = Date.now()
         // console.log('Incoming:', position)
     }
 
