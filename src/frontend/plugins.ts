@@ -93,7 +93,7 @@ export class GamepadDriver {
             }
         }
 
-        console.log('gamepadDriver requestState:', pluginGamepadInput)
+        // console.log('gamepadDriver requestState:', pluginGamepadInput)
 
         for(const gamepad in this._gamepads){
             const gamepadState = navigator.getGamepads()[this._gamepads[gamepad].index]
