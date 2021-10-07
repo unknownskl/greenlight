@@ -81,6 +81,18 @@ export default class StreamingView {
                     case 78:
                         this._application._StreamingView._streamClient._xCloudPlayer.getChannelProcessor('input').pressButton(0, { Nexus: 1 })
                         break;
+                    case 219:
+                        this._application._StreamingView._streamClient._xCloudPlayer.getChannelProcessor('input').pressButton(0, { LeftShoulder: 1 })
+                        break;
+                    case 221:
+                        this._application._StreamingView._streamClient._xCloudPlayer.getChannelProcessor('input').pressButton(0, { RightShoulder: 1 })
+                        break;
+                    case 86:
+                        this._application._StreamingView._streamClient._xCloudPlayer.getChannelProcessor('input').pressButton(0, { View: 1 })
+                        break;
+                    case 77:
+                        this._application._StreamingView._streamClient._xCloudPlayer.getChannelProcessor('input').pressButton(0, { Menu: 1 })
+                        break;
                     case 48:
                         this._application._StreamingView._streamClient._xCloudPlayer.getChannelProcessor('audio')._softReset()
                         break;

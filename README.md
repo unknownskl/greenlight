@@ -20,6 +20,10 @@ The following keys are mapped as following:
     Dpad: Keypad direction controls
     Buttons: A, B, X, Y, Backspace (Mapped as B), Enter (Mapped as A)
     Nexus (Xbox button): N
+    Left bumper: [
+    Right bumper: ]
+    View: V
+    Menu: M
 
 ### Streaming stats
 
@@ -55,7 +59,6 @@ Run development build:
 ## Known Issues
 
 - Audio can get distorted when the audio is delayed or gets out of sync. This should recover within 3 seconds. You can also manually press `0` on your keyboard to reset the audio timings.
-- Video can get behind when the window is out of focus. To fix the issue, restart the application.
 - Streaming from the Xbox Series seems to be working much better commpared to the Xbox One. The application is tested on both the Xbox One and Xbox Series.
 
 ## Changelog
