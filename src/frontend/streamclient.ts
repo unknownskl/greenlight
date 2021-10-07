@@ -15,7 +15,7 @@ export default class StreamClient {
     _application:Application;
     _xCloudPlayer:xCloudPlayer
     _xCloudPlayerConfig:xCloudPlayerConfig = {
-        ui_systemui: [10,19,31,27,32]
+        ui_systemui: [10,31,27,32]
     }
     _xCloudClient:xCloudClient
 
