@@ -83,6 +83,11 @@ export default class Application {
                 // appView.style.backgroundImage = "linear-gradient(0deg, rgba(26,27,30,1) 0%, rgba(26,27,30,1) 50%, rgba(0,212,255,0) 100%), url('assets/images/background_2.jpg')"
                 const randomSelect = backgrounds[Math.floor(Math.random()*backgrounds.length)];
                 authView.style.backgroundImage = randomSelect
+
+                // open popup?
+                const url = "https://account.xbox.com/account/signin?returnUrl=https%3A%2F%2Fwww.xbox.com%2Fen-US%2Fplay&ru=https%3A%2F%2Fwww.xbox.com%2Fen-US%2Fplay"
+                window.open(url)
+
             } else  if(event.view === 'app'){
                 if(this._AppView === undefined){
                     this._AppView = new AppView(this)

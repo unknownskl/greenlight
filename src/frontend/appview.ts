@@ -114,6 +114,10 @@ export default class AppView {
                     }
                 }
 
+                if(profiles.people.length === 0) {
+                    friendsHtml += '<li class="offline"><div class="userinfo"><center><p>No friends online</p></center></div></li>'
+                }
+
                 // // Query for offline people
                 // for(const person in profiles.people){
                 //     if(profiles.people[person].presenceState === 'Offline'){
