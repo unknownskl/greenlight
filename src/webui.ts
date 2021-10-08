@@ -50,6 +50,16 @@ export default class xCloudWeb {
                                 //
                                 console.log('Clienthandshake is done!!')
 
+                                // Set size to fullscreen
+                                document.getElementById('xCloudRender').style.position = 'absolute'
+                                document.getElementById('xCloudRender').style.width = '100%'
+                                document.getElementById('xCloudRender').style.height = '100%'
+                                document.getElementById('xCloudRender').style.top = '0'
+                                document.getElementById('xCloudRender').style.left = '0'
+                                document.getElementById('xCloudRender').style.right = '0'
+                                document.getElementById('xCloudRender').style.bottom = '0'
+                                document.getElementById('xCloudRender').style.backgroundColor = '#000000'
+
                             }).catch((error) => {
                                 console.log(error)
                             })

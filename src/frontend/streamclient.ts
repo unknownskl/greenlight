@@ -15,7 +15,7 @@ export default class StreamClient {
     _application:Application;
     _xCloudPlayer:xCloudPlayer
     _xCloudPlayerConfig:xCloudPlayerConfig = {
-        ui_systemui: [10,31,27,32]
+        ui_systemui: [10,19,31,27,32]
     }
     _xCloudClient:xCloudClient
 
@@ -219,17 +219,17 @@ export class ModalHelper {
         }
 
         document.getElementById('dialogButton1').onclick = () => {
-            this._application.getChannelProcessor('message').sendTransaction(this._activeId, JSON.stringify({ Result: 0 }))
+            this._application.getChannelProcessor('message').sendTransaction(this._activeId, { Result: 0 })
             this.resetModal()
         }
 
         document.getElementById('dialogButton2').onclick = () => {
-            this._application.getChannelProcessor('message').sendTransaction(this._activeId, JSON.stringify({ Result: 1 }))
+            this._application.getChannelProcessor('message').sendTransaction(this._activeId, { Result: 1 })
             this.resetModal()
         }
 
         document.getElementById('dialogButton3').onclick = () => {
-            this._application.getChannelProcessor('message').sendTransaction(this._activeId, JSON.stringify({ Result: 2 }))
+            this._application.getChannelProcessor('message').sendTransaction(this._activeId, { Result: 2 })
             this.resetModal()
         }
     }

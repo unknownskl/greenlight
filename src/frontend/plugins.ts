@@ -95,13 +95,16 @@ export class GamepadDriver {
 
         // console.log('gamepadDriver requestState:', pluginGamepadInput)
 
-        for(const gamepad in this._gamepads){
-            const gamepadState = navigator.getGamepads()[this._gamepads[gamepad].index]
-            const state = this.mapStateLabels(gamepadState?.buttons, gamepadState?.axes, this._gamepads[gamepad].index)
+        const gamepads = navigator.getGamepads()
+        for(let gamepad = 0; gamepad < gamepads.length; gamepad++){
+            const gamepadState = gamepads[gamepad]
+            
+            if(gamepadState !== null){
+                const state = this.mapStateLabels(gamepadState.buttons, gamepadState.axes)
+                const mergedState = { ...state, ...pluginGamepadInput }
 
-            const mergedState = { ...state, ...pluginGamepadInput }
-
-            this._application.getChannelProcessor('input').queueGamepadState(mergedState)
+                this._application.getChannelProcessor('input').queueGamepadState(mergedState)
+            }
         }
     }
 

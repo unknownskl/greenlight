@@ -60,6 +60,7 @@ Run development build:
 
 - Audio can get distorted when the audio is delayed or gets out of sync. This should recover within 3 seconds. You can also manually press `0` on your keyboard to reset the audio timings.
 - Streaming from the Xbox Series seems to be working much better commpared to the Xbox One. The application is tested on both the Xbox One and Xbox Series.
+- When switching from xCloud to xHome and vice versa can cause the controller to stop responding. Restart the application to fix this problem.
 
 ## Changelog
 
