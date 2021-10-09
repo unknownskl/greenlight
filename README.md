@@ -13,6 +13,8 @@ _DISCLAIMER: Xbox-xCloud-Client is not affiliated with Microsoft or Xbox._
 - Keyboard controls
 - Build-in online friends list
 
+![Main window](images/main.png | width=250) ![Streaming Window](images/stream.png | width=250)
+
 ### Keyboard controls
 
 The following keys are mapped as following:
