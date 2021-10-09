@@ -12,6 +12,8 @@ export default class xCloudWeb {
     _apiClient:apiClient
     _xCloudPlayer:xCloudPlayer
 
+    _type:'xhome'|'xcloud'
+
     constructor() {
         console.log('xCloud Web UI constructor called')
 
@@ -34,35 +36,13 @@ export default class xCloudWeb {
                 document.getElementById('xHome_startstream_'+device).onclick = () => {
                     console.log('Start stream for', consoles[device].serverId)
 
+                    this._type = 'xhome'
                     this._apiClient.startStream('xhome', consoles[device].serverId).then((state:any) => {
                         console.log('api response:', state)
 
                         if(state.state === 'Provisioned') {
                             // Lets do the handshake thingie...
-
-                            const config = {
-                                ui_systemui: [32],
-                                input_driver: new GamepadDriver()
-                            }
-                            this._xCloudPlayer = new xCloudPlayer('xCloudRender', config)
-
-                            this.clientHandshake().then(() => {
-                                //
-                                console.log('Clienthandshake is done!!')
-
-                                // Set size to fullscreen
-                                document.getElementById('xCloudRender').style.position = 'absolute'
-                                document.getElementById('xCloudRender').style.width = '100%'
-                                document.getElementById('xCloudRender').style.height = '100%'
-                                document.getElementById('xCloudRender').style.top = '0'
-                                document.getElementById('xCloudRender').style.left = '0'
-                                document.getElementById('xCloudRender').style.right = '0'
-                                document.getElementById('xCloudRender').style.bottom = '0'
-                                document.getElementById('xCloudRender').style.backgroundColor = '#000000'
-
-                            }).catch((error) => {
-                                console.log(error)
-                            })
+                            this.setupClient()
                         } else {
                             console.log('State is not Provisioned. Got:', state)
                         }
@@ -81,36 +61,14 @@ export default class xCloudWeb {
             const titleId = (document.getElementById('xCloudTitleid') as any).value
             console.log('Start stream for xCloud title:', titleId)
 
+            this._type = 'xcloud'
             this._apiClient.startStream('xcloud', titleId).then((state:any) => {
                 console.log('api response:', state)
 
                 if(state.state === 'Provisioned') {
                     // Lets do the handshake thingie...
 
-                    const config = {
-                        ui_systemui: [32],
-                        input_driver: new GamepadDriver()
-                    }
-                    this._xCloudPlayer = new xCloudPlayer('xCloudRender', config)
-
-                    this.clientHandshake().then(() => {
-                        //
-                        console.log('Clienthandshake is done!!')
-
-                        // Set size to fullscreen
-                        document.getElementById('xCloudRender').style.position = 'absolute'
-                        document.getElementById('xCloudRender').style.width = '100%'
-                        document.getElementById('xCloudRender').style.height = '100%'
-                        document.getElementById('xCloudRender').style.top = '0'
-                        document.getElementById('xCloudRender').style.left = '0'
-                        document.getElementById('xCloudRender').style.right = '0'
-                        document.getElementById('xCloudRender').style.bottom = '0'
-                        document.getElementById('xCloudRender').style.backgroundColor = '#000000'
-
-
-                    }).catch((error) => {
-                        console.log(error)
-                    })
+                    this.setupClient()
                 } else {
                     console.log('State is not Provisioned. Got:', state)
                 }
@@ -138,7 +96,11 @@ export default class xCloudWeb {
 
                         this._xCloudPlayer.setIceCandidates(iceAnswer)
 
-                        // @TODO: Setup Keepalive
+                        if(this._type === 'xcloud'){
+                            setInterval(() => {
+                                this._apiClient.keepalive()
+                            }, 1000 * 60)
+                        }
 
                         this._xCloudPlayer.getEventBus().on('connectionstate', (event) => {
                             console.log(':: Connection state updated:', event)
@@ -171,60 +133,33 @@ export default class xCloudWeb {
                 reject(error)
             })
         })
+    }
 
-        // this._webrtcClient.createOffer().then((offer:any) => {
-        //     // console.log('SDP Client:', offer)
+    setupClient() {
+        const config = {
+            ui_systemui: [32],
+            input_driver: new GamepadDriver()
+        }
+        this._xCloudPlayer = new xCloudPlayer('xCloudRender', config)
 
-        //     this._xCloudClient.sendSdp(offer.sdp).then((sdpAnswer:any) => {
-        //         // console.log('SDP Server:', sdpAnswer)
+        this.clientHandshake().then(() => {
+            //
+            console.log('Clienthandshake is done!!')
 
-        //         this._webrtcClient.setRemoteOffer(sdpAnswer.sdp)
+            // Set size to fullscreen
+            document.getElementById('xCloudRender').style.position = 'absolute'
+            document.getElementById('xCloudRender').style.width = '100%'
+            document.getElementById('xCloudRender').style.height = '100%'
+            document.getElementById('xCloudRender').style.top = '0'
+            document.getElementById('xCloudRender').style.left = '0'
+            document.getElementById('xCloudRender').style.right = '0'
+            document.getElementById('xCloudRender').style.bottom = '0'
+            document.getElementById('xCloudRender').style.backgroundColor = '#000000'
 
-        //         // Continue with ICE
-        //         const candidates = this._webrtcClient.getIceCandidates()
-        //         this._xCloudClient.sendIce(candidates[0].candidate).then((iceAnswer:any) => {
-        //             // console.log('ICE Server:', iceAnswer)
 
-        //             this._webrtcClient.setIceCandidates(iceAnswer)
-
-        //             // Setup keepAlive timer
-        //             this._keepAliveInterval = setInterval(() => {
-        //                 this._xCloudClient.sendKeepalive()
-        //             }, 60000)
-
-        //             this._webrtcClient.getEventBus().on('connectionstate', (event) => {
-        //                 console.log(':: Connection state updated:', event)
-
-        //                 if(event.state === 'connected'){
-        //                     // We are connected
-        //                     console.log(':: We are connected!')
-
-        //                     this._streamStarted()
-
-        //                 } else if(event.state === 'closing'){
-        //                     // Connection is closing
-        //                     console.log(':: We are going to disconnect!')
-
-        //                 } else if(event.state === 'closed'){
-        //                     // Connection has been closed. We have to cleanup here
-        //                     console.log(':: We are disconnected!')
-        //                     this._streamStopped()
-        //                 }
-        //             })
-
-        //             resolve(true)
-
-        //         }).catch((error) => {
-        //             reject(error)
-        //         })
-
-        //     }).catch((error) => {
-        //         reject(error)
-        //     })
-
-        // }).catch((error) => {
-        //     reject(error)
-        // })
+        }).catch((error) => {
+            console.log(error)
+        })
     }
 }
 

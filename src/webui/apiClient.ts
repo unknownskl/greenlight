@@ -87,6 +87,16 @@ export default class apiClient {
         })
     }
 
+    keepalive() {
+        return new Promise((resolve, reject) => {
+            this._get('/api/keepalive').then((data:any) => {
+                resolve(data)
+            }).catch((error) => {
+                reject(error)
+            })
+        })
+    }
+
     _get(path:string) {
         return new Promise((resolve, reject) => {
             fetch(path).then(response => response.json()).then((data) => {

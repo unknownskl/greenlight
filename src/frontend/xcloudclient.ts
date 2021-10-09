@@ -476,25 +476,32 @@ export default class xCloudClient {
 
     sendKeepalive(){
         return new Promise((resolve, reject) => {
-            fetch('https://' + this._host + '/' + this._sessionPath + '/keepalive', {
+            const req = https.request({
+                host: this._host,
+                path: '/'+this._sessionPath+'/keepalive',
                 method: 'POST', // *GET, POST, PUT, DELETE, etc.
-                cache: 'no-cache',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': 'Bearer '+this._token
                 }
-            }).then((response) => {
-                if(response.status !== 200){
-                    console.log('StreamClient.js: Error sending keepalive signal. Status:', response.status, 'Body:', response.body)
+            }, (response) => {
+                if(response.statusCode !== 200){
+                    console.log('StreamClient.js: Error sending keepalive signal. Status:', response.statusCode)
                     reject({
-                        status: response.status
+                        status: response.statusCode
                     })
                 } else {
                     resolve('ok')
                 }
-            }).catch((error) => {
+            })
+
+            req.on('error', (error:any) => {
                 reject(error)
             });
+
+            req.write('')
+
+            req.end()
         })
     }
 }

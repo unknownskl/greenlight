@@ -25,7 +25,7 @@ const createWindow = (): void => {
   // Create the browser window.
     mainWindow = new BrowserWindow({
     width: 1500,
-    height: 900,
+    height: 875,
     autoHideMenuBar: true,
 
     webPreferences: {

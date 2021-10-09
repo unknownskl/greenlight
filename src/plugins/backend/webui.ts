@@ -211,6 +211,20 @@ export class WebuiPluginBackend {
                     res.writeHead(500);
                     res.end('Only POST is supported');
                 }
+
+            } else if(req.url == '/api/keepalive'){
+
+                this._xCloudClient.sendKeepalive().then((response:any) => {
+                    res.writeHead(200);
+                    res.end(JSON.stringify(response))
+    
+                }).catch((error:any) => {
+                    console.log('keepalive error:', error)
+
+                    res.writeHead(error.status);
+                    res.end('API returned http status: ' + error.status)
+                })
+
             } else {
                 res.writeHead(404);
                 res.end('Not found: '+req.url);

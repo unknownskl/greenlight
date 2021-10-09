@@ -147,7 +147,7 @@ export class OpentrackPluginBackend {
 
     getMenu() {
         return {
-            label: 'OpenTrack',
+            label: 'OpenTrack (beta)',
             submenu: [
                 {
                     label: (this._isRunning === true) ? 'Stop OpenTrack' : 'Start OpenTrack',
