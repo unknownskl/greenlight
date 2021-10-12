@@ -50,7 +50,7 @@
     "electron": "13.2.2",
     "electron-builder": "^22.11.7",
     "eslint": "^7.32.0",
-    "eslint-plugin-import": "^2.24.1",
+    "eslint-plugin-import": "^2.25.1",
     "fork-ts-checker-webpack-plugin": "^6.3.2",
     "node-loader": "^2.0.0",
     "style-loader": "^3.2.1",
