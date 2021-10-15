@@ -163,6 +163,14 @@ export class OpentrackPluginBackend {
                     label: this.getStatusLabel(),
                     enabled: false,
                 },
+                { type: 'separator' },
+                {
+                    label: 'Open MS Flight Simulator setup guide',
+                    click: async () => {
+                        const { shell } = require('electron')
+                        await shell.openExternal('https://github.com/unknownskl/xbox-xcloud-client/wiki/OpenTrack-MS-Flight-Simulator-setup-manual')
+                    }
+                },
                 ...this.getPositionsMenu(),
             ]
         }

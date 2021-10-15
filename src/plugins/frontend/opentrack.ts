@@ -42,9 +42,9 @@ export class OpentrackPluginFrontend {
             this._application._ipc.send('opentrack-position', {})
         }, 50)
 
-        document.getElementById('pluginsContent').innerHTML += '<div id="plugin_opentrack_view"><p>Loading view...</p></div>'
+        // document.getElementById('pluginsContent').innerHTML += '<div id="plugin_opentrack_view"><p>Loading view...</p></div>'
 
-        this.renderSettings()
+        // this.renderSettings()
     }
 
     setupHandlers() {
