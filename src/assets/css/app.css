@@ -23,7 +23,7 @@ body {
     bottom: 0px;
 }
 
-#splashView, #authView, #appView, #streamingView {
+#splashView, #authView, #appView, #xCloudView, #streamingView {
     position: absolute;
     top: 0px;
     left: 0px;
@@ -280,6 +280,17 @@ body {
     opacity: 1;
 }
 
+#actionBar ul li a#pluginsMenulink {
+    padding: 4px;
+    margin-right: 8px;
+}
+
+#actionBar ul li a#pluginsMenulink img {
+    height: 20px;
+    position: relative;
+    top: 4px;
+}
+
 
 #actionBar ul.userProfile span.gamerscore {
     background: #ffcf40;
@@ -292,6 +303,70 @@ body {
     font-weight: bold;
 }
 
+/*
+ Plugins tooltip
+*/
+
+#pluginsTooltip {
+    position: absolute;
+    top: 20px;
+    bottom: 20px;
+    right: 120px;
+    backdrop-filter: blur(20px);
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 99;
+    width: 400px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+}
+
+#pluginsTooltip #pluginsContent {
+    padding-bottom: 10px;
+    overflow-y: auto;
+    position: absolute;
+    top: 55px;
+    bottom: 1px;
+    left: 0px;
+    right: 0px;
+}
+
+#pluginsTooltip h1 {
+    color: #ffffff;
+    opacity: 0.5;
+    padding-top: 15px;
+    margin-left: 20px;
+    margin-right: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #505050;
+    font-size: 20px;
+}
+
+#pluginsTooltip h2 {
+    color: #ffffff;
+    opacity: 0.5;
+    padding-top: 10px;
+    margin-left: 25px;
+    margin-right: 15px;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #505050;
+    font-size: 14px;
+}
+
+#pluginsTooltip #pluginsContent p {
+    color: #ffffff;
+    opacity: 0.5;
+    padding-top: 5px;
+    margin-left: 30px;
+    margin-right: 20px;
+    padding-bottom: 10px;
+    font-size: 12px;
+}
+
+#pluginsTooltip #pluginsContent .settingValue {
+    float: right;
+}
+
 /* #actionBar ul.userProfile li {
     opacity: 0.7;
 } */
@@ -300,8 +375,6 @@ body {
     color: #ffffff;
     padding-top: 4px;
 }
-
-
 
 
 #consolesList {
@@ -338,6 +411,87 @@ body {
 #consolesList div.consoleItem p {
     padding-top: 10px;
     padding-bottom: 15px;
+}
+
+/**
+ xCloud View
+**/
+
+
+#xCloud {
+    width: 100%;
+    position: absolute;
+    top: 70px;
+    left: 0px;
+    right: 0px;
+}
+
+#xCloudSearch {
+    /* */
+    padding-top: 24px;
+    padding-left: 24px;
+    padding-right: 24px;
+}
+
+#xCloudSearch input#xCloudSearchInput {
+    background:rgba(0, 0, 0, 0.55);
+    color: #ffffff;
+    padding: 10px;
+    border-radius: 10px;
+    width: 99%;
+    outline: none;
+}
+
+#xCloudGames {
+    display: flex;
+    flex-wrap: wrap;
+    padding-bottom: 40px;
+}
+
+#xCloudContent {
+    padding-top: 70px;
+}
+
+/* #xCloud .btn {
+    margin: 40px;
+    padding-top: 0px;
+} */
+
+#xCloudGames div.titleWrap {
+    width: 12%;
+    padding-top: 40px;
+    /* padding-bottom: 40px; */
+}
+
+#xCloudGames div.titleItem {
+    background: #000000;
+    color: #ffffff;
+    margin-left: 24px;
+    margin-right: 24px;
+    position: relative;
+    border-radius: 8px;
+    padding: 8px;
+}
+
+#xCloudGames span.titleName {
+    position: relative;
+    font-size: 14px;
+    opacity: 0.7;
+    text-align: center;
+    display: block;
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+#xCloudGames img.titleImage {
+    max-width: 100%;
+    margin-right: 10px;
+    border-radius: 8px;
+}
+
+#xCloudGames .btn-xcloud-start {
+    margin: 5px auto;
+    display: block;
 }
 
 /**
@@ -552,8 +706,8 @@ button.btn {
 }
 
 button.btn-small {
-    height: 30px;
-    padding-top: 4px;
+    height: 24px;
+    padding-top: 0px;
     min-width: 20px;
 }
 

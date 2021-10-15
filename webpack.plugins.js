@@ -13,6 +13,21 @@ module.exports = [
             from: path.join(__dirname, 'src/assets'),
             to: 'main_window/assets/',
         },
+
+        {
+            from: path.join(__dirname, 'node_modules/xbox-xcloud-player/src/Opus'),
+            to: 'opus/',
+        },{
+            from: path.join(__dirname, 'node_modules/xbox-xcloud-player/src/Opus'),
+            to: 'main_window/opus/',
+        },
+        {
+            from: path.join(__dirname, 'node_modules/xbox-xcloud-player/src/Worker/Opus.js'),
+            to: 'dist/opusWorker.min.js',
+        },{
+            from: path.join(__dirname, 'node_modules/xbox-xcloud-player/src/Worker/Opus.js'),
+            to: 'main_window/dist/opusWorker.min.js',
+        },
     ],
 }),
 ];

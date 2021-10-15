@@ -1,11 +1,13 @@
 import Application from "./application";
 // import https from 'https'
 import apiClient from "./apiclient";
+import xCloudClient from "./xcloudclient";
 
 export default class AppView {
 
     _application:Application;
     _apiClient;
+    _xCloudClient;
 
     constructor(application:Application){
         this._application = application
@@ -27,38 +29,13 @@ export default class AppView {
         
 
         // Fetch consoles...
-        fetch('https://uks.gssv-play-prodxhome.xboxlive.com/v6/servers/home', {
-            method: 'GET', // *GET, POST, PUT, DELETE, etc.
-            mode: 'cors', // no-cors, *cors, same-origin
-            cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-            // credentials: 'same-origin', // include, *same-origin, omit
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer '+this._application._tokenStore._streamingToken
-              // 'Content-Type': 'application/x-www-form-urlencoded',
-            }
-        }).then((response) => {
-            if(response.status !== 200){
-                console.log('Error fetching consoles. Status:', response.status, 'Body:', response.body)
-            } else {
-                response.json().then((data) => {
-                    console.log('consoles:', data)
+        this._xCloudClient = new xCloudClient(this._application, 'uks.gssv-play-prodxhome.xboxlive.com', this._application._tokenStore._streamingToken, 'home')
+        this._xCloudClient.getConsoles().then((consoles:any) => {
+            this.showConsoles(consoles.results)
 
-                    this.showConsoles(data.results)
-
-                }).catch((error) => {
-                    console.log('ERROR json',  error)
-                })
-                // const responseData = JSON.parse(response.body);
-            }
         }).catch((error) => {
             console.log('ERROR retrieve consoles',  error)
-        });
-
-        // this._apiClient = XboxApi({
-        //     uhs: this._application._tokenStore._web.uhs,
-        //     userToken: this._application._tokenStore._web.userToken
-        // })
+        })
 
         this._apiClient = new apiClient(this._application._tokenStore._web.uhs, this._application._tokenStore._web.userToken)
         this._apiClient.getProfile().then((profile:any) => {
@@ -135,6 +112,10 @@ export default class AppView {
                         friendsHtml += '    </div>'
                         friendsHtml += '</li>'
                     }
+                }
+
+                if(profiles.people.length === 0) {
+                    friendsHtml += '<li class="offline"><div class="userinfo"><center><p>No friends online</p></center></div></li>'
                 }
 
                 // // Query for offline people
@@ -238,6 +219,7 @@ export default class AppView {
     load(){
         return new Promise((resolve, reject) => {
             console.log('AppView.js: Loaded view')
+
             resolve(true)
         })
     }

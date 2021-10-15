@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>Xbox xHome Streaming</title>
+    <title>xCloud Streaming</title>
 
     <script>
       function setWebTokens(uhs, userToken){
@@ -12,31 +12,31 @@
       function setStreamingToken(streamingToken){
         document.getElementById('token_streaming_token').value = streamingToken
       }
+      function setxCloudStreamingToken(streamingToken, host){
+        document.getElementById('token_xcloud_streaming_token').value = streamingToken
+        document.getElementById('token_xcloud_streaming_host').value = host
+      }
+      function setxCloudMSALToken(token){
+        document.getElementById('token_xcloud_msal_token').value = token
+      }
       window.addEventListener('resize', () => {
-        if(document.getElementById('videoRender') !== null && document.getElementById('videoHolder') !== null) {
-          var videoRender = document.getElementById('videoRender')
+        if(document.getElementById('videoHolder') !== null && document.querySelector("#videoHolder video") !== null) {
+          var videoRender = document.querySelector("#videoHolder video")
           var videoHolder = document.getElementById('videoHolder')
           videoRender.width = videoHolder.clientWidth
           videoRender.height = videoHolder.clientHeight
         }
       })
     </script>
-    
-    <script src="assets/xsdk/client.js"></script>
-    <script src="assets/xsdk/gamepad.js"></script>
-    <script src="assets/xsdk/channels/base.js"></script>
-    <script src="assets/xsdk/channels/video.js"></script>
-    <script src="assets/xsdk/channels/audio.js"></script>
-    <script src="assets/xsdk/channels/input.js"></script>
-    <script src="assets/xsdk/channels/control.js"></script>
-    <script src="assets/xsdk/channels/message.js"></script>
-    <script src="assets/xsdk/channels/chat.js"></script>
 
   </head>
   <body>
     <input id="token_web_uhs" value="" type="hidden" />
     <input id="token_web_usertoken" value="" type="hidden" />
     <input id="token_streaming_token" value="" type="hidden" />
+    <input id="token_xcloud_streaming_token" value="" type="hidden" />
+    <input id="token_xcloud_streaming_host" value="" type="hidden" />
+    <input id="token_xcloud_msal_token" value="" type="hidden" />
 
     <div id="appRoot">
       
@@ -44,7 +44,7 @@
         <!--
           Splash View
         -->
-        <h1>xHome Streaming</h1>
+        <h1>xCloud Streaming</h1>
 
         <div class="lds-ring"><div></div><div></div><div></div><div></div></div><br />
       </div>
@@ -57,7 +57,7 @@
           <h1>Login to Xbox</h1>
 
           <p>
-            Please authenticate below to access xHome Streaming
+            Please authenticate below to access xCloud and xHome Streaming
           </p>
           <br />
 
@@ -77,10 +77,11 @@
         </a>
 
         <ul class="menu">
-            <li><a href="#" id="actionBarMyConsoles" title="List your available consoles">My Consoles</a></li>
-            <li><a href="#" id="actionBarStreamingViewActive" title="Current open stream" style="display:none;">Active stream</a></li>
-            <li><a href="#" class="btn btn-cancel" id="actionBarStreamingDisconnect" title="Current open stream" style="display:none;">Disconnect</a></li>
-            <li><a href="#" id="actionBarStreamingView" title="Debug view to test Streaming View"style="display:none;">Streaming View</a></li>
+          <li><a href="#" id="actionBarMyConsoles" title="List your available consoles">My Consoles</a></li>
+          <li id="actionBarxCloud" style="display:none;"><a href="#" title="xCloud Library">xCloud Library</a></li>
+          <li><a href="#" id="actionBarStreamingViewActive" title="Current open stream" style="display:none;">Active stream</a></li>
+          <li><a href="#" class="btn btn-cancel" id="actionBarStreamingDisconnect" title="Current open stream" style="display:none;">Disconnect</a></li>
+          <li><a href="#" id="actionBarStreamingView" title="Debug view to test Streaming View" style="display:none;">Streaming View</a></li>
         </ul>
 
         <a href="#" id="userProfileLogoLink" title="Gamerpic">
@@ -93,9 +94,17 @@
             <span id="actionBarUserGamerscore" title="Gamerscore"></span>
           </li>
           <li><a href="#" id="actionBarUserProfile"  onclick="confirm('Do you want to log out?') ? window.open('https://account.xbox.com/Account/Signout?returnUrl=https%3A%2F%2Fwww.xbox.com%3A443%2Fen-US%2F&ru=https%3A%2F%2Fwww.xbox.com%2Fen-US%2F', '_blank', 'top=500,left=200,frame=true,nodeIntegration=no') : ''" title="Profile">N/A</a></li>
+          <li id="actionBarPlugins" style="display:none;"><a id="pluginsMenulink"><img class="pluginIcon" src="assets/icons/plugins.svg" /></a></li>
         </ul>
 
       </header>
+
+      <div id="pluginsTooltip" style="display:none;">
+        <h1>Plugins</h1>
+
+        <div id="pluginsContent">
+        </div>
+      </div>
 
       <!--
         Application View
@@ -117,6 +126,32 @@
             <center>
               <div class="lds-ring"><div></div><div></div><div></div><div></div></div><br />
             </center>
+          </div>
+        </div>
+      </div>
+
+      <!--
+        xCloud Library View
+      -->
+      <div id="xCloudView" style="display:none;">
+
+        <div id="xCloudContent">
+          <div id="xCloud">
+
+            <div id="xCloudSearch">
+              <input id="xCloudSearchInput" type="text" placeholder="Search xCloud title" />
+            </div>
+
+            <div id="xCloudGames">
+
+              <div style="text-align: center; width: 100%">
+                <div class="lds-ring"><div></div><div></div><div></div><div></div></div><br />
+              </div>
+
+            <!-- <button class="btn" id="startxCloudTestStream">Start Destiny 2 on xCloud</button>
+            <button class="btn" id="startxCloudTestStream2">Start Super Lucky Tail on xCloud</button> -->
+
+            </div>
           </div>
         </div>
       </div>
@@ -167,8 +202,8 @@
             <p>
                 <strong>Video FPS:</strong> <span id="videoFpsCounter">0</span> (<span id="videoLatencyCounter">N/A</span>)<br />
                 <strong>Audio FPS:</strong> <span id="audioFpsCounter">0</span> (<span id="audioLatencyCounter">N/A</span>)<br />
-                <strong>Metadata Input:</strong> <span id="inputLatencyCounter">N/A</span><br />
-                <strong>Gamepad Input:</strong> <span id="gamepadLatencyCounter">N/A</span>
+                <strong>Metadata Input:</strong> <span id="metadataFpsCounter">0</span> <span id="inputLatencyCounter">N/A</span><br />
+                <strong>Gamepad Input:</strong> <span id="inputFpsCounter">0</span> <span id="gamepadLatencyCounter">N/A</span>
             </p>
         </div>
 
@@ -178,20 +213,21 @@
             Video: <span id="videoBitrate"></span><br />
             Audio: <span id="audioBitrate"></span><br />
           </p><br />
-          <p>
+          <!-- <p>
             <strong>Set bitrate:</strong><br />
             <button class="btn btn-small" id="control_bitrate_512">512</button>
             <button class="btn btn-small" id="control_bitrate_2500">2500</button>
             <button class="btn btn-small" id="control_bitrate_5000">5000</button>
             <button class="btn btn-small" id="control_bitrate_8500">8500</button>
             <button class="btn btn-small" id="control_bitrate_12000">12000</button> <br />
-          </p>
+          </p> -->
+          <button class="btn btn-small" id="request_videoframe">Request VideoFrame</button> <br />
           <strong>Debug output:</strong>
           <p>
               <!-- <strong>Video:</strong> <span id="videoPerformance"></span><br /> -->
-              <strong>Video Latency:</strong> <span id="videoLatency"></span><br />
+              <!-- <strong>Video Latency:</strong> <span id="videoLatency"></span><br /> -->
               <!-- <strong>Audio:</strong> <span id="audioPerformance"></span><br /> -->
-              <strong>Audio Latency:</strong> <span id="audioLatency"></span><br />
+              <!-- <strong>Audio Latency:</strong> <span id="audioLatency"></span><br /> -->
               <strong>Input:</strong> <span id="inputPerformance"></span> <br />
               <strong>Input Latency:</strong> <span id="inputLatency"></span><br />
           </p>
