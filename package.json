@@ -1,6 +1,6 @@
 {
-  "name": "Xbox-xHomestreaming",
-  "version": "1.0.3",
+  "name": "Xbox-xCloud",
+  "version": "1.1.0",
   "description": "xbox-xcloud-client is an open-source client for Xbox home streaming made in Javascript and Typescript.",
   "main": ".webpack/main",
   "scripts": {
@@ -10,7 +10,8 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
-    "lint": "eslint --ext .ts ."
+    "lint": "eslint --ext .ts .",
+    "builder": "electron-builder"
   },
   "build": {
     "appId": "unknownskl.xcloud-client",
@@ -42,20 +43,27 @@
     "@electron-forge/maker-squirrel": "^6.0.0-beta.58",
     "@electron-forge/maker-zip": "^6.0.0-beta.58",
     "@electron-forge/plugin-webpack": "^6.0.0-beta.58",
+    "@types/express": "^4.17.13",
     "@typescript-eslint/eslint-plugin": "^4.29.3",
     "@typescript-eslint/parser": "^4.29.3",
     "@vercel/webpack-asset-relocator-loader": "^1.7.0",
     "copy-webpack-plugin": "^9.0.1",
     "css-loader": "^6.2.0",
-    "electron": "13.2.2",
+    "electron": "15.2.0",
     "electron-builder": "^22.11.7",
     "eslint": "^7.32.0",
     "eslint-plugin-import": "^2.24.1",
+    "express": "^4.17.1",
     "fork-ts-checker-webpack-plugin": "^6.3.2",
+    "https-browserify": "^1.0.0",
+    "mime": "^1.6.0",
     "node-loader": "^2.0.0",
+    "stream-http": "^3.2.0",
     "style-loader": "^3.2.1",
     "ts-loader": "^9.2.5",
-    "typescript": "^4.3.5"
+    "typescript": "^4.3.5",
+    "webpack-cli": "^4.8.0",
+    "xbox-xcloud-player": "^0.1.0-beta10"
   },
   "config": {
     "forge": {
@@ -94,10 +102,15 @@
                   "html": "./src/index.html",
                   "js": "./src/renderer.ts",
                   "name": "main_window"
+                },
+                {
+                  "html": "./src/webui.html",
+                  "js": "./src/webui.ts",
+                  "name": "webui"
                 }
               ]
             },
-            "devContentSecurityPolicy": "img-src http://localhost:3000 https://*.xboxlive.com data:; media-src 'unsafe-inline' blob:; connect-src 'self' https://*.xbox.com https://*.xboxlive.com; default-src 'self' 'unsafe-inline' data:; script-src 'self' 'unsafe-eval' 'unsafe-inline' data:"
+            "devContentSecurityPolicy": "worker-src 'self' blob: data:; img-src http://localhost:3000 https://store-images.s-microsoft.com https://*.xboxlive.com data:; media-src 'unsafe-inline' blob:; connect-src 'self' https://displaycatalog.mp.microsoft.com https://*.xbox.com https://*.xboxlive.com; default-src 'self' 'unsafe-inline' data:; script-src 'self' 'unsafe-eval' 'unsafe-inline' data:"
           }
         ]
       ]
