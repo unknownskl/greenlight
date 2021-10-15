@@ -54,7 +54,7 @@ export class OpentrackPluginFrontend {
             this._position = variables.position
             this._positionTimestamp = variables.timestamp
 
-            this.renderSettings()
+            // this.renderSettings()
         })
 
         this._application._ipc.on('opentrack-position', (event:any, variables:any) => {
@@ -98,8 +98,8 @@ export class OpentrackPluginFrontend {
 
     convertToControllerInput(position:any) {
         const state = {
-            RightThumbXAxis: (position.yaw/20),
-            RightThumbYAxis: -(position.pitch/20)
+            RightThumbXAxis: (position.yaw/90),
+            RightThumbYAxis: -(position.pitch/90)
         }
 
         return state

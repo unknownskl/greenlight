@@ -354,9 +354,9 @@ export default class xCloudClient {
                 "messageType":"offer",
                 "sdp": sdp,
                 "configuration":{
-                   "containerizeVideo":true,
-                   "requestedH264Profile":2,
-                   "chatConfiguration":{
+                    // "containerizeVideo":true,
+                    // "requestedH264Profile":2,
+                    "chatConfiguration":{
                       "bytesPerSample":2,
                       "expectedClipDurationMs":100,
                       "format":{
