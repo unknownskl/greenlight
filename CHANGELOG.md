@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.1.0 - 2021-10-15
+- Added link to MS Flight Simulator wiki page
+- Enable Dialog support only in stream configuration
+
 ## v1.1.0-beta4 - 2021-10-09
 - Added a update notifier for new updates
 - Added keyboard controls for right trigger, left trigger, view and menu button
