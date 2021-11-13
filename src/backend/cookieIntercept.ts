@@ -17,14 +17,14 @@ export default function (details:any):void {
     if(details.url === 'https://www.xbox.com/?lc=1033'){
         // Catched logout action
 
-        let windowId = 0
-        if(process.env.ISDEV !== undefined){
-            windowId = (details.webContentsId-1)
-        } else {
-            windowId = details.webContentsId
-        }
-        const window = BrowserWindow.fromId(windowId)
-        window.close()
+        // let windowId = 0
+        // if(process.env.ISDEV !== undefined){
+        //     windowId = (details.webContentsId-1)
+        // } else {
+        //     windowId = details.webContentsId
+        // }
+        // const window = BrowserWindow.fromId(windowId)
+        // window.close()
 
         session.defaultSession.clearStorageData()
 
@@ -90,14 +90,16 @@ export default function (details:any):void {
             }).catch((error) => {
                 //  Failed to retrieve xcloud Token. Lets close the login window.
 
-                let windowId = 0
-                if(process.env.ISDEV !== undefined){
-                    windowId = (details.webContentsId-1)
-                } else {
-                    windowId = details.webContentsId
-                }
-                const window = BrowserWindow.fromId(windowId)
-                window.close()
+                // let windowId = 0
+                // if(process.env.ISDEV !== undefined){
+                //     windowId = (details.webContentsId-1)
+                // } else {
+                //     windowId = details.webContentsId
+                // }
+                // const window = BrowserWindow.fromId(windowId)
+                // window.close()
+
+                alert('Load application...')
             })
         }
     }

@@ -12,7 +12,7 @@ export default class Plugins {
 
     load(id:string, pluginClass:any) {
         this._plugins[id] = new pluginClass(this._application)
-        console.log('plugins loaded:', this._plugins[id])
+        // console.log('plugins loaded:', this._plugins[id])
 
         this._plugins[id].load()
     }
