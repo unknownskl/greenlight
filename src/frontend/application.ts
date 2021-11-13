@@ -85,8 +85,8 @@ export default class Application {
                 authView.style.backgroundImage = randomSelect
 
                 // open popup?
-                const url = "https://account.xbox.com/account/signin?returnUrl=https%3A%2F%2Fwww.xbox.com%2Fen-US%2Fplay&ru=https%3A%2F%2Fwww.xbox.com%2Fen-US%2Fplay"
-                window.open(url)
+                // const url = "https://account.xbox.com/account/signin?returnUrl=https%3A%2F%2Fwww.xbox.com%2Fen-US%2Fplay&ru=https%3A%2F%2Fwww.xbox.com%2Fen-US%2Fplay"
+                // window.open(url)
 
             } else  if(event.view === 'app'){
                 if(this._AppView === undefined){

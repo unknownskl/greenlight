@@ -354,6 +354,7 @@ export default class xCloudClient {
                 "messageType":"offer",
                 "sdp": sdp,
                 "configuration":{
+                    "containerizeAudio":false,
                     // "containerizeVideo":true,
                     // "requestedH264Profile":2,
                     "chatConfiguration":{
@@ -376,7 +377,7 @@ export default class xCloudClient {
                    },
                    "control":{
                       "minVersion":1,
-                      "maxVersion":1
+                      "maxVersion":2
                    },
                    "input":{
                       "minVersion":1,

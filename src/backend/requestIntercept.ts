@@ -1,4 +1,4 @@
-import { BrowserWindow } from "electron"
+// import { BrowserWindow } from "electron"
 
 export default function (details:any, callback:any):void {
     if (details.uploadData !== undefined && details.requestHeaders !== undefined && details.method === 'POST'){

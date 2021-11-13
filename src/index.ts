@@ -36,14 +36,43 @@ const createWindow = (): void => {
     }
   });
 
-  // mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
-  mainWindow.loadURL('https://account.xbox.com/account/signin?returnUrl=https%3A%2F%2Fwww.xbox.com%2Fen-US%2Fplay');
+  if(tokenCheck.webtoken.uhs !== ''){
+    // We already have all the tokens
+    mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
+    tokenCheck.loadUI();
+    mainWindow.webContents.executeJavaScript("setxCloudMSALToken('"+tokenCheck.msaltoken+"');");
+  } else {
+    mainWindow.loadURL('https://account.xbox.com/account/signin?returnUrl=https%3A%2F%2Fwww.xbox.com%2Fen-US%2Fplay');
+  }
 
   // Open the DevTools if we are in dev mode
   if(process.env.ISDEV !== undefined) {
     mainWindow.webContents.openDevTools();
   }
 };
+
+const tokenCheck = {
+  webtoken: {
+    uhs: '',
+    userToken: '',
+  },
+  streamingtoken: '',
+  cloudstreamingtoken: {
+    token: '',
+    host: '',
+  },
+  msaltoken: '',
+
+  loadUI(){
+    mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
+
+    mainWindow.webContents.executeJavaScript("setWebTokens('" + this.webtoken.uhs + "', '" + this.webtoken.userToken + "');");
+    mainWindow.webContents.executeJavaScript("setStreamingToken('" + this.streamingtoken + "');");
+    mainWindow.webContents.executeJavaScript("setxCloudStreamingToken('" + this.cloudstreamingtoken.token + "', '" + this.cloudstreamingtoken.host + "');");
+    // mainWindow.webContents.executeJavaScript("setxCloudMSALToken('" + this.msaltoken + "');");
+  
+  }
+}
 
 app.on('ready', () => {
 
@@ -68,29 +97,6 @@ app.on('ready', () => {
       'https://login.microsoftonline.com/consumers/oauth2/v2.0/token'
     ]
   }, interceptRequest.bind(tokenStore))
-
-  var tokenCheck = {
-    webtoken: {
-      uhs: '',
-      userToken: '',
-    },
-    streamingtoken: '',
-    cloudstreamingtoken: {
-      token: '',
-      host: '',
-    },
-    msaltoken: '',
-
-    loadUI(){
-      mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
-
-      mainWindow.webContents.executeJavaScript("setWebTokens('" + this.webtoken.uhs + "', '" + this.webtoken.userToken + "');");
-      mainWindow.webContents.executeJavaScript("setStreamingToken('" + this.streamingtoken + "');");
-      mainWindow.webContents.executeJavaScript("setxCloudStreamingToken('" + this.cloudstreamingtoken.token + "', '" + this.cloudstreamingtoken.host + "');");
-      // mainWindow.webContents.executeJavaScript("setxCloudMSALToken('" + this.msaltoken + "');");
-    
-    }
-  }
 
   // Handle login
   tokenStore.addEventListener('onwebtoken', (tokens:any) => {
