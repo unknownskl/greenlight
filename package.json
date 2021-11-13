@@ -47,7 +47,7 @@
     "@typescript-eslint/eslint-plugin": "^4.29.3",
     "@typescript-eslint/parser": "^4.29.3",
     "@vercel/webpack-asset-relocator-loader": "^1.7.0",
-    "copy-webpack-plugin": "^9.0.1",
+    "copy-webpack-plugin": "^9.1.0",
     "css-loader": "^6.2.0",
     "electron": "13.3.0",
     "electron-builder": "^22.13.1",
