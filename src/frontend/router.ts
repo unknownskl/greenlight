@@ -1,5 +1,3 @@
-import { NodeEventEmitter } from "electron"
-
 interface EventCallback {
     (data: string): void;
 }
