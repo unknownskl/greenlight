@@ -30,7 +30,6 @@ const createWindow = (): void => {
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
-      enableRemoteModule: true,
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
       webSecurity: false,
       devTools: (process.env.ISDEV !== undefined) ? true : false
