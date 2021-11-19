@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.2.0-beta1 - 2021-11-19
+- Updated lots of dependencies to latest version
+- Changed the login flow of the application and removed the popup
+
 ## v1.1.0 - 2021-10-15
 - Added link to MS Flight Simulator wiki page
 - Enable Dialog support only in stream configuration
