@@ -31,7 +31,7 @@ export default function (details:any):void {
         app.relaunch()
         app.exit()
 
-    } else if(details.url.includes('/xbox/accountsignin?returnUrl=https%3a%2f%2fwww.xbox.com%2fen-US%2fplay')){
+    } else if(details.url.includes('/xbox/accountsignin?returnUrl=')){
         // We are already logged in..  Lets get the token..
 
         let cookieFound = false
@@ -73,6 +73,8 @@ export default function (details:any):void {
 
         if(cookieFound === true){
             this.setWebTokens(authToken.UserClaims.uhs, authToken.Token)
+
+            console.log('- Bootstrap application now...')
 
             // let windowId = 0
             // if(process.env.ISDEV !== undefined){

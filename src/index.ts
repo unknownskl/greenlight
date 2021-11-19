@@ -39,8 +39,8 @@ const createWindow = (): void => {
   if(tokenCheck.webtoken.uhs !== ''){
     // We already have all the tokens
     mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
-    tokenCheck.loadUI();
-    mainWindow.webContents.executeJavaScript("setxCloudMSALToken('"+tokenCheck.msaltoken+"');");
+    tokenCheck.refreshTokens();
+    // mainWindow.webContents.executeJavaScript("setxCloudMSALToken('"+tokenCheck.msaltoken+"');");
   } else {
     mainWindow.loadURL('https://account.xbox.com/account/signin?returnUrl=https%3A%2F%2Fwww.xbox.com%2Fen-US%2Fplay');
   }
@@ -63,13 +63,13 @@ const tokenCheck = {
   },
   msaltoken: '',
 
-  loadUI(){
-    mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
+  refreshTokens(){
+    // mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 
     mainWindow.webContents.executeJavaScript("setWebTokens('" + this.webtoken.uhs + "', '" + this.webtoken.userToken + "');");
     mainWindow.webContents.executeJavaScript("setStreamingToken('" + this.streamingtoken + "');");
     mainWindow.webContents.executeJavaScript("setxCloudStreamingToken('" + this.cloudstreamingtoken.token + "', '" + this.cloudstreamingtoken.host + "');");
-    // mainWindow.webContents.executeJavaScript("setxCloudMSALToken('" + this.msaltoken + "');");
+    mainWindow.webContents.executeJavaScript("setxCloudMSALToken('" + this.msaltoken + "');");
   
   }
 }
@@ -100,7 +100,7 @@ app.on('ready', () => {
 
   // Handle login
   tokenStore.addEventListener('onwebtoken', (tokens:any) => {
-    // tokenCheck.loadUI()
+    // mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY)
 
     // mainWindow.webContents.executeJavaScript("setWebTokens('"+tokens.uhs+"', '"+tokens.userToken+"');");
     console.log('web tokens set')
@@ -109,6 +109,8 @@ app.on('ready', () => {
       uhs: tokens.uhs,
       userToken: tokens.userToken,
     }
+
+    tokenCheck.refreshTokens()
   })
 
   tokenStore.addEventListener('onstreamingtoken', (token:any) => {
@@ -116,6 +118,7 @@ app.on('ready', () => {
     console.log('xhome tokens set')
 
     tokenCheck.streamingtoken = token
+    // tokenCheck.refreshTokens()
   })
 
   tokenStore.addEventListener('onxcloudstreamingtoken', (token:any) => {
@@ -126,21 +129,25 @@ app.on('ready', () => {
       token: token.token,
       host: token.host,
     }
+    // tokenCheck.refreshTokens()
   })
 
   tokenStore.addEventListener('onmsaltoken', (token:any) => {
-    mainWindow.webContents.executeJavaScript("setxCloudMSALToken('"+token+"');");
+    // mainWindow.webContents.executeJavaScript("setxCloudMSALToken('"+token+"');");
     console.log('xcloud msal token set')
 
+    mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY)
+
     tokenCheck.msaltoken = token
+    tokenCheck.refreshTokens()
   })
 
   tokenStore.addEventListener('onmsal', (tuple:any) => {
     const data = tokenStore._msalData[0].bytes
 
-    console.log('Initialize UI...')
+    // console.log('Initialize UI...')
     // mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
-    tokenCheck.loadUI()
+    // tokenCheck.refreshTokens()
 
     const headers:Record<string,string> = tokenStore._msalHeaders
     headers['Content-Length'] = data.byteLength.toString()

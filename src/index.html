@@ -6,18 +6,26 @@
 
     <script>
       function setWebTokens(uhs, userToken){
-        document.getElementById('token_web_uhs').value = uhs
-        document.getElementById('token_web_usertoken').value = userToken
+        if(document.getElementById('token_web_uhs') !== undefined){
+          document.getElementById('token_web_uhs').value = uhs
+          document.getElementById('token_web_usertoken').value = userToken
+        }
       }
       function setStreamingToken(streamingToken){
-        document.getElementById('token_streaming_token').value = streamingToken
+        if(document.getElementById('token_streaming_token') !== undefined){
+          document.getElementById('token_streaming_token').value = streamingToken
+        }
       }
       function setxCloudStreamingToken(streamingToken, host){
-        document.getElementById('token_xcloud_streaming_token').value = streamingToken
-        document.getElementById('token_xcloud_streaming_host').value = host
+        if(document.getElementById('token_xcloud_streaming_tokens') !== undefined){
+          document.getElementById('token_xcloud_streaming_token').value = streamingToken
+          document.getElementById('token_xcloud_streaming_host').value = host
+        }
       }
       function setxCloudMSALToken(token){
-        document.getElementById('token_xcloud_msal_token').value = token
+        if(document.getElementById('token_xcloud_msal_token') !== undefined){
+          document.getElementById('token_xcloud_msal_token').value = token
+        }
       }
       window.addEventListener('resize', () => {
         if(document.getElementById('videoHolder') !== null && document.querySelector("#videoHolder video") !== null) {
