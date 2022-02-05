@@ -54,7 +54,7 @@
     "eslint": "^8.8.0",
     "eslint-plugin-import": "^2.25.4",
     "express": "^4.17.2",
-    "fork-ts-checker-webpack-plugin": "^6.5.0",
+    "fork-ts-checker-webpack-plugin": "^7.0.0",
     "https-browserify": "^1.0.0",
     "mime": "^3.0.0",
     "node-loader": "^2.0.0",
