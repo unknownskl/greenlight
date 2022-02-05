@@ -9,7 +9,8 @@ export default class Router {
         'auth',
         'app',
         'xCloud',
-        'streaming'
+        'streaming',
+        'settings'
     ]
 
     _currentView = 'splash'

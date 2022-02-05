@@ -94,7 +94,8 @@
             <span id="actionBarUserGamerscore" title="Gamerscore"></span>
           </li>
           <li><a href="#" id="actionBarUserProfile"  onclick="confirm('Do you want to log out?') ? window.open('https://account.xbox.com/Account/Signout?returnUrl=https%3A%2F%2Fwww.xbox.com%3A443%2Fen-US%2F&ru=https%3A%2F%2Fwww.xbox.com%2Fen-US%2F', '_blank', 'top=500,left=200,frame=true,nodeIntegration=no') : ''" title="Profile">N/A</a></li>
-          <li id="actionBarPlugins" style="display:none;"><a id="pluginsMenulink"><img class="pluginIcon" src="assets/icons/plugins.svg" /></a></li>
+          <li id="actionBarPlugins" style="display:none;"><a class="iconLink"><img class="pluginIcon" src="assets/icons/plugins.svg" /></a></li>
+          <li id="actionBarSettings"><a href="#" class="iconLink" title="Settings"><img class="pluginIcon" src="assets/icons/gamepad.svg" /></a></li>
         </ul>
 
       </header>
@@ -239,6 +240,27 @@
             </p>
         </div>
 
+      </div>
+
+      <!--
+        Settings View
+      -->
+      <div id="settingsView" style="display:none;">
+
+        <div id="settingsContent">
+          <div class="card">
+
+            <h1>Settings</h1>
+
+            <h2>Region</h2>
+            <p>Override your xCloud region below:</p>
+
+            <select id="settingsxCloudRegions">
+              <option value="" disabled>Failed to load regions</option>
+            </select>
+
+          </div>
+        </div>
       </div>
 
     </div>

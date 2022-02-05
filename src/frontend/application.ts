@@ -3,6 +3,7 @@ import Router from './router'
 import AppView from './appview'
 import StreamingView from './streamingview'
 import xCloudView from './xcloudview'
+import SettingsView from './settingsview'
 import appMenu from '../backend/appMenu'
 import Plugins from '../frontend/plugins'
 
@@ -26,6 +27,7 @@ export default class Application {
     _AppView:AppView
     _StreamingView:StreamingView
     _xCloudView:xCloudView
+    _SettingsView:SettingsView
 
     _menu:appMenu
     _plugins:Plugins
@@ -53,15 +55,15 @@ export default class Application {
             }
         }, 1000)
 
-        const debugStreamingView = (<HTMLInputElement>document.getElementById('actionBarStreamingView'))
-        debugStreamingView.style.display = (process.env.ISDEV !== undefined) ? 'block': 'none'
+        // const debugStreamingView = (<HTMLInputElement>document.getElementById('actionBarStreamingView'))
+        // debugStreamingView.style.display = (process.env.ISDEV !== undefined) ? 'block': 'none'
 
-        const debugPlugins = (<HTMLInputElement>document.getElementById('actionBarPlugins'))
-        debugPlugins.style.display = (process.env.ISDEV !== undefined) ? 'inline-block': 'none'
+        // const debugPlugins = (<HTMLInputElement>document.getElementById('actionBarPlugins'))
+        // debugPlugins.style.display = (process.env.ISDEV !== undefined) ? 'inline-block': 'none'
 
         this._router.addEventListener('onviewshow', (event:any) => {
             // Check if we need the actionbar
-            if(event.view === 'app' || event.view === 'streaming' || event.view === 'xCloud'){
+            if(event.view === 'app' || event.view === 'streaming' || event.view === 'xCloud' || event.view === 'settings'){
                 const actionBar = (<HTMLInputElement>document.getElementById('actionBar'))
                 actionBar.style.display = 'block'
             } else {
@@ -126,6 +128,19 @@ export default class Application {
                     this._xCloudView.unload()
                 }
             }
+
+            if(event.view === 'settings'){
+                if(this._SettingsView === undefined){
+                    this._SettingsView = new SettingsView(this)
+                }
+                this._SettingsView.load()
+                
+            } else if(event.previousView === 'settings'){
+                // Unload appview
+                if(this._SettingsView !== undefined){
+                    this._SettingsView.unload()
+                }
+            }
         })
 
         // Build nav
@@ -140,6 +155,9 @@ export default class Application {
         })
         document.getElementById('actionBarStreamingViewActive').addEventListener('click', (e:Event) => {
             this._router.setView('streaming')
+        })
+        document.getElementById('actionBarSettings').addEventListener('click', (e:Event) => {
+            this._router.setView('settings')
         })
 
         document.getElementById('pluginsMenulink').addEventListener('click', (e:Event) => {

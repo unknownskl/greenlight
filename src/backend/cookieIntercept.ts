@@ -187,16 +187,27 @@ function requestxCloudStreamingToken(streamingToken:CookieToken, tokenStore:Toke
             res.on('close', () => {
                 if(res.statusCode == 200){
                     const xgpuToken = JSON.parse(responseData.toString())
+                    tokenStore.setxCloudRegions(xgpuToken.offeringSettings.regions)
 
-                    let regionHost
-                    for(const region in xgpuToken.offeringSettings.regions){
-                        // console.log(jsonHomeToken.offeringSettings.regions[region])
-                        if(xgpuToken.offeringSettings.regions[region].isDefault === true){
-                            regionHost = xgpuToken.offeringSettings.regions[region].baseUri.substr(8)
+                    // Check if we have a region set alreadt
+                    if(tokenStore._xCloudRegionHost === ''){
+
+                        let regionHost
+                        for(const region in xgpuToken.offeringSettings.regions){
+
+                            if(xgpuToken.offeringSettings.regions[region].isDefault === true){
+                                regionHost = xgpuToken.offeringSettings.regions[region].baseUri.substr(8)
+                            }
                         }
+                        console.log('debug: setting xcloud token using default region', regionHost)
+                        tokenStore.setxCloudStreamingToken(xgpuToken.gsToken, regionHost)
+
+                    } else {
+                        console.log('debug: setting xcloud token using already set region', tokenStore._xCloudRegionHost)
+                        tokenStore.setxCloudStreamingToken(xgpuToken.gsToken, tokenStore._xCloudRegionHost)
                     }
-                    console.log('debug: setting xcloud token')
-                    tokenStore.setxCloudStreamingToken(xgpuToken.gsToken, regionHost)
+
+                    
                     resolve(true)
                 } else {
                     console.log('- Error while retrieving xCloud token')

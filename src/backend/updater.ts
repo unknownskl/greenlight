@@ -31,10 +31,10 @@ export default class Updater {
                     let newestStable:any = false
 
                     for(const release in data){
-                        console.log(data[release].name)
-                        console.log(data[release].html_url)
-                        console.log(data[release].tag_name)
-                        console.log(data[release].prerelease)
+                        // console.log(data[release].name)
+                        // console.log(data[release].html_url)
+                        // console.log(data[release].tag_name)
+                        // console.log(data[release].prerelease)
 
                         if(newestPrerelease === false){
                             newestPrerelease = data[release]
@@ -51,10 +51,10 @@ export default class Updater {
                     }
 
                     if(current !== false){
-                        console.log('Updater.ts - We found our release. Lets compare:')
-                        console.log('onPrerelease', onPrerelease)
-                        console.log('newestPrerelease', newestPrerelease)
-                        console.log('newestStable', newestStable)
+                        // console.log('Updater.ts - We found our release. Lets compare:')
+                        // console.log('onPrerelease', onPrerelease)
+                        // console.log('newestPrerelease', newestPrerelease)
+                        // console.log('newestStable', newestStable)
 
                         let newestVersion:any = false
 

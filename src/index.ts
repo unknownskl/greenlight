@@ -18,6 +18,10 @@ if (require('electron-squirrel-startup')) { // eslint-disable-line global-requir
   app.quit();
 }
 
+const stateStore = {
+  xCloudHost: ''
+}
+
 let mainWindow:BrowserWindow
 const tokenStore = new TokenStore()
 
@@ -37,6 +41,13 @@ const createWindow = (): void => {
   });
 
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
+
+  // Check if we already have tokens..
+  console.log('tokenStore:', tokenStore)
+  if(tokenStore._web.uhs && tokenStore._web.userToken){ mainWindow.webContents.executeJavaScript("setWebTokens('"+tokenStore._web.uhs+"', '"+tokenStore._web.userToken+"');"); }
+  if(tokenStore._streamingToken){ mainWindow.webContents.executeJavaScript("setStreamingToken('"+tokenStore._streamingToken+"');"); }
+  if(tokenStore._web.uhs){ mainWindow.webContents.executeJavaScript("setxCloudStreamingToken('"+tokenStore._xCloudStreamingToken+"','"+tokenStore._xCloudRegionHost+"');"); }
+  if(tokenStore._web.uhs){ mainWindow.webContents.executeJavaScript("setxCloudMSALToken('"+tokenStore._msalToken+"');"); }
 
   // Open the DevTools if we are in dev mode
   if(process.env.ISDEV !== undefined) {

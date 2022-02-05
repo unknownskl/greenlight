@@ -23,7 +23,7 @@ body {
     bottom: 0px;
 }
 
-#splashView, #authView, #appView, #xCloudView, #streamingView {
+#splashView, #authView, #appView, #xCloudView, #streamingView, #settingsView {
     position: absolute;
     top: 0px;
     left: 0px;
@@ -286,6 +286,17 @@ body {
 }
 
 #actionBar ul li a#pluginsMenulink img {
+    height: 20px;
+    position: relative;
+    top: 4px;
+}
+
+#actionBar ul li a.iconLink {
+    padding: 4px;
+    margin-right: 8px;
+}
+
+#actionBar ul li a.iconLink img {
     height: 20px;
     position: relative;
     top: 4px;
@@ -673,6 +684,74 @@ body {
 
     position: relative;
     top: 18px;
+}
+
+/**
+ Settings View
+**/
+
+#settingsContent {
+    padding-top: 70px;
+}
+
+#settingsContent select#settingsxCloudRegions {
+    margin-left: 40px;
+    margin-right: 40px;
+    background: #000000;
+    color: #ffffff;
+}
+
+#settingsContent select#settingsxCloudRegions input {
+    background: #000000;
+    color: #ffffff;
+}
+
+/**
+ Card UI
+**/
+
+div.card {
+    background: #000000;
+    width: 93%;
+    margin: 48px;
+    /* text-align: center; */
+    color: #ffffff;
+    padding-top: 40px;
+    padding-bottom: 40px;
+}
+
+div.card-3{
+    width: 30%;
+}
+
+
+
+div.card h1 {
+    font-size: 28px;
+    display: block;
+    padding-left: 40px;
+    padding-right: 40px;
+}
+
+div.card h2 {
+    font-size: 14px;
+    font-weight: normal;
+    opacity: 0.3;
+    display: block;
+    padding-left: 40px;
+    padding-right: 40px;
+}
+
+div.card img {
+    padding-top: 10px;
+    padding-bottom: 15px;
+}
+
+div.card p {
+    padding-top: 10px;
+    padding-bottom: 15px;
+    padding-left: 40px;
+    padding-right: 40px;
 }
 
 /**

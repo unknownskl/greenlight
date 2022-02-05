@@ -12,6 +12,7 @@ export default class TokenStore {
     _streamingToken = '';
     _xCloudStreamingToken = '';
     _xCloudRegionHost = '';
+    _xCloudRegions:any = [];
     _msalData:Array<UploadData>;
     _msalHeaders:Record<string,string>;
     _msalToken = '';
@@ -44,6 +45,10 @@ export default class TokenStore {
         
         this.emitEvent('onxcloudstreamingtoken', { token: this._xCloudStreamingToken, host: this._xCloudRegionHost })
         return true
+    }
+
+    setxCloudRegions(regions:any) {
+        this._xCloudRegions = regions
     }
     
     setMSALData(data: any, headers: any):boolean {
