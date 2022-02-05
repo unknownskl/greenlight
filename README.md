@@ -2,7 +2,7 @@
 
 [![Build/release](https://github.com/unknownskl/xbox-xcloud-client/actions/workflows/build.yml/badge.svg)](https://github.com/unknownskl/xbox-xcloud-client/actions/workflows/build.yml)
 
-xbox-xcloud-client is an open-source client for xCloud and xHome streaming made in Javascript and Typescript.
+xbox-xcloud-client is an open-source client for xCloud and xHome streaming made in Javascript and Typescript. The client is an application wrapper around [xbox-xcloud-player](https://github.com/unknownskl/xbox-xcloud-player).
 
 _DISCLAIMER: Xbox-xCloud-Client is not affiliated with Microsoft or Xbox._
 
@@ -34,7 +34,6 @@ During the stream you can show extra debug statistics that contain extra data ab
 On the left bottom you can see the status (Altough not always accurate). The right top you can find the FPS of the video and audio decoders including the latency. On the right bottom you can find debug information about the buffer queues and other information that is useful for debugging perposes.
 
 When possible always provide this information with your issue when possible (if it is related).
-
 ### Online friends list
 
 The application also provides a way to see which of your friends are online. This can be useful when you want to quickly check if anyone is online to play with :)
