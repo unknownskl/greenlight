@@ -5,6 +5,7 @@
 - Updated lots of dependencies to latest version
 - Updated xbox-xcloud-player to 1.2.0 with support for channel control v2. Should improve reliability of controls
 - Fixed homestreaming only login
+- Added experimental region switcher in settings
 
 ## v1.2.0-beta1 - 2021-11-19
 - Updated lots of dependencies to latest version
