@@ -17,14 +17,19 @@ export default function (details:any):void {
     if(details.url === 'https://www.xbox.com/?lc=1033'){
         // Catched logout action
 
-        let windowId = 0
-        if(process.env.ISDEV !== undefined){
-            windowId = (details.webContentsId-1)
-        } else {
-            windowId = details.webContentsId
-        }
-        const window = BrowserWindow.fromId(windowId)
-        window.close()
+        // let windowId = 0
+        // if(process.env.ISDEV !== undefined){
+        //     windowId = (details.webContentsId-1)
+        // } else {
+        //     windowId = details.webContentsId
+        // }
+        // try {
+        //     const window = BrowserWindow.fromId(windowId)
+        //     window.close()
+        // } catch(error){
+        //     console.log('Failed to close parent window')
+        //     console.log(error)
+        // }
 
         session.defaultSession.clearStorageData()
 
@@ -96,8 +101,13 @@ export default function (details:any):void {
                 } else {
                     windowId = details.webContentsId
                 }
-                const window = BrowserWindow.fromId(windowId)
-                window.close()
+                try {
+                    const window = BrowserWindow.fromId(windowId)
+                    window.close()
+                } catch(error){
+                    console.log('Failed to close parent window in cookieIntercept', details.webContentsId)
+                    console.log(error)
+                }
             })
         }
     }

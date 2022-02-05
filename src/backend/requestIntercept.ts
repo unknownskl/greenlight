@@ -10,8 +10,13 @@ export default function (details:any, callback:any):void {
       } else {
           windowId = details.webContentsId
       }
-      const window = BrowserWindow.fromId(windowId)
-      window.close()
+      try {
+        const window = BrowserWindow.fromId(windowId)
+        window.close()
+      } catch(error){
+          console.log('Failed to close parent window in requestIntercept', details.webContentsId)
+          console.log(error)
+      }
 
       callback({cancel: true})
     } else {

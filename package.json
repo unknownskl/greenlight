@@ -34,6 +34,7 @@
   "license": "MIT",
   "dependencies": {
     "electron-squirrel-startup": "^1.0.0",
+    "url": "^0.11.0",
     "xbox-webapi": "^1.2.0"
   },
   "devDependencies": {
