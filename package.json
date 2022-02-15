@@ -50,7 +50,7 @@
     "@vercel/webpack-asset-relocator-loader": "^1.7.0",
     "copy-webpack-plugin": "^10.2.4",
     "css-loader": "^6.6.0",
-    "electron": "17.0.0",
+    "electron": "17.0.1",
     "electron-builder": "^22.14.13",
     "eslint": "^8.9.0",
     "eslint-plugin-import": "^2.25.4",
