@@ -49,7 +49,7 @@
     "@typescript-eslint/parser": "^5.13.0",
     "@vercel/webpack-asset-relocator-loader": "^1.7.0",
     "copy-webpack-plugin": "^10.2.4",
-    "css-loader": "^6.6.0",
+    "css-loader": "^6.7.0",
     "electron": "17.1.0",
     "electron-builder": "^22.14.13",
     "eslint": "^8.10.0",
