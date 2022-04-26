@@ -54,7 +54,7 @@
     "electron-builder": "^22.14.13",
     "eslint": "^8.14.0",
     "eslint-plugin-import": "^2.26.0",
-    "express": "^4.17.3",
+    "express": "^4.18.0",
     "fork-ts-checker-webpack-plugin": "^7.2.7",
     "https-browserify": "^1.0.0",
     "mime": "^3.0.0",
