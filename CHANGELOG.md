@@ -3,6 +3,8 @@
 ## v1.2.0-beta3 - 2022-xx-xx
 - Update dependencies
 - Improve bitrate and enable streaming of Xbox 360 games (credits to `award` on the OpenXbox discord)
+- Added an overview of connected gamepads on the settings page
+- Added button in streaming view to send the Nexus button press for gamepads that do not support the Xbox button
 
 ## v1.2.0-beta2 - 2022-02-05
 - Rebuild branch from main and started over

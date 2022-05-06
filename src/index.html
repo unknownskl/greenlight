@@ -81,6 +81,7 @@
           <li id="actionBarxCloud" style="display:none;"><a href="#" title="xCloud Library">xCloud Library</a></li>
           <li><a href="#" id="actionBarStreamingViewActive" title="Current open stream" style="display:none;">Active stream</a></li>
           <li><a href="#" class="btn btn-cancel" id="actionBarStreamingDisconnect" title="Current open stream" style="display:none;">Disconnect</a></li>
+          <li><a href="#" class="btn btn" id="actionBarNexusMenu" title="Open Xbox Nexus" style="display:none;">Nexus</a></li>
           <li><a href="#" id="actionBarStreamingView" title="Debug view to test Streaming View" style="display:none;">Streaming View</a></li>
         </ul>
 
@@ -250,14 +251,20 @@
         <div id="settingsContent">
           <div class="card">
 
-            <h1>Settings</h1>
-
-            <h2>Region</h2>
-            <p>Override your xCloud region below:</p>
+            <h1>Region</h1>
+            <p>Select xCloud region for streaming:</p>
 
             <select id="settingsxCloudRegions">
               <option value="" disabled>Failed to load regions</option>
             </select>
+
+          </div>
+          <div class="card">
+
+            <h1>Controls</h1>
+            <p>Detected gamepads:</p>
+            
+            <div id="settingsGamepads">Loading...</div>
 
           </div>
         </div>

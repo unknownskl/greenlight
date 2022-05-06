@@ -130,11 +130,43 @@ export default class SettingsView {
         selectInput.innerHTML = selectHtml
 
         selectInput.addEventListener('change', (event) => {
-            console.log('Region changed:', (<HTMLSelectElement>event.target).value)
+            console.log('SettingsView.js: Region changed:', (<HTMLSelectElement>event.target).value)
             const newRegion = (<HTMLSelectElement>event.target).value
             application._tokenStore._xCloudRegionHost = newRegion
         })
 
+        // Detect gamepads
+        const settingsGamepads = (<HTMLInputElement>document.getElementById('settingsGamepads'))
+        settingsGamepads.innerHTML = '<div id="SettingsGamepad_0" class="gamepadCard">...</div><div id="SettingsGamepad_1" class="gamepadCard">...</div><div id="SettingsGamepad_2" class="gamepadCard">...</div><div id="SettingsGamepad_3" class="gamepadCard">...</div>'
+
+        const gamepads = navigator.getGamepads()
+        for(const gamepad in gamepads){
+            this.drawGamepad(gamepad, gamepads[gamepad])
+        }
+
+        window.addEventListener("gamepadconnected", (e) => {
+            const gamepads = navigator.getGamepads()
+
+            for(const gamepad in gamepads){
+                this.drawGamepad(gamepad, gamepads[gamepad])
+            }
+        })
+
+    }
+
+    drawGamepad(index:any, gamepad:any){
+      console.log('SettingsView.js: index:', parseInt(index), 'gamepad', gamepad)
+
+      const gamepadDiv = (<HTMLInputElement>document.getElementById('SettingsGamepad_'+parseInt(index)))
+
+
+      if(gamepad === null){
+        gamepadDiv.innerHTML = '<span class="grey">Gamepad ' + (parseInt(index)+1) + ': No Gamepad</span>'
+      } else {
+        gamepadDiv.innerHTML = 'Gamepad ' + (parseInt(index)+1) + ': '+ gamepad.id + ' <span class="grey">(mapping: ' + gamepad.mapping + ', axes: ' + gamepad.axes.length + ', buttons: ' + gamepad.buttons.length + ')</span>'
+      }
+
+      
     }
 
     load(){

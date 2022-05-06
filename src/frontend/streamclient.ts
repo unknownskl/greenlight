@@ -132,9 +132,11 @@ export default class StreamClient {
     destroy(){
         const actionBarStreamingViewActive = (<HTMLInputElement>document.getElementById('actionBarStreamingViewActive'))
         const actionBarStreamingDisconnect = (<HTMLInputElement>document.getElementById('actionBarStreamingDisconnect'))
+        const actionBarNexusMenu = (<HTMLInputElement>document.getElementById('actionBarNexusMenu'))
         const loadingScreen = (<HTMLInputElement>document.getElementById('loadingScreen'))
         actionBarStreamingViewActive.style.display = 'none'
         actionBarStreamingDisconnect.style.display = 'none'
+        actionBarNexusMenu.style.display = 'none'
         loadingScreen.style.display = 'block'
 
         // this._xCloudPlayer.stopWebrtcConnection()

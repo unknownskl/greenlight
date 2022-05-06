@@ -694,11 +694,28 @@ body {
     padding-top: 70px;
 }
 
+#settingsContent h2 {
+    font-size: 20px;
+    padding-top: 10px;
+}
+
+#settingsContent .gamepadCard {
+    padding-top: 10px;
+    padding-left: 40px;
+    padding-right: 40px;
+}
+
+#settingsContent .gamepadCard .grey {
+    color: #505050;
+}
+
 #settingsContent select#settingsxCloudRegions {
     margin-left: 40px;
     margin-right: 40px;
     background: #000000;
     color: #ffffff;
+    border-radius: 5px;
+    padding: 5px;
 }
 
 #settingsContent select#settingsxCloudRegions input {
