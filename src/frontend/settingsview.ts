@@ -146,11 +146,16 @@ export default class SettingsView {
 
         window.addEventListener("gamepadconnected", (e) => {
             const gamepads = navigator.getGamepads()
-
             for(const gamepad in gamepads){
                 this.drawGamepad(gamepad, gamepads[gamepad])
             }
         })
+        window.addEventListener("gamepaddisconnected", (e) => {
+          const gamepads = navigator.getGamepads()
+          for(const gamepad in gamepads){
+              this.drawGamepad(gamepad, gamepads[gamepad])
+          }
+      })
 
     }
 
@@ -159,13 +164,11 @@ export default class SettingsView {
 
       const gamepadDiv = (<HTMLInputElement>document.getElementById('SettingsGamepad_'+parseInt(index)))
 
-
       if(gamepad === null){
         gamepadDiv.innerHTML = '<span class="grey">Gamepad ' + (parseInt(index)+1) + ': No Gamepad</span>'
       } else {
         gamepadDiv.innerHTML = 'Gamepad ' + (parseInt(index)+1) + ': '+ gamepad.id + ' <span class="grey">(mapping: ' + gamepad.mapping + ', axes: ' + gamepad.axes.length + ', buttons: ' + gamepad.buttons.length + ')</span>'
       }
-
       
     }
 
