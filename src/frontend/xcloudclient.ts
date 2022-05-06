@@ -124,6 +124,46 @@ export default class xCloudClient {
                 }
             }
 
+            const deviceInfo = JSON.stringify({
+                "appInfo": {
+                    "env": {
+                        "clientAppId": "Microsoft.GamingApp",
+                        "clientAppType": "native",
+                        "clientAppVersion": "2203.1001.4.0",
+                        "clientSdkVersion": "5.3.0",
+                        "httpEnvironment": "prod",
+                        "sdkInstallId": ""
+                    }
+                },
+                "conn": {
+                    "cell": {
+                        "carrier": "",
+                        "mcc": "",
+                        "mnc": "",
+                        "networkDetail": "",
+                        "roaming": "Unknown",
+                        "strengthPct": -1
+                    },
+                    "type": "Wifi",
+                    "wifi": {
+                        "freq": -2147483648,
+                        "strengthDbm": -2147483648,
+                        "strengthPct": 80
+                    }
+                },
+                "dev": {
+                    "hw": {
+                        "make": "Micro-Star International Co., Ltd.",
+                        "model": "GS66 Stealth 10SGS",
+                        "sdktype": "native"
+                    },
+                    "os": {
+                        "name": "Windows 10 Pro",
+                        "ver": "19041.1.amd64fre.vb_release.191206-1406"
+                    }
+                }
+            })
+
             const req = https.request({
             // fetch('https://'+this._host+'/v5/sessions/'+this._type+'/play', {
                 host: this._host,
@@ -131,10 +171,11 @@ export default class xCloudClient {
                 method: 'POST', // *GET, POST, PUT, DELETE, etc.
                 headers: {
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer '+this._token
+                'Authorization': 'Bearer '+this._token,
                 // 'Content-Type': 'application/x-www-form-urlencoded',
-                }
-            }, (response) => {
+                'X-MS-Device-Info': deviceInfo,
+                'User-Agent': deviceInfo
+            }}, (response) => {
                 let body = ''
 
                 response.on('data', (chunk) => {

@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.2.0-beta3 - 2022-xx-xx
+- Update dependencies
+- Improve bitrate and enable streaming of Xbox 360 games (credits to `award` on the OpenXbox discord)
+
 ## v1.2.0-beta2 - 2022-02-05
 - Rebuild branch from main and started over
 - Updated lots of dependencies to latest version
