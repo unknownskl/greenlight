@@ -160,14 +160,14 @@ export default class Application {
             this._router.setView('settings')
         })
 
-        document.getElementById('pluginsMenulink').addEventListener('click', (e:Event) => {
-            // Show debug panel?
-            if(document.getElementById('pluginsTooltip').style.display === 'none'){
-                document.getElementById('pluginsTooltip').style.display = 'block'
-            } else {
-                document.getElementById('pluginsTooltip').style.display = 'none'
-            }
-        })
+        // document.getElementById('pluginsMenulink').addEventListener('click', (e:Event) => {
+        //     // Show debug panel?
+        //     if(document.getElementById('pluginsTooltip').style.display === 'none'){
+        //         document.getElementById('pluginsTooltip').style.display = 'block'
+        //     } else {
+        //         document.getElementById('pluginsTooltip').style.display = 'none'
+        //     }
+        // })
     }
 
     listenForTokens():void {

@@ -16,9 +16,11 @@
   "build": {
     "appId": "unknownskl.xcloud-client",
     "mac": {
-      "target": "dmg",
-      "icon": "src/assets/icon.icns",
-      "arch": "universal"
+      "target": {
+        "target": "dmg",
+        "arch": ["universal"]
+      },
+      "icon": "src/assets/icon.icns"
     },
     "win": {
       "icon": "src/assets/icon.ico"
