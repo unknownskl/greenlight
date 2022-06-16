@@ -188,6 +188,7 @@ function requestxCloudStreamingToken(streamingToken:CookieToken, tokenStore:Toke
                 if(res.statusCode == 200){
                     const xgpuToken = JSON.parse(responseData.toString())
                     tokenStore.setxCloudRegions(xgpuToken.offeringSettings.regions)
+                    console.log('xCloud Regions:', xgpuToken.offeringSettings.regions)
 
                     // Check if we have a region set alreadt
                     if(tokenStore._xCloudRegionHost === ''){

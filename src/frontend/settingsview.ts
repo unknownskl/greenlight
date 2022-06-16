@@ -25,98 +25,111 @@ export default class SettingsView {
 
         // Load Regions
         const xCloudRegions = [
-            {
-              name: 'AustraliaEast',
-              baseUri: 'https://eau.gssv-play-prod.xboxlive.com',
-              networkTestHostname: 'eau.gssv-fastlane-prod.xboxlive.com',
-              isDefault: false,
-              fallbackPriority: -1
-            },
-            {
-              name: 'AustraliaSouthEast',
-              baseUri: 'https://seau.gssv-play-prod.xboxlive.com',
-              networkTestHostname: 'seau.gssv-fastlane-prod.xboxlive.com',
-              isDefault: false,
-              fallbackPriority: -1
-            },
-            {
-              name: 'BrazilSouth',
-              baseUri: 'https://brs.gssv-play-prod.xboxlive.com',
-              networkTestHostname: 'brs.gssv-fastlane-prod.xboxlive.com',
-              isDefault: false,
-              fallbackPriority: -1
-            },
-            {
-              name: 'EastUS',
-              baseUri: 'https://eus.gssv-play-prod.xboxlive.com',
-              networkTestHostname: 'eus.gssv-fastlane-prod.xboxlive.com',
-              isDefault: false,
-              fallbackPriority: -1
-            },
-            {
-              name: 'EastUS2',
-              baseUri: 'https://eus2.gssv-play-prod.xboxlive.com',
-              networkTestHostname: 'eus2.gssv-fastlane-prod.xboxlive.com',
-              isDefault: false,
-              fallbackPriority: -1
-            },
-            {
-              name: 'JapanEast',
-              baseUri: 'https://ejp.gssv-play-prod.xboxlive.com',
-              networkTestHostname: 'ejp.gssv-fastlane-prod.xboxlive.com',
-              isDefault: false,
-              fallbackPriority: -1
-            },
-            {
-              name: 'KoreaCentral',
-              baseUri: 'https://ckr.gssv-play-prod.xboxlive.com',
-              networkTestHostname: 'ckr.gssv-fastlane-prod.xboxlive.com',
-              isDefault: false,
-              fallbackPriority: -1
-            },
-            {
-              name: 'NorthCentralUs',
-              baseUri: 'https://ncus.gssv-play-prod.xboxlive.com',
-              networkTestHostname: 'ncus.gssv-fastlane-prod.xboxlive.com',
-              isDefault: false,
-              fallbackPriority: -1
-            },
-            {
-              name: 'SouthCentralUS',
-              baseUri: 'https://scus.gssv-play-prod.xboxlive.com',
-              networkTestHostname: 'scus.gssv-fastlane-prod.xboxlive.com',
-              isDefault: false,
-              fallbackPriority: -1
-            },
-            {
-              name: 'UKSouth',
-              baseUri: 'https://uks.gssv-play-prod.xboxlive.com',
-              networkTestHostname: 'uks.gssv-fastlane-prod.xboxlive.com',
-              isDefault: false,
-              fallbackPriority: 0
-            },
-            {
-              name: 'WestEurope',
-              baseUri: 'https://weu.gssv-play-prod.xboxlive.com',
-              networkTestHostname: 'weu.gssv-fastlane-prod.xboxlive.com',
-              isDefault: true,
-              fallbackPriority: -1
-            },
-            {
-              name: 'WestUS',
-              baseUri: 'https://wus.gssv-play-prod.xboxlive.com',
-              networkTestHostname: 'wus.gssv-fastlane-prod.xboxlive.com',
-              isDefault: false,
-              fallbackPriority: -1
-            },
-            {
-              name: 'WestUS2',
-              baseUri: 'https://wus2.gssv-play-prod.xboxlive.com',
-              networkTestHostname: 'wus2.gssv-fastlane-prod.xboxlive.com',
-              isDefault: false,
-              fallbackPriority: -1
-            }
-          ]
+          {
+            name: 'AustraliaEast',
+            baseUri: 'https://eau.core.gssv-play-prod.xboxlive.com',
+            networkTestHostname: 'eau.gssv-fastlane-prod.xboxlive.com',
+            isDefault: false,
+            // systemUpdateGroups: null,
+            fallbackPriority: -1
+          },
+          {
+            name: 'AustraliaSouthEast',
+            baseUri: 'https://seau.core.gssv-play-prod.xboxlive.com',
+            networkTestHostname: 'seau.gssv-fastlane-prod.xboxlive.com',
+            isDefault: false,
+            // systemUpdateGroups: null,
+            fallbackPriority: -1
+          },
+          {
+            name: 'BrazilSouth',
+            baseUri: 'https://brs.core.gssv-play-prod.xboxlive.com',
+            networkTestHostname: 'brs.gssv-fastlane-prod.xboxlive.com',
+            isDefault: false,
+            // systemUpdateGroups: null,
+            fallbackPriority: -1
+          },
+          {
+            name: 'EastUS',
+            baseUri: 'https://eus.core.gssv-play-prod.xboxlive.com',
+            networkTestHostname: 'eus.gssv-fastlane-prod.xboxlive.com',
+            isDefault: false,
+            // systemUpdateGroups: null,
+            fallbackPriority: -1
+          },
+          {
+            name: 'EastUS2',
+            baseUri: 'https://eus2.core.gssv-play-prod.xboxlive.com',
+            networkTestHostname: 'eus2.gssv-fastlane-prod.xboxlive.com',
+            isDefault: false,
+            // systemUpdateGroups: null,
+            fallbackPriority: -1
+          },
+          {
+            name: 'JapanEast',
+            baseUri: 'https://ejp.core.gssv-play-prod.xboxlive.com',
+            networkTestHostname: 'ejp.gssv-fastlane-prod.xboxlive.com',
+            isDefault: false,
+            // systemUpdateGroups: null,
+            fallbackPriority: -1
+          },
+          {
+            name: 'KoreaCentral',
+            baseUri: 'https://ckr.core.gssv-play-prod.xboxlive.com',
+            networkTestHostname: 'ckr.gssv-fastlane-prod.xboxlive.com',
+            isDefault: false,
+            // systemUpdateGroups: null,
+            fallbackPriority: -1
+          },
+          {
+            name: 'NorthCentralUs',
+            baseUri: 'https://ncus.core.gssv-play-prod.xboxlive.com',
+            networkTestHostname: 'ncus.gssv-fastlane-prod.xboxlive.com',
+            isDefault: false,
+            // systemUpdateGroups: null,
+            fallbackPriority: -1
+          },
+          {
+            name: 'SouthCentralUS',
+            baseUri: 'https://scus.core.gssv-play-prod.xboxlive.com',
+            networkTestHostname: 'scus.gssv-fastlane-prod.xboxlive.com',
+            isDefault: false,
+            // systemUpdateGroups: null,
+            fallbackPriority: -1
+          },
+          {
+            name: 'UKSouth',
+            baseUri: 'https://uks.core.gssv-play-prod.xboxlive.com',
+            networkTestHostname: 'uks.gssv-fastlane-prod.xboxlive.com',
+            isDefault: true,
+            // systemUpdateGroups: null,
+            fallbackPriority: -1
+          },
+          {
+            name: 'WestEurope',
+            baseUri: 'https://weu.core.gssv-play-prod.xboxlive.com',
+            networkTestHostname: 'weu.gssv-fastlane-prod.xboxlive.com',
+            isDefault: false,
+            // systemUpdateGroups: null,
+            fallbackPriority: 0
+          },
+          {
+            name: 'WestUS',
+            baseUri: 'https://wus.core.gssv-play-prod.xboxlive.com',
+            networkTestHostname: 'wus.gssv-fastlane-prod.xboxlive.com',
+            isDefault: false,
+            // systemUpdateGroups: null,
+            fallbackPriority: -1
+          },
+          {
+            name: 'WestUS2',
+            baseUri: 'https://wus2.core.gssv-play-prod.xboxlive.com',
+            networkTestHostname: 'wus2.gssv-fastlane-prod.xboxlive.com',
+            isDefault: false,
+            // systemUpdateGroups: null,
+            fallbackPriority: -1
+          }
+        ]
         const selectInput = document.getElementById('settingsxCloudRegions')
         let selectHtml = ''
         for(const region in xCloudRegions){
