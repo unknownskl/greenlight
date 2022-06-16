@@ -18,7 +18,9 @@
     "mac": {
       "target": {
         "target": "dmg",
-        "arch": ["universal"]
+        "arch": [
+          "universal"
+        ]
       },
       "mergeASARs": false,
       "icon": "src/assets/icon.icns"
