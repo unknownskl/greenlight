@@ -38,7 +38,7 @@
     "xbox-webapi": "^1.3.0"
   },
   "devDependencies": {
-    "@electron-forge/cli": "^6.0.0-beta.63",
+    "@electron-forge/cli": "^6.0.0-beta.64",
     "@electron-forge/maker-deb": "^6.0.0-beta.63",
     "@electron-forge/maker-rpm": "^6.0.0-beta.63",
     "@electron-forge/maker-squirrel": "^6.0.0-beta.64",
