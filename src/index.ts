@@ -9,6 +9,7 @@ import Updater from './backend/updater'
 
 import { OpentrackPluginBackend as OpentrackPlugin } from './plugins/backend/opentrack'
 import { WebuiPluginBackend as WebuiPlugin } from './plugins/backend/webui'
+import * as path from 'path';
 
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
@@ -41,6 +42,20 @@ const createWindow = (): void => {
   });
 
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
+
+  if (process.platform !== 'darwin' && process.platform !== 'win32') {
+    // setup SteamOS font injector script
+    mainWindow.webContents.setWindowOpenHandler(() => {
+      return {
+        action: 'allow',
+        overrideBrowserWindowOptions: {
+          webPreferences: {
+            preload: path.join(__dirname, 'preload.js')
+          }
+        }
+      }
+    });
+  }
 
   // Check if we already have tokens..
   console.log('tokenStore:', tokenStore)
