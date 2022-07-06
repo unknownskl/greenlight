@@ -48,7 +48,7 @@ Click on the Xbox logo on the left top. It will ask you to confirm to close the 
 
 ### Number input seems to be broken
 
-This is because the Steam Deck is missing a font and falls back to numbers. This issue should be solved with the latest patch (not confirmed yet)
+This is because the Steam Deck is missing a font and falls back to a font without numbers. The numbers are still being typed but they are not visible. This issue should be solved with the latest patch (not confirmed yet)
 
 ## Install
 
