@@ -2,6 +2,7 @@
 
 ## v1.2.0-beta5 - 2022-07-06
 - Add close button action to the Xbox logo to exit full-screen mode on Steam Deck #280
+- Possible fix for number input on Steam Deck #237
 - Make video background black #292
 - Set user agent to latest Edge version as it seemms to impove quality
 - Updated dependencies
