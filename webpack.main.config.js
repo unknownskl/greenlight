@@ -6,6 +6,7 @@ module.exports = {
   entry: {
     index: './src/index.ts',
     webui: './src/webui.ts',
+    preload: './src/preload.ts',
   },
   // Put your normal webpack config below here
   module: {
