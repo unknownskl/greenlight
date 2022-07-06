@@ -38,6 +38,18 @@ When possible always provide this information with your issue when possible (if 
 
 The application also provides a way to see which of your friends are online. This can be useful when you want to quickly check if anyone is online to play with :)
 
+## Steam Deck
+
+This application is reported to be working on the Steam Deck with some small bugs and side-effects.
+
+### To close the application
+
+Click on the Xbox logo on the left top. It will ask you to confirm to close the window.
+
+### Number input seems to be broken
+
+This is because the Steam Deck is missing a font and falls back to numbers. This issue should be solved with the latest patch (not confirmed yet)
+
 ## Install
 
 You can either compile the project yourself or download the (unsigned) executable from the [releases](https://github.com/unknownskl/xbox-xcloud-client/releases) page
