@@ -3,8 +3,8 @@
 ## v1.2.0-beta6 - 2022-07-16
 - Fix error retrieving xCloud token 'InvalidCountry' #300 (credits to `award` on the OpenXbox discord)
 - Fix message 'No friends online' when no friends are online
-- Added `--fullscreen` argumments to launch app in fullscreen #312
-- Added switch `--connect=F400000000000000` argumments to auto-connect to a console #312
+- Added `--fullscreen` argument to launch app in fullscreen #312
+- Added switch `--connect=F400000000000000` argument to auto-connect to a console #312
 - Updated dependencies
 
 ## v1.2.0-beta5 - 2022-07-06
