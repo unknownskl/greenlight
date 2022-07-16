@@ -87,6 +87,7 @@ export default class AppView {
                 let friendsHtml = '<ul class="people">'
 
                 // Query for online peopple
+                let friendsOnline = 0
                 for(const person in profiles.people){
                     if(profiles.people[person].presenceState === 'Online'){
                         friendsHtml += '<li class="online">'
@@ -111,10 +112,12 @@ export default class AppView {
 
                         friendsHtml += '    </div>'
                         friendsHtml += '</li>'
+
+                        friendsOnline++
                     }
                 }
-
-                if(profiles.people.length === 0) {
+                console.log('profiles online: ', friendsOnline)
+                if(friendsOnline === 0) {
                     friendsHtml += '<li class="offline"><div class="userinfo"><center><p>No friends online</p></center></div></li>'
                 }
 
