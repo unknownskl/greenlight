@@ -174,7 +174,8 @@ function requestxCloudStreamingToken(streamingToken:CookieToken, tokenStore:Toke
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Content-Length': data.length
+                'Content-Length': data.length,
+                'x-gssv-client': 'XboxComBrowser'
             }
         }
         const req = https.request(options, (res) => {
