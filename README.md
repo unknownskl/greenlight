@@ -42,6 +42,14 @@ The application also provides a way to see which of your friends are online. Thi
 
 This application is reported to be working on the Steam Deck with some small bugs and side-effects.
 
+### Fullscreen on launch
+
+To launch the application in full-screen mode use the `--fullscreen` argument when launching the application.
+
+### Connect on launch
+
+To auto-connect to your xbox on launch you can provide the `--connect=F400000000000000` argument when launchng the application.
+
 ### To close the application
 
 Click on the Xbox logo on the left top. It will ask you to confirm to close the window.
