@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.2.0-beta6 - 2022-07-16
+- Fix error retrieving xCloud token 'InvalidCountry' #300 (credits to `award` on the OpenXbox discord)
+- Fix message 'No friends online' when no friends are online
+- Updated dependencies
+
 ## v1.2.0-beta5 - 2022-07-06
 - Add close button action to the Xbox logo to exit full-screen mode on Steam Deck #280
 - Possible fix for number input on Steam Deck #237
