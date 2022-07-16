@@ -14,6 +14,12 @@ import * as path from 'path';
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 
+const switches = {
+  fullscreen: false,
+  autoconnect: false,
+  connectConsoleId: ''
+}
+
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
   app.quit();
@@ -31,6 +37,7 @@ const createWindow = (): void => {
     mainWindow = new BrowserWindow({
     width: 1500,
     height: 875,
+    fullscreen: switches.fullscreen,
 
     webPreferences: {
       nodeIntegration: true,
@@ -107,6 +114,13 @@ app.on('ready', () => {
   tokenStore.addEventListener('onstreamingtoken', (token:any) => {
     mainWindow.webContents.executeJavaScript("setStreamingToken('"+token+"');");
     console.log('xhome tokens set')
+
+    // Lets set the consoleid of the console we want to connect to
+    if(switches.autoconnect === true && switches.connectConsoleId != ''){
+      mainWindow.webContents.executeJavaScript("setAutoconnect('"+switches.connectConsoleId+"');");
+      // mainWindow.webContents.executeJavaScript("startStream('"+switches.connectConsoleId+"');");
+      // .startStream('xhome', consoles[device].serverId)
+    }
   })
 
   tokenStore.addEventListener('onxcloudstreamingtoken', (token:any) => {
@@ -182,6 +196,26 @@ app.on('activate', () => {
     createWindow();
   }
 });
+
+console.log('Bootstrapping Xbox-xCloud-Client using args:', process.argv)
+
+// Read fullscreen switch
+if(process.argv.includes('--fullscreen')){
+  console.log('- Fullscreen switch acive')
+  switches.fullscreen = true
+}
+
+// Read auto-connect switch
+// if(process.argv.includes('--connect')){
+  for(const arg in process.argv){
+    if(process.argv[arg].includes('--connect')){
+      // got value:
+      console.log('- Connect switch active, value:', process.argv[arg].substring(10))
+      switches.autoconnect = true
+      switches.connectConsoleId = process.argv[arg].substring(10)
+    }
+  }
+// }
 
 // appMenu().renderMenu()
 const menu = new appMenu()

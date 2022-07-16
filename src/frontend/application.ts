@@ -177,6 +177,7 @@ export default class Application {
         const inputxCloudStreamingToken = document.getElementById('token_xcloud_streaming_token')
         const inputxCloudStreamingHost = document.getElementById('token_xcloud_streaming_host')
         const inputxCloudMSALToken = document.getElementById('token_xcloud_msal_token')
+        const inputAutoconnect = document.getElementById('switch_autoconnect')
 
         const inputWebTokenInterval = setInterval(() => {
             const valueUhs  = (<HTMLInputElement>inputWebUhs).value
@@ -231,6 +232,12 @@ export default class Application {
         this._tokenStore.addEventListener('onstreamingtoken', (token) => {
             if(this._tokenStore._web.uhs !== '' && this._tokenStore._streamingToken !== ''){
                 this._router.setView('app')
+
+                // Check if we have an auto-connect token
+                const consoleId = (<HTMLInputElement>inputAutoconnect).value
+                if(consoleId !== ''){
+                    this.startStream('xhome', consoleId)
+                }
             }
         })
 

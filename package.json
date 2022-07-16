@@ -5,6 +5,8 @@
   "main": ".webpack/main",
   "scripts": {
     "start": "ISDEV=true electron-forge start",
+    "startfullscreen": "ISDEV=true electron-forge start -- --fullscreen",
+    "startconnect": "ISDEV=true electron-forge start -- --connect=F400000000000000",
     "compile": "electron-forge make",
     "test": "echo \"Error: no test specified\" && exit 1",
     "package": "electron-forge package",
