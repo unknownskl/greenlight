@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.2.0 - 2022-08-09
+- Promote beta to official release
+- Bump dependencies
+
 ## v1.2.0-beta6 - 2022-07-16
 - Fix error retrieving xCloud token 'InvalidCountry' #300 (credits to `award` on the OpenXbox discord)
 - Fix message 'No friends online' when no friends are online
