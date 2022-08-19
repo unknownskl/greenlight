@@ -6,8 +6,11 @@ import { ipcRenderer } from 'electron'
 import Header from '../components/header'
 import Button from '../components/ui/button'
 
+// import { UserProvider } from '../context/userContext'
+import { useUser } from '../context/userContext'
+
 function Home() {
-  const [consoles, setConsoles] = React.useState([])
+  const { consoles, setConsoles} = useUser()
 
   React.useEffect(() => {
     ipcRenderer.send('stream', {

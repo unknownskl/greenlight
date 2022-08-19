@@ -3,4 +3,3 @@ node_modules
 .next
 app
 dist
-.storybook
