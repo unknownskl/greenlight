@@ -1,0 +1,84 @@
+#component_header {
+    backdrop-filter: blur(20px);
+
+    background: rgba(0, 0, 0, 0.55);
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    height: 70px;
+    overflow: hidden;
+    z-index: 80;
+    opacity: 1;
+
+    -webkit-transition: opacity 0.3s ease-in-out;
+    -moz-transition: opacity 0.3s ease-in-out;
+    -ms-transition: opacity 0.3s ease-in-out;
+    -o-transition: opacity 0.3s ease-in-out;
+    transition: opacity 0.3s ease-in-out;
+    
+    /* -webkit-transition: all 1s linear;
+    -moz-transition: all 1s linear;
+    -o-transition: all 1s linear;
+    transition: all 1s linear; */
+}
+
+#component_header a#actionBarLogo {
+    float: left;
+    color: #ffffff;
+}
+#component_header a#actionBarLogo svg {
+    fill: #ffffff;
+    padding: 19px;
+    opacity: 0.5;
+    transition: 0.3s;
+}
+
+#component_header a#actionBarLogo:hover img, #component_header a#actionBarLogo:hover svg {
+    opacity: 1;
+}
+
+
+#component_header ul {
+    float: left;
+    margin: 0px;
+    padding: 0px;
+    padding-top: 14px;
+}
+
+#component_header ul.userProfile {
+    float: right;
+    margin: 0px;
+    padding: 0px;
+    padding-top: 14px;
+}
+
+#component_header ul li {
+    display: inline-block;
+    padding-right: 10px;
+}
+
+#component_header ul li a {
+    display: inline-block;
+    color: #ffffff;
+    text-decoration: none;
+    padding: 10px;
+    opacity: 0.7;
+    transition: 0.3s;
+}
+
+#component_header ul li a:hover {
+    opacity: 1;
+}
+
+#component_header ul.userProfile span.gamerscore {
+    color: #222222;
+    background: #ffcf40;
+    display: inline-block;
+    border-radius: 10px;
+    width: 20px;
+    height: 20px;
+    text-align: center;
+    font-size: 15px;
+    font-weight: bold;
+}

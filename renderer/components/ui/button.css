@@ -1,0 +1,55 @@
+.btn {
+    padding: 0.7rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+
+    background-color: #444444;
+    border: 2px solid #444444;
+    color: #ffffff;
+    text-transform: uppercase;
+    font-weight: bold;
+
+    transition: background-color 0.1s ease;
+
+    align-items: flex-start;
+    display: inline-flex;
+    flex-direction: column;
+}
+
+.btn:hover {
+    background-color: #6f6f6f;
+}
+
+.btn:disabled {
+    cursor: default;
+    opacity: 0.5;
+}
+
+.btn-small {
+    padding: 0.4rem 0.7rem;
+    font-size: 12px;
+}
+
+.btn-large {
+    padding: 1.4rem 2rem;
+    font-size: 12px;
+    font-size: 16px;
+}
+
+.btn-primary {
+    background-color: #008746;
+    border-color: #005e31;
+}
+
+.btn-primary:hover {
+    background-color: #005e31;
+}
+
+.btn-cancel {
+    background-color: rgb(195, 0, 0);
+    border-color: rgb(155, 0, 0);
+}
+
+.btn-cancel:hover {
+    background-color: rgb(155, 0, 0);
+}

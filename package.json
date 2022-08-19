@@ -1,0 +1,42 @@
+{
+  "private": true,
+  "name": "greenlight",
+  "description": "Greenlight is a streaming application for Xbox and xCloud",
+  "version": "1.0.0",
+  "author": "Yoshihide Shiono <shiono.yoshihide@gmail.com>",
+  "main": "app/background.js",
+  "scripts": {
+    "dev": "nextron",
+    "build": "nextron build",
+    "postinstall": "electron-builder install-app-deps",
+    "storybook": "start-storybook -p 6006 -s ./renderer/public",
+    "build-storybook": "build-storybook"
+  },
+  "dependencies": {
+    "electron-serve": "^1.1.0",
+    "electron-store": "^8.0.1",
+    "xbox-webapi": "^1.3.0",
+    "xbox-xcloud-player": "0.2.0-beta2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.18.6",
+    "@storybook/addon-actions": "^6.5.9",
+    "@storybook/addon-essentials": "^6.5.9",
+    "@storybook/addon-interactions": "^6.5.9",
+    "@storybook/addon-links": "^6.5.9",
+    "@storybook/builder-webpack5": "^6.5.9",
+    "@storybook/manager-webpack5": "^6.5.9",
+    "@storybook/react": "^6.5.9",
+    "@storybook/testing-library": "^0.0.13",
+    "@types/node": "^16.11.7",
+    "@types/react": "^18.0.8",
+    "babel-loader": "^8.2.5",
+    "electron": "^18.2.0",
+    "electron-builder": "^23.0.3",
+    "next": "^12.1.6",
+    "nextron": "^8.1.0",
+    "react": "^18.1.0",
+    "react-dom": "^18.1.0",
+    "typescript": "^4.6.4"
+  }
+}

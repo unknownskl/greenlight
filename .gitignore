@@ -1,0 +1,6 @@
+node_modules
+*.log
+.next
+app
+dist
+.storybook

@@ -1,0 +1,31 @@
+body, * {
+    padding: 0px;
+    margin: 0px;
+
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none;
+}
+
+body {
+    background: rgb(26, 27, 30);
+    font-family: "Segoe UI",SegoeUI,"Helvetica Neue",Helvetica,Arial,sans-serif;
+    color: #ffffff;
+}
+
+@import 'components/header.css';
+@import 'components/footer.css';
+
+/* 
+ * UI Components
+ */
+@import 'components/ui/button.css';
+@import 'components/ui/streamcomponent.css';
+
+div#app_body {
+    position: fixed;
+    padding-top: 70px;
+}

@@ -1,0 +1,91 @@
+#component_footer {
+    backdrop-filter: blur(20px);
+
+    background: rgba(0, 0, 0, 0.55);
+    position: fixed;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    height: 40px;
+    overflow: hidden;
+    z-index: 80;
+    opacity: 1;
+
+    -webkit-transition: height 0.2s ease;
+    -moz-transition: height 0.2s ease;
+    -ms-transition: height 0.2s ease;
+    -o-transition: height 0.2s ease;
+    transition: height 0.2s ease;
+    
+    /* -webkit-transition: all 1s linear;
+    -moz-transition: all 1s linear;
+    -o-transition: all 1s linear;
+    transition: all 1s linear; */
+}
+
+#component_footer.connected:hover {
+    height: 120px;
+}
+
+#component_footer.disabled {
+    height: 0px;
+}
+
+#component_footer p.status {
+    font-size: 12px;
+    text-transform: uppercase;
+    /* font-weight: bold; */
+    color: #444444;
+    padding-top: 11px;
+    padding-left: 20px;
+    opacity: 1;
+
+    transition: opacity 0.2s ease;
+}
+
+#component_footer.connected:hover p.status {
+    opacity: 0;
+}
+
+#component_footer div.current_app {
+    opacity: 0;
+    position: absolute;
+    top: 10px;
+    left: 20px;
+    right: 20px;
+
+    transition: opacity 0.2s ease;
+}
+
+#component_footer div.current_app img.current_app_logo {
+    /* opacity: 0; */
+    /* position: absolute; */
+    /* top: 5px;
+    left: 20px; */
+    height: 100px;
+    width: 100px;
+    border-radius: 2px;
+}
+
+#component_footer div.current_app p.current_app_name {
+    position: absolute;
+    top: 0px;
+    left: 120px;
+    font-size: 20px;
+    color: #6f6f6f;
+}
+
+#component_footer div.current_app div.current_app_actions {
+    position: absolute;
+    top: 40px;
+    left: 120px;
+    right: 0px;
+    color: #6f6f6f;
+}
+
+
+
+
+#component_footer.connected:hover div.current_app {
+    opacity: 1;
+}
