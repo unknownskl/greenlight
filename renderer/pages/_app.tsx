@@ -14,35 +14,41 @@ import { UserProvider } from '../context/userContext'
 export default function MyApp({ Component, pageProps }) {
   // return <Component {...pageProps} />
   const [loggedIn, setLoginState] = React.useState(false);
+  const [prevUserState, setPrevUserState] = React.useState({
+    signedIn: false,
+    gamertag: '',
+    gamerpic: '',
+    gamerscore: '',
+  });
   const [headerLinks, setHeaderLinks] = React.useState([
     {
       name: 'My Consoles',
-      title: '',
+      title: 'View consoles',
       url: '/home',
       active: true
     },{
       name: 'xCloud Library',
-      title: '',
+      title: 'Browse xCloud library',
       url: '/xcloud/home',
       active: false
     },{
       name: 'Marketplace',
-      title: '',
+      title: 'Browse the marketplace',
       url: '/store/home',
       active: false
     },{
       name: 'Debug',
-      title: '',
+      title: 'Debug page',
       url: '/debug',
       active: false
     },{
-      name: 'Setings',
-      title: '',
+      name: 'Settings',
+      title: 'Change application settings',
       url: '/settings',
       active: false
     },{
       name: 'Profile',
-      title: '',
+      title: 'View profile',
       url: '/profile',
       active: false
     }
@@ -50,26 +56,33 @@ export default function MyApp({ Component, pageProps }) {
 
   React.useEffect(() => {
     const tokenInterval = setInterval(() => {
-      ipcRenderer.send('auth-tokens', {
-        type: 'request'
+      ipcRenderer.send('auth', {
+        type: 'init'
       })
     }, 500)
 
 
-    ipcRenderer.on('auth-tokens', (event, data) => {
+    ipcRenderer.on('auth', (event, data) => {
       if(data.loggedIn === true){
         // We are logged in!
         setLoginState(true)
         clearInterval(tokenInterval)
+      } else {
+        setPrevUserState({
+          signedIn: data.signedIn,
+          gamertag: data.gamertag,
+          gamerpic: data.gamerpic,
+          gamerscore: data.gamerscore,
+        })
       }
     })
 
     // cleanup this component
     return () => {
         clearInterval(tokenInterval)
-        ipcRenderer.removeAllListeners('auth-tokens');
+        ipcRenderer.removeAllListeners('auth');
     };
-}, []);
+  }, []);
 
   let appBody
   if(loggedIn){
@@ -84,7 +97,7 @@ export default function MyApp({ Component, pageProps }) {
   } else {
     appBody = (
       <React.Fragment>
-        <Auth />
+        <Auth signedIn={ prevUserState.signedIn} gamertag={ prevUserState.gamertag } gamerpic={ prevUserState.gamerpic } gamerscore={ prevUserState.gamerscore } />
       </React.Fragment>)
   }
 

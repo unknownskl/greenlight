@@ -1,0 +1,40 @@
+div#component_auth {
+    width: 100vw;
+    height: 100vh;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+div#component_auth_modal {
+    min-width: 50%;
+}
+
+div.component_auth_profile_container {
+    display: flex;
+    padding-bottom: 20px;
+}
+
+div.component_auth_profile_gamerpic {
+    width: 80px;
+    height: 80px;
+}
+
+div.component_auth_profile_gamerpic img.component_auth_profile_gamerpic_img {
+    width: 80px;
+    height: 80px;
+    border-radius: 40px;
+}
+
+div.component_auth_profile_userdetails {
+    padding-top: 10px;
+    padding-left: 20px;
+    font-size: 13px;
+}
+
+div.component_auth_profile_userdetails h1 {
+    font-weight: normal;
+    font-size: 20px;
+    padding-bottom: 5px;
+}

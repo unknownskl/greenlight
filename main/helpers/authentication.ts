@@ -1,9 +1,10 @@
-import Store from 'electron-store';
+import Store from 'electron-store'
 import https from 'https'
 import { app, session, BrowserWindow, ipcMain } from 'electron';
 import { createWindow } from './index'
 
 const isProd: boolean = process.env.NODE_ENV === 'production';
+const store = new Store({ name: 'helper_authentication' })
 
 export default (appEvents) => {
 
@@ -316,8 +317,8 @@ export default (appEvents) => {
                 })
                 
                 req.on('error', (error) => {
-                    console.log('- Error while retrieving from url:', this.url)
-                    console.log('  Error:', error)
+                    // console.log('- Error while retrieving from url:', this.url)
+                    // console.log('  Error:', error)
                     reject({
                         error: error
                     })
@@ -336,12 +337,22 @@ export default (appEvents) => {
         }
     }
 
-    ipcMain.on('auth-tokens', (event, arg) => {
+    ipcMain.on('auth', (event, arg) => {
         // console.log('got auth-tokens message', arg)
 
-        if(arg.type === 'request'){
-            event.sender.send('auth-tokens', {
-                loggedIn: Authentication._loggedIn
+        if(arg.type === 'init'){
+
+            const gamertag = store.get('user.gamertag')
+            const gamerpic = store.get('user.gamerpic')
+            const gamerscore = store.get('user.gamerscore')
+
+            event.sender.send('auth', {
+                loggedIn: Authentication._loggedIn,
+
+                signedIn: true,
+                gamertag: gamertag ? gamertag : '',
+                gamerpic: gamerpic ? gamerpic : '',
+                gamerscore: gamerscore ? gamerscore : '',
             })
         }
     });

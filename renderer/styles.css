@@ -18,14 +18,17 @@ body {
 
 @import 'components/header.css';
 @import 'components/footer.css';
+@import 'components/auth.css';
 
 /* 
  * UI Components
  */
 @import 'components/ui/button.css';
+@import 'components/ui/card.css';
 @import 'components/ui/streamcomponent.css';
 
 div#app_body {
     position: fixed;
     padding-top: 70px;
+    width: 100vw;
 }
