@@ -32,11 +32,11 @@ export default function MyApp({ Component, pageProps }) {
       url: '/xcloud/home',
       active: false
     },{
-      name: 'Marketplace',
-      title: 'Browse the marketplace',
-      url: '/store/home',
-      active: false
-    },{
+    //   name: 'Marketplace',
+    //   title: 'Browse the marketplace',
+    //   url: '/store/home',
+    //   active: false
+    // },{
       name: 'Debug',
       title: 'Debug page',
       url: '/debug',
@@ -67,6 +67,7 @@ export default function MyApp({ Component, pageProps }) {
         // We are logged in!
         setLoginState(true)
         clearInterval(tokenInterval)
+
       } else {
         setPrevUserState({
           signedIn: data.signedIn,

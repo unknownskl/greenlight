@@ -1,7 +1,9 @@
 import React from 'react';
 import Link from 'next/link';
+import { ipcRenderer } from 'electron';
 
 import Card from '../components/ui/card'
+import Button from './ui/button';
 
 interface AuthProps {
   signedIn: boolean
@@ -18,24 +20,11 @@ function Auth({
   ...props
 }: AuthProps) {
 
-  // const [loginCounter, setLoginCounter] = React.useState(0);
-
-  // React.useEffect(() => { 
-  //   const loginInterval = setInterval(() => {
-  //     console.log(loginCounter)
-  //     if(loginCounter >= 3){
-  //       setLoginCounter(0)
-  //     } else {
-  //       const newCounter = loginCounter+1
-  //       console.log('new counter:', newCounter)
-  //       setLoginCounter(newCounter)
-  //     }
-  //   }, 1000)
-
-  //   return () => {
-  //       clearInterval(loginInterval)
-  //   };
-  // }, []);
+  function startAuthFlow(){
+    ipcRenderer.send('auth', {
+      type: 'login'
+    })
+  }
   
   return (
     <React.Fragment>
@@ -58,7 +47,18 @@ function Auth({
                   </p>
                 </div>
 
-              </div>) : (<div>Login</div>) }
+              </div>) : (<div style={ {
+                textAlign: 'center',
+                paddingBottom: '20px'
+              }}>
+                <h1>Login with Xbox</h1>
+                
+                <p>
+                  Please authenticate below to access xCloud and xHome Streaming
+                </p>
+
+                <Button label="Login" className='btn-primary' onClick={ () => { startAuthFlow() } }></Button>
+              </div>) }
             </Card>
           </div>
         </div>

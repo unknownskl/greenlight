@@ -349,11 +349,31 @@ export default (appEvents) => {
             event.sender.send('auth', {
                 loggedIn: Authentication._loggedIn,
 
-                signedIn: true,
+                signedIn: gamertag ? true : false,
                 gamertag: gamertag ? gamertag : '',
                 gamerpic: gamerpic ? gamerpic : '',
                 gamerscore: gamerscore ? gamerscore : '',
             })
+        } else if(arg.type === 'logout'){
+            console.log('Application received logout call. Removing session and cached keys')
+
+            session.defaultSession.clearStorageData().then(() => {
+                store.delete('user')
+                app.quitting = true
+                console.log('Restarting application...')
+                app.quit()
+                app.relaunch()
+
+            }).catch((error) => {
+                console.log('Failed to remove local storage:', error)
+            })
+        } else if(arg.type == 'login') {
+
+            console.log('opening auth flow')
+            if(! Authentication.checkAuthentication()){
+                Authentication.startHooks()
+                Authentication.startAuthflow()
+            }
         }
     });
 

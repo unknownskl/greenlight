@@ -36,4 +36,5 @@ div.component_card h2.grey {
 div.component_card p {
     padding-bottom: 10px;
     font-size: 15px;
+    opacity: 0.7;
 }

@@ -29,8 +29,8 @@ function Home() {
 
     return () => {
       ipcRenderer.removeAllListeners('stream');
-  };
-}, []);
+    };
+  }, []);
 
   return (
     <React.Fragment>
