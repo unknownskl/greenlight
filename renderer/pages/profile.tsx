@@ -6,7 +6,7 @@ import { ipcRenderer } from 'electron'
 import Header from '../components/header'
 import Button from '../components/ui/button'
 
-function Home() {
+function Profile() {
   const [consoles, setConsoles] = React.useState([])
 
   React.useEffect(() => {
@@ -42,4 +42,4 @@ function Home() {
   );
 };
 
-export default Home;
+export default Profile;

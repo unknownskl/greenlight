@@ -48,7 +48,7 @@ function Home() {
       }>
         {consoles.map((item, i) => {               
            return (
-            <Card className='padbottom'>
+            <Card className='padbottom' key={i}>
               <h1>{item.name}</h1>
               <h2 className='grey'>{item.id}</h2>
 

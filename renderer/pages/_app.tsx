@@ -21,37 +21,7 @@ export default function MyApp({ Component, pageProps }) {
     gamerscore: '',
   });
   const [headerLinks, setHeaderLinks] = React.useState([
-    {
-      name: 'My Consoles',
-      title: 'View consoles',
-      url: '/home',
-      active: true
-    },{
-      name: 'xCloud Library',
-      title: 'Browse xCloud library',
-      url: '/xcloud/home',
-      active: false
-    },{
-    //   name: 'Marketplace',
-    //   title: 'Browse the marketplace',
-    //   url: '/store/home',
-    //   active: false
-    // },{
-      name: 'Debug',
-      title: 'Debug page',
-      url: '/debug',
-      active: false
-    },{
-      name: 'Settings',
-      title: 'Change application settings',
-      url: '/settings',
-      active: false
-    },{
-      name: 'Profile',
-      title: 'View profile',
-      url: '/profile',
-      active: false
-    }
+    
   ])
 
   React.useEffect(() => {
@@ -63,18 +33,52 @@ export default function MyApp({ Component, pageProps }) {
 
 
     ipcRenderer.on('auth', (event, data) => {
+      setPrevUserState({
+        signedIn: data.signedIn,
+        gamertag: data.gamertag,
+        gamerpic: data.gamerpic,
+        gamerscore: data.gamerscore,
+      })
+      // console.log(prevUserState.gamertag)
+      setHeaderLinks([
+        {
+          name: 'My Consoles',
+          title: 'View consoles',
+          url: '/home',
+          active: true
+        },{
+          name: 'xCloud Library',
+          title: 'Browse xCloud library',
+          url: '/xcloud/home',
+          active: false
+        },{
+        //   name: 'Marketplace',
+        //   title: 'Browse the marketplace',
+        //   url: '/store/home',
+        //   active: false
+        // },{
+          name: 'Debug',
+          title: 'Debug page',
+          url: '/debug',
+          active: false
+        },{
+          name: 'Settings',
+          title: 'Change application settings',
+          url: '/settings',
+          active: false
+        },{
+          name: data.gamertag,
+          title: 'View profile',
+          url: '/profile',
+          active: false
+        }
+      ])
+
       if(data.loggedIn === true){
         // We are logged in!
         setLoginState(true)
         clearInterval(tokenInterval)
 
-      } else {
-        setPrevUserState({
-          signedIn: data.signedIn,
-          gamertag: data.gamertag,
-          gamerpic: data.gamerpic,
-          gamerscore: data.gamerscore,
-        })
       }
     })
 
