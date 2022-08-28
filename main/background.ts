@@ -1,20 +1,24 @@
-import { app, ipcMain, session } from 'electron';
+import { app, BrowserWindow, ipcMain, session } from 'electron';
 import serve from 'electron-serve';
-import { createWindow, Authentication } from './helpers';
+import { createWindow, Authentication, xboxWorker } from './helpers';
 import Events from './events'
 const path = require('path')
 const os = require('os')
 
 const isProd: boolean = process.env.NODE_ENV === 'production';
-class Application {
-  _events
-  _authentication
+export default class Application {
+  _events:Events
+  _authentication:Authentication
+  _xboxWorker:xboxWorker
+
+  _mainWindow:BrowserWindow
 
   _isQuitting = false
 
   constructor(){
-    this._events = new Events()
+    this._events = new Events(this)
     this._authentication = new Authentication(this)
+    this._xboxWorker = new xboxWorker(this)
 
     if(this.isProd()) {
       serve({ directory: 'app' });
@@ -37,32 +41,32 @@ class Application {
 
   async start(){
     // Load React Devtools
-    // const reactDevToolsPath = path.join(
-    //   os.homedir(),
-    //   '/Library/Application Support/Google/Chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/4.25.0_0'
-    // )
-    // await session.defaultSession.loadExtension(reactDevToolsPath)
+    const reactDevToolsPath = path.join(
+      os.homedir(),
+      '/Library/Application Support/Google/Chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/4.25.0_0'
+    )
+    await session.defaultSession.loadExtension(reactDevToolsPath)
   
-    let mainWindow = createWindow('main', {
+    this._mainWindow = createWindow('main', {
       width: 1000,
       height: 600,
     });
   
     if (isProd) {
-      await mainWindow.loadURL('app://./home.html');
+      await this._mainWindow.loadURL('app://./home.html');
     } else {
       console.log(process.argv)
       const port = process.argv[2];
-      await mainWindow.loadURL(`http://localhost:${port}/home`);
-      mainWindow.webContents.openDevTools();
+      await this._mainWindow.loadURL(`http://localhost:${port}/home`);
+      this._mainWindow.webContents.openDevTools();
     }
   
-    mainWindow.on('close', (event) => {
+    this._mainWindow.on('close', (event) => {
       if(this._isQuitting) {
-        mainWindow = null
+        this._mainWindow = null
       } else {
         event.preventDefault()
-        mainWindow.hide()
+        this._mainWindow.hide()
       }
     })
   
@@ -73,15 +77,21 @@ class Application {
     }
   
     // setInterval(() => {
-    //   console.log('Application is in fullscreen:', mainWindow.fullScreen)
+    //   console.log('Application is in fullscreen:', this._mainWindow.fullScreen)
     // }, 1000)
   
-    app.on('activate', () => { mainWindow.show() })
+    app.on('activate', () => { this._mainWindow.show() })
   }
 
   quit() {
     this._isQuitting = true
     app.quit()
+  }
+
+  restart() {
+    this._isQuitting = true
+    app.quit()
+    app.relaunch()
   }
 
   isProd(){

@@ -1,7 +1,7 @@
 #component_header {
     backdrop-filter: blur(20px);
 
-    /* background: rgba(0, 0, 0, 0.55); */
+    background: rgba(0, 0, 0, 0.1);
     position: fixed;
     top: 0px;
     left: 0px;

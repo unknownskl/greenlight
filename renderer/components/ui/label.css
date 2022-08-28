@@ -1,0 +1,30 @@
+span.component_label {
+    background: #444444;
+    display: inline-block;
+    font-size: 0.8rem;
+    padding-top: 5px;
+    padding-left: 8px;
+    padding-right: 8px;
+    padding-bottom: 5px;
+    border-radius: 3px;
+    text-shadow: 1px 1px 10px #111111;
+    border: 2px solid #444444;
+    color: #ffffff;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+span.component_label.orange {
+    background: orange;
+    border: 2px solid orange;
+}
+
+span.component_label.green {
+    background: #008746;
+    border: 2px solid #008746;
+}
+
+span.component_label.red {
+    background: red;
+    border: 2px solid red;
+}

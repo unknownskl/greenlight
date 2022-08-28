@@ -42,9 +42,10 @@ function Auth({
                   <p>
                     Gamerscore: { gamerscore }
                   </p>
-                  <p>
+                  {/* <p>
                     { 'Logging in...' }
-                  </p>
+                  </p> */}
+                  <Button label="Login" className='btn-primary' onClick={ () => { startAuthFlow() } }></Button>
                 </div>
 
               </div>) : (<div style={ {

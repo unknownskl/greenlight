@@ -4,8 +4,14 @@ import Head from 'next/head';
 import Link from 'next/link';
 
 import Header from '../components/header'
+import Card from '../components/ui/card'
+
+import { useSettings } from '../context/userContext'
+
 
 function Debug() {
+  const { settings, setSettings} = useSettings()
+
     // const [message, setMessage] = React.useState('no ipc message');
 
     // const onClickWithIpc = () => {
@@ -17,22 +23,49 @@ function Debug() {
     //     setMessage(message);
     // };
     
-    // React.useEffect(() => {
-    //     ipcRenderer.on('ping-pong', (event, data) => {
-    //         setMessage(data);
-    //     });
+    React.useEffect(() => {
+      setSettings({
+        ...settings,
+        streamingMode: true,
+      })
+
+      // console.log('debug settings:', settings)
+
+      // ipcRenderer.send('stream', {
+      //   type: 'start_stream',
+      //   data: {
+      //     type: 'home',
+      //     serverId: 'F4000EEB7F3EF52A'
+      //   }
+      // })
+
+        // ipcRenderer.on('ping-pong', (event, data) => {
+        //     setMessage(data);
+        // });
     
-    //     // cleanup this component
-    //     return () => {
-    //         ipcRenderer.removeAllListeners('ping-pong');
-    //     };
-    // }, []);
+        // // cleanup this component
+        // return () => {
+        //     ipcRenderer.removeAllListeners('ping-pong');
+        // };
+    }, []);
 
   return (
     <React.Fragment>
       <Head>
         <title>Greenlight - Debug</title>
       </Head>
+
+      <div style={{
+        paddingTop: '20px'
+      }}>
+
+        <Card className='padbottom'>
+          <h1>Settings</h1>
+
+          <pre>{JSON.stringify(settings)}</pre>
+        </Card>
+
+      </div>
 
     </React.Fragment>
   );

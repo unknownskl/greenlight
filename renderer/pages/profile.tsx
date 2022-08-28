@@ -34,7 +34,7 @@ function Profile() {
         <title>Greenlight - My Profile</title>
       </Head>
 
-      <div>
+      <div style={{ paddingTop: '20px' }}>
         derp
       </div>
 

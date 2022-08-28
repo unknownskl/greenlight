@@ -21,7 +21,7 @@ function Button({
   if(label === undefined)
     label = 'Button'
 
-  className = 'btn '+className
+  className = className ? 'btn '+className : 'btn'
 
   return (
     <React.Fragment>

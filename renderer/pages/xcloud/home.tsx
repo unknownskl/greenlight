@@ -22,8 +22,8 @@ function xCloudLibrary() {
         <title>Greenlight - xCloud Library</title>
       </Head>
 
-      <div>
-        <p>xCloud Library</p>
+      <div style={{ paddingTop: '20px' }}>
+          <p>xCloud Library</p>
       </div>
     </React.Fragment>
   );

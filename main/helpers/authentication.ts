@@ -2,6 +2,7 @@ import Store from 'electron-store'
 import https from 'https'
 import { app, session, BrowserWindow, ipcMain } from 'electron';
 import { createWindow } from './index'
+import Application from '../background'
 
 const isProd: boolean = process.env.NODE_ENV === 'production';
 const store = new Store({ name: 'helper_authentication' })
@@ -41,7 +42,7 @@ export default class Authentication {
     _appLevel = 0 // 0 = not logged in, 1 = xhomestreamin, 2 = xcloud
     _authWindow:BrowserWindow
 
-    _application
+    _application:Application
 
     constructor(application){
         this._application = application
@@ -62,15 +63,24 @@ export default class Authentication {
                     gamerpic: gamerpic ? gamerpic : '',
                     gamerscore: gamerscore ? gamerscore : '',
                 })
+            } else if(arg.type === 'get_user'){
+                const gamertag = store.get('user.gamertag')
+                const gamerpic = store.get('user.gamerpic')
+                const gamerscore = store.get('user.gamerscore')
+    
+                event.sender.send('auth', {
+                    type: 'user',
+                    gamertag: gamertag ? gamertag : '',
+                    gamerpic: gamerpic ? gamerpic : '',
+                    gamerscore: gamerscore ? gamerscore : '',
+                })
             } else if(arg.type === 'logout'){
                 console.log('Application received logout call. Removing session and cached keys')
     
                 session.defaultSession.clearStorageData().then(() => {
                     store.delete('user')
-                    app.quitting = true
                     console.log('Restarting application...')
-                    app.quit()
-                    app.relaunch()
+                    this._application.restart()
     
                 }).catch((error) => {
                     console.log('Failed to remove local storage:', error)
@@ -78,10 +88,10 @@ export default class Authentication {
             } else if(arg.type == 'login') {
     
                 console.log('opening auth flow')
-                if(! this.checkAuthentication()){
+                // if(! this.checkAuthentication()){
                     this.startHooks()
                     this.startAuthflow()
-                }
+                // }
             }
         });
     }
@@ -369,6 +379,10 @@ export default class Authentication {
             req.write(data)
             req.end()
         })
+    }
+
+    isAuthenticated() {
+        return this._loggedIn
     }
 
     setAppTokens(level) {

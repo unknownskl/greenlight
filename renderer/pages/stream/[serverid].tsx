@@ -8,17 +8,31 @@ import xCloudPlayer from 'xbox-xcloud-player'
 import Header from '../../components/header'
 import StreamComponent from '../../components/ui/streamcomponent'
 
+
 function Stream() {
   const router = useRouter()
+  // const [streamStarted, setStreamStarted] = React.useState(false)
   // const [xPlayer, setxPlayer] = React.useState(new xCloudPlayer('videoHolder', {
   //   ui_systemui: [19]
   // }));
+
+  let rerenderTimeout
 
   let xPlayer = new xCloudPlayer('streamComponent', {
     ui_systemui: [19]
   })
 
   React.useEffect(() => {
+
+    // setSettings({
+    //   ...settings,
+    //   streamingMode: true,
+    // })
+
+    // const isStreamingMode = document.getElementById('streamComponent') ? true : false
+
+    // document.getElementById('streamComponent') ? document.getElementById('streamComponent').innerHTML = '' : ''
+    document.getElementById('streamComponentHolder').innerHTML = '<div id="streamComponent"></div>'
 
     ipcRenderer.send('stream', {
       type: 'start_stream',
@@ -75,7 +89,9 @@ function Stream() {
 
     return () => {
       ipcRenderer.removeAllListeners('stream');
-      xPlayer.reset()
+      // xPlayer.reset()
+
+      if(rerenderTimeout){ clearTimeout(rerenderTimeout) }
     };
   })
 
@@ -85,11 +101,7 @@ function Stream() {
         <title>Greenlight - Streaming {router.query.serverid}</title>
       </Head>
 
-      <div>
-        <p>Streaming View: {router.query.serverid}</p>
-      </div>
-
-      <StreamComponent></StreamComponent>
+      {/* <StreamComponent onDisconnect={ () => { xPlayer.reset() }}></StreamComponent> */}
     </React.Fragment>
   );
 };

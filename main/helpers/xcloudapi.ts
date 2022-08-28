@@ -10,6 +10,9 @@ export default class xCloudApi {
 
     _sessionPath:string
 
+    _exchangeCounter = 0
+    _exchangeUrl = ''
+
     constructor(host:string, token: string, type:'home'|'cloud' = 'home'){
         this._host = host
         this._token = token
@@ -239,6 +242,25 @@ export default class xCloudApi {
 
     isExchangeReady(url:string) {
         return new Promise((resolve, reject) => {
+
+            if(this._exchangeUrl != url){
+                // New session
+                this._exchangeUrl = url
+                this._exchangeCounter = 0
+            } else {
+                // Existing session
+                if(this._exchangeCounter < 30){
+                    this._exchangeCounter++
+                } else {
+                    reject({
+                        error: 'Client API Timeout after 30 tries on ' + url
+                    })
+                    return;
+                }
+            }
+
+            // this._exchangeUrl
+            // this._exchangeCounter
 
             // fetch('https://'+this._host+''+url, {
             const req = https.request({

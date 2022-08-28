@@ -12,13 +12,14 @@ function Settings() {
 
   React.useEffect(() => {
     ipcRenderer.send('auth', {
-      type: 'init'
+      type: 'get_user'
     })
 
     ipcRenderer.on('auth', (event, args) => {
       if(args.type === 'error'){
         alert((args.data !== undefined) ? args.message+': '+JSON.stringify(args.data) : args.message)
-      } else {
+
+      } else if(args.type === 'user') {
         console.log('got event response:', args)
         setGamertag(args.gamertag)
       }
@@ -39,7 +40,7 @@ function Settings() {
 
   return (
     <React.Fragment>
-        <div>
+        <div style={{ paddingTop: '20px' }}>
             <Card className='padbottom'>
                 <h1>Current user</h1>
 

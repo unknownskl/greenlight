@@ -1,0 +1,42 @@
+div.components_sidebarfrienditem {
+    padding-top: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-bottom: 10px;
+}
+
+div.components_sidebarfrienditem div.components_sidebarfrienditem_gamerpic {
+    border: 3px solid #ffffff;
+    width: 40px;
+    height: 40px;
+    border-radius: 5px;
+}
+
+div.components_sidebarfrienditem div.components_sidebarfrienditem_gamerpic img.components_sidebarfrienditem_gamerpic_img {
+    width: 40px;
+    height: 40px;
+    display: block;
+}
+
+div.components_sidebarfrienditem div.components_sidebarfrienditem_userdetails {
+    width: 100%;
+    padding-left: 10px;
+
+    display: flex;
+    align-items: center;
+}
+
+div.components_sidebarfrienditem div.components_sidebarfrienditem_userdetails h1 {
+    font-size: 1rem;
+    font-weight: 400;
+    padding-bottom: 2px;
+}
+
+div.components_sidebarfrienditem div.components_sidebarfrienditem_userdetails p {
+    font-size: 0.9rem;
+    font-weight: 200;
+}
+
+div.components_sidebarfrienditem div.components_sidebarfrienditem_useroptions {
+    margin-left: auto;
+}

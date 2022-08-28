@@ -3,6 +3,7 @@ import EventEmitter from 'events'
 import { ipcMain } from 'electron'
 import { xCloudApi } from './helpers'
 import xboxWebApi from 'xbox-webapi'
+import Application from './background'
 
 const authStore = new Store({ name: 'helper_authentication' })
 
@@ -10,17 +11,21 @@ const REQ_TYPE_STREAM_GET_CONSOLES = 'get_consoles'
 const REQ_TYPE_STREAM_START_STREAM = 'start_stream'
 const REQ_TYPE_STREAM_START_STREAM_SDP = 'start_stream_sdp'
 const REQ_TYPE_STREAM_START_STREAM_ICE = 'start_stream_ice'
+const REQ_TYPE_STREAM_STOP_STREAM = 'stop_stream'
 
 const RES_TYPE_STREAM_ERROR = 'error'
 
 export default class Events extends EventEmitter {
+    _application:Application
 
     _xCloudApi
     _xHomeApi
     _webApi
     
-    constructor(){
+    constructor(application){
         super()
+
+        this._application = application
 
         // Init IPCMain
         ipcMain.on('stream', (event, arg) => {
@@ -39,6 +44,11 @@ export default class Events extends EventEmitter {
                     })
                 })
             } else if(arg.type == REQ_TYPE_STREAM_START_STREAM){
+                // Set app mode to streaming
+                // event.sender.send('app_view', {
+                //     streamingMode: true
+                // })
+
                 // @TODO: Implement xHome / xCloud switch
                 this._xHomeApi.startSession(arg.data.serverId).then((data) => {
                     event.sender.send('stream', {
@@ -80,6 +90,10 @@ export default class Events extends EventEmitter {
                         data: error,
                     })
                 })
+            }  else if(arg.type == REQ_TYPE_STREAM_STOP_STREAM){
+                event.sender.send('app_view', {
+                    streamingMode: false
+                })
             } else {
                 event.sender.send('stream', {
                     type: RES_TYPE_STREAM_ERROR,
@@ -97,10 +111,10 @@ export default class Events extends EventEmitter {
                 userToken: tokens.web.token,
                 uhs: tokens.web.uhs,
             })
-            console.log('web tokens:', tokens.web)
+            // console.log('web tokens:', tokens.web)
 
-            this._webApi.getProvider('profile').get('/users/me/profile/settings?settings=GameDisplayName,GameDisplayPicRaw,Gamerscore,Gamertag').then(function(result){
-                console.log('resolve', result.profileUsers[0])
+            this._webApi.getProvider('profile').get('/users/me/profile/settings?settings=GameDisplayName,GameDisplayPicRaw,Gamerscore,Gamertag').then((result) => {
+                // console.log('resolve', result.profileUsers[0])
 
                 if(result.profileUsers.length > 0) {
                     for(const setting in result.profileUsers[0].settings){
@@ -115,6 +129,10 @@ export default class Events extends EventEmitter {
                             authStore.set('user.gamerscore', result.profileUsers[0].settings[setting].value)
                         }
                     }
+
+                    this.emit('loaded', {
+                        gamertag: authStore.get('user.gamertag')
+                    })
                 }
         
             }).catch(function(error){
@@ -133,5 +151,9 @@ export default class Events extends EventEmitter {
             //     console.log(error)
             // })
         })
+    }
+
+    sendIpc(name, value){
+        this._application._mainWindow.webContents.send(name, value)
     }
 }

@@ -25,10 +25,28 @@ body {
  */
 @import 'components/ui/button.css';
 @import 'components/ui/card.css';
+@import 'components/ui/label.css';
 @import 'components/ui/streamcomponent.css';
+
+@import 'components/sidebar/friends.css';
+@import 'components/sidebar/frienditem.css';
 
 div#app_body {
     position: fixed;
     padding-top: 70px;
-    width: 100vw;
+    left: 0px;
+    width: 70vw;
+    height: 100vh;
+}
+
+div#app_sidebar {
+    position: fixed;
+    padding-top: 70px;
+    right: 0px;
+    width: 30vw;
+    height: 100vh;
+    overflow-y: auto;
+
+    backdrop-filter: blur(20px);
+    background: rgba(0, 0, 0, 0.3);
 }
