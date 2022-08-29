@@ -45,8 +45,7 @@ function Home() {
         flexWrap: 'wrap',
         alignItems: 'stretch',
         paddingTop: '20px'
-      }
-      }>
+      }}>
         {consoles && consoles.map((item, i) => {               
            return (
             <Card className='padbottom' key={i}>
@@ -72,7 +71,7 @@ function Home() {
 
               {(item.remoteManagementEnabled === true && item.consoleStreamingEnabled === true) ?
                 (item.powerState == 'On' ? <Label className='green'>Powered on</Label> :
-                item.powerState == 'ConnectedStandby' ? <Label className='green'>Standby</Label> :
+                item.powerState == 'ConnectedStandby' ? <Label>Standby</Label> :
                 <Label>{item.powerState}</Label>) :
               (<div>
                 {!item.remoteManagementEnabled ? '' : <p><Label className='orange'>Warning</Label> Remote management not enabled</p>}
@@ -89,7 +88,7 @@ function Home() {
 
               <div style={ { display: 'flex', gap: '20px', minWidth: 280 }}>
                 <Link href={ `stream/${item.id}` }>
-                  <Button label="Start stream" />
+                  <Button label="Start stream" className='btn-primary' />
                 </Link>
                 {/* <Link href={ `stream/${item.id}` }>
                   <Button label="Remote Control" />

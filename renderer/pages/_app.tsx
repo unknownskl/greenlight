@@ -12,7 +12,7 @@ import SidebarFriends from '../components/sidebar/friends'
 import StreamComponent from '../components/ui/streamcomponent'
 
 
-import { UserProvider, SettingsProvider, useSettings, useUser } from '../context/userContext'
+import { UserProvider, SettingsProvider, useSettings, useUser, XcloudProvider } from '../context/userContext'
 
 
 // This default export is required in a new `pages/_app.js` file.
@@ -24,6 +24,7 @@ export default function MyApp({ Component, pageProps }) {
     gamertag: '',
     gamerpic: '',
     gamerscore: '',
+    level: '',
   });
   // const [headerLinks, setHeaderLinks] = React.useState([])
   const [streamingMode, setStreamingMode] = React.useState(false)
@@ -52,6 +53,7 @@ export default function MyApp({ Component, pageProps }) {
         gamertag: data.gamertag,
         gamerpic: data.gamerpic,
         gamerscore: data.gamerscore,
+        level: data.level,
       })
       
       // setHeaderLinks((headerLinks.length > 0) ? headerLinks : [
@@ -103,33 +105,22 @@ export default function MyApp({ Component, pageProps }) {
 
   let appBody
   if(loggedIn){
-    // if(! isStreaming()){
-      appBody = (
-        <React.Fragment>
-          <Header gamertag={ prevUserState.gamertag } hidden={ isStreaming() } />
+    appBody = (
+      <React.Fragment>
+        <Header gamertag={ prevUserState.gamertag } hidden={ isStreaming() } level={ prevUserState.level } />
 
-          <div id="app_body">
-            <Component {...pageProps} />
-          </div>
+        <div id="app_body">
+          <Component {...pageProps} />
+        </div>
 
-          <div id="app_sidebar" style={{
-            display: isStreaming() ? 'none' : 'block'
-          }}>
-            <SidebarFriends></SidebarFriends>
-          </div>
-          <Footer />
-        </React.Fragment>)
-    // } else {
-    //   appBody = (
-    //     <React.Fragment>
-    //         <Header links={ headerLinks } hidden={ true } />
+        <div id="app_sidebar" style={{
+          display: isStreaming() ? 'none' : 'block'
+        }}>
+          <SidebarFriends></SidebarFriends>
+        </div>
+        <Footer />
+      </React.Fragment>)
 
-    //         <div id="app_body full">
-    //           <Component {...pageProps} />
-    //         </div>
-    //       <Footer />
-    //     </React.Fragment>)
-    // }
   } else {
     appBody = (
       <React.Fragment>
@@ -153,7 +144,9 @@ export default function MyApp({ Component, pageProps }) {
       }}>
         <UserProvider>
           <SettingsProvider>
-            {appBody}
+            <XcloudProvider>
+              {appBody}
+            </XcloudProvider>
           </SettingsProvider>
         </UserProvider>
       </div>

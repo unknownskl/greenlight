@@ -4,14 +4,7 @@ export const UserContext = React.createContext({
     consoles: [],
     setConsoles: async (consoles) => null,
 })
-
-export const settingsContext = React.createContext({
-    settings: undefined,
-    setSettings: async (settings) => null,
-})
-
 export const useUser = () => useContext(UserContext)
-export const useSettings = () => useContext(settingsContext)
 
 export const UserProvider = ({ children }) => {
     const [consoles, setConsoles] = useState([])
@@ -21,8 +14,32 @@ export const UserProvider = ({ children }) => {
             </UserContext.Provider>
 }
 
+
+
+export const XcloudContext = React.createContext({
+    xcloudTitles: [],
+    setXcloudTitles: async (titles) => null,
+})
+export const useXcloud = () => useContext(XcloudContext)
+
+export const XcloudProvider = ({ children }) => {
+    const [xcloudTitles, setXcloudTitles] = useState([])
+
+    return <XcloudContext.Provider value={{ xcloudTitles, setXcloudTitles }}>
+                    {children}
+            </XcloudContext.Provider>
+}
+
+
+
+export const SettingsContext = React.createContext({
+    settings: undefined,
+    setSettings: async (settings) => null,
+})
+export const useSettings = () => useContext(SettingsContext)
+
 export const SettingsProvider = ({ children }) => {
     const [settings, setSettings] = useState({})
 
-    return <settingsContext.Provider value={{ settings, setSettings }}> {children} </settingsContext.Provider>
+    return <SettingsContext.Provider value={{ settings, setSettings }}> {children} </SettingsContext.Provider>
 }

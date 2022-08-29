@@ -7,12 +7,13 @@ import Button from './button'
 interface StreamComponentProps {
   hidden?: boolean;
   onDisconnect?: () => void;
-
+  onMenu?: () => void;
 }
 
 function StreamComponent({
   hidden = true,
   onDisconnect,
+  onMenu,
   ...props
 }: StreamComponentProps) {
 
@@ -28,6 +29,11 @@ function StreamComponent({
     window.addEventListener('mousemove', mouseEvent)
     window.addEventListener('mousedown', mouseEvent)
     const mouseInterval = setInterval(() => {
+      if(gamebarElement === null){
+        gamebarElement = document.getElementById('component_streamcomponent_gamebar')
+        return;
+      }
+
       if((Date.now()-lastMovement) >= 2000){
         if(! gamebarElement.className.includes('hidden')){
           gamebarElement.className = 'hidden'
@@ -57,6 +63,10 @@ function StreamComponent({
   }
 
   function toggleDebug(){
+    if(debugElement === null){
+      debugElement = document.getElementById('component_streamcomponent_debug')
+    }
+
     if(debugElement.className.includes('hidden')){
       debugElement.className = ''
     } else {
@@ -73,7 +83,7 @@ function StreamComponent({
         <div id="component_streamcomponent_gamebar">
           <div id="component_streamcomponent_gamebar_menu">
             <Button label="Disconnect" className='btn-cancel' onClick={ () => { streamDisconnect() } }></Button>
-            <Button label="Menu" onClick={ () => { streamDisconnect() } }></Button>
+            <Button label="Menu" onClick={ onMenu }></Button>
 
             <div style={{
               marginLeft: 'auto',

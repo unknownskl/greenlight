@@ -23,33 +23,31 @@ function Stream() {
   })
 
   React.useEffect(() => {
-
-    // setSettings({
-    //   ...settings,
-    //   streamingMode: true,
-    // })
-
-    // const isStreamingMode = document.getElementById('streamComponent') ? true : false
-
-    // document.getElementById('streamComponent') ? document.getElementById('streamComponent').innerHTML = '' : ''
     document.getElementById('streamComponentHolder').innerHTML = '<div id="streamComponent"></div>'
 
-    ipcRenderer.send('stream', {
+    let ipc_channel = 'stream'
+    let serverId = router.query.serverid
+    if((router.query.serverid as string).substr(0, 6) == 'xcloud'){
+      ipc_channel = 'xcloud'
+      serverId = (router.query.serverid as string).substr(7)
+    }
+
+    ipcRenderer.send(ipc_channel, {
       type: 'start_stream',
       data: {
         type: 'home',
-        serverId: router.query.serverid
+        serverId: serverId
       }
     })
 
-    ipcRenderer.on('stream', (event, args) => {
+    ipcRenderer.on(ipc_channel, (event, args) => {
       if(args.type === 'error') {
         alert((args.data !== undefined) ? args.message+': '+JSON.stringify(args.data) : args.message)
 
       } else if(args.type === 'start_stream'){
         if(args.data.state === 'Provisioned'){
           xPlayer.createOffer().then((offer:any) => {
-            ipcRenderer.send('stream', {
+            ipcRenderer.send(ipc_channel, {
               type: 'start_stream_sdp',
               data: {
                 sdp: offer.sdp
@@ -73,7 +71,7 @@ function Stream() {
             })
           }
 
-          ipcRenderer.send('stream', {
+          ipcRenderer.send(ipc_channel, {
             type: 'start_stream_ice',
             data: {
               ice: candidates
@@ -84,16 +82,31 @@ function Stream() {
         }
       } else if(args.type === 'start_stream_ice'){
         xPlayer.setIceCandidates(args.data)
+      } else {
+        console.log('Unknown event:', args)
       }
     })
 
     return () => {
-      ipcRenderer.removeAllListeners('stream');
+      ipcRenderer.removeAllListeners(ipc_channel);
       // xPlayer.reset()
 
       if(rerenderTimeout){ clearTimeout(rerenderTimeout) }
     };
   })
+
+  // Keyboard controls
+  // React.useEffect(() => {
+
+  //   return () => {
+  //     //
+  //   };
+  // })
+
+  function gamepadSend(button){
+    console.log('Press button:', button)
+    xPlayer.getChannelProcessor('input').pressButton(0, { Nexus: 1 })
+  }
 
   return (
     <React.Fragment>
@@ -102,7 +115,7 @@ function Stream() {
       </Head>
 
       {/* <StreamComponent onDisconnect={ () => { xPlayer.reset() }}></StreamComponent> */}
-      <StreamComponent></StreamComponent>
+      <StreamComponent onMenu={ () => { gamepadSend('nexus') } }></StreamComponent>
     </React.Fragment>
   );
 };

@@ -17,6 +17,14 @@ div.component_card.padbottom {
     padding-bottom: 20px;
 }
 
+div.component_card.fixedsize {
+    width: 150px;
+}
+
+div.component_card.fullsize {
+    width: 100vw;
+}
+
 div.component_card h1 {
     font-weight: normal;
     font-size: 20px;

@@ -1,4 +1,5 @@
 import https from 'https'
+import Application from '../background'
 
 export default class xCloudApi {
 
@@ -13,7 +14,8 @@ export default class xCloudApi {
     _exchangeCounter = 0
     _exchangeUrl = ''
 
-    constructor(host:string, token: string, type:'home'|'cloud' = 'home'){
+    constructor(application:Application, host:string, token: string, type:'home'|'cloud' = 'home'){
+        this._application = application
         this._host = host
         this._token = token
         this._type = type
@@ -44,7 +46,39 @@ export default class xCloudApi {
     }
 
     getTitles() {
-        return this.get('https://' + this._host + '/v1/titles')
+        return new Promise((resolve, reject) => {
+            let responseData = ''
+
+            const req = https.request({
+                host: this._host,
+                path: '/v1/titles',
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer '+this._token
+                },
+            }, (response:any) => {
+                response.on('data', (data:any) => {
+                    // console.log('data', data)
+                    responseData += data
+                });
+
+                response.on('end', (data:any) => {
+                    if(response.statusCode === 200){
+                        resolve(JSON.parse(responseData))
+                    } else {
+                        reject({
+                            status: response.statusCode
+                        })
+                    }
+                });
+            })
+
+            req.on('error', (error) => {
+                reject(error)
+            });
+            req.end();
+        })
     }
 
     getConsoles() {
@@ -61,7 +95,7 @@ export default class xCloudApi {
                 },
             }, (response:any) => {
                 response.on('data', (data:any) => {
-                    console.log('data', data)
+                    // console.log('data', data)
                     responseData += data
                 });
 
@@ -201,18 +235,18 @@ export default class xCloudApi {
                                 if(state.state === 'ReadyToConnect'){
                                     // We need to authenticate with the MSAL token
     
-                                    // this.xcloudAuth(this._application._tokenStore._msalToken, data.sessionPath).then((authResponse) => {
-                                    //     // Authentication ok. Lets connect!
-                                    //     this.isProvisioningReady('/'+data.sessionPath+'/state').then((state:any) => {
-                                    //         resolve(state)
+                                    this.xcloudAuth(this._application._authentication._tokens.msal.token, data.sessionPath).then((authResponse) => {
+                                        // Authentication ok. Lets connect!
+                                        this.isProvisioningReady('/'+data.sessionPath+'/state').then((state:any) => {
+                                            resolve(state)
     
-                                    //     }).catch((error) =>{
-                                    //         reject(error)
-                                    //     })
+                                        }).catch((error) =>{
+                                            reject(error)
+                                        })
     
-                                    // }).catch((error) =>{
-                                    //     reject(error)
-                                    // })
+                                    }).catch((error) =>{
+                                        reject(error)
+                                    })
     
                                 } else {
                                     // Lets connect
@@ -324,7 +358,7 @@ export default class xCloudApi {
 
                 response.on('end', () => {
                     if(response.statusCode !== 200){
-                        console.log('xCloudPlayer Client - '+url+' - Waiting...')
+                        console.log('xCloudPlayer Client - '+url+' - Waiting...', body)
                         setTimeout(() => {
                             this.isProvisioningReady(url).then((data:any) => {
                                 resolve(data)

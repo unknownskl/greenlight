@@ -4,11 +4,9 @@ import Link from 'next/link';
 import { ipcRenderer } from 'electron'
 
 interface HeaderProps {
-  username?: string;
-  gamerscore?: string;
   hidden?: boolean;
-  gamertag?: string;
-  links?: Array<any>;
+  gamertag: string;
+  level: number;
   /**
    * Optional click handler
    */
@@ -18,11 +16,13 @@ interface HeaderProps {
 function Header({
   hidden = false,
   gamertag,
+  level = 0,
   // links,
   ...props
 }: HeaderProps) {
 
-  const [headerLinks, setHeaderLinks] = React.useState([
+  console.log('level:', level)
+  const [headerLinks, setHeaderLinks] = React.useState((level > 1) ? [
     {
       name: 'My Consoles',
       title: 'View consoles',
@@ -33,13 +33,24 @@ function Header({
       title: 'Browse xCloud library',
       url: '/xcloud/home'
     },{
-    //   name: 'Marketplace',
-    //   title: 'Browse the marketplace',
-    //   url: '/store/home'
-    // },{
       name: 'Debug',
       title: 'Debug page',
       url: '/debug'
+    },{
+      name: 'Settings',
+      title: 'Change application settings',
+      url: '/settings'
+    },{
+      name: gamertag,
+      title: 'View profile',
+      url: '/profile'
+    }
+  ] : [
+    {
+      name: 'My Consoles',
+      title: 'View consoles',
+      url: '/home',
+      active: true,
     },{
       name: 'Settings',
       title: 'Change application settings',

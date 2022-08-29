@@ -31,7 +31,7 @@ function SidebarFriendItem({
           <div className="components_sidebarfrienditem_gamerpic" style={ {
             borderColor: '#' + userinfo.preferredColor.primaryColor
           }}>
-            <img className='components_sidebarfrienditem_gamerpic_img' src={userinfo.displayPicRaw} />
+            <img className='components_sidebarfrienditem_gamerpic_img' loading='lazy' src={userinfo.displayPicRaw} />
           </div>
           
           <div className='components_sidebarfrienditem_userdetails'>

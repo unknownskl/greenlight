@@ -62,6 +62,7 @@ export default class Authentication {
                     gamertag: gamertag ? gamertag : '',
                     gamerpic: gamerpic ? gamerpic : '',
                     gamerscore: gamerscore ? gamerscore : '',
+                    level: this._appLevel,
                 })
                 
             } else if(arg.type === 'get_user'){
@@ -74,6 +75,7 @@ export default class Authentication {
                     gamertag: gamertag ? gamertag : '',
                     gamerpic: gamerpic ? gamerpic : '',
                     gamerscore: gamerscore ? gamerscore : '',
+                    level: this._appLevel,
                 })
 
             } else if(arg.type === 'logout'){

@@ -40,41 +40,44 @@ function Settings() {
 
   return (
     <React.Fragment>
-        <div style={{ paddingTop: '20px' }}>
-            <Card className='padbottom'>
-                <h1>Current user</h1>
+      <Head>
+        <title>Greenlight - Settings</title>
+      </Head>
+      <div style={{ paddingTop: '20px' }}>
+        <Card className='padbottom'>
+          <h1>Current user</h1>
 
-                <p>
-                  Logged in as: {gamertag}
-                </p>
+          <p>
+            Logged in as: {gamertag}
+          </p>
 
-                <Button label="Logout user" className="btn-small" onClick={ () => { confirmLogout() } }></Button>
-            </Card>
+          <Button label="Logout user" className="btn-small" onClick={ () => { confirmLogout() } }></Button>
+        </Card>
 
-            <Card className='padbottom'>
-                <h1>xCloud</h1>
+        <Card className='padbottom'>
+          <h1>xCloud</h1>
 
-                <p>
-                  xCloud settings
-                </p>
-            </Card>
+          <p>
+            xCloud settings
+          </p>
+        </Card>
 
-            <Card className='padbottom'>
-                <h1>xHomestreaming</h1>
+        <Card className='padbottom'>
+          <h1>xHomestreaming</h1>
 
-                <p>
-                  xHomestreaming settings
-                </p>
-            </Card>
+          <p>
+            xHomestreaming settings
+          </p>
+        </Card>
 
-            <Card className='padbottom'>
-                <h1>Gamepad</h1>
+        <Card className='padbottom'>
+          <h1>Gamepad</h1>
 
-                <p>
-                  Gamepad settings
-                </p>
-            </Card>
-        </div>
+          <p>
+            Gamepad settings
+          </p>
+        </Card>
+      </div>
     </React.Fragment>
   );
 };
