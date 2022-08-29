@@ -87,8 +87,62 @@ function Stream() {
       }
     })
 
+    // Keyboard events
+    const keyboardDownEvent = (e) => {
+      switch(e.keyCode){
+        case 38:
+          xPlayer.getChannelProcessor('input').pressButton(0, { DPadUp: 1 })
+          break;
+        case 40:
+          xPlayer.getChannelProcessor('input').pressButton(0, { DPadDown: 1 })
+          break;
+        case 37:
+          xPlayer.getChannelProcessor('input').pressButton(0, { DPadLeft: 1 })
+          break;
+        case 39:
+          xPlayer.getChannelProcessor('input').pressButton(0, { DPadRight: 1 })
+          break;
+        case 13:
+        case 65:
+          xPlayer.getChannelProcessor('input').pressButton(0, { A: 1 })
+          break;
+        case 8:
+        case 66:
+          xPlayer.getChannelProcessor('input').pressButton(0, { B: 1 })
+          break;
+        case 88:
+          xPlayer.getChannelProcessor('input').pressButton(0, { X: 1 })
+          break;
+        case 89:
+          xPlayer.getChannelProcessor('input').pressButton(0, { Y: 1 })
+          break;
+        case 78:
+          xPlayer.getChannelProcessor('input').pressButton(0, { Nexus: 1 })
+          break;
+        case 219:
+          xPlayer.getChannelProcessor('input').pressButton(0, { LeftShoulder: 1 })
+          break;
+        case 221:
+          xPlayer.getChannelProcessor('input').pressButton(0, { RightShoulder: 1 })
+          break;
+        case 86:
+          xPlayer.getChannelProcessor('input').pressButton(0, { View: 1 })
+          break;
+        case 77:
+          xPlayer.getChannelProcessor('input').pressButton(0, { Menu: 1 })
+          break;
+        case 48:
+          xPlayer.getChannelProcessor('audio')._softReset()
+          break;
+      }
+    }
+    window.addEventListener('keydown', keyboardDownEvent)
+
+    // Modal window
+
     return () => {
       ipcRenderer.removeAllListeners(ipc_channel);
+      window.removeEventListener('keydown', keyboardDownEvent)
       // xPlayer.reset()
 
       if(rerenderTimeout){ clearTimeout(rerenderTimeout) }

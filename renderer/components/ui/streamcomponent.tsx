@@ -23,11 +23,13 @@ function StreamComponent({
 
   React.useEffect(() => {
 
+    // Gamebar menu mouse events
     const mouseEvent = (e) => {
       lastMovement = Date.now()
     }
     window.addEventListener('mousemove', mouseEvent)
     window.addEventListener('mousedown', mouseEvent)
+
     const mouseInterval = setInterval(() => {
       if(gamebarElement === null){
         gamebarElement = document.getElementById('component_streamcomponent_gamebar')
@@ -43,13 +45,23 @@ function StreamComponent({
           gamebarElement.className = ''
         }
       }
-
     }, 100)
+
+    // Keyboard events
+    const keyboardPressEvent = (e) => {
+      switch(e.keyCode){
+        case 126:
+            toggleDebug()
+            break;
+      }
+    }
+    window.addEventListener('keypress', keyboardPressEvent)
   
     // cleanup this component
     return () => {
         window.removeEventListener('mousemove', mouseEvent)
         window.removeEventListener('mousedown', mouseEvent)
+        window.removeEventListener('keypress', keyboardPressEvent)
         clearInterval(mouseInterval)
     };
   }, []);
