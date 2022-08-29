@@ -32,7 +32,7 @@ function Home() {
       ipcRenderer.removeAllListeners('stream');
     };
   }, []);
-console.log('consoles', consoles)
+  
   return (
     <React.Fragment>
       <Head>

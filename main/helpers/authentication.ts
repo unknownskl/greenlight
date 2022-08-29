@@ -63,6 +63,7 @@ export default class Authentication {
                     gamerpic: gamerpic ? gamerpic : '',
                     gamerscore: gamerscore ? gamerscore : '',
                 })
+                
             } else if(arg.type === 'get_user'){
                 const gamertag = store.get('user.gamertag')
                 const gamerpic = store.get('user.gamerpic')
@@ -74,6 +75,7 @@ export default class Authentication {
                     gamerpic: gamerpic ? gamerpic : '',
                     gamerscore: gamerscore ? gamerscore : '',
                 })
+
             } else if(arg.type === 'logout'){
                 console.log('Application received logout call. Removing session and cached keys')
     
@@ -85,8 +87,12 @@ export default class Authentication {
                 }).catch((error) => {
                     console.log('Failed to remove local storage:', error)
                 })
+
+            } else if(arg.type === 'quit'){
+                console.log('Application received quit call. Exiting application')
+                this._application.quit()
+
             } else if(arg.type == 'login') {
-    
                 console.log('opening auth flow')
                 // if(! this.checkAuthentication()){
                     this.startHooks()

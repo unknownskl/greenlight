@@ -24,10 +24,10 @@ function Debug() {
     // };
     
     React.useEffect(() => {
-      setSettings({
-        ...settings,
-        streamingMode: true,
-      })
+      // setSettings({
+      //   ...settings,
+      //   streamingMode: true,
+      // })
 
       // console.log('debug settings:', settings)
 

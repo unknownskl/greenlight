@@ -102,6 +102,7 @@ function Stream() {
       </Head>
 
       {/* <StreamComponent onDisconnect={ () => { xPlayer.reset() }}></StreamComponent> */}
+      <StreamComponent></StreamComponent>
     </React.Fragment>
   );
 };

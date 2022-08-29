@@ -32,19 +32,21 @@ body {
 @import 'components/sidebar/frienditem.css';
 
 div#app_body {
-    position: fixed;
+    /* position: fixed; */
     padding-top: 70px;
-    left: 0px;
+    /* left: 0px; */
     width: 70vw;
-    height: 100vh;
+    /* height: 100vh; */
+    /* bottom: 0px; */
+    overflow-y: auto;
 }
 
 div#app_sidebar {
     position: fixed;
-    padding-top: 70px;
+    top: 70px;
     right: 0px;
     width: 30vw;
-    height: 100vh;
+    bottom: 0px;
     overflow-y: auto;
 
     backdrop-filter: blur(20px);

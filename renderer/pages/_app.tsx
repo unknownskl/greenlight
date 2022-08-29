@@ -25,7 +25,7 @@ export default function MyApp({ Component, pageProps }) {
     gamerpic: '',
     gamerscore: '',
   });
-  const [headerLinks, setHeaderLinks] = React.useState([])
+  // const [headerLinks, setHeaderLinks] = React.useState([])
   const [streamingMode, setStreamingMode] = React.useState(false)
 
   React.useEffect(() => {
@@ -54,39 +54,33 @@ export default function MyApp({ Component, pageProps }) {
         gamerscore: data.gamerscore,
       })
       
-      setHeaderLinks((headerLinks.length > 0) ? headerLinks : [
-        {
-          name: 'My Consoles',
-          title: 'View consoles',
-          url: '/home',
-          active: true
-        },{
-          name: 'xCloud Library',
-          title: 'Browse xCloud library',
-          url: '/xcloud/home',
-          active: false
-        },{
-        //   name: 'Marketplace',
-        //   title: 'Browse the marketplace',
-        //   url: '/store/home',
-        //   active: false
-        // },{
-          name: 'Debug',
-          title: 'Debug page',
-          url: '/debug',
-          active: false
-        },{
-          name: 'Settings',
-          title: 'Change application settings',
-          url: '/settings',
-          active: false
-        },{
-          name: data.gamertag,
-          title: 'View profile',
-          url: '/profile',
-          active: false
-        }
-      ])
+      // setHeaderLinks((headerLinks.length > 0) ? headerLinks : [
+      //   {
+      //     name: 'My Consoles',
+      //     title: 'View consoles',
+      //     url: '/home'
+      //   },{
+      //     name: 'xCloud Library',
+      //     title: 'Browse xCloud library',
+      //     url: '/xcloud/home'
+      //   },{
+      //   //   name: 'Marketplace',
+      //   //   title: 'Browse the marketplace',
+      //   //   url: '/store/home'
+      //   // },{
+      //     name: 'Debug',
+      //     title: 'Debug page',
+      //     url: '/debug'
+      //   },{
+      //     name: 'Settings',
+      //     title: 'Change application settings',
+      //     url: '/settings'
+      //   },{
+      //     name: data.gamertag,
+      //     title: 'View profile',
+      //     url: '/profile'
+      //   }
+      // ])
 
       if(data.loggedIn === true){
         // We are logged in!
@@ -112,7 +106,7 @@ export default function MyApp({ Component, pageProps }) {
     // if(! isStreaming()){
       appBody = (
         <React.Fragment>
-          <Header links={ headerLinks } hidden={ isStreaming() } />
+          <Header gamertag={ prevUserState.gamertag } hidden={ isStreaming() } />
 
           <div id="app_body">
             <Component {...pageProps} />
@@ -160,8 +154,6 @@ export default function MyApp({ Component, pageProps }) {
         <UserProvider>
           <SettingsProvider>
             {appBody}
-
-            <StreamComponent></StreamComponent>
           </SettingsProvider>
         </UserProvider>
       </div>
