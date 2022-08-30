@@ -3,12 +3,14 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { ipcRenderer } from 'electron'
 
+import { useSettings } from '../context/userContext'
+
 import Card from '../components/ui/card'
 import Button from '../components/ui/button'
 
 function Settings() {
   const [gamertag, setGamertag] = React.useState('Loading...');
-
+  const { settings, setSettings} = useSettings()
 
   React.useEffect(() => {
     ipcRenderer.send('auth', {
@@ -36,6 +38,14 @@ function Settings() {
         type: 'logout'
       })
     }
+  }
+
+  function setBitrate(e){
+    console.log('Set bitrate to:', e.target.value)
+    setSettings({
+      ...settings,
+      xhome_bitrate: e.target.value
+    })
   }
 
   return (
@@ -66,7 +76,17 @@ function Settings() {
           <h1>xHomestreaming</h1>
 
           <p>
-            xHomestreaming settings
+            Bitrate: <select onChange={ setBitrate }>
+              <option value="256">256 kbps</option>
+              <option value="512">512 kbps</option>
+              <option value="1024">1 mbps</option>
+              <option value="2048">2 mbps</option>
+              <option value="4096">4 mbps</option>
+              <option value="8192">8 mbps</option>
+              <option value="12288">12 mbps</option>
+              <option value="16384">16 mbps</option>
+              <option value="20480">20 mbps</option>
+            </select>
           </p>
         </Card>
 

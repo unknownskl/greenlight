@@ -3,17 +3,20 @@ import Link from 'next/link';
 import Router from 'next/router';
 import React from 'react';
 import Button from './button'
+import xPlayer from 'xbox-xcloud-player'
 
 interface StreamComponentProps {
   hidden?: boolean;
   onDisconnect?: () => void;
   onMenu?: () => void;
+  xPlayer: xPlayer;
 }
 
 function StreamComponent({
   hidden = true,
   onDisconnect,
   onMenu,
+  xPlayer,
   ...props
 }: StreamComponentProps) {
 

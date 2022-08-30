@@ -5,6 +5,8 @@ import { useRouter } from 'next/router'
 import { ipcRenderer } from 'electron'
 import xCloudPlayer from 'xbox-xcloud-player'
 
+import { useSettings } from '../../context/userContext'
+
 import Header from '../../components/header'
 import StreamComponent from '../../components/ui/streamcomponent'
 
@@ -15,6 +17,7 @@ function Stream() {
   // const [xPlayer, setxPlayer] = React.useState(new xCloudPlayer('videoHolder', {
   //   ui_systemui: [19]
   // }));
+  const { settings, setSettings} = useSettings()
 
   let rerenderTimeout
 
@@ -47,10 +50,12 @@ function Stream() {
       } else if(args.type === 'start_stream'){
         if(args.data.state === 'Provisioned'){
           xPlayer.createOffer().then((offer:any) => {
+            console.log('sdp:', setMediaBitrates(offer.sdp, (ipc_channel == 'home') ? settings.xhome_bitrate || 4096 : settings.xcloud_bitrate || 2048))
+
             ipcRenderer.send(ipc_channel, {
               type: 'start_stream_sdp',
               data: {
-                sdp: offer.sdp
+                sdp: setMediaBitrates(offer.sdp, (ipc_channel == 'home') ? settings.xhome_bitrate || 4096 : settings.xcloud_bitrate || 2048)
               }
             })
           })
@@ -162,6 +167,48 @@ function Stream() {
     xPlayer.getChannelProcessor('input').pressButton(0, { Nexus: 1 })
   }
 
+  function setMediaBitrates(sdp, videoBitrate) {
+    return setMediaBitrate(setMediaBitrate(sdp, "video", videoBitrate), "audio", 512);
+  }
+   
+  function setMediaBitrate(sdp, media, bitrate) {
+    var lines = sdp.split("\n");
+    var line = -1;
+    for (var i = 0; i < lines.length; i++) {
+      if (lines[i].indexOf("m="+media) === 0) {
+        line = i;
+        break;
+      }
+    }
+    if (line === -1) {
+      console.debug("Could not find the m line for", media);
+      return sdp;
+    }
+    console.debug("Found the m line for", media, "at line", line);
+   
+    // Pass the m line
+    line++;
+   
+    // Skip i and c lines
+    while(lines[line].indexOf("i=") === 0 || lines[line].indexOf("c=") === 0) {
+      line++;
+    }
+   
+    // If we're on a b line, replace it
+    if (lines[line].indexOf("b") === 0) {
+      console.debug("Replaced b line at line", line);
+      lines[line] = "b=AS:"+bitrate
+      return lines.join("\n");
+    }
+    
+    // Add a new b line
+    console.debug("Adding new b line before line", line);
+    var newLines = lines.slice(0, line)
+    newLines.push("b=AS:"+bitrate)
+    newLines = newLines.concat(lines.slice(line, lines.length))
+    return newLines.join("\n")
+  }
+
   return (
     <React.Fragment>
       <Head>
@@ -169,7 +216,7 @@ function Stream() {
       </Head>
 
       {/* <StreamComponent onDisconnect={ () => { xPlayer.reset() }}></StreamComponent> */}
-      <StreamComponent onMenu={ () => { gamepadSend('nexus') } }></StreamComponent>
+      <StreamComponent onMenu={ () => { gamepadSend('nexus') } } xPlayer={ xPlayer }></StreamComponent>
     </React.Fragment>
   );
 };
