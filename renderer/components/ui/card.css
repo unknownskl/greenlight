@@ -46,3 +46,12 @@ div.component_card p {
     font-size: 15px;
     opacity: 0.7;
 }
+
+div.component_card input.card_input_text_transparent {
+    background: none;
+    border: 0px;
+    color: #ffffff;
+    outline: none;
+    width: 100%;
+    padding: 5px;
+}

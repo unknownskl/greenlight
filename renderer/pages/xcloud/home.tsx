@@ -11,6 +11,9 @@ import Button from '../../components/ui/button';
 
 function xCloudLibrary() {
   const { xcloudTitles, setXcloudTitles} = useXcloud()
+  const [filter, setFilter] = React.useState({
+    name: ''
+  });
 
   React.useEffect(() => {
     if(xcloudTitles.length == 0){
@@ -44,6 +47,21 @@ function xCloudLibrary() {
     return ''
   }
 
+  function filterProducts(e){
+    console.log('Search value:', e.target.value)
+
+    setFilter({
+      name: e.target.value
+    })
+
+    // ipcRenderer.send('xcloud', {
+    //   type: 'filter_titles',
+    //   options: {
+    //     name: e.target.value
+    //   }
+    // })
+  }
+
   return (
     <React.Fragment>
       <Head>
@@ -62,10 +80,18 @@ function xCloudLibrary() {
         {(xcloudTitles.length == 0) ? <Card className='padbottom fullsize'>
           <h1>Loading xCloud library</h1>
           <p>Please wait while we retrieve your xCloud library...</p>
-        </Card> : ''}
+        </Card> : <Card className='padbottom fullsize'>
+          <input type='text' onChange={ filterProducts } placeholder="Search" className='card_input_text_transparent' />
+        </Card> }
 
         {xcloudTitles.map((item, i) => {               
           // console.log(item)
+
+          if(filter.name !== ''){
+            if(! item.LocalizedProperties[0].ProductTitle.toLowerCase().includes(filter.name.toLowerCase())){
+              return
+            }
+          }
 
           return (
             <Card className='padbottom fixedsize' key={i}>

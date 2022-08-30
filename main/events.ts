@@ -172,6 +172,14 @@ export default class Events extends EventEmitter {
                             type: REQ_TYPE_XCLOUD_GET_TITLES,
                             data: titles
                         })
+                    }).catch((error) => {
+                        console.log('Error fetching xCloud titles:', error)
+    
+                        event.sender.send('xcloud', {
+                            type: RES_TYPE_ERROR,
+                            message: 'Error in Promise',
+                            data: error,
+                        })
                     })
 
                 }).catch((error) => {
