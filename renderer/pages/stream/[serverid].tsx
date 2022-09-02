@@ -22,7 +22,13 @@ function Stream() {
   let rerenderTimeout
 
   let xPlayer = new xCloudPlayer('streamComponent', {
-    ui_systemui: [19]
+    ui_systemui: []
+  })
+
+  xPlayer.setControllerRumble(settings.controller_vibration)
+
+  xPlayer.getEventBus().on('connectionstate', (event) => {
+    console.log('connectionstate changed:', event)
   })
 
   React.useEffect(() => {
@@ -43,6 +49,10 @@ function Stream() {
       }
     })
 
+    if((ipc_channel === 'xcloud') ? settings.xcloud_bitrate : settings.xhome_bitrate > 0){
+      xPlayer.setVideoBitrate((ipc_channel === 'xcloud') ? settings.xcloud_bitrate : settings.xhome_bitrate)
+    }
+
     ipcRenderer.on(ipc_channel, (event, args) => {
       if(args.type === 'error') {
         alert((args.data !== undefined) ? args.message+': '+JSON.stringify(args.data) : args.message)
@@ -50,12 +60,13 @@ function Stream() {
       } else if(args.type === 'start_stream'){
         if(args.data.state === 'Provisioned'){
           xPlayer.createOffer().then((offer:any) => {
-            console.log('sdp:', setMediaBitrates(offer.sdp, (ipc_channel == 'home') ? settings.xhome_bitrate || 4096 : settings.xcloud_bitrate || 2048))
+            // console.log('sdp:', setMediaBitrates(offer.sdp, (ipc_channel == 'home') ? settings.xhome_bitrate || 4096 : settings.xcloud_bitrate || 2048))
 
             ipcRenderer.send(ipc_channel, {
               type: 'start_stream_sdp',
               data: {
-                sdp: setMediaBitrates(offer.sdp, (ipc_channel == 'home') ? settings.xhome_bitrate || 4096 : settings.xcloud_bitrate || 2048)
+                sdp: offer.sdp
+                // sdp: (ipc_channel == 'home') ? setMediaBitrates(offer.sdp, settings.xhome_bitrate || 4096) : offer.sdp
               }
             })
           })
@@ -165,48 +176,6 @@ function Stream() {
   function gamepadSend(button){
     console.log('Press button:', button)
     xPlayer.getChannelProcessor('input').pressButton(0, { Nexus: 1 })
-  }
-
-  function setMediaBitrates(sdp, videoBitrate) {
-    return setMediaBitrate(setMediaBitrate(sdp, "video", videoBitrate), "audio", 512);
-  }
-   
-  function setMediaBitrate(sdp, media, bitrate) {
-    var lines = sdp.split("\n");
-    var line = -1;
-    for (var i = 0; i < lines.length; i++) {
-      if (lines[i].indexOf("m="+media) === 0) {
-        line = i;
-        break;
-      }
-    }
-    if (line === -1) {
-      console.debug("Could not find the m line for", media);
-      return sdp;
-    }
-    console.debug("Found the m line for", media, "at line", line);
-   
-    // Pass the m line
-    line++;
-   
-    // Skip i and c lines
-    while(lines[line].indexOf("i=") === 0 || lines[line].indexOf("c=") === 0) {
-      line++;
-    }
-   
-    // If we're on a b line, replace it
-    if (lines[line].indexOf("b") === 0) {
-      console.debug("Replaced b line at line", line);
-      lines[line] = "b=AS:"+bitrate
-      return lines.join("\n");
-    }
-    
-    // Add a new b line
-    console.debug("Adding new b line before line", line);
-    var newLines = lines.slice(0, line)
-    newLines.push("b=AS:"+bitrate)
-    newLines = newLines.concat(lines.slice(line, lines.length))
-    return newLines.join("\n")
   }
 
   return (

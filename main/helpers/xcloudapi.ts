@@ -65,6 +65,7 @@ export default class xCloudApi {
 
                 response.on('end', (data:any) => {
                     if(response.statusCode === 200){
+                        console.log('xCloudApi - getTitles() response: 200')
                         resolve(JSON.parse(responseData))
                     } else {
                         reject({
@@ -95,6 +96,7 @@ export default class xCloudApi {
                 },
             }, (response:any) => {
                 response.on('data', (data:any) => {
+                    console.log('xCloudApi - getConsoles() response: 200')
                     // console.log('data', data)
                     responseData += data
                 });
@@ -167,22 +169,6 @@ export default class xCloudApi {
                         "sdkInstallId": ""
                     }
                 },
-                "conn": {
-                    "cell": {
-                        "carrier": "",
-                        "mcc": "",
-                        "mnc": "",
-                        "networkDetail": "",
-                        "roaming": "Unknown",
-                        "strengthPct": -1
-                    },
-                    "type": "Wifi",
-                    "wifi": {
-                        "freq": -2147483648,
-                        "strengthDbm": -2147483648,
-                        "strengthPct": 80
-                    }
-                },
                 "dev": {
                     "hw": {
                         "make": "Micro-Star International Co., Ltd.",
@@ -192,6 +178,16 @@ export default class xCloudApi {
                     "os": {
                         "name": "Windows 10 Pro",
                         "ver": "19041.1.amd64fre.vb_release.191206-1406"
+                    },
+                    "displayInfo": {
+                        "dimensions": {
+                            "widthInPixels": 1920,
+                            "heightInPixels": 1080
+                        },
+                        "pixelDensity": {
+                            "dpiX": 1,
+                            "dpiY": 1
+                        }
                     }
                 }
             })
@@ -222,6 +218,8 @@ export default class xCloudApi {
                             body: body
                         })
                     } else {
+                        console.log('xCloudApi - startSession() response: 200')
+
                         const data = JSON.parse(body)
                         // console.log('resObject', resObject)
                         // response.json().then((data) => {
@@ -373,6 +371,8 @@ export default class xCloudApi {
                             console.log('xCloudPlayer Client - '+url+' - Ready! Got data:', data)
                             resolve(data)
                         } else {
+                            console.log('xCloudPlayer Client - '+url+' -', data)
+
                             setTimeout(() => {
                                 this.isProvisioningReady(url).then((data:any) => {
                                     resolve(data)
@@ -462,7 +462,7 @@ export default class xCloudApi {
                    },
                    "control":{
                       "minVersion":1,
-                      "maxVersion":2
+                      "maxVersion":3
                    },
                    "input":{
                       "minVersion":1,

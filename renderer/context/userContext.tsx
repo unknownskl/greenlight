@@ -39,7 +39,11 @@ export const SettingsContext = React.createContext({
 export const useSettings = () => useContext(SettingsContext)
 
 export const SettingsProvider = ({ children }) => {
-    const [settings, setSettings] = useState({})
+    const [settings, setSettings] = useState({
+        xhome_bitrate: 0,
+        xcloud_bitrate: 0,
+        controller_vibration: true
+    })
 
     return <SettingsContext.Provider value={{ settings, setSettings }}> {children} </SettingsContext.Provider>
 }
