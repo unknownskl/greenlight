@@ -28,10 +28,7 @@ jobs:
           node-version: 14
 
       - name: Install dependencies
-        run: npm ci
-
-      - name: Compile webpack scripts
-        run: npm run compile
+        run: yarn
 
       - name: Build/release Electron app
         uses: samuelmeuli/action-electron-builder@v1
