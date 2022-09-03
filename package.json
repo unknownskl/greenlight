@@ -2,8 +2,8 @@
   "private": true,
   "name": "greenlight",
   "description": "Greenlight is a streaming application for Xbox and xCloud",
-  "version": "1.0.0",
-  "author": "Yoshihide Shiono <shiono.yoshihide@gmail.com>",
+  "version": "2.0.0-alpha1",
+  "author": "UnknownSKL",
   "main": "app/background.js",
   "scripts": {
     "dev": "nextron",
