@@ -9,10 +9,8 @@ import Header from '../components/header'
 import Footer from '../components/footer'
 import Auth from '../components/auth'
 import SidebarFriends from '../components/sidebar/friends'
-import StreamComponent from '../components/ui/streamcomponent'
 
-
-import { UserProvider, SettingsProvider, useSettings, useUser, XcloudProvider } from '../context/userContext'
+import { UserProvider } from '../context/userContext'
 
 
 // This default export is required in a new `pages/_app.js` file.
@@ -107,7 +105,7 @@ export default function MyApp({ Component, pageProps }) {
   if(loggedIn){
     appBody = (
       <React.Fragment>
-        <Header gamertag={ prevUserState.gamertag } hidden={ isStreaming() } level={ prevUserState.level } />
+        <Header gamertag={ prevUserState.gamertag } hidden={ isStreaming() } level={ parseInt(prevUserState.level) } />
 
         <div id="app_body">
           <Component {...pageProps} />
