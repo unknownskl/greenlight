@@ -59,3 +59,21 @@ div#component_streamcomponent_gamebar div#component_streamcomponent_gamebar_menu
     display: flex;
     gap: 20px;
 }
+
+div#component_streamcomponent_loader {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    position: fixed;
+    z-index: 98;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    text-align: center;
+}
+
+div#component_streamcomponent_loader.hidden {
+    display: none;
+}

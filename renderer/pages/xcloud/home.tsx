@@ -7,13 +7,17 @@ import { ipcRenderer } from 'electron'
 import Header from '../../components/header'
 import Card from '../../components/ui/card'
 import { useXcloud } from '../../context/userContext'
-import Button from '../../components/ui/button';
+import Button from '../../components/ui/button'
+import Loader from '../../components/ui/loader'
 
 function xCloudLibrary() {
   const { xcloudTitles, setXcloudTitles} = useXcloud()
   const [filter, setFilter] = React.useState({
     name: ''
   });
+  const [page, setPage] = React.useState(0);
+
+  const resultsPerPage = 40
 
   React.useEffect(() => {
     if(xcloudTitles.length == 0){
@@ -50,6 +54,7 @@ function xCloudLibrary() {
   function filterProducts(e){
     console.log('Search value:', e.target.value)
 
+    setPage(0)
     setFilter({
       name: e.target.value
     })
@@ -60,6 +65,55 @@ function xCloudLibrary() {
     //     name: e.target.value
     //   }
     // })
+  }
+
+  function nextPage(){
+    setPage(page+1)
+    window.scrollTo({ top: 0 })
+  }
+
+  function prevPage(){
+    setPage(page-1)
+    window.scrollTo({ top: 0 })
+  }
+
+  function gotoPage(page){
+    setPage(parseInt(page)-1)
+    window.scrollTo({ top: 0 })
+  }
+
+  function drawPageButtons(){
+    const buttons = []
+    const totalPages = Math.ceil(filterTitles(xcloudTitles, filter).length/resultsPerPage)
+  
+    buttons.push((<Button onClick={ prevPage } disabled={page <= 0} label="Previous page"></Button>))
+    for(let i=1; i <= totalPages; i++){
+      buttons.push((<Button key={i} label={i.toString()} className={ page == (i-1) ? 'btn-primary': '' } onClick={ () => { gotoPage(i) }}></Button>))
+    }
+    buttons.push((<Button onClick={ nextPage } disabled={page >= totalPages-1} label="Next page"></Button>))
+
+    return buttons
+  }
+
+  function filterTitles(titles, filter){
+
+    let returnTitles = []
+    let filterActive = false
+
+    for(const title in titles){
+      if(filter.name !== ''){
+        filterActive = true
+        if(titles[title].LocalizedProperties[0].ProductTitle.toLowerCase().includes(filter.name.toLowerCase())){
+          returnTitles.push(titles[title])
+        }
+      }
+    }
+
+    if(filterActive === false){
+      returnTitles = titles
+    }
+
+    return returnTitles
   }
 
   return (
@@ -78,21 +132,32 @@ function xCloudLibrary() {
       }}>
 
         {(xcloudTitles.length == 0) ? <Card className='padbottom fullsize'>
-          <h1>Loading xCloud library</h1>
-          <p>Please wait while we retrieve your xCloud library...</p>
+
+          <div style={{
+            display: 'flex'
+          }}>
+            <div style={{
+              paddingRight: 20
+            }}>
+              <Loader></Loader>
+            </div>
+            <div>
+              <h1>Loading xCloud library</h1>
+              <p>Please wait while we retrieve your xCloud library...</p>
+            </div>
+          </div>
         </Card> : <Card className='padbottom fullsize'>
-          <input type='text' onChange={ filterProducts } placeholder="Search" className='card_input_text_transparent' />
+          <input type='text' onChange={ filterProducts } placeholder="Search xCloud title" className='card_input_text_transparent' />
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            paddingTop: 10
+          }}>
+            { drawPageButtons() }
+          </div>
         </Card> }
 
-        {xcloudTitles.map((item, i) => {               
-          // console.log(item)
-
-          if(filter.name !== ''){
-            if(! item.LocalizedProperties[0].ProductTitle.toLowerCase().includes(filter.name.toLowerCase())){
-              return
-            }
-          }
-
+        {filterTitles(xcloudTitles, filter).slice(page*resultsPerPage, ((page*resultsPerPage)+resultsPerPage)).map((item, i) => {
           return (
             <Card className='padbottom fixedsize' key={i}>
               <p style={{ height: '40px' }}>{item.LocalizedProperties[0].ProductTitle}</p>
@@ -109,6 +174,20 @@ function xCloudLibrary() {
             </Card>
           )
         })}
+
+        {(filterTitles(xcloudTitles, filter).length == 0 && xcloudTitles.length > 0) ? <Card className='padbottom fullsize'>
+          <h1>No results</h1>
+          <p>There are no xCloud titles matching your search query.</p>
+        </Card> : ''}
+
+        {(xcloudTitles.length == 0) ? '' : <Card className='padbottom fullsize'>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between'
+          }}>
+            { drawPageButtons() }
+          </div>
+        </Card> }
           
       </div>
     </React.Fragment>

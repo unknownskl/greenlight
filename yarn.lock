@@ -11860,20 +11860,20 @@ x-default-browser@^0.4.0:
   optionalDependencies:
     default-browser-id "^1.0.4"
 
-xbox-webapi@^1.3.0:
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/xbox-webapi/-/xbox-webapi-1.3.0.tgz#864fab1010307fd498b116b02397578dd435b9e3"
-  integrity sha512-zPzc/fQtPTPDvwQRO91+oXvJUerR1ojc/0FmaMhAuTnYi0pNtrx8HWkf/33D4pGD7DB+bhSwmdEharw7meDKtQ==
+xbox-webapi@^1.4.1:
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/xbox-webapi/-/xbox-webapi-1.4.1.tgz#bb66b44eccc6629cb8d5868f049cc1042399ea2a"
+  integrity sha512-Vm7csk3AOO1zErvN4hZUSalC72/klzZDwbl3rc2HHuE1syhfIzg5pVkOeEHdRnZzLsg+XFVpHkuG4wNk+fBvpw==
   dependencies:
     cli-ux "^6.0.6"
     debug "^4.2.0"
     express "^4.17.1"
     uuid4 "^2.0.2"
 
-xbox-xcloud-player@0.2.0-beta3:
-  version "0.2.0-beta3"
-  resolved "https://registry.yarnpkg.com/xbox-xcloud-player/-/xbox-xcloud-player-0.2.0-beta3.tgz#14bd7eed3a0c57aa82d15bf181427bc81fe4eb5c"
-  integrity sha512-6fYB5hIJXG0vEyAvEPOnhk9CeMt8d2TzOTbjNkdvL4gOE5FxvhPXG5lszcG2Eng93KKj4OfhAn+jvz2QiGgBrA==
+xbox-xcloud-player@0.2.0-beta4:
+  version "0.2.0-beta4"
+  resolved "https://registry.yarnpkg.com/xbox-xcloud-player/-/xbox-xcloud-player-0.2.0-beta4.tgz#39d38c1f01439054e8744ac4631ec9e74acf5788"
+  integrity sha512-MAUc76TNFQI0MITKIg1n3uheG7x8RyeIn/S7Qcq8+TEhjyDdrddUvwZgP4gWSg7k4NpLbbKOa8vwjYCHrKEUWg==
 
 xdg-basedir@^4.0.0:
   version "4.0.0"

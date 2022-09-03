@@ -15,7 +15,7 @@ export default class xboxWorker {
             // console.log('xboxWorker has been loaded!')
             // new Notification({ title: 'User logged in', body: 'Welcome back, '+userinfo.gamertag }).show()
 
-            setInterval(() => { this.intervalFriends() }, 15 * 1000) // Api is limited to 30 requests per 300 seconds. (300/30 = 10 sec)
+            setInterval(() => { this.intervalFriends() }, 30 * 1000) // Api is limited to 30 requests per 300 seconds. (300/30 = 10 sec)
             this.intervalFriends()
         })
     }

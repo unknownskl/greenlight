@@ -1,0 +1,14 @@
+div.components_achievement_gamerow {
+    display: flex;
+    min-height: 30px;
+    padding-bottom: 10px;
+}
+
+div.components_achievement_gamerow a {
+    text-decoration: none;
+    color: inherit;
+}
+
+div.components_achievement_gamerow_right {
+    margin-left: auto;
+}

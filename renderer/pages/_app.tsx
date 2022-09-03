@@ -143,11 +143,7 @@ export default function MyApp({ Component, pageProps }) {
         height: '100vh'
       }}>
         <UserProvider>
-          <SettingsProvider>
-            <XcloudProvider>
-              {appBody}
-            </XcloudProvider>
-          </SettingsProvider>
+          {appBody}
         </UserProvider>
       </div>
     </React.Fragment>

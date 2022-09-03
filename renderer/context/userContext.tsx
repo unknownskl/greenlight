@@ -6,14 +6,6 @@ export const UserContext = React.createContext({
 })
 export const useUser = () => useContext(UserContext)
 
-export const UserProvider = ({ children }) => {
-    const [consoles, setConsoles] = useState([])
-
-    return <UserContext.Provider value={{ consoles, setConsoles }}>
-                    {children}
-            </UserContext.Provider>
-}
-
 
 
 export const XcloudContext = React.createContext({
@@ -21,14 +13,6 @@ export const XcloudContext = React.createContext({
     setXcloudTitles: async (titles) => null,
 })
 export const useXcloud = () => useContext(XcloudContext)
-
-export const XcloudProvider = ({ children }) => {
-    const [xcloudTitles, setXcloudTitles] = useState([])
-
-    return <XcloudContext.Provider value={{ xcloudTitles, setXcloudTitles }}>
-                    {children}
-            </XcloudContext.Provider>
-}
 
 
 
@@ -38,12 +22,32 @@ export const SettingsContext = React.createContext({
 })
 export const useSettings = () => useContext(SettingsContext)
 
-export const SettingsProvider = ({ children }) => {
+export const AchievementsContext = React.createContext({
+    achievements: undefined,
+    setAchievements: async (settings) => null,
+})
+export const useAchievements = () => useContext(AchievementsContext)
+
+
+
+export const UserProvider = ({ children }) => {
+    const [consoles, setConsoles] = useState([])
+    const [xcloudTitles, setXcloudTitles] = useState([])
     const [settings, setSettings] = useState({
         xhome_bitrate: 0,
         xcloud_bitrate: 0,
         controller_vibration: true
     })
+    const [achievements, setAchievements] = useState([])
 
-    return <SettingsContext.Provider value={{ settings, setSettings }}> {children} </SettingsContext.Provider>
+
+    return <UserContext.Provider value={{ consoles, setConsoles }}>
+        <XcloudContext.Provider value={{ xcloudTitles, setXcloudTitles }}>
+            <SettingsContext.Provider value={{ settings, setSettings }}>
+                <AchievementsContext.Provider value={{ achievements, setAchievements }}>
+                    {children}
+                </AchievementsContext.Provider>
+            </SettingsContext.Provider>
+        </XcloudContext.Provider>
+    </UserContext.Provider>
 }

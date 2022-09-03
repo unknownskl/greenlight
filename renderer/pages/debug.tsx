@@ -60,9 +60,9 @@ function Debug() {
       }}>
 
         <Card className='padbottom'>
-          <h1>Settings</h1>
+          <h1>Debug</h1>
 
-          <pre>{JSON.stringify(settings)}</pre>
+          <pre>{JSON.stringify(JSON.parse(JSON.stringify(settings)), null, 2)  }</pre>
         </Card>
 
       </div>

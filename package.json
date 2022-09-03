@@ -15,8 +15,8 @@
   "dependencies": {
     "electron-serve": "^1.1.0",
     "electron-store": "^8.0.1",
-    "xbox-webapi": "^1.3.0",
-    "xbox-xcloud-player": "0.2.0-beta3"
+    "xbox-webapi": "^1.4.1",
+    "xbox-xcloud-player": "0.2.0-beta4"
   },
   "devDependencies": {
     "@babel/core": "^7.18.6",

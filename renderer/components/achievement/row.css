@@ -1,0 +1,21 @@
+div.components_achievement_row {
+    display: flex;
+    min-height: 90px;
+    padding-bottom: 10px;
+}
+
+div.components_achievement_row img.components_achievement_row_icon {
+    aspect-ratio: 16/9;
+    width: 120px;
+    margin-right: 20px;
+}
+div.components_achievement_row div.components_achievement_row_rewards p {
+    font-size: 13px;
+    color: grey;
+    padding-bottom: 5px;
+}
+
+div.components_achievement_row_right {
+    margin-left: auto;
+}
+

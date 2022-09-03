@@ -29,6 +29,20 @@ function Stream() {
 
   xPlayer.getEventBus().on('connectionstate', (event) => {
     console.log('connectionstate changed:', event)
+
+    const connStatus = document.getElementById('component_streamcomponent_connectionstatus')
+    if(connStatus !== null){
+      if(event.state == 'connected'){
+        connStatus.innerText = 'Client has been connected!'
+        document.getElementById('component_streamcomponent_loader').className = 'hidden'
+
+      } else if(event.state == 'new'){
+        connStatus.innerText = 'Starting connection...'
+
+      } else if(event.state == 'connecting'){
+        connStatus.innerText = 'Connecting to console...'
+      }
+    }
   })
 
   React.useEffect(() => {

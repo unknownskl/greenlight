@@ -15,6 +15,12 @@ const REQ_TYPE_STREAM_STOP_STREAM = 'stop_stream'
 
 const REQ_TYPE_XCLOUD_GET_TITLES = 'get_titles'
 
+const REQ_TYPE_WEB_GET_RECENT_ACHIEVEMENTS = 'get_recent_achievements'
+const REQ_TYPE_WEB_GET_RECENT_ACHIEVEMENTS_TITLEID = 'get_recent_achievements_titleid'
+
+const REQ_TYPE_MARKET_GET_PRODUCT = 'get_product'
+
+
 const RES_TYPE_ERROR = 'error'
 
 export default class Events extends EventEmitter {
@@ -33,6 +39,8 @@ export default class Events extends EventEmitter {
         // Init IPCMain
         this._setupStreaming()
         this._setupxCloud()
+        this._setupWeb()
+        this._setupMarketplace()
 
         this.on('start', (tokens) => {
             // We have been authenticated. We can load things like gamerpic etc here
@@ -41,13 +49,16 @@ export default class Events extends EventEmitter {
             this._xCloudApi = new xCloudApi(this._application, tokens.xcloud.host, tokens.xcloud.token, 'cloud')
             this._webApi = new xboxWebApi({
                 userToken: tokens.web.token,
-                uhs: tokens.web.uhs,
+                uhs: tokens.web.uhs
             })
             this._xCloudBrowser = new xCloudBrowser(this._webApi, this._application._authentication._tokens.xcloud.market)
             // console.log('web tokens:', tokens.web)
 
             this._webApi.getProvider('profile').get('/users/me/profile/settings?settings=GameDisplayName,GameDisplayPicRaw,Gamerscore,Gamertag').then((result) => {
-                // console.log('resolve', result.profileUsers[0])
+                this._webApi.getProvider('userpresence').get('/users/me').then((result) => {
+                    // Set xuid hack
+                    this._webApi._authentication._user = { xid: result.xuid }
+                })
 
                 if(result.profileUsers.length > 0) {
                     for(const setting in result.profileUsers[0].settings){
@@ -244,6 +255,81 @@ export default class Events extends EventEmitter {
                     type: RES_TYPE_ERROR,
                     message: 'Unknown Type: '+arg.type
                 })
+            }
+        })
+    }
+
+    _setupWeb(){
+        ipcMain.on('xboxweb', (event, arg) => {
+            switch(arg.type){
+                case REQ_TYPE_WEB_GET_RECENT_ACHIEVEMENTS:
+                    this._webApi.getProvider('achievements').getTitleAchievements(arg.continuationToken || 0).then((data) => {
+                        event.sender.send('xboxweb', {
+                            type: REQ_TYPE_WEB_GET_RECENT_ACHIEVEMENTS,
+                            data: data
+                        })
+
+                    }).catch((error) => {
+                        console.log('events.ts - Failed to fetch achievements:', error)
+                        event.sender.send('xboxweb', {
+                            type: RES_TYPE_ERROR,
+                            message: 'Failed to retrieve achievements: '+error
+                        })
+                    })
+                    break;
+
+                case REQ_TYPE_WEB_GET_RECENT_ACHIEVEMENTS_TITLEID:
+                    console.log(arg)
+                    this._webApi.getProvider('achievements').getTitleId(arg.titleid || 0, arg.continuationToken || 0).then((data) => {
+                        event.sender.send('xboxweb', {
+                            type: REQ_TYPE_WEB_GET_RECENT_ACHIEVEMENTS_TITLEID,
+                            data: data
+                        })
+
+                    }).catch((error) => {
+                        console.log('events.ts - Failed to fetch achievements:', error)
+                        event.sender.send('xboxweb', {
+                            type: RES_TYPE_ERROR,
+                            message: 'Failed to retrieve achievements: '+error
+                        })
+                    })
+                    break;
+
+                default:
+                    event.sender.send('xboxweb', {
+                        type: RES_TYPE_ERROR,
+                        message: 'Unknown request type: '+arg.type
+                    })
+                    break;
+            }
+        })
+    }
+
+    _setupMarketplace(){
+        ipcMain.on('marketplace', (event, arg) => {
+            switch(arg.type){
+                case REQ_TYPE_MARKET_GET_PRODUCT:
+                    // this._webApi.getProvider('achievements').getTitleAchievements(arg.continuationToken || 0).then((data) => {
+                    //     event.sender.send('xboxweb', {
+                    //         type: REQ_TYPE_WEB_GET_RECENT_ACHIEVEMENTS,
+                    //         data: data
+                    //     })
+
+                    // }).catch((error) => {
+                    //     console.log('events.ts - Failed to fetch achievements:', error)
+                        event.sender.send('marketplace', {
+                            type: RES_TYPE_ERROR,
+                            // message: 'Failed to retrieve product: '+error
+                            message: 'Not implemented'
+                        })
+                    // })
+                    break;
+                default:
+                    event.sender.send('marketplace', {
+                        type: RES_TYPE_ERROR,
+                        message: 'Unknown request type: '+arg.type
+                    })
+                    break;
             }
         })
     }

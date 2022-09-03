@@ -1,9 +1,11 @@
 import { ipcRenderer } from 'electron'
-import Link from 'next/link';
-import Router from 'next/router';
-import React from 'react';
+import Link from 'next/link'
+import Router from 'next/router'
+import React from 'react'
 import Button from './button'
 import xPlayer from 'xbox-xcloud-player'
+import Loader from './loader'
+import Card from './card'
 
 interface StreamComponentProps {
   hidden?: boolean;
@@ -93,6 +95,17 @@ function StreamComponent({
     <React.Fragment>
       <div>
         <div id="streamComponentHolder">
+        </div>
+
+        <div id="component_streamcomponent_loader">
+          <Card className='padbottom'>
+            <h1>Loading...</h1>
+
+            <Loader></Loader>
+
+            <p>We are getting your stream ready...</p>
+            <p id="component_streamcomponent_connectionstatus"></p>
+          </Card>
         </div>
 
         <div id="component_streamcomponent_gamebar">

@@ -370,6 +370,8 @@ export default class xCloudApi {
                         if(data.state === 'Provisioned' || data.state === 'ReadyToConnect'){
                             console.log('xCloudPlayer Client - '+url+' - Ready! Got data:', data)
                             resolve(data)
+                        } else if(data.state == 'Failed') {
+                            reject(data)
                         } else {
                             console.log('xCloudPlayer Client - '+url+' -', data)
 
