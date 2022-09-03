@@ -27,6 +27,7 @@ body {
 @import 'components/ui/card.css';
 @import 'components/ui/label.css';
 @import 'components/ui/streamcomponent.css';
+@import 'components/ui/progressbar.css';
 
 @import 'components/sidebar/friends.css';
 @import 'components/sidebar/frienditem.css';

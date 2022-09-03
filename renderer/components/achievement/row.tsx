@@ -62,7 +62,7 @@ function AchievementRow({
 
         <div>
             <p style={{ fontWeight: 200 }}>{achievement.name}</p>
-            <p>{achievement.isSecret ? 'This is a secret...' : achievement.progressState == 'Achieved' ? achievement.description : achievement.lockedDescription}</p>
+            <p>{(achievement.isSecret && achievement.progressState !== 'Achieved') ? 'This is a secret...' : achievement.progressState == 'Achieved' ? achievement.description : achievement.lockedDescription}</p>
 
             <div className='components_achievement_row_rewards'>
               <p>Rewards:</p>

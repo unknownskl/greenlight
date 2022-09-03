@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import React from 'react'
 import Button from '../ui/button'
+import ProgressBar from '../ui/progressbar'
 
 interface SidebarFriendItemProps {
   achievement;
@@ -22,8 +23,11 @@ function AchievementGameRow({
         </div>
 
         <div className='components_achievement_gamerow_right'>
-          <p>{achievement.currentGamerscore}/{achievement.maxGamerscore} G</p>
-          <p>{achievement.earnedAchievements} unlocked</p>
+          <ProgressBar value={ (achievement.currentGamerscore/achievement.maxGamerscore)*100 }>{achievement.currentGamerscore}/{achievement.maxGamerscore}</ProgressBar>
+
+          <p style={{ textAlign: 'center' }}>
+            {achievement.earnedAchievements} 🏆
+          </p>
         </div>
       </div>
     </React.Fragment>

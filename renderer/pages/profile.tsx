@@ -13,7 +13,9 @@ import { useAchievements } from '../context/userContext'
 
 function Profile() {
   const {achievements, setAchievements} = useAchievements()
+  const [page, setPage] = React.useState(0);
   let loadingAchievements = []
+  const resultsPerPage = 10
 
   React.useEffect(() => {
     if(achievements.length <= 0){
@@ -29,9 +31,7 @@ function Profile() {
 
       } else if(args.type == 'get_recent_achievements') {
         console.log('Received achievements:', args)
-        // @TODO: Continuation token
         loadingAchievements = [...loadingAchievements, ...args.data.titles]
-        // console.log(loadingAchievements, [...loadingAchievements, ...args.data.titles])
 
         if(args.data.pagingInfo.continuationToken !== null){
           ipcRenderer.send('xboxweb', {
@@ -52,14 +52,42 @@ function Profile() {
     };
   }, []);
 
-  function sortAchievements(achievements){
+  function filterAchievements(achievements){
+
+    // Sort
     achievements.sort(function(a:any, b:any){
-      // Turn your strings into dates, and then subtract them
-      // to get a value that is either negative, positive, or zero.
       return new Date(b.lastUnlock) - new Date(a.lastUnlock);
     })
 
     return achievements
+  }
+
+  function nextPage(){
+    setPage(page+1)
+    window.scrollTo({ top: 0 })
+  }
+
+  function prevPage(){
+    setPage(page-1)
+    window.scrollTo({ top: 0 })
+  }
+
+  function gotoPage(page){
+    setPage(parseInt(page)-1)
+    window.scrollTo({ top: 0 })
+  }
+
+  function drawPageButtons(){
+    const buttons = []
+    const totalPages = Math.ceil(filterAchievements(achievements).length/resultsPerPage)
+  
+    buttons.push((<Button onClick={ prevPage } disabled={page <= 0} label="Previous page"></Button>))
+    for(let i=1; i <= totalPages; i++){
+      buttons.push((<Button key={i} label={i.toString()} className={ page == (i-1) ? 'btn-primary': '' } onClick={ () => { gotoPage(i) }}></Button>))
+    }
+    buttons.push((<Button onClick={ nextPage } disabled={page >= totalPages-1} label="Next page"></Button>))
+
+    return buttons
   }
 
   return (
@@ -87,12 +115,20 @@ function Profile() {
               </div>
             </div>
 
-            {sortAchievements(achievements).map((item, i) => {
+            {filterAchievements(achievements).slice(page*resultsPerPage, ((page*resultsPerPage)+resultsPerPage)).map((item, i) => {
               // console.log(item)
               return <AchievementGameRow achievement={ item }></AchievementGameRow>
             })}
 
             {achievements.length === 0 ? <Loader></Loader> : ''}
+
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              paddingTop: 10
+            }}>
+              { drawPageButtons() }
+            </div>
           </div>
         </Card>
       </div>
