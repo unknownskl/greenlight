@@ -56,7 +56,7 @@ function Profile() {
 
     // Sort
     achievements.sort(function(a:any, b:any){
-      return new Date(b.lastUnlock) - new Date(a.lastUnlock);
+      return (new Date(b.lastUnlock) as any) - (new Date(a.lastUnlock) as any)
     })
 
     return achievements
