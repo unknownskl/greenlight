@@ -3,12 +3,12 @@ name: Build/release
 on:
   push:
     branches:
-      - main
+      - main-v2
     tags:
       - v*
   pull_request:
     branches:
-      - main
+      - main-v2
 
 jobs:
   release:
