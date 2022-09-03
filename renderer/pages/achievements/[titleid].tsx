@@ -8,7 +8,8 @@ import xCloudPlayer from 'xbox-xcloud-player'
 import Header from '../../components/header'
 import StreamComponent from '../../components/ui/streamcomponent'
 import Card from '../../components/ui/card'
-import AchievementRow from '../../components/achievement/row';
+import AchievementRow from '../../components/achievement/row'
+import Loader from '../../components/ui/loader'
 
 function AchievmentTitle() {
   const router = useRouter()
@@ -65,6 +66,8 @@ function AchievmentTitle() {
             {achievements.map((item, i) => {
               return <AchievementRow achievement={ item }></AchievementRow>
             })}
+
+            {achievements.length === 0 ? <Loader></Loader> : ''}
         </Card>
       </div>
     </React.Fragment>

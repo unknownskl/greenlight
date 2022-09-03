@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react'
 
 export const UserContext = React.createContext({
     consoles: [],
-    setConsoles: async (consoles) => null,
+    setConsoles: (consoles) => null,
 })
 export const useUser = () => useContext(UserContext)
 
@@ -10,7 +10,7 @@ export const useUser = () => useContext(UserContext)
 
 export const XcloudContext = React.createContext({
     xcloudTitles: [],
-    setXcloudTitles: async (titles) => null,
+    setXcloudTitles: (titles) => null,
 })
 export const useXcloud = () => useContext(XcloudContext)
 
@@ -18,13 +18,13 @@ export const useXcloud = () => useContext(XcloudContext)
 
 export const SettingsContext = React.createContext({
     settings: undefined,
-    setSettings: async (settings) => null,
+    setSettings: (settings) => null,
 })
 export const useSettings = () => useContext(SettingsContext)
 
 export const AchievementsContext = React.createContext({
     achievements: undefined,
-    setAchievements: async (settings) => null,
+    setAchievements: (settings) => null,
 })
 export const useAchievements = () => useContext(AchievementsContext)
 
