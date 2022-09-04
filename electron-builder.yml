@@ -3,7 +3,6 @@ productName: Greenlight
 copyright: Copyright © 2021-2022 UnknownSKL
 homepage: https://github.com/unknownskl/xbox-xcloud-client
 license: MIT
-author: UnknownSKL
 
 directories:
   output: dist
