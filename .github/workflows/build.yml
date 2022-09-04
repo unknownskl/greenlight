@@ -26,9 +26,7 @@ jobs:
         uses: actions/checkout@v3
       
       - name: Install flatpak and flatpak-builder
-        run: |
-          sudo apt-get install -y flatpak flatpak-builder elfutils
-          sudo flatpak remote-add --if-not-exists --system flathub https://flathub.org/repo/flathub.flatpakrepo
+        run: sudo apt-get install -y flatpak flatpak-builder elfutils && sudo flatpak remote-add --if-not-exists --system flathub https://flathub.org/repo/flathub.flatpakrepo
         if: matrix.os == 'ubuntu-latest'
 
       - name: Install Node.js, NPM and Yarn
