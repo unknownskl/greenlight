@@ -9,6 +9,10 @@ on:
   pull_request:
     branches:
       - main-v2
+      
+env:
+  FPM_DEBUG: flatpak
+  DEBUG: electron-builder
 
 jobs:
   release:
