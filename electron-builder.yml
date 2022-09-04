@@ -1,12 +1,54 @@
-appId: com.example.nextron
-productName: My Nextron App
-copyright: Copyright © 2018 Yoshihide Shiono
+appId: com.unknownskl.greenlight
+productName: Greenlight
+copyright: Copyright © 2021-2022 UnknownSKL
+homepage: https://github.com/unknownskl/xbox-xcloud-client
+license: MIT
+author: UnknownSKL
+
 directories:
   output: dist
   buildResources: resources
+
 files:
   - from: .
     filter:
       - package.json
       - app
 publish: null
+
+
+# Mac OS configuration
+mac:
+  category: public.app-category.games
+  # icon: "src/app/assets/images/icon.icns"
+  target: dmg
+
+# Config for OSX dmg
+dmg:
+  contents:
+    - x: 130
+      y: 220
+    - x: 410
+      y: 220
+      type: "link"
+      path: "/Applications"
+
+# Windows configuration
+win:
+  # icon: "src/app/assets/images/icon.ico"
+  target:
+    - "zip"
+    - "nsis"
+
+# Config for the windows installer
+nsis:
+  oneClick: true
+  perMachine: true
+
+# Linux configuration
+linux:
+  category: Game
+  target:
+    - "AppImage"
+    - "flatpak"
+    - "deb"

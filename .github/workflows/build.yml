@@ -42,25 +42,25 @@ jobs:
           release: ${{ startsWith(github.ref, 'refs/tags/v') }}
         # if: startsWith(github.ref, 'refs/tags/v')
 
-      - name: Build/release Electron app
-        uses: samuelmeuli/action-electron-builder@v1
-        with:
-          # GitHub token, automatically provided to the action
-          # (No need to define this secret in the repo settings)
-          github_token: ${{ secrets.github_token }}
-          args: -l AppImage
+      # - name: Build/release Electron app
+      #   uses: samuelmeuli/action-electron-builder@v1
+      #   with:
+      #     # GitHub token, automatically provided to the action
+      #     # (No need to define this secret in the repo settings)
+      #     github_token: ${{ secrets.github_token }}
+      #     args: -l AppImage
 
-          # If the commit is tagged with a version (e.g. "v1.0.0"),
-          # release the app after building
-          release: ${{ startsWith(github.ref, 'refs/tags/v') }}
-        if: matrix.os == 'ubuntu-latest'
+      #     # If the commit is tagged with a version (e.g. "v1.0.0"),
+      #     # release the app after building
+      #     release: ${{ startsWith(github.ref, 'refs/tags/v') }}
+      #   if: matrix.os == 'ubuntu-latest'
 
       - name: Publish artifacts on ubuntu
         uses: actions/upload-artifact@v2
         with:
-          name: xbox-xcloud-electron-linux.deb
+          name: xbox-xcloud-electron-linux.AppImage
           path: |
-            dist/*.deb
+            dist/*.Appimage
         if: matrix.os == 'ubuntu-latest' && contains(github.event.head_commit.message, '[build]')
 
       - name: Publish artifacts on osx
