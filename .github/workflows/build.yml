@@ -31,7 +31,7 @@ jobs:
 
       - name: Install flathub repo
         run: |
-          sudo flatpak remote-add --if-not-exists --system flathub https://flathub.org/repo/flathub.flatpakrepo
+          sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
         if: matrix.os == 'ubuntu-latest'
 
       - name: Install Node.js, NPM and Yarn
