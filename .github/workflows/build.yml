@@ -11,8 +11,7 @@ on:
       - main-v2
       
 env:
-  FPM_DEBUG: flatpak
-  DEBUG: electron-builder
+  DEBUG: '*'
 
 jobs:
   release:
