@@ -21,6 +21,10 @@ jobs:
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v3
+      
+      - name: Install flatpak
+        run: sudo apt-get install -y flatpak
+        if: matrix.os == 'ubuntu-latest'
 
       - name: Install Node.js, NPM and Yarn
         uses: actions/setup-node@v3.4.1
