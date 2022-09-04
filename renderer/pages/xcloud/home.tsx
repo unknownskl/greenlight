@@ -44,7 +44,7 @@ function xCloudLibrary() {
   function getBoxArt(images){
     for(const image in images){
       if(images[image].ImagePurpose == 'BoxArt'){
-        return images[image].Uri
+        return 'https:' + images[image].Uri
       }
     }
     console.log('no image ;(', images)
