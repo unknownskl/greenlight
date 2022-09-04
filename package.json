@@ -3,8 +3,7 @@
   "name": "greenlight",
   "description": "Greenlight is a streaming application for Xbox and xCloud",
   "version": "2.0.0-alpha1",
-  "author": "UnknownSKL",
-  "email": "info+github@jimkroon.nl",
+  "author": "UnknownSKL <info+github@jimkroon.nl>",
   "main": "app/background.js",
   "scripts": {
     "dev": "nextron",
