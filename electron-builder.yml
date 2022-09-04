@@ -49,3 +49,11 @@ linux:
     - "AppImage"
     - "flatpak"
     - "deb"
+
+flatpak:
+  runtime: org.freedesktop.Platform
+  runtimeVersion: 21.08
+
+  sdk: org.freedesktop.Sdk
+  base: org.electronjs.Electron2.BaseApp
+  baseVersion: 21.08
