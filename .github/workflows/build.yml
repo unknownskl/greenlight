@@ -19,11 +19,11 @@ jobs:
         os: [macos-latest, ubuntu-latest, windows-latest]
 
     steps:
-      - name: Check out Git repository
+      - name: Checkout Git repository
         uses: actions/checkout@v3
       
-      - name: Install flatpak
-        run: sudo apt-get install -y flatpak
+      - name: Install flatpak and flatpak-builder
+        run: sudo apt-get install -y flatpak flatpak-builder
         if: matrix.os == 'ubuntu-latest'
 
       - name: Install Node.js, NPM and Yarn
@@ -31,7 +31,7 @@ jobs:
         with:
           node-version: 14
 
-      - name: Install dependencies
+      - name: Install yarn dependencies
         run: yarn
 
       - name: Build/release Electron app
