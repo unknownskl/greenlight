@@ -67,7 +67,7 @@ jobs:
       #     release: ${{ startsWith(github.ref, 'refs/tags/v') }}
       #   if: matrix.os == 'ubuntu-latest'
 
-      - name: Publish artifacts on ubuntu
+      - name: Publish AppImage
         uses: actions/upload-artifact@v2
         with:
           name: xbox-xcloud-electron-linux.AppImage
@@ -75,7 +75,7 @@ jobs:
             dist/*.Appimage
         if: matrix.os == 'ubuntu-latest' && contains(github.event.head_commit.message, '[build]')
 
-      - name: Publish artifacts on osx
+      - name: Publish DMG
         uses: actions/upload-artifact@v2
         with:
           name: xbox-xcloud-electron-osx.dmg
@@ -83,7 +83,7 @@ jobs:
             dist/*.dmg
         if: matrix.os == 'macos-latest' && contains(github.event.head_commit.message, '[build]')
 
-      - name: Publish artifacts on windows
+      - name: Publish EXE
         uses: actions/upload-artifact@v2
         with:
           name: xbox-xcloud-electron-windows.zip

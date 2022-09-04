@@ -19,6 +19,7 @@ mac:
   category: public.app-category.games
   # icon: "src/app/assets/images/icon.icns"
   target: dmg
+  arch: [ "universal" ]
 
 # Config for OSX dmg
 dmg:
