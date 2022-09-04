@@ -10,8 +10,8 @@ on:
     branches:
       - main-v2
       
-env:
-  DEBUG: '*'
+# env:
+#   DEBUG: '*'
 
 jobs:
   release:
