@@ -47,7 +47,7 @@ linux:
   category: Game
   target:
     - "AppImage"
-    - "flatpak"
+    # - "flatpak"
     - "deb"
 
 flatpak:
