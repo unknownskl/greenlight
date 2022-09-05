@@ -43,7 +43,7 @@
   "dependencies": {
     "electron-squirrel-startup": "^1.0.0",
     "url": "^0.11.0",
-    "xbox-webapi": "^1.4.0"
+    "xbox-webapi": "^1.4.1"
   },
   "devDependencies": {
     "@electron-forge/cli": "^6.0.0-beta.65",
