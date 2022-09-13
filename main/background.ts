@@ -53,11 +53,11 @@ export default class Application {
 
   async start(){
     // Load React Devtools
-    const reactDevToolsPath = path.join(
-      os.homedir(),
-      '/Library/Application Support/Google/Chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/4.25.0_0'
-    )
-    await session.defaultSession.loadExtension(reactDevToolsPath)
+    // const reactDevToolsPath = path.join(
+    //   os.homedir(),
+    //   '/Library/Application Support/Google/Chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/4.25.0_0'
+    // )
+    // await session.defaultSession.loadExtension(reactDevToolsPath)
 
     const extraOptions:extraOptions = {}
 
