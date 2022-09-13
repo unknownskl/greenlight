@@ -6,12 +6,17 @@ const path = require('path')
 const os = require('os')
 
 const isProd: boolean = process.env.NODE_ENV === 'production';
+
+interface extraOptions {
+  fullscreen?: boolean;
+}
 export default class Application {
   _events:Events
   _authentication:Authentication
   _xboxWorker:xboxWorker
 
   _mainWindow:BrowserWindow
+  _fullscreenMode = false
 
   _isQuitting = false
 
@@ -20,6 +25,13 @@ export default class Application {
     this._authentication = new Authentication(this)
     this._xboxWorker = new xboxWorker(this)
 
+    // Read fullscreen switch
+    if(process.argv.includes('--fullscreen')){
+      console.log('- Fullscreen switch acive')
+      this._fullscreenMode = true
+    }
+
+    // Boot application
     if(this.isProd()) {
       serve({ directory: 'app' });
     } else {
@@ -46,10 +58,17 @@ export default class Application {
       '/Library/Application Support/Google/Chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/4.25.0_0'
     )
     await session.defaultSession.loadExtension(reactDevToolsPath)
+
+    const extraOptions:extraOptions = {}
+
+    if(this._fullscreenMode === true){
+      extraOptions.fullscreen = true
+    }
   
     this._mainWindow = createWindow('main', {
       width: 1000,
       height: 600,
+      ...extraOptions,
     });
   
     if (isProd) {
