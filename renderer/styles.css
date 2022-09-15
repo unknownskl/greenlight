@@ -38,12 +38,16 @@ body {
 
 div#app_body {
     /* position: fixed; */
-    padding-top: 70px;
+    /* padding-top: 70px; */
     /* left: 0px; */
     width: 70vw;
-    /* height: 100vh; */
+    height: 100vh;
     /* bottom: 0px; */
     overflow-y: auto;
+}
+
+div#app_body_container{
+    padding-top: 70px;
 }
 
 div#app_sidebar {

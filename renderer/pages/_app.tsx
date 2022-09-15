@@ -53,34 +53,6 @@ export default function MyApp({ Component, pageProps }) {
         gamerscore: data.gamerscore,
         level: data.level,
       })
-      
-      // setHeaderLinks((headerLinks.length > 0) ? headerLinks : [
-      //   {
-      //     name: 'My Consoles',
-      //     title: 'View consoles',
-      //     url: '/home'
-      //   },{
-      //     name: 'xCloud Library',
-      //     title: 'Browse xCloud library',
-      //     url: '/xcloud/home'
-      //   },{
-      //   //   name: 'Marketplace',
-      //   //   title: 'Browse the marketplace',
-      //   //   url: '/store/home'
-      //   // },{
-      //     name: 'Debug',
-      //     title: 'Debug page',
-      //     url: '/debug'
-      //   },{
-      //     name: 'Settings',
-      //     title: 'Change application settings',
-      //     url: '/settings'
-      //   },{
-      //     name: data.gamertag,
-      //     title: 'View profile',
-      //     url: '/profile'
-      //   }
-      // ])
 
       if(data.loggedIn === true){
         // We are logged in!
@@ -108,7 +80,9 @@ export default function MyApp({ Component, pageProps }) {
         <Header gamertag={ prevUserState.gamertag } hidden={ isStreaming() } level={ parseInt(prevUserState.level) } />
 
         <div id="app_body">
-          <Component {...pageProps} />
+          <div id="app_body_container">
+            <Component {...pageProps} />
+          </div>
         </div>
 
         <div id="app_sidebar" style={{
@@ -133,7 +107,7 @@ export default function MyApp({ Component, pageProps }) {
       </Head>
       
       <div style={ {
-        background: 'linear-gradient(0deg, rgba(26,27,30,1) 0%, rgba(26,27,30,1) 25%, rgba(0,212,255,0) 100%), url(\'/images/backgrounds/background1.jpeg\')',
+        background: 'linear-gradient(0deg, rgba(26,27,30,1) 0%, rgba(26,27,30,1) 25%, rgba(0,212,255,0) 100%), url(\'/images/backgrounds/background1.jpeg\') fixed',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
         backgroundSize: 'cover',

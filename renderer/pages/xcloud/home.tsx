@@ -163,8 +163,8 @@ function xCloudLibrary() {
               <p style={{ height: '40px' }}>{item.LocalizedProperties[0].ProductTitle}</p>
 
               <img src={ getBoxArt(item.LocalizedProperties[0].Images) } loading='lazy' style={{
-                width: 150,
-                height: 150,
+                width: 144,
+                height: 144,
                 marginBottom: 10,
               }} />
 
