@@ -1,38 +1,93 @@
-<p align="center"><img src="https://i.imgur.com/NZfsD1p.png"></p>
+# Greenlight
 
-## Usage
+[![Build/release](https://github.com/unknownskl/xbox-xcloud-client/actions/workflows/build.yml/badge.svg)](https://github.com/unknownskl/xbox-xcloud-client/actions/workflows/build.yml)
 
-### Create an App
+Greenlight is an open-source client for xCloud and xHome streaming made in Javascript and Typescript. The client is an application wrapper around [xbox-xcloud-player](https://github.com/unknownskl/xbox-xcloud-player).
+Application runs on Linux, mac, Windows and Steam Deck.
 
-```
-# with npx
-$ npx create-nextron-app my-app --example with-typescript
+_DISCLAIMER: Greenlight is not affiliated with Microsoft, Xbox or Moonlight. All rights and trademarks are property of their respective owners._
 
-# with yarn
-$ yarn create nextron-app my-app --example with-typescript
+## Features
 
-# with pnpx
-$ pnpx create-nextron-app my-app --example with-typescript
-```
+- Stream video and audio from the Xbox One and Xbox Series
+- Support for gamepad controls
+- Supports rumble on xCloud
+- Keyboard controls
+- Build-in online friends list
 
-### Install Dependencies
+<img src="images/main.png" width="400" /> <img src="images/stream.png" width="400" />
 
-```
-$ cd my-app
+### Keyboard controls
 
-# using yarn or npm
-$ yarn (or `npm install`)
+The following keys are mapped as following:
 
-# using pnpm
-$ pnpm install --shamefully-hoist
-```
+    Dpad: Keypad direction controls
+    Buttons: A, B, X, Y, Backspace (Mapped as B), Enter (Mapped as A)
+    Nexus (Xbox button): N
+    Left bumper: [
+    Right bumper: ]
+    View: V
+    Menu: M
 
-### Use it
+### Streaming stats
 
-```
-# development mode
-$ yarn dev (or `npm run dev` or `pnpm run dev`)
+During the stream you can show extra debug statistics that contain extra data about the buffer queues and other information. To bring this up you have to press `~` on your keyboard.
 
-# production build
-$ yarn build (or `npm run build` or `pnpm run build`)
-```
+On the left bottom you can see the status (Altough not always accurate). The right top you can find the FPS of the video and audio decoders including the latency. On the right bottom you can find debug information about the buffer queues and other information that is useful for debugging perposes.
+
+When possible always provide this information with your issue when possible (if it is related).
+### Online friends list
+
+The application also provides a way to see which of your friends are online. This can be useful when you want to quickly check if anyone is online to play with :)
+
+## Steam Deck
+
+This application is reported to be working on the Steam Deck with some small bugs and side-effects.
+
+### Fullscreen on launch
+
+To launch the application in full-screen mode use the `--fullscreen` argument when launching the application.
+
+### Connect on launch
+
+To auto-connect to your xbox on launch you can provide the `--connect=F400000000000000` argument when launchng the application.
+
+### To close the application
+
+Click on the Xbox logo on the left top. It will ask you to confirm to close the window.
+
+### Number input seems to be broken
+
+This is because the Steam Deck is missing a font and falls back to a font without numbers. The numbers are still being typed but they are not visible. This issue should be solved with the latest patch (not confirmed yet)
+
+## Install
+
+You can either compile the project yourself or download the (unsigned) executable from the [releases](https://github.com/unknownskl/xbox-xcloud-client/releases) page
+
+## Local Development
+
+Clone the repository:
+
+    git clone https://github.com/unknownskl/xbox-xcloud-client.git
+    cd xbox-xcloud-client
+
+Install dependencies:
+
+    yarn
+
+Run development build:
+
+    yarn dev
+
+Create production build:
+
+    yarn build
+
+## Known Issues
+
+- Audio can get distorted when the audio is delayed or gets out of sync. This should recover within 3 seconds. You can also manually press `0` on your keyboard to reset the audio timings.
+- Streaming from the Xbox Series seems to be working much better commpared to the Xbox One. The application is tested on both the Xbox One and Xbox Series.
+
+## Changelog
+
+See [changelog](CHANGELOG.md)
