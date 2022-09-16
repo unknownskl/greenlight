@@ -147,7 +147,7 @@ export default class Authentication {
             title: 'Authentication'
         });
         
-        await authWindow.loadURL('https://account.xbox.com/account/signin?returnUrl=https%3A%2F%2Fwww.xbox.com%2Fen-US%2Fplay&ru=https%3A%2F%2Fwww.xbox.com%2Fen-US%2Fplay');
+        await authWindow.loadURL('https://www.xbox.com/play');
         this._authWindow = authWindow
 
         return authWindow
@@ -161,7 +161,7 @@ export default class Authentication {
             app.relaunch()
             app.exit()
 
-        } else if(details.url.includes('/xbox/accountsignin?returnUrl=https%3a%2f%2fwww.xbox.com%2fen-US%2fplay')){
+        } else if(details.url.includes('/play/login/redirect/?redirectUrl=')){
             // We are already logged in..  Lets get the token..
 
             let cookieFound = false
@@ -267,7 +267,7 @@ export default class Authentication {
             this._tokens.msal.id_token = response.id_token
             this._tokens.msal.client_info = response.client_info
 
-            console.log('- Retrieved MSAL token', response)
+            console.log('- Retrieved MSAL tokens')
             this.setAppTokens(2)
         }).catch((error) => {
 
@@ -397,6 +397,29 @@ export default class Authentication {
         this._loggedIn = true
         this._appLevel = level
 
-        this._application._events.emit('start', this._tokens)
+        this.waitTillReady(level)
+    }
+
+    waitTillReady(level) {
+        if(level == 1) {
+            // Check web token only
+            if(this._tokens.web.token !== false && this._tokens.gamestreaming.token !== false){
+                this._application._events.emit('start', this._tokens)
+            } else {
+                setTimeout(() => {
+                    this.waitTillReady(level)
+                }, 100)
+            }
+        } else {
+            // Check all tokens
+            if(this._tokens.web.token !== false && this._tokens.gamestreaming.token !== false && this._tokens.xcloud.token !== false && this._tokens.msal.token !== false){
+                this._application._events.emit('start', this._tokens)
+            } else {
+                setTimeout(() => {
+                    this.waitTillReady(level)
+                }, 100)
+            }
+        }
+        
     }
 }
