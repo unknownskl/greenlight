@@ -3,6 +3,7 @@
 ## v2.0.0-alpha1 - 2022-09-??
 - Complete rewrite of application and rebrand to Greenlight
 - Updated xbox-xcloud-player to 2.0.0 with low latency streaming and rumble support! (Only xCloud)
+- Optimised authentication flow to make it more reliable and faster
 
 ## v1.2.0 - 2022-08-09
 - Promote beta to official release
