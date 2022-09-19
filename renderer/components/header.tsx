@@ -32,10 +32,10 @@ function Header({
       name: 'xCloud Library',
       title: 'Browse xCloud library',
       url: '/xcloud/home'
-    },{
-      name: 'Debug',
-      title: 'Debug page',
-      url: '/debug'
+    // },{
+    //   name: 'Debug',
+    //   title: 'Debug page',
+    //   url: '/debug'
     },{
       name: 'Settings',
       title: 'Change application settings',

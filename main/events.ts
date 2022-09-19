@@ -12,6 +12,7 @@ const REQ_TYPE_STREAM_START_STREAM = 'start_stream'
 const REQ_TYPE_STREAM_START_STREAM_SDP = 'start_stream_sdp'
 const REQ_TYPE_STREAM_START_STREAM_ICE = 'start_stream_ice'
 const REQ_TYPE_STREAM_STOP_STREAM = 'stop_stream'
+const REQ_TYPE_STREAM_KEEPALIVE = 'keepalive'
 
 const REQ_TYPE_XCLOUD_GET_TITLES = 'get_titles'
 
@@ -160,6 +161,9 @@ export default class Events extends EventEmitter {
                         data: error,
                     })
                 })
+            } else if(arg.type == REQ_TYPE_STREAM_KEEPALIVE){
+                // Do nothing
+
             }  else if(arg.type == REQ_TYPE_STREAM_STOP_STREAM){
                 event.sender.send('app_view', {
                     streamingMode: false
@@ -242,6 +246,18 @@ export default class Events extends EventEmitter {
                         data: data,
                     })
 
+                }).catch((error) => {
+                    event.sender.send('xcloud', {
+                        type: RES_TYPE_ERROR,
+                        message: error.message || 'Error in Promise',
+                        data: error,
+                    })
+                })
+
+            } else if(arg.type == REQ_TYPE_STREAM_KEEPALIVE){
+                // @TODO: Implement xHome / xCloud switch
+                this._xCloudApi.sendKeepalive().then((data) => {
+                    // do nothing
                 }).catch((error) => {
                     event.sender.send('xcloud', {
                         type: RES_TYPE_ERROR,

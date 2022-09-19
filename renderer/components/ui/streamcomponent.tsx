@@ -75,8 +75,10 @@ function StreamComponent({
     // ipcRenderer.send('stream', {
     //   type: 'stop_stream'
     // })
-    document.getElementById('streamComponentHolder').innerHTML = ''
-    Router.push('/home')
+    document.getElementById('streamComponentHolder').innerHTML = '';
+    // (Router as any).back()
+    // window.history.back()
+    xPlayer.reset()
   }
 
   function toggleDebug(){

@@ -86,11 +86,11 @@ function xCloudLibrary() {
     const buttons = []
     const totalPages = Math.ceil(filterTitles(xcloudTitles, filter).length/resultsPerPage)
   
-    buttons.push((<Button onClick={ prevPage } disabled={page <= 0} label="Previous page"></Button>))
+    buttons.push((<Button onClick={ prevPage } disabled={page <= 0} className='btn-small' label="Previous page"></Button>))
     for(let i=1; i <= totalPages; i++){
-      buttons.push((<Button key={i} label={i.toString()} className={ page == (i-1) ? 'btn-primary': '' } onClick={ () => { gotoPage(i) }}></Button>))
+      buttons.push((<Button key={i} label={i.toString()} className={ page == (i-1) ? 'btn-small btn-primary': 'btn-small' } onClick={ () => { gotoPage(i) }}></Button>))
     }
-    buttons.push((<Button onClick={ nextPage } disabled={page >= totalPages-1} label="Next page"></Button>))
+    buttons.push((<Button onClick={ nextPage } disabled={page >= totalPages-1} className='btn-small' label="Next page"></Button>))
 
     return buttons
   }

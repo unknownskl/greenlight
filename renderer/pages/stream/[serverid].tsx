@@ -1,7 +1,7 @@
 import React from 'react';
-import Head from 'next/head';
-import Link from 'next/link';
-import { useRouter } from 'next/router'
+import Head from 'next/head'
+import Link from 'next/link'
+import { Router, useRouter } from 'next/router'
 import { ipcRenderer } from 'electron'
 import xCloudPlayer from 'xbox-xcloud-player'
 
@@ -19,7 +19,8 @@ function Stream() {
   // }));
   const { settings, setSettings} = useSettings()
 
-  let rerenderTimeout
+  // let rerenderTimeout
+  let keepaliveInterval
 
   let xPlayer = new xCloudPlayer('streamComponent', {
     ui_systemui: []
@@ -36,11 +37,25 @@ function Stream() {
         connStatus.innerText = 'Client has been connected!'
         document.getElementById('component_streamcomponent_loader').className = 'hidden'
 
+        // Start keepalive loop
+
+        keepaliveInterval = setInterval(() => {
+          ipcRenderer.send(((router.query.serverid as string).substr(0, 6) == 'xcloud') ? 'xcloud' : 'stream', {
+            type: 'keepalive'
+          })
+        }, 30000) // Send every 30 seconds
+
       } else if(event.state == 'new'){
         connStatus.innerText = 'Starting connection...'
 
       } else if(event.state == 'connecting'){
         connStatus.innerText = 'Connecting to console...'
+
+      } else if(event.state == 'closed') {
+        // Client has been disconnected. Lets return to home.
+        // (Router as any).back()
+        window.history.back()
+        xPlayer.reset()
       }
     }
   })
@@ -175,7 +190,7 @@ function Stream() {
       window.removeEventListener('keydown', keyboardDownEvent)
       // xPlayer.reset()
 
-      if(rerenderTimeout){ clearTimeout(rerenderTimeout) }
+      if(keepaliveInterval){ clearInterval(keepaliveInterval) }
     };
   })
 

@@ -18,37 +18,37 @@ function Profile() {
   const resultsPerPage = 10
 
   React.useEffect(() => {
-    if(achievements.length <= 0){
-      ipcRenderer.send('xboxweb', {
-        type: 'get_recent_achievements'
-      })
-      loadingAchievements = []
-    }
+    // if(achievements.length <= 0){
+    //   ipcRenderer.send('xboxweb', {
+    //     type: 'get_recent_achievements'
+    //   })
+    //   loadingAchievements = []
+    // }
 
-    ipcRenderer.on('xboxweb', (event, args) => {
-      if(args.type === 'error'){
-        alert((args.data !== undefined) ? args.message+': '+JSON.stringify(args.data) : args.message)
+    // ipcRenderer.on('xboxweb', (event, args) => {
+    //   if(args.type === 'error'){
+    //     alert((args.data !== undefined) ? args.message+': '+JSON.stringify(args.data) : args.message)
 
-      } else if(args.type == 'get_recent_achievements') {
-        console.log('Received achievements:', args)
-        loadingAchievements = [...loadingAchievements, ...args.data.titles]
+    //   } else if(args.type == 'get_recent_achievements') {
+    //     console.log('Received achievements:', args)
+    //     loadingAchievements = [...loadingAchievements, ...args.data.titles]
 
-        if(args.data.pagingInfo.continuationToken !== null){
-          ipcRenderer.send('xboxweb', {
-            type: 'get_recent_achievements',
-            continuationToken: args.data.pagingInfo.continuationToken
-          })
-        } else {
-          setAchievements(loadingAchievements)
-        }
+    //     if(args.data.pagingInfo.continuationToken !== null){
+    //       ipcRenderer.send('xboxweb', {
+    //         type: 'get_recent_achievements',
+    //         continuationToken: args.data.pagingInfo.continuationToken
+    //       })
+    //     } else {
+    //       setAchievements(loadingAchievements)
+    //     }
 
-      } else {
-        console.log('got unknown response:', args)
-      }
-    })
+    //   } else {
+    //     console.log('got unknown response:', args)
+    //   }
+    // })
 
     return () => {
-      ipcRenderer.removeAllListeners('xboxweb');
+      // ipcRenderer.removeAllListeners('xboxweb');
     };
   }, []);
 
@@ -97,7 +97,7 @@ function Profile() {
       </Head>
 
       <div style={{ paddingTop: '20px' }}>
-        <Card className='padbottom'>
+        {/* <Card className='padbottom'>
           <h1>Recent achievements</h1>
 
           <div>
@@ -130,7 +130,9 @@ function Profile() {
               { drawPageButtons() }
             </div>
           </div>
-        </Card>
+        </Card> */}
+
+
       </div>
 
     </React.Fragment>
