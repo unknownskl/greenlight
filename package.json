@@ -15,6 +15,7 @@
   "dependencies": {
     "electron-serve": "^1.1.0",
     "electron-store": "^8.0.1",
+    "electron-update-notifier": "^1.6.0",
     "xbox-webapi": "^1.4.1",
     "xbox-xcloud-player": "0.2.0-beta4"
   },
