@@ -1,8 +1,7 @@
 import { app, BrowserWindow, ipcMain, session } from 'electron';
 import serve from 'electron-serve';
-import { createWindow, Authentication, xboxWorker } from './helpers';
+import { createWindow, Authentication, xboxWorker, updater } from './helpers';
 import Events from './events'
-import { setUpdateNotification } from 'electron-update-notifier'
 const path = require('path')
 const os = require('os')
 
@@ -40,8 +39,7 @@ export default class Application {
     }
     
     app.whenReady().then(() => {
-      setUpdateNotification({
-        repository: 'unknownskl/xbox-xcloud-client',
+      updater({
         debug: false,
         silent: true
       })
