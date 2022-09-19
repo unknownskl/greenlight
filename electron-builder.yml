@@ -11,7 +11,7 @@ files:
     filter:
       - package.json
       - app
-publish: null
+publish: onTag
 
 
 # Mac OS configuration
