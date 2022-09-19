@@ -5,11 +5,15 @@
   "version": "2.0.0-beta1",
   "author": "UnknownSKL <info+github@jimkroon.nl>",
   "main": "app/background.js",
-  "repository": "https://github.com/unknownskl/xbox-xcloud-client",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/unknownskl/xbox-xcloud-client.git"
+  },
   "scripts": {
     "dev": "nextron",
     "build": "nextron build",
     "postinstall": "electron-builder install-app-deps",
+    "publish":"electron-builder -p onTag",
     "storybook": "start-storybook -p 6006 -s ./renderer/public",
     "build-storybook": "build-storybook"
   },
