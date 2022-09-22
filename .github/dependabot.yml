@@ -23,7 +23,7 @@ updates:
       - "github-actions dependencies"
 
   # Maintain dependencies for npm
-  - package-ecosystem: "yarn"
+  - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "weekly"
