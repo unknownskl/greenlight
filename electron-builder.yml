@@ -53,6 +53,7 @@ linux:
     - "AppImage"
     # - "flatpak"
     - "deb"
+    - "pacman"
 
 flatpak:
   runtime: org.freedesktop.Platform
