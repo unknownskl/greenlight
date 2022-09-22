@@ -12,3 +12,21 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+
+  # Maintain dependencies for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    target-branch: "main-v2"
+    labels:
+      - "github-actions dependencies"
+
+  # Maintain dependencies for npm
+  - package-ecosystem: "yarn"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    target-branch: "main-v2"
+    labels:
+      - "yarn dependencies"
