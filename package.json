@@ -13,7 +13,7 @@
     "dev": "nextron",
     "build": "nextron build",
     "postinstall": "electron-builder install-app-deps",
-    "publish":"electron-builder -p onTag",
+    "publish": "electron-builder -p onTag",
     "storybook": "start-storybook -p 6006 -s ./renderer/public",
     "build-storybook": "build-storybook"
   },
