@@ -147,7 +147,7 @@ export default class Authentication {
             title: 'Authentication'
         });
         
-        await authWindow.loadURL('https://www.xbox.com/play');
+        await authWindow.loadURL('https://account.xbox.com/account/signin?returnUrl=https%3A%2F%2Fwww.xbox.com%2Fplay');
         this._authWindow = authWindow
 
         return authWindow
