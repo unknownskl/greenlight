@@ -24,7 +24,7 @@
     "electron-store": "^8.0.1",
     "github-url-to-object": "^4.0.6",
     "xbox-webapi": "^1.4.1",
-    "xbox-xcloud-player": "0.2.0-beta4"
+    "xbox-xcloud-player": "0.2.0-beta5"
   },
   "devDependencies": {
     "@babel/core": "^7.19.1",
