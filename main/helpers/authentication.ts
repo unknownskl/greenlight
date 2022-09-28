@@ -161,7 +161,7 @@ export default class Authentication {
             app.relaunch()
             app.exit()
 
-        } else if(details.url.includes('/play/login/redirect/?redirectUrl=')){
+        } else if(details.url.includes('/xbox/accountsignin?returnUrl=')){
             // We are already logged in..  Lets get the token..
 
             let cookieFound = false
