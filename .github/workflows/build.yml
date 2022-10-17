@@ -35,7 +35,7 @@ jobs:
       #   if: matrix.os == 'ubuntu-latest'
 
       - name: Install Node.js, NPM and Yarn
-        uses: actions/setup-node@v3.5.0
+        uses: actions/setup-node@v3.5.1
         with:
           node-version: 18
 
