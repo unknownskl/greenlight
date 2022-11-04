@@ -107,6 +107,6 @@ export default class xCloudBrowser {
             ids = inputId
         }
 
-        return this._webApi.getProvider('catalog').get('/v7.0/products?actionFilter=Browse&bigIds='+ids+'&fieldsTemplate=browse&languages=en-us&market='+this._market)
+        return this._webApi.getProvider('catalog').get('/v7.0/products?actionFilter=Browse&bigIds='+ids+'&fieldsTemplate=browse&languages=en-us&market=us')
     }
 }
