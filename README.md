@@ -24,8 +24,10 @@ The following keys are mapped as following:
     Dpad: Keypad direction controls
     Buttons: A, B, X, Y, Backspace (Mapped as B), Enter (Mapped as A)
     Nexus (Xbox button): N
-    Left bumper: [
-    Right bumper: ]
+    Left Bumper: [
+    Right Bumper: ]
+    Left Trigger: -
+    Right Trigger: =
     View: V
     Menu: M
 
@@ -42,7 +44,7 @@ The application also provides a way to see which of your friends are online. Thi
 
 ## Steam Deck Setup
 
-This application is reported to be working on the Steam Deck with some small bugs and side-effects.
+This application is reported to be working on the Steam Deck with some small bugs and side-effects. You can map one of the Steam Deck back buttons to the 'N' key to simulate the Xbox button.
 
 ### Optional launch arguments
 
