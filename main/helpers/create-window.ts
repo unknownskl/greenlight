@@ -19,6 +19,7 @@ export default (windowName: string, options: BrowserWindowConstructorOptions): B
   const restore = () => store.get(key, defaultSize);
 
   const getCurrentPosition = () => {
+    win.removeMenu()
     const position = win.getPosition();
     const size = win.getSize();
     return {

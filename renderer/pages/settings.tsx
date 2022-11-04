@@ -27,10 +27,13 @@ function Settings() {
       }
     })
 
-    drawControllers()
+    const controllerInterval = setInterval(() => {
+      drawControllers()
+    }, 200)
 
     return () => {
       ipcRenderer.removeAllListeners('auth');
+      clearInterval(controllerInterval)
     };
   }, []);
 
@@ -72,7 +75,7 @@ function Settings() {
     for(const gamepad in gamepads){
 
       if(gamepads[gamepad] !== null){
-        console.log(gamepads[gamepad])
+        // console.log(gamepads[gamepad])
         controllerHtml += '<p>#'+(parseInt(gamepad)+1)+' - '+ gamepads[gamepad].id +' (axes: '+ gamepads[gamepad].axes.length +', buttons: '+ gamepads[gamepad].buttons.length +', rumble: '+ ((gamepads[gamepad] as any).vibrationActuator !== undefined ? (gamepads[gamepad] as any).vibrationActuator.type : 'Not supported') +')</p>'
       } else {
         controllerHtml += '<p>#'+(parseInt(gamepad)+1)+' - No gamepad detected</p>'
