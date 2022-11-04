@@ -1,5 +1,12 @@
 # Changelog
 
+## v2.0.0-beta2 - 2022-11-04
+- Fixed login issue where the website is displayed instead of the login page #425
+- Bump xbox-xcloud-player to 0.2.0-beta6
+- Implemented improved keyboard support (Credits to @JosephMichels)
+- Potentional fix for xcloud promise error #511
+- Fixed a display issue with controllers on the settings page #469
+
 ## v2.0.0-beta1 - 2022-09-20
 - Complete rewrite of application and rebrand to Greenlight
 - Updated xbox-xcloud-player to 2.0.0 with low latency streaming and rumble support! (Only xCloud)
