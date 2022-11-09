@@ -50,7 +50,7 @@
     "@electron-forge/maker-deb": "^6.0.0-beta.74",
     "@electron-forge/maker-rpm": "^6.0.0",
     "@electron-forge/maker-squirrel": "^6.0.0-beta.75",
-    "@electron-forge/maker-zip": "^6.0.0",
+    "@electron-forge/maker-zip": "^6.0.1",
     "@electron-forge/plugin-webpack": "^6.0.0-beta.68",
     "@types/express": "^4.17.14",
     "@typescript-eslint/eslint-plugin": "^5.42.0",
