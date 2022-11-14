@@ -30,7 +30,7 @@
     "@babel/core": "^7.20.2",
     "@storybook/addon-actions": "^6.5.13",
     "@storybook/addon-essentials": "^6.5.13",
-    "@storybook/addon-interactions": "^6.5.12",
+    "@storybook/addon-interactions": "^6.5.13",
     "@storybook/addon-links": "^6.5.9",
     "@storybook/builder-webpack5": "^6.5.13",
     "@storybook/manager-webpack5": "^6.5.13",
