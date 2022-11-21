@@ -2904,10 +2904,10 @@
   resolved "https://registry.yarnpkg.com/@types/qs/-/qs-6.9.7.tgz#63bb7d067db107cc1e457c303bc25d511febf6cb"
   integrity sha512-FGa1F62FT09qcrueBA6qYTrJPVDzah9a+493+o2PCXsesWHIn27G98TsSMs3WPNbZIEj4+VJf6saSFpvD+3Zsw==
 
-"@types/react@^18.0.24":
-  version "18.0.24"
-  resolved "https://registry.yarnpkg.com/@types/react/-/react-18.0.24.tgz#2f79ed5b27f08d05107aab45c17919754cc44c20"
-  integrity sha512-wRJWT6ouziGUy+9uX0aW4YOJxAY0bG6/AOk5AW5QSvZqI7dk6VBIbXvcVgIw/W5Jrl24f77df98GEKTJGOLx7Q==
+"@types/react@^18.0.25":
+  version "18.0.25"
+  resolved "https://registry.yarnpkg.com/@types/react/-/react-18.0.25.tgz#8b1dcd7e56fe7315535a4af25435e0bb55c8ae44"
+  integrity sha512-xD6c0KDT4m7n9uD4ZHi02lzskaiqcBxf4zi+tXZY98a04wvc0hi/TcCPC2FOESZi51Nd7tlUeOJY8RofL799/g==
   dependencies:
     "@types/prop-types" "*"
     "@types/scheduler" "*"
