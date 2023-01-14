@@ -78,6 +78,7 @@ function StreamComponent({
     document.getElementById('streamComponentHolder').innerHTML = '';
     // (Router as any).back()
     // window.history.back()
+    window.history.back()
     xPlayer.reset()
   }
 

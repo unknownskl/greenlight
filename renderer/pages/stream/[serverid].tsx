@@ -54,7 +54,6 @@ function Stream() {
       } else if(event.state == 'closed') {
         // Client has been disconnected. Lets return to home.
         // (Router as any).back()
-        window.history.back()
         xPlayer.reset()
       }
     }
