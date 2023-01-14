@@ -14,10 +14,10 @@ function Home() {
       <div>
         <p>
           ⚡ Electron + Next.js ⚡ -
-          <Link href="/next">
+          <Link legacyBehavior href="/next">
             <a>Go to next page</a>
           </Link>
-          <Link href="/log">
+          <Link legacyBehavior href="/log">
             <a>Go to logs</a>
           </Link>
         </p>

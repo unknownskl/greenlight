@@ -75,7 +75,7 @@ function Header({
 
     for(const link in headerLinks){
       linksHtml.push(<li key={ link }>
-        <Link href={ headerLinks[link].url }>
+        <Link legacyBehavior href={ headerLinks[link].url }>
           <a title={ headerLinks[link].title } onClick={ () => {setMenuActive(link)} } className={headerLinks[link].active === true ? 'active' : ''}>{ headerLinks[link].name }</a>
         </Link>
       </li>)

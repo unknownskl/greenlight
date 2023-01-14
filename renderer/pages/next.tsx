@@ -10,7 +10,7 @@ function Next() {
       <div>
         <p>
           ⚡ Electron + Next.js ⚡ -
-          <Link href="/home">
+          <Link legacyBehavior href="/home">
             <a>Go to home page</a>
           </Link>
         </p>
