@@ -37,7 +37,7 @@
     "@storybook/react": "^6.5.15",
     "@storybook/testing-library": "^0.0.13",
     "@types/node": "^18.11.18",
-    "@types/react": "^18.0.26",
+    "@types/react": "^18.0.27",
     "babel-loader": "^9.1.2",
     "electron": "21",
     "electron-builder": "^23.6.0",
