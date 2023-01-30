@@ -60,7 +60,7 @@
     "css-loader": "^6.7.3",
     "electron": "20.2.0",
     "electron-builder": "^23.6.0",
-    "eslint": "^8.32.0",
+    "eslint": "^8.33.0",
     "eslint-plugin-import": "^2.27.5",
     "express": "^4.18.2",
     "fork-ts-checker-webpack-plugin": "^7.3.0",
