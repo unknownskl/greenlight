@@ -267,10 +267,37 @@ export default class Authentication {
             this._tokens.msal.id_token = response.id_token
             this._tokens.msal.client_info = response.client_info
 
-            console.log('- Retrieved MSAL tokens')
-            this.setAppTokens(2)
-        }).catch((error) => {
+            console.log('- Retrieved MSAL tokens, refreshing token...')
 
+            const data = {
+                client_id: '1f907974-e22b-4810-a9de-d9647380c97e',
+                scope: 'service::http://Passport.NET/purpose::PURPOSE_XBOX_CLOUD_CONSOLE_TRANSFER_TOKEN openid profile offline_access',
+                grant_type: 'refresh_token',
+                refresh_token: response.refresh_token
+            }
+            const dataEncoded = new URLSearchParams(Object.entries(data)).toString();
+
+            this.request({
+                hostname: 'login.microsoftonline.com',
+                method: 'POST',
+                path: '/consumers/oauth2/v2.0/token',
+            }, dataEncoded, {
+                'Origin': 'https://www.xbox.com',
+                'Content-Type': 'application/x-www-form-urlencoded',
+                // 'Content-Length': ''
+            }).then((response:any) => {
+                this._tokens.msal.refresh_token = response.refresh_token
+                this._tokens.msal.token = response.access_token
+                this._tokens.msal.id_token = response.id_token
+
+                console.log('- Retrieved refreshed token')
+
+                this.setAppTokens(2)
+            }).catch((error) => {
+                console.log('ERROR refreshing MSAL token:', error)
+            })
+        }).catch((error) => {
+            console.log('ERROR retrieving MSAL token:', error)
         })
     }
 
@@ -294,7 +321,7 @@ export default class Authentication {
             this._tokens.gamestreaming.regions = response.offeringSettings.regions
             this._tokens.gamestreaming.settings = response.offeringSettings.clientCloudSettings
 
-            console.log('- Retrieved xHome streaming tokens')
+            console.log('- Retrieved xHome streaming token:', this._tokens.gamestreaming.token)
         }).catch((error) => {
 
         })
@@ -338,7 +365,7 @@ export default class Authentication {
         })
     }
 
-    request(options, data = '', headers = {}) {
+    request(options, data, headers = {}) {
 
         return new Promise((resolve, reject) => {
             const reqOptions = {
@@ -383,7 +410,7 @@ export default class Authentication {
                     error: error
                 })
             })
-        
+
             req.write(data)
             req.end()
         })
