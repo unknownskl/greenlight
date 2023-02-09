@@ -16,6 +16,10 @@ body {
     color: #ffffff;
 }
 
+a {
+    text-decoration: none;
+}
+
 @import 'components/header.css';
 @import 'components/footer.css';
 @import 'components/auth.css';
