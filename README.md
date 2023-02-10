@@ -48,8 +48,9 @@ This application is reported to be working on the Steam Deck with some small bug
 
 ### Optional launch arguments
 
+| Argument | Descriiption |
+|----------|--------------|
 | --fullscreen | Starts the application in fullscreen |
-| --connect=F400000000000000 | Auto-connects to given console id |
 
 ### To close the application
 
