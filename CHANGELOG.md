@@ -1,5 +1,10 @@
 # Changelog
 
+## v2.0.0-bet3 - 2023-02-10
+- Fixed xCloud exchange token error when launching an xCloud game. Fixes #732 & #717 (Credits to `award` on the OpenXbox discord)
+- Auto-hide menu bar on fullscreen. (Credits to @Willsie-Digital)
+- Fixed UI glitching out when starting a stream which errors out
+
 ## v2.0.0-beta2 - 2022-11-04
 - Fixed login issue where the website is displayed instead of the login page #425
 - Bump xbox-xcloud-player to 0.2.0-beta6
