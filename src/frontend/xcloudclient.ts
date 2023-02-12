@@ -14,6 +14,8 @@ export default class xCloudClient {
 
     _sessionPath:string
 
+    _language = window.navigator.language ?? 'en-US'
+
     constructor(application:Application, host:string, token: string, type:'home'|'cloud' = 'home'){
         this._application = application
         this._host = host
@@ -27,7 +29,7 @@ export default class xCloudClient {
                 method: 'GET', // *GET, POST, PUT, DELETE, etc.
                 headers: {
                     'Authorization': 'Bearer '+this._token,
-                    'Accept-Language': 'en-US',
+                    'Accept-Language': this._language,
                 }
             }).then((response) => {
                 if(response.status !== 200){
@@ -96,7 +98,7 @@ export default class xCloudClient {
                         "nanoVersion":"V3;RtcdcTransport.dll",
                         "enableTextToSpeech":false,
                         "highContrast":0,
-                        "locale":"en-US",
+                        "locale":this._language,
                         "useIceConnection":false,
                         "timezoneOffsetMinutes":120,
                         "sdkType":"web",
@@ -113,7 +115,7 @@ export default class xCloudClient {
                         "nanoVersion":"V3;RtcdcTransport.dll",
                         "enableTextToSpeech":false,
                         "highContrast":0,
-                        "locale":"en-US",
+                        "locale":this._language,
                         "useIceConnection":false,
                         "timezoneOffsetMinutes":120,
                         "sdkType":"web",
