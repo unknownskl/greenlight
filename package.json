@@ -39,7 +39,7 @@
     "@types/node": "^18.13.0",
     "@types/react": "^18.0.28",
     "babel-loader": "^9.1.2",
-    "electron": "21",
+    "electron": "23",
     "electron-builder": "^23.6.0",
     "next": "^13.1.6",
     "nextron": "^8.5.0",
