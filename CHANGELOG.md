@@ -1,5 +1,8 @@
 # Changelog
 
+## v2.0.0-beta4 - 2023-03-06
+- Added stereo sound output
+
 ## v2.0.0-bet3 - 2023-02-10
 - Fixed xCloud exchange token error when launching an xCloud game. Fixes #732 & #717 (Credits to `award` on the OpenXbox discord)
 - Auto-hide menu bar on fullscreen. (Credits to @Willsie-Digital)
