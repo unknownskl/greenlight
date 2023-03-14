@@ -154,12 +154,11 @@ export default class Authentication {
 
                         this.requestxCloudToken(res7.Token)
                         this.requestxHomeToken(res7.Token)
-                        this.requestWebToken(res7.Token)
 
                         // this._tokens.gamestreaming.token = res7.Token
                         // this._tokens.xcloud.token = res7.Token
                         // this._tokens.web.token = res6.UserToken.Token
-                        this._tokens.web.token = res6.UserToken.Token
+                        // this._tokens.web.token = res6.UserToken.Token
             
                         xalAuthenticator.exchange_refresh_token_for_xcloud_transfer_token(res5.refresh_token).then((res8:any) => {
                             console.log('res8 xcloud:', res8)
@@ -176,6 +175,15 @@ export default class Authentication {
             
                     }).catch((error7) => {
                         console.log('do_xsts_authorization error:', error7)
+                    })
+
+                    
+                    xalAuthenticator.do_xsts_authorization(res6.DeviceToken, res6.TitleToken.Token, res6.UserToken.Token, "http://xboxlive.com").then((res_web:any) => {
+                        console.log('res_web web:', res_web)
+                        // this._tokens.web.token = res_web.Token
+                        this._tokens.web.uhs = res_web.DisplayClaims.xui[0].uhs
+                        this._tokens.web.token = res_web.Token
+                        this._tokens.web.expires = res_web.expires
                     })
 
                 }).catch((error6) => {
@@ -497,67 +505,6 @@ export default class Authentication {
         })
     }
 
-    requestWebToken(streamingToken){
-        return new Promise((resolve, reject) => {
-            console.log('- Requesting web tokens')
-
-            // Get xHomeStreaming Token
-            const data = {
-                client_id: '1f907974-e22b-4810-a9de-d9647380c97e',
-                scope: 'xboxlive.signin openid profile offline_access',
-                grant_type: 'refresh_token',
-                refresh_token: streamingToken
-            }
-            const dataEncoded = new URLSearchParams(Object.entries(data)).toString();
-
-            this.request({
-                hostname: 'login.microsoftonline.com',
-                method: 'POST',
-                path: '/consumers/oauth2/v2.0/token',
-            }, dataEncoded, {
-                'Origin': 'https://www.xbox.com',
-                'Content-Type': 'application/x-www-form-urlencoded',
-                // 'Content-Length': ''
-            }).then((response:any) => {
-                // this._tokens.web.refresh_token = response.refresh_token
-                // this._tokens.msal.token = response.access_token
-                // this._tokens.msal.id_token = response.id_token
-
-                console.log('- Retrieved refreshed web token', response)
-
-            }).catch((error) => {
-                console.log('ERROR refreshing MSAL token:', error)
-            })
-        
-            // const options = {
-            //     hostname: 'login.live.com',
-            //     method: 'POST',
-            //     path: 'oauth20_authorize.srf',
-            // }
-
-            // this.request(options, data).then((response:any) => {
-            //     this._tokens.xcloud.token = response.gsToken
-            //     this._tokens.xcloud.expires = (Date.now()+response.durationInSeconds)
-            //     this._tokens.xcloud.market = response.market
-            //     this._tokens.xcloud.regions = response.offeringSettings.regions
-            //     this._tokens.xcloud.settings = response.offeringSettings.clientCloudSettings
-
-            //     for(const region in this._tokens.xcloud.regions){
-            //         if(this._tokens.xcloud.regions[region].isDefault){
-            //             this._tokens.xcloud.host = this._tokens.xcloud.regions[region].baseUri.substr(8)
-            //         }
-            //     }
-
-            //     console.log('- Retrieved xCloud streaming tokens')
-
-            //     resolve(response)
-            // }).catch((error) => {
-            //     console.log('xcloud request error:', error)
-            //     reject(error)
-            // })
-        })
-    }
-
     request(options, data, headers = {}) {
 
         return new Promise((resolve, reject) => {
@@ -614,9 +561,6 @@ export default class Authentication {
     }
 
     setAppTokens(level) {
-        this._loggedIn = true
-        this._appLevel = level
-
         this.waitTillReady(level)
     }
 
@@ -625,6 +569,8 @@ export default class Authentication {
         if(level == 1) {
             // Check web token only
             if(this._tokens.web.token !== false && this._tokens.gamestreaming.token !== false){
+                this._loggedIn = true
+                this._appLevel = level
                 this._application._events.emit('start', this._tokens)
             } else {
                 setTimeout(() => {
@@ -634,6 +580,8 @@ export default class Authentication {
         } else {
             // Check all tokens
             if(this._tokens.web.token !== false && this._tokens.gamestreaming.token !== false && this._tokens.xcloud.token !== false && this._tokens.msal.token !== false){
+                this._loggedIn = true
+                this._appLevel = level
                 this._application._events.emit('start', this._tokens)
             } else {
                 setTimeout(() => {
