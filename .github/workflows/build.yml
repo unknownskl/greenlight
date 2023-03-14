@@ -49,6 +49,30 @@ jobs:
       - run: vcpkg install openssl:x64-windows-static-md
         if: runner.os == 'Windows'
 
+      - name: Set up cargo cache
+        uses: actions/cache@v3
+        continue-on-error: false
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+            xal-node/target/
+          key: ${{ runner.os }}-${{ runner.arch }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-${{ runner.arch }}-cargo-
+
+      - name: Set up node_modules cache
+        uses: actions/cache@v3
+        continue-on-error: false
+        with:
+          path: |
+            node_modules/           
+            xal-node/node_modules/           
+          key: ${{ runner.os }}-${{ runner.arch }}-npm-${{ hashFiles('**/package.json') }}-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: ${{ runner.os }}-${{ runner.arch }}-npm-
+
       - name: Install yarn dependencies
         run: yarn
 
