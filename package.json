@@ -44,6 +44,7 @@
     "electron-builder": "^23.6.0",
     "next": "^13.2.3",
     "nextron": "^8.5.0",
+    "node-loader": "^2.0.0",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
     "typescript": "^4.9.5"

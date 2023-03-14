@@ -153,11 +153,13 @@ export default class Authentication {
                         console.log('res7 gssv:', res7.Token)
 
                         this.requestxCloudToken(res7.Token)
+                        this.requestxHomeToken(res7.Token)
+                        this.requestWebToken(res7.Token)
 
-                        this._tokens.gamestreaming.token = res7.Token
+                        // this._tokens.gamestreaming.token = res7.Token
                         // this._tokens.xcloud.token = res7.Token
                         // this._tokens.web.token = res6.UserToken.Token
-                        this._tokens.web.token = res7.Token
+                        this._tokens.web.token = res6.UserToken.Token
             
                         xalAuthenticator.exchange_refresh_token_for_xcloud_transfer_token(res5.refresh_token).then((res8:any) => {
                             console.log('res8 xcloud:', res8)
@@ -211,6 +213,7 @@ export default class Authentication {
             console.log(device_token)
           
             xalAuthenticator.do_sisu_authentication(device_token.Token).then((sisu_response:any) => {
+                console.log('Sisu auth response:', sisu_response)
 
                 this._sisu_local_code_verifier = sisu_response.local_code_verifier
                 this._sisu_session_id = sisu_response.sisu_session_id
@@ -420,6 +423,41 @@ export default class Authentication {
     //     })
     // }
 
+    requestxHomeToken(streamingToken){
+        return new Promise((resolve, reject) => {
+            console.log('- Requesting xHome streaming tokens')
+
+            // Get xHomeStreaming Token
+            const data = JSON.stringify({
+                "token": streamingToken,
+                "offeringId": "xhome"
+            })
+        
+            const options = {
+                hostname: 'xhome.gssv-play-prod.xboxlive.com',
+                method: 'POST',
+                path: '/v2/login/user',
+            }
+
+            this.request(options, data).then((response:any) => {
+                this._tokens.web.token = response.gsToken
+
+                this._tokens.gamestreaming.token = response.gsToken
+                this._tokens.gamestreaming.expires = (Date.now()+response.durationInSeconds)
+                this._tokens.gamestreaming.market = response.market
+                this._tokens.gamestreaming.regions = response.offeringSettings.regions
+                this._tokens.gamestreaming.settings = response.offeringSettings.clientCloudSettings
+
+                console.log('- Retrieved xHome streaming tokens')
+
+                resolve(response)
+            }).catch((error) => {
+                console.log('xcloud request error:', error)
+                reject(error)
+            })
+        })
+    }
+
     requestxCloudToken(streamingToken){
         return new Promise((resolve, reject) => {
             console.log('- Requesting xCloud streaming tokens')
@@ -456,6 +494,67 @@ export default class Authentication {
                 console.log('xcloud request error:', error)
                 reject(error)
             })
+        })
+    }
+
+    requestWebToken(streamingToken){
+        return new Promise((resolve, reject) => {
+            console.log('- Requesting web tokens')
+
+            // Get xHomeStreaming Token
+            const data = {
+                client_id: '1f907974-e22b-4810-a9de-d9647380c97e',
+                scope: 'xboxlive.signin openid profile offline_access',
+                grant_type: 'refresh_token',
+                refresh_token: streamingToken
+            }
+            const dataEncoded = new URLSearchParams(Object.entries(data)).toString();
+
+            this.request({
+                hostname: 'login.microsoftonline.com',
+                method: 'POST',
+                path: '/consumers/oauth2/v2.0/token',
+            }, dataEncoded, {
+                'Origin': 'https://www.xbox.com',
+                'Content-Type': 'application/x-www-form-urlencoded',
+                // 'Content-Length': ''
+            }).then((response:any) => {
+                // this._tokens.web.refresh_token = response.refresh_token
+                // this._tokens.msal.token = response.access_token
+                // this._tokens.msal.id_token = response.id_token
+
+                console.log('- Retrieved refreshed web token', response)
+
+            }).catch((error) => {
+                console.log('ERROR refreshing MSAL token:', error)
+            })
+        
+            // const options = {
+            //     hostname: 'login.live.com',
+            //     method: 'POST',
+            //     path: 'oauth20_authorize.srf',
+            // }
+
+            // this.request(options, data).then((response:any) => {
+            //     this._tokens.xcloud.token = response.gsToken
+            //     this._tokens.xcloud.expires = (Date.now()+response.durationInSeconds)
+            //     this._tokens.xcloud.market = response.market
+            //     this._tokens.xcloud.regions = response.offeringSettings.regions
+            //     this._tokens.xcloud.settings = response.offeringSettings.clientCloudSettings
+
+            //     for(const region in this._tokens.xcloud.regions){
+            //         if(this._tokens.xcloud.regions[region].isDefault){
+            //             this._tokens.xcloud.host = this._tokens.xcloud.regions[region].baseUri.substr(8)
+            //         }
+            //     }
+
+            //     console.log('- Retrieved xCloud streaming tokens')
+
+            //     resolve(response)
+            // }).catch((error) => {
+            //     console.log('xcloud request error:', error)
+            //     reject(error)
+            // })
         })
     }
 
