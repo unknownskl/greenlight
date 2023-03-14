@@ -27,18 +27,6 @@ jobs:
         with:
           submodules: recursive
 
-      # - script: git submodule update --init --recursive
-        
-      
-      # - name: Install flatpak and flatpak-builder
-      #   run: sudo apt-get install -y flatpak flatpak-builder elfutils
-      #   if: matrix.os == 'ubuntu-latest'
-
-      # - name: Install flathub repo
-      #   run: |
-      #     sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo && flatpak update --appstream
-      #   if: matrix.os == 'ubuntu-latest'
-
       - name: Install Node.js, NPM and Yarn
         uses: actions/setup-node@v3.6.0
         with:
