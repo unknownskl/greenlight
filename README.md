@@ -48,7 +48,7 @@ This application is reported to be working on the Steam Deck with some small bug
 
 ### Optional launch arguments
 
-| Argument | Descriiption |
+| Argument | Description |
 |----------|--------------|
 | --fullscreen | Starts the application in fullscreen |
 
@@ -66,6 +66,7 @@ Clone the repository:
 
     git clone https://github.com/unknownskl/xbox-xcloud-client.git
     cd xbox-xcloud-client
+    git submodule update --init --recursive
 
 Install dependencies:
 

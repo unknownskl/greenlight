@@ -250,7 +250,7 @@ export default class Authentication {
             }
 
             this.request(options, data).then((response:any) => {
-                this._tokens.web.token = response.gsToken
+                // this._tokens.web.token = response.gsToken
 
                 this._tokens.gamestreaming.token = response.gsToken
                 this._tokens.gamestreaming.expires = (Date.now()+response.durationInSeconds)
