@@ -30,7 +30,7 @@ function SidebarFriends({
       <div id="components_sidebarfriends" key="components_sidebarfriends">
         {onlineFriends.map((item:any, i) => {               
            return (
-            <SidebarFriendItem userinfo={ item }></SidebarFriendItem>
+            <SidebarFriendItem key={ item.xuid } userinfo={ item }></SidebarFriendItem>
            ) 
         })}
       </div>
