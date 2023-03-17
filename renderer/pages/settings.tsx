@@ -46,7 +46,7 @@ function Settings() {
   }
 
   function setxHomeBitrate(e){
-    console.log('Set bitrate to:', e.target.value)
+    console.log('Set xHome bitrate to:', e.target.value)
     setSettings({
       ...settings,
       xhome_bitrate: parseInt(e.target.value)
@@ -54,7 +54,7 @@ function Settings() {
   }
 
   function setxCloudBitrate(e){
-    console.log('Set bitrate to:', e.target.value)
+    console.log('Set xCloud bitrate to:', e.target.value)
     setSettings({
       ...settings,
       xcloud_bitrate: parseInt(e.target.value)
@@ -111,18 +111,8 @@ function Settings() {
           </p> <br />
 
           <p>
-            Bitrate: <select onChange={ setxCloudBitrate }>
-              <option selected={settings.xcloud_bitrate === 0} value="0">Unlimited (default)</option>
-              <option selected={settings.xcloud_bitrate === 256} value="256">256 kbps</option>
-              <option selected={settings.xcloud_bitrate === 512} value="512">512 kbps</option>
-              <option selected={settings.xcloud_bitrate === 1024} value="1024">1 mbps</option>
-              <option selected={settings.xcloud_bitrate === 2048} value="2048">2 mbps</option>
-              <option selected={settings.xcloud_bitrate === 4096} value="4096">4 mbps</option>
-              <option selected={settings.xcloud_bitrate === 8192} value="8192">8 mbps</option>
-              <option selected={settings.xcloud_bitrate === 12288} value="12288">12 mbps</option>
-              <option selected={settings.xcloud_bitrate === 16384} value="16384">16 mbps</option>
-              <option selected={settings.xcloud_bitrate === 20480} value="20480">20 mbps</option>
-            </select>
+            Bitrate: <input type="range" min="0" max="102400" step="1024" value={settings.xcloud_bitrate} onChange={ setxCloudBitrate } />
+            ({ settings.xcloud_bitrate == 0 ? settings.xcloud_bitrate + " (unlimited)" : Math.floor(settings.xcloud_bitrate / 1024) + " mbps" })
           </p>
         </Card>
 
@@ -134,18 +124,8 @@ function Settings() {
           </p> <br />
 
           <p>
-            Bitrate: <select onChange={ setxHomeBitrate }>
-              <option selected={settings.xhome_bitrate === 0} value="0">Unlimited (default)</option>
-              <option selected={settings.xhome_bitrate === 256} value="256">256 kbps</option>
-              <option selected={settings.xhome_bitrate === 512} value="512">512 kbps</option>
-              <option selected={settings.xhome_bitrate === 1024} value="1024">1 mbps</option>
-              <option selected={settings.xhome_bitrate === 2048} value="2048">2 mbps</option>
-              <option selected={settings.xhome_bitrate === 4096} value="4096">4 mbps</option>
-              <option selected={settings.xhome_bitrate === 8192} value="8192">8 mbps</option>
-              <option selected={settings.xhome_bitrate === 12288} value="12288">12 mbps</option>
-              <option selected={settings.xhome_bitrate === 16384} value="16384">16 mbps</option>
-              <option selected={settings.xhome_bitrate === 20480} value="20480">20 mbps</option>
-            </select>
+            Bitrate: <input type="range" min="0" max="102400" step="1024" value={settings.xhome_bitrate} onChange={ setxHomeBitrate } />
+            ({ settings.xhome_bitrate == 0 ? settings.xhome_bitrate + " (unlimited)" : Math.floor(settings.xhome_bitrate / 1024) + " mbps" })
           </p>
         </Card>
 
