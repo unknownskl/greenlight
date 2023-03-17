@@ -59,6 +59,8 @@ export default class Events extends EventEmitter {
                 this._webApi.getProvider('userpresence').get('/users/me').then((result) => {
                     // Set xuid hack
                     this._webApi._authentication._user = { xid: result.xuid }
+                }).catch((error) => {
+                    console.log('events.ts: Error: Failed to retrieve current user profile (2):', error)
                 })
 
                 if(result.profileUsers.length > 0) {
@@ -81,7 +83,7 @@ export default class Events extends EventEmitter {
                 }
         
             }).catch(function(error){
-                console.log('reject', error)
+                console.log('events.ts: Error: Failed to retrieve current user (1):', error)
             })
 
             // this._webApi.getProvider('smartglass').getConsolesList().then((consoles) => {

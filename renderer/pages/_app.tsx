@@ -26,6 +26,7 @@ export default function MyApp({ Component, pageProps }) {
   });
   // const [headerLinks, setHeaderLinks] = React.useState([])
   const [streamingMode, setStreamingMode] = React.useState(false)
+  const [isLoading, setIsLoading] = React.useState(false)
 
   React.useEffect(() => {
     const tokenInterval = setInterval(() => {
@@ -42,6 +43,10 @@ export default function MyApp({ Component, pageProps }) {
       if(data.streamingMode !== undefined){
         setStreamingMode(data.streamingMode)
       }
+    })
+
+    ipcRenderer.on('app_loading', (event, data) => {
+      setIsLoading(true)
     })
 
 
@@ -96,7 +101,7 @@ export default function MyApp({ Component, pageProps }) {
   } else {
     appBody = (
       <React.Fragment>
-        <Auth signedIn={ prevUserState.signedIn} gamertag={ prevUserState.gamertag } gamerpic={ prevUserState.gamerpic } gamerscore={ prevUserState.gamerscore } />
+        <Auth signedIn={ prevUserState.signedIn} gamertag={ prevUserState.gamertag } gamerpic={ prevUserState.gamerpic } gamerscore={ prevUserState.gamerscore } isLoading={ isLoading } />
       </React.Fragment>)
   }
 

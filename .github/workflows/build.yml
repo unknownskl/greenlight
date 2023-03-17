@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main-v2
+      - feature/*
     tags:
       - v*
   pull_request:
@@ -24,20 +25,42 @@ jobs:
     steps:
       - name: Checkout Git repository
         uses: actions/checkout@v3
-      
-      # - name: Install flatpak and flatpak-builder
-      #   run: sudo apt-get install -y flatpak flatpak-builder elfutils
-      #   if: matrix.os == 'ubuntu-latest'
-
-      # - name: Install flathub repo
-      #   run: |
-      #     sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo && flatpak update --appstream
-      #   if: matrix.os == 'ubuntu-latest'
+        with:
+          submodules: recursive
 
       - name: Install Node.js, NPM and Yarn
         uses: actions/setup-node@v3.6.0
         with:
           node-version: 18
+
+      - run: echo "VCPKG_ROOT=$env:VCPKG_INSTALLATION_ROOT" | Out-File -FilePath $env:GITHUB_ENV -Append
+        if: runner.os == 'Windows'
+      - run: vcpkg install openssl:x64-windows-static-md
+        if: runner.os == 'Windows'
+
+      - name: Set up cargo cache
+        uses: actions/cache@v3
+        continue-on-error: false
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+            xal-node/target/
+          key: ${{ runner.os }}-${{ runner.arch }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-${{ runner.arch }}-cargo-
+
+      - name: Set up node_modules cache
+        uses: actions/cache@v3
+        continue-on-error: false
+        with:
+          path: |
+            node_modules/           
+            xal-node/node_modules/           
+          key: ${{ runner.os }}-${{ runner.arch }}-npm-${{ hashFiles('**/package.json') }}-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: ${{ runner.os }}-${{ runner.arch }}-npm-
 
       - name: Install yarn dependencies
         run: yarn
@@ -52,20 +75,7 @@ jobs:
           # If the commit is tagged with a version (e.g. "v1.0.0"),
           # release the app after building
           release: ${{ startsWith(github.ref, 'refs/tags/v') }}
-        # if: startsWith(github.ref, 'refs/tags/v')
-
-      # - name: Build/release Electron app
-      #   uses: samuelmeuli/action-electron-builder@v1
-      #   with:
-      #     # GitHub token, automatically provided to the action
-      #     # (No need to define this secret in the repo settings)
-      #     github_token: ${{ secrets.github_token }}
-      #     args: -l AppImage
-
-      #     # If the commit is tagged with a version (e.g. "v1.0.0"),
-      #     # release the app after building
-      #     release: ${{ startsWith(github.ref, 'refs/tags/v') }}
-      #   if: matrix.os == 'ubuntu-latest'
+        # if: startsWith(github.ref, 'refs/tags/v') 
 
       - name: Publish Linux AppImage
         uses: actions/upload-artifact@v3
