@@ -1,6 +1,6 @@
 # Changelog
 
-## v2.0.0-beta5 - 2023-03-17
+## v2.0.0-beta5 - 2023-03-19
 - Replaced authentication process with xal-rs library to optimise authentication flow
 - Save settings to localStorage (PR#769, credits to @kohanyirobert)
 - Update bitrate selector/editor (PR#768, credits to @kohanyirobert)
