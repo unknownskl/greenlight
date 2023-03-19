@@ -119,8 +119,8 @@ export default class Authentication {
     startHooks() {
         session.defaultSession.webRequest.onBeforeRedirect({
             urls: [
-                'https://login.live.com/oauth20_authorize.srf?*&route=R3_BAY&res=success',
-                'https://login.live.com/oauth20_authorize.srf?*&route=R3_BAY&res=cancel',
+                'https://login.live.com/oauth20_authorize.srf?*&res=success',
+                'https://login.live.com/oauth20_authorize.srf?*&res=cancel',
                 'https://login.live.com/ppsecure/post.srf?*&route=R3_BL2'
             ]
         }, (details) => {
