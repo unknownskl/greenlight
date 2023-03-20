@@ -1,5 +1,8 @@
 # Changelog
 
+## v2.0.0-beta6 - 2023-03-20
+- Fixed startup error on Apple M1 and M2 macs
+
 ## v2.0.0-beta5 - 2023-03-19
 - Replaced authentication process with xal-rs library to optimise authentication flow
 - Save settings to localStorage (PR#769, credits to @kohanyirobert)
