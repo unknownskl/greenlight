@@ -3,3 +3,6 @@ node_modules
 .next
 app
 dist
+build/
+.flatpak-builder/
+build-bundle/

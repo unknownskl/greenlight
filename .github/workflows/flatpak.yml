@@ -1,0 +1,35 @@
+name: Build/flatpak
+
+on:
+  push:
+    branches:
+      - main-v2
+      - feature/*
+    tags:
+      - v*
+  pull_request:
+    branches:
+      - main-v2
+      
+# env:
+#   DEBUG: '*'
+
+jobs:
+  flatpak:
+    name: Flatpak Build
+    runs-on: ubuntu-latest
+
+    container:
+      image: bilelmoussaoui/flatpak-github-actions:gnome-40
+      options: --privileged
+
+    steps:
+      - name: Checkout Git repository
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - uses: flatpak/flatpak-github-actions/flatpak-builder@v4
+        with:
+          bundle: greenlight.flatpak
+          manifest-path: flatpak/dev.unknownskl.greenlight.yml
+          cache-key: flatpak-builder-${{ github.sha }}
