@@ -19,9 +19,9 @@ jobs:
     name: Flatpak Build
     runs-on: ubuntu-latest
 
-    container:
-      image: bilelmoussaoui/flatpak-github-actions:gnome-40
-      options: --privileged
+    # container:
+    #   image: bilelmoussaoui/flatpak-github-actions:gnome-40
+    #   options: --privileged
 
     steps:
       - name: Checkout Git repository
@@ -34,21 +34,21 @@ jobs:
         with:
           node-version: 18
 
-      - name: Set up node_modules cache
-        uses: actions/cache@v3
-        continue-on-error: false
-        with:
-          path: |
-            node_modules/           
-            xal-node/node_modules/           
-          key: ${{ runner.os }}-${{ runner.arch }}-npm-${{ hashFiles('**/package.json') }}-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: ${{ runner.os }}-${{ runner.arch }}-npm-
+      # - name: Set up node_modules cache
+      #   uses: actions/cache@v3
+      #   continue-on-error: false
+      #   with:
+      #     path: |
+      #       node_modules/           
+      #       xal-node/node_modules/           
+      #     key: ${{ runner.os }}-${{ runner.arch }}-npm-${{ hashFiles('**/package.json') }}-${{ hashFiles('**/yarn.lock') }}
+      #     restore-keys: ${{ runner.os }}-${{ runner.arch }}-npm-
 
-      - name: Install yarn
-        run: npm install -g yarn
+      # - name: Install yarn
+      #   run: npm install -g yarn
 
-      - name: Install yarn dependencies
-        run: yarn
+      # - name: Install yarn dependencies
+      #   run: yarn
 
       - uses: flatpak/flatpak-github-actions/flatpak-builder@v4
         with:
