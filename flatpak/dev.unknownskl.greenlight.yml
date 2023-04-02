@@ -31,6 +31,7 @@ modules:
         npm_config_cache: /run/build/greenlight/flatpak-node/npm-cache
         npm_config_offline: 'true'
     build-commands:
+      - touch ~/.yarnrc
       - yarn config --offline set yarn-offline-mirror $FLATPAK_BUILDER_BUILDDIR/flatpak-node/yarn-mirror
       # Install npm dependencies
       - yarn --offline
