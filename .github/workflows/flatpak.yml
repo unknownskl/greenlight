@@ -50,6 +50,16 @@ jobs:
       # - name: Install yarn dependencies
       #   run: yarn
 
+      - name: Set up flatpak build cache
+        uses: actions/cache@v3
+        continue-on-error: false
+        with:
+          path: |
+            build/           
+            .flatpak-builder/           
+          key: ${{ runner.os }}-${{ runner.arch }}-flatpak-builder-${{ hashFiles('flatpak/*') }}
+          restore-keys: ${{ runner.os }}-${{ runner.arch }}-flatpak-builder-
+
       - uses: flatpak/flatpak-github-actions/flatpak-builder@v4
         with:
           bundle: greenlight.flatpak
