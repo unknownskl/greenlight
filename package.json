@@ -37,7 +37,7 @@
     "@storybook/manager-webpack5": "^6.5.16",
     "@storybook/react": "^6.5.16",
     "@storybook/testing-library": "^0.1.0",
-    "@types/node": "^18.15.3",
+    "@types/node": "^18.15.11",
     "@types/react": "^18.0.32",
     "babel-loader": "^9.1.2",
     "electron": "21",
