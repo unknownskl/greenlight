@@ -121,18 +121,24 @@ export default class Events extends EventEmitter {
                 // event.sender.send('app_view', {
                 //     streamingMode: true
                 // })
-
-                // @TODO: Implement xHome / xCloud switch
+                
                 this._xHomeApi.startSession(arg.data.serverId).then((data) => {
                     event.sender.send('stream', {
                         type: REQ_TYPE_STREAM_START_STREAM,
                         data: data,
                     })
                 }).catch((error) => {
+                    if(error.errorDetails.code === 'WNSError') {
+                        error.message = 'Failed to send the start stream command to your Xbox. You can try it again or if the problem persists try the following:\n- Turn your Xbox on and off\n- Check the settings on your Xbox and make sure that streaming is allowed\n- Verify if you are able to stream via the xbox app on your phone or pc\n\nDetails'
+                    }
+
                     event.sender.send('stream', {
                         type: RES_TYPE_ERROR,
                         message: error.message || 'Error in Promise',
-                        data: error,
+                        data: {
+                            state: error.state,
+                            errorDetails: error.errorDetails
+                        },
                     })
                 })
             } else if(arg.type == REQ_TYPE_STREAM_START_STREAM_SDP){
@@ -225,7 +231,6 @@ export default class Events extends EventEmitter {
                 })
 
             } else if(arg.type == REQ_TYPE_STREAM_START_STREAM_SDP){
-                // @TODO: Implement xHome / xCloud switch
                 this._xCloudApi.sendSdp(arg.data.sdp).then((data) => {
                     event.sender.send('xcloud', {
                         type: REQ_TYPE_STREAM_START_STREAM_SDP,
