@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, session } from 'electron';
+import { app, BrowserWindow, ipcMain, session, protocol } from 'electron';
 import serve from 'electron-serve';
 import { createWindow, Authentication, xboxWorker, updater } from './helpers';
 import Events from './events'
@@ -103,6 +103,11 @@ export default class Application {
     // setInterval(() => {
     //   console.log('Application is in fullscreen:', this._mainWindow.fullScreen)
     // }, 1000)
+
+    // Catch authentication protocol to prevent handling errors.
+    protocol.registerFileProtocol('ms-xal-public-beta-000000004c20a908', (request, callback) => {
+      callback('404')
+    })
   
     app.on('activate', () => { this._mainWindow.show() })
   }
