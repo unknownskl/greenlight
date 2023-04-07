@@ -1,6 +1,6 @@
 # Greenlight
 
-[![Build/release](https://github.com/unknownskl/xbox-xcloud-client/actions/workflows/build.yml/badge.svg)](https://github.com/unknownskl/xbox-xcloud-client/actions/workflows/build.yml)
+[![Build/release](https://github.com/unknownskl/greenlight/actions/workflows/build.yml/badge.svg)](https://github.com/unknownskl/greenlight/actions/workflows/build.yml)
 
 Greenlight is an open-source client for xCloud and xHome streaming made in Javascript and Typescript. The client is an application wrapper around [xbox-xcloud-player](https://github.com/unknownskl/xbox-xcloud-player).
 Application runs on Linux, mac, Windows and Steam Deck.
@@ -58,14 +58,14 @@ Click on the Xbox logo on the left top. It will ask you to confirm to close the 
 
 ## Install
 
-You can either compile the project yourself or download the (unsigned) executable from the [releases](https://github.com/unknownskl/xbox-xcloud-client/releases) page
+You can either compile the project yourself or download the (unsigned) executable from the [releases](https://github.com/unknownskl/greenlight/releases) page
 
 ## Local Development
 
 Clone the repository:
 
-    git clone https://github.com/unknownskl/xbox-xcloud-client.git
-    cd xbox-xcloud-client
+    git clone https://github.com/unknownskl/greenlight.git
+    cd greenlight
     git submodule update --init --recursive
 
 Install dependencies:

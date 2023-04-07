@@ -7,7 +7,7 @@
   "main": "app/background.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/unknownskl/xbox-xcloud-client.git"
+    "url": "git+https://github.com/unknownskl/greenlight.git"
   },
   "scripts": {
     "dev": "yarn run build-deps && nextron",
