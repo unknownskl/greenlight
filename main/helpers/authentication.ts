@@ -124,12 +124,12 @@ export default class Authentication {
                 'https://login.live.com/ppsecure/post.srf?*&route=R3_BL2'
             ]
         }, (details) => {
-            console.log('XALAUTH:', details.redirectURL)
+            // console.log('XALAUTH:', details.redirectURL)
 
             const url = new URL(details.redirectURL)
             const code = url.searchParams.get('code')
             const state = url.searchParams.get('state')
-            console.log('XALAUTH2:', code, state)
+            // console.log('XALAUTH2:', code, state)
 
             if(code === null){
                 const error = url.searchParams.get('error')
@@ -143,18 +143,18 @@ export default class Authentication {
             this._authWindow.close()
 
             xalAuthenticator.exchange_code_for_token(code, this._sisu_local_code_verifier).then((res5:any) => {
-                console.log('Retrieved token:', res5)
+                // console.log('Retrieved token:', res5)
           
                 xalAuthenticator.do_sisu_authorization(this._sisu_session_id, res5.access_token, this._sisu_device_token.Token).then((res6:any) => {
-                    console.log('res6:', res6)
+                    // console.log('res6:', res6)
             
                     xalAuthenticator.do_xsts_authorization(res6.DeviceToken, res6.TitleToken.Token, res6.UserToken.Token, "http://gssv.xboxlive.com/").then((res7:any) => {
-                        console.log('res7 gssv:', res7.Token)
+                        // console.log('res7 gssv:', res7.Token)
 
                         this.requestxHomeToken(res7.Token)
             
                         xalAuthenticator.exchange_refresh_token_for_xcloud_transfer_token(res5.refresh_token).then((res8:any) => {
-                            console.log('res8 xcloud:', res8)
+                            // console.log('res8 xcloud:', res8)
 
                             this._tokens.msal.token = res8.lpt
 
@@ -179,7 +179,7 @@ export default class Authentication {
 
                     
                     xalAuthenticator.do_xsts_authorization(res6.DeviceToken, res6.TitleToken.Token, res6.UserToken.Token, "http://xboxlive.com").then((res_web:any) => {
-                        console.log('res_web web:', res_web)
+                        // console.log('res_web web:', res_web)
                         this._tokens.web.uhs = res_web.DisplayClaims.xui[0].uhs
                         this._tokens.web.token = res_web.Token
                         this._tokens.web.expires = res_web.expires
