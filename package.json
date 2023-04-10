@@ -40,7 +40,7 @@
     "@types/node": "^18.15.11",
     "@types/react": "^18.0.32",
     "babel-loader": "^9.1.2",
-    "electron": "21",
+    "electron": "24",
     "electron-builder": "^23.6.0",
     "next": "^13.2.4",
     "nextron": "^8.5.0",
