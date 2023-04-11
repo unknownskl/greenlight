@@ -4,7 +4,7 @@ import { app, session, BrowserWindow, ipcMain } from 'electron';
 import { createWindow } from './index'
 import Application from '../background'
 import XalLibrary from '../../xal-node/src_ts/lib'
-const xalAuthenticator = new XalLibrary.XalAuthenticator()
+let xalAuthenticator = new XalLibrary.XalAuthenticator()
 
 const isProd: boolean = process.env.NODE_ENV === 'production';
 const store = new Store({ name: 'helper_authentication' })
@@ -95,6 +95,8 @@ export default class Authentication {
     
                 session.defaultSession.clearStorageData().then(() => {
                     store.delete('user')
+                    store.delete('code_token')
+                    store.delete('sisu_token')
                     console.log('Restarting application...')
                     this._application.restart()
     
@@ -110,7 +112,7 @@ export default class Authentication {
                 console.log('opening auth flow')
                 // if(! this.checkAuthentication()){
                     this.startHooks()
-                    this.startAuthflow()
+                    this.startAuthflow(true)
                 // }
             }
         });
@@ -144,46 +146,13 @@ export default class Authentication {
 
             xalAuthenticator.exchange_code_for_token(code, this._sisu_local_code_verifier).then((res5:any) => {
                 // console.log('Retrieved token:', res5)
+                store.set('code_token', res5)
           
                 xalAuthenticator.do_sisu_authorization(this._sisu_session_id, res5.access_token, this._sisu_device_token.Token).then((res6:any) => {
                     // console.log('res6:', res6)
-            
-                    xalAuthenticator.do_xsts_authorization(res6.DeviceToken, res6.TitleToken.Token, res6.UserToken.Token, "http://gssv.xboxlive.com/").then((res7:any) => {
-                        // console.log('res7 gssv:', res7.Token)
+                    store.set('sisu_token', res6)
 
-                        this.requestxHomeToken(res7.Token)
-            
-                        xalAuthenticator.exchange_refresh_token_for_xcloud_transfer_token(res5.refresh_token).then((res8:any) => {
-                            // console.log('res8 xcloud:', res8)
-
-                            this._tokens.msal.token = res8.lpt
-
-                            // Auth done, lets cleanup and load the ui
-                            xalAuthenticator.close()
-
-                            this.requestxCloudToken(res7.Token).then((result) => {
-                                // Supports xCloud
-                                this.setAppTokens(2)
-                            }).catch((error) => {
-                                // Supports xHome only
-                                this.setAppTokens(1)
-                            })
-                
-                        }).catch((error8) => {
-                            console.log('exchange_refresh_token_for_xcloud_transfer_token error:', error8)
-                        })
-            
-                    }).catch((error7) => {
-                        console.log('do_xsts_authorization error:', error7)
-                    })
-
-                    
-                    xalAuthenticator.do_xsts_authorization(res6.DeviceToken, res6.TitleToken.Token, res6.UserToken.Token, "http://xboxlive.com").then((res_web:any) => {
-                        // console.log('res_web web:', res_web)
-                        this._tokens.web.uhs = res_web.DisplayClaims.xui[0].uhs
-                        this._tokens.web.token = res_web.Token
-                        this._tokens.web.expires = res_web.expires
-                    })
+                    this.retrieveTokens(res5, res6)
 
                 }).catch((error6) => {
                   console.log('do_sisu_authorization error:', error6)
@@ -203,7 +172,62 @@ export default class Authentication {
         }
     }
 
-    async startAuthflow() {
+    retrieveTokens(code_token, sisu_token) {
+
+        xalAuthenticator.do_xsts_authorization(sisu_token.DeviceToken, sisu_token.TitleToken.Token, sisu_token.UserToken.Token, "http://gssv.xboxlive.com/").then((xsts_token:any) => {
+            
+            this._isAuthenticating = true
+            this.requestxHomeToken(xsts_token.Token)
+
+            xalAuthenticator.exchange_refresh_token_for_xcloud_transfer_token(code_token.refresh_token).then((res8:any) => {
+                this._tokens.msal.token = res8.lpt
+
+                // Auth done, lets cleanup and load the ui
+                xalAuthenticator.close()
+
+                this.requestxCloudToken(xsts_token.Token).then((result) => {
+                    // Supports xCloud
+                    this.setAppTokens(2)
+                }).catch((error) => {
+                    // Supports xHome only
+                    this.setAppTokens(1)
+                })
+
+            }).catch((error8) => {
+                console.log('exchange_refresh_token_for_xcloud_transfer_token error:', error8)
+            })
+
+            xalAuthenticator.do_xsts_authorization(sisu_token.DeviceToken, sisu_token.TitleToken.Token, sisu_token.UserToken.Token, "http://xboxlive.com").then((res_web:any) => {
+                // console.log('res_web web:', res_web)
+                this._tokens.web.uhs = res_web.DisplayClaims.xui[0].uhs
+                this._tokens.web.token = res_web.Token
+                this._tokens.web.expires = res_web.expires
+            }).catch((error7) => {
+                console.log('[XAL] Failed to get authentication token for web:', error7)
+            })
+
+        }).catch((error7) => {
+            console.log('[SISU] Retrieved error from XalAuthenticator. Tokens are probably expired:', error7)
+
+            xalAuthenticator = new XalLibrary.XalAuthenticator()
+            this.startAuthflow(true)
+        })
+    }
+
+    async startAuthflow(force = false) {
+
+        if(force !== true){
+            // Check for token
+            const storedXstsTokens = store.get('sisu_token', false)
+            const storedCodeTokens = store.get('code_token', false)
+            if(storedXstsTokens !== false && storedCodeTokens !== false){
+                console.log('We got tokens!', storedCodeTokens, storedXstsTokens)
+
+                this.retrieveTokens(storedCodeTokens, storedXstsTokens)
+                return
+            }
+        }
+
         xalAuthenticator.get_device_token().then((device_token:any) => {
             console.log(device_token)
           
