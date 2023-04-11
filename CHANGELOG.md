@@ -1,5 +1,10 @@
 # Changelog
 
+## v2.0.0-beta7 - 2023-04-11
+- Smoothen login experience by saving the login tokens and attempt authentication before popup prompt #782
+- Add better description for WNSError #798 #788 #702
+- Fixed authentication error on windows by registering url protocol #776 #790
+
 ## v2.0.0-beta6 - 2023-03-20
 - Fixed startup error on Apple M1 and M2 macs
 
