@@ -76,7 +76,9 @@ function Settings() {
 
       if(gamepads[gamepad] !== null){
         // console.log(gamepads[gamepad])
-        controllerHtml += '<p>#'+(parseInt(gamepad)+1)+' - '+ gamepads[gamepad].id +' (axes: '+ gamepads[gamepad].axes.length +', buttons: '+ gamepads[gamepad].buttons.length +', rumble: '+ ((gamepads[gamepad] as any).vibrationActuator !== undefined ? (gamepads[gamepad] as any).vibrationActuator.type : 'Not supported') +')</p>'
+        controllerHtml += '<p>#'+(parseInt(gamepad)+1)+' - '+ gamepads[gamepad].id +' (axes: '+ gamepads[gamepad].axes.length +', buttons: '+ gamepads[gamepad].buttons.length +', rumble: '+ ((gamepads[gamepad] as any).
+        !== undefined && (gamepads[gamepad] as any).
+        !== null ? (gamepads[gamepad] as any).vibrationActuator.type : 'Not supported') +')</p>'
       } else {
         controllerHtml += '<p>#'+(parseInt(gamepad)+1)+' - No gamepad detected</p>'
       }
