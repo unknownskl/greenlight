@@ -30,11 +30,12 @@ modules:
         XDG_CACHE_HOME: /run/build/greenlight/flatpak-node/cache
         npm_config_cache: /run/build/greenlight/flatpak-node/npm-cache
         npm_config_offline: 'true'
+        yarn_config_cache: /run/build/greenlight/flatpak-node/yarn-mirror
     build-commands:
-      - touch /tmp/.yarnrc && HOME=/tmp/ yarn config --offline set yarn-offline-mirror $FLATPAK_BUILDER_BUILDDIR/flatpak-node/yarn-mirror
       # - yarn config --offline set yarn-offline-mirror $FLATPAK_BUILDER_BUILDDIR/flatpak-node/yarn-mirror
       # Install npm dependencies
-      - yarn --offline
+      # - yarn --offline
+      - touch /tmp/.yarnrc && HOME=/tmp/ yarn config --offline set yarn-offline-mirror $FLATPAK_BUILDER_BUILDDIR/flatpak-node/yarn-mirror/ && HOME=/tmp/ yarn --offline
       # Build the app; in this example the `dist` script
       # in package.json runs electron-builder
       - cp flatpak/cargo.xal-rs.lock xal-node/xal-rs/Cargo.lock
