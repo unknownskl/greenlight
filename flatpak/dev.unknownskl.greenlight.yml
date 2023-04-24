@@ -35,7 +35,8 @@ modules:
       # - yarn config --offline set yarn-offline-mirror $FLATPAK_BUILDER_BUILDDIR/flatpak-node/yarn-mirror
       # Install npm dependencies
       # - yarn --offline
-      - touch /tmp/.yarnrc && HOME=/tmp/ yarn config --offline set yarn-offline-mirror $FLATPAK_BUILDER_BUILDDIR/flatpak-node/yarn-mirror/ && HOME=/tmp/ yarn --offline
+      - mkdir /usr/local/share/ && touch /usr/local/share/.yarnrc && touch /tmp/.yarnrc && HOME=/tmp/ yarn config --offline set yarn-offline-mirror $FLATPAK_BUILDER_BUILDDIR/flatpak-node/yarn-mirror/ && HOME=/tmp/ yarn --offline
+      # - touch /tmp/.yarnrc && HOME=/tmp/ yarn config --offline set yarn-offline-mirror $FLATPAK_BUILDER_BUILDDIR/flatpak-node/yarn-mirror/ && HOME=/tmp/ yarn --offline
       # Build the app; in this example the `dist` script
       # in package.json runs electron-builder
       - cp flatpak/cargo.xal-rs.lock xal-node/xal-rs/Cargo.lock
