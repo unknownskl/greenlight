@@ -17,6 +17,7 @@ export default class Application {
 
   _mainWindow:BrowserWindow
   _fullscreenMode = false
+  _autostartStream = ''
 
   _isQuitting = false
 
@@ -26,9 +27,22 @@ export default class Application {
     this._xboxWorker = new xboxWorker(this)
 
     // Read fullscreen switch
-    if(process.argv.includes('--fullscreen')){
-      console.log('- Fullscreen switch acive')
-      this._fullscreenMode = true
+    console.log('Program args:', process.argv)
+
+    for(const arg in process.argv){
+      console.log(process.argv[arg])
+
+      if(process.argv[arg].includes('--fullscreen')){
+        console.log('- Fullscreen switch acive')
+        this._fullscreenMode = true
+      }
+
+      if(process.argv[arg].includes('--connect=')){
+        let key = process.argv[arg].substring(10)
+
+        console.log('- Connect switch is active, key:', key)
+        this._autostartStream = key
+      }
     }
 
     // Boot application
@@ -54,6 +68,16 @@ export default class Application {
     });
     
     app.on('before-quit', () => this._isQuitting = true)
+  }
+
+  getAutoStreamStart(){
+    if(this._autostartStream !== ''){
+      const key = this._autostartStream
+      this._autostartStream = ''
+      return key
+    } else {
+      return false
+    }
   }
 
   async start(){

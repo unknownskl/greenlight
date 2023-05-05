@@ -49,6 +49,14 @@ export default function MyApp({ Component, pageProps }) {
       setIsLoading(true)
     })
 
+    ipcRenderer.on('do_action', (event, data) => {
+      console.log('Got do_action event:', event, data)
+      
+      if(data.type == 'startStream'){
+        Router.push('stream/' + data.data.titleId)
+      }
+    })
+
 
     ipcRenderer.on('auth', (event, data) => {
       setPrevUserState({

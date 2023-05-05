@@ -104,6 +104,18 @@ export default class Events extends EventEmitter {
         ipcMain.on('stream', (event, arg) => {
 
             if(arg.type == REQ_TYPE_STREAM_GET_CONSOLES){
+
+                // Check for autoStream params
+                const autostartStream = this._application.getAutoStreamStart()
+                if(autostartStream !== false){
+                    event.sender.send('do_action', {
+                        type: 'startStream',
+                        data: {
+                            titleId: autostartStream
+                        },
+                    })
+                }
+
                 this._webApi.getProvider('smartglass').getConsolesList().then((consoles) => {
                     event.sender.send('stream', {
                         type: REQ_TYPE_STREAM_GET_CONSOLES,
