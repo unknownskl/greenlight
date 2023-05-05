@@ -1,5 +1,8 @@
 # Changelog
 
+## v2.0.0-beta8 - 2023-05-xx
+- Add --connect=<value> option to start a stream op startup #805 #509 
+
 ## v2.0.0-beta7 - 2023-04-11
 - Smoothen login experience by saving the login tokens and attempt authentication before popup prompt #782
 - Add better description for WNSError #798 #788 #702
