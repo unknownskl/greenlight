@@ -51,7 +51,9 @@ This application is reported to be working on the Steam Deck with some small bug
 | Argument | Description |
 |----------|--------------|
 | --fullscreen | Starts the application in fullscreen |
-| --connect=<value> | Will start stream once the user is authenticated. For console use `F000000000000000` format and for xCloud use `xcloud_<title>` |
+| --connect=<value> | Will start stream once the user is authenticated. |
+
+For console use `F000000000000000` format and for xCloud use `xcloud_<title>`
 
 ### To close the application
 
