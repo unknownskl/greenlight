@@ -36,7 +36,8 @@ export const UserProvider = ({ children }) => {
     const [settings, setSettings] = useState({
         xhome_bitrate: 0,
         xcloud_bitrate: 0,
-        controller_vibration: true
+        controller_vibration: true,
+        video_size: ""
     })
     const [achievements, setAchievements] = useState([])
 

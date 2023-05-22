@@ -68,6 +68,15 @@ function Settings() {
     })
   }
 
+  function setVideoSize(e){
+    console.log(e);
+    
+    setSettings({
+      ...settings,
+      video_size: e
+    })
+  }
+
   function drawControllers(){
     const gamepads = navigator.getGamepads()
     let controllerHtml = '<h1>Gamepads detected</h1> '
@@ -86,7 +95,8 @@ function Settings() {
 
     document.getElementById('settings_gamepad_layout').innerHTML = controllerHtml
   }
-
+  console.log(settings.video_size);
+  
   return (
     <React.Fragment>
       <Head>
@@ -138,6 +148,24 @@ function Settings() {
               <input type='checkbox' onChange={ setControllerVibration } checked={settings.controller_vibration} />&nbsp;
               Enable
             </label>
+          </p>
+
+          <br />
+          <div id='settings_gamepad_layout'>
+
+          </div>
+        </Card>
+
+        <Card className='padbottom'>
+          <h1>Video Size</h1>
+
+          <p>
+           
+          <select value={settings.video_size} onChange={(e) => {setVideoSize(e.target.value)}} >
+            <option value="">Default</option>
+            <option selected value="Fill">Strech</option>
+            <option value="Cover">Zoom</option>
+          </select>
           </p>
 
           <br />
