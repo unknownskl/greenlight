@@ -22,7 +22,7 @@ function Stream() {
   // let rerenderTimeout
   let keepaliveInterval
 
-  let xPlayer = new xCloudPlayer('streamComponent'+settings.video_size, {
+  let xPlayer = new xCloudPlayer('streamComponent', {
     ui_systemui: []
   })
 
@@ -60,7 +60,7 @@ function Stream() {
   })
 
   React.useEffect(() => {
-    document.getElementById('streamComponentHolder').innerHTML = '<div id="streamComponent'+settings.video_size+'"></div>'
+    document.getElementById('streamComponentHolder').innerHTML = '<div id="streamComponent" class="size_'+settings.video_size+'"></div>'
 
     let ipc_channel = 'stream'
     let serverId = router.query.serverid

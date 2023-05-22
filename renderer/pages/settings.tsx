@@ -22,7 +22,6 @@ function Settings() {
         alert((args.data !== undefined) ? args.message+': '+JSON.stringify(args.data) : args.message)
 
       } else if(args.type === 'user') {
-        console.log('got event response:', args)
         setGamertag(args.gamertag)
       }
     })
@@ -69,8 +68,6 @@ function Settings() {
   }
 
   function setVideoSize(e){
-    console.log(e);
-    
     setSettings({
       ...settings,
       video_size: e
@@ -157,21 +154,16 @@ function Settings() {
         </Card>
 
         <Card className='padbottom'>
-          <h1>Video Size</h1>
+          <h1>Video</h1>
 
           <p>
-           
-          <select value={settings.video_size} onChange={(e) => {setVideoSize(e.target.value)}} >
-            <option value="">Default</option>
-            <option selected value="Fill">Strech</option>
-            <option value="Cover">Zoom</option>
-          </select>
+            Video size: &nbsp; 
+            <select value={settings.video_size} onChange={(e) => {setVideoSize(e.target.value)}}>
+              <option selected value='default'>Default</option>
+              <option value='stretch'>Strech</option>
+              <option value='zoom'>Zoom</option>
+            </select>
           </p>
-
-          <br />
-          <div id='settings_gamepad_layout'>
-
-          </div>
         </Card>
       </div>
     </React.Fragment>
