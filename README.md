@@ -65,6 +65,14 @@ You can either compile the project yourself or download the (unsigned) executabl
 
 ## Local Development
 
+### Requirements
+
+- Rust ([https://rustup.rs/](https://rustup.rs/))
+- NodeJS ([https://nodejs.org/](https://nodejs.org/))
+- Yarn ([https://yarnpkg.com/](https://yarnpkg.com/))
+
+### Steps to get up and running
+
 Clone the repository:
 
     git clone https://github.com/unknownskl/greenlight.git
