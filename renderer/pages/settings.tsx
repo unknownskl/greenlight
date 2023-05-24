@@ -160,7 +160,7 @@ function Settings() {
             Video size: &nbsp; 
             <select value={settings.video_size} onChange={(e) => {setVideoSize(e.target.value)}}>
               <option selected value='default'>Default</option>
-              <option value='stretch'>Strech</option>
+              <option value='stretch'>Stretch</option>
               <option value='zoom'>Zoom</option>
             </select>
           </p>
