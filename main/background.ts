@@ -110,13 +110,16 @@ export default class Application {
     }
   
     this._mainWindow.on('close', (event) => {
-      if(this._isQuitting) {
-        this._mainWindow = null
-      } else if (process.platform === 'win32') {
-        app.quit()
+      if(process.platform == 'darwin') {
+        // Lets hide and run on the background on OSX
+        if(this._isQuitting) {
+          this._mainWindow = null
+        } else {
+          event.preventDefault()
+          this._mainWindow.hide()
+        }
       } else {
-        event.preventDefault()
-        this._mainWindow.hide()
+        app.quit()
       }
     })
   
