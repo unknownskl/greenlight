@@ -25,6 +25,7 @@
     "electron-serve": "^1.1.0",
     "electron-store": "^8.0.1",
     "github-url-to-object": "^4.0.6",
+    "uplot": "^1.6.24",
     "xbox-webapi": "^1.4.1",
     "xbox-xcloud-player": "0.2.0-beta7"
   },
