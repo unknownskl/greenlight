@@ -3,6 +3,8 @@
 ## v2.0.0-beta8 - 2023-05-xx
 - Add --connect=<value> option to start a stream op startup #805 #509 
 - Add video zoom option (Credits to @adolmarro) #667
+- Fix app not closing on Windows and Linux when using OS close button (PR#843, credits to @kohanyirobert)
+- Don't always rebuild xal-node if not necessary (PR#842, credits to @kohanyirobert)
 
 ## v2.0.0-beta7 - 2023-04-11
 - Smoothen login experience by saving the login tokens and attempt authentication before popup prompt #782
