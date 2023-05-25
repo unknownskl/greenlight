@@ -95,7 +95,7 @@ function StreamComponent({
           spanGaps: false,
     
           // in-legend display
-          label: "Packets dropped",
+          label: "Packets lost",
     
           // series style
           stroke: "green",
