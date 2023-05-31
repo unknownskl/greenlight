@@ -25,7 +25,7 @@ function Auth({
 
   function startAuthFlow(){
     ipcRenderer.send('auth', {
-      type: 'login'
+      type: 'login',
     })
   }
 

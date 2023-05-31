@@ -4,6 +4,7 @@ import { app, session, BrowserWindow, ipcMain } from 'electron';
 import { createWindow } from './index'
 import Application from '../background'
 import XalLibrary from '../../xal-node/src_ts/lib'
+
 let xalAuthenticator = new XalLibrary.XalAuthenticator()
 
 const isProd: boolean = process.env.NODE_ENV === 'production';
@@ -51,6 +52,8 @@ export default class Authentication {
     _sisu_session_id
     _sisu_device_token
 
+    _force_region = "";
+
     constructor(application){
         this._application = application
 
@@ -65,6 +68,10 @@ export default class Authentication {
                 // Check loading?
                 if(this._isAuthenticating === true){
                     event.sender.send('app_loading', {})
+                }
+
+                if (arg.force_region){
+                    this._force_region = arg.force_region;
                 }
     
                 event.sender.send('auth', {
@@ -109,6 +116,7 @@ export default class Authentication {
                 this._application.quit()
 
             } else if(arg.type == 'login') {
+                this._force_region = arg.force_region;
                 console.log('opening auth flow')
                 // if(! this.checkAuthentication()){
                     this.startHooks()
@@ -308,7 +316,16 @@ export default class Authentication {
                 path: '/v2/login/user',
             }
 
-            this.request(options, data).then((response:any) => {
+            let headers = {};
+
+
+            if (store.get("force_region") !== "") {
+                headers = {
+                    "X-Forwarded-For": store.get("force_region"),
+                };
+            }
+
+            this.request(options, data, headers).then((response:any) => {
                 this._tokens.xcloud.token = response.gsToken
                 this._tokens.xcloud.expires = (Date.now()+response.durationInSeconds)
                 this._tokens.xcloud.market = response.market

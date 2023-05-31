@@ -28,10 +28,12 @@ export default function MyApp({ Component, pageProps }) {
   const [streamingMode, setStreamingMode] = React.useState(false)
   const [isLoading, setIsLoading] = React.useState(false)
 
+
   React.useEffect(() => {
     const tokenInterval = setInterval(() => {
+
       ipcRenderer.send('auth', {
-        type: 'init'
+        type: 'init',
       })
     }, 500)
 
