@@ -28,8 +28,8 @@ function StreamComponent({
   let debugElement = document.getElementById('component_streamcomponent_debug')
   let webRtcStatsInterval
 
-  let jitterData = [new Float32Array([Date.now()]), new Float32Array([0.0])]
-  let droppedData = [new Float32Array([Date.now()]), new Float32Array([0.0]), new Float32Array([0.0])]
+  let jitterData = [new Float32Array([performance.now()]), new Float32Array([0.0])]
+  let droppedData = [new Float32Array([performance.now()]), new Float32Array([0.0]), new Float32Array([0.0])]
   let framesDroppedBaseline = 0
   let packetsDroppedBaseline = 0
   let frameCountDomUpdate = 0
@@ -120,12 +120,12 @@ function StreamComponent({
               droppedData = sliceData(droppedData, droppedData[0].length-1200, droppedData[0].length)
             }
 
-            jitterData[0] = new Float32Array([...Array.from(jitterData[0]), Date.now()])
-            jitterData[1] = new Float32Array([...Array.from(jitterData[0]), report['jitter']])
+            jitterData[0] = new Float32Array([...Array.from(jitterData[0]), performance.now()])
+            jitterData[1] = new Float32Array([...Array.from(jitterData[1]), report['jitter']])
 
-            droppedData[0] = new Float32Array([...Array.from(droppedData[0]), Date.now()])
-            droppedData[1] = new Float32Array([...Array.from(droppedData[0]), report['packetsLost']-packetsDroppedBaseline])
-            droppedData[2] = new Float32Array([...Array.from(droppedData[0]), report['framesDropped']-framesDroppedBaseline])
+            droppedData[0] = new Float32Array([...Array.from(droppedData[0]), performance.now()])
+            droppedData[1] = new Float32Array([...Array.from(droppedData[1]), report['packetsLost']-packetsDroppedBaseline])
+            droppedData[2] = new Float32Array([...Array.from(droppedData[2]), report['framesDropped']-framesDroppedBaseline])
             packetsDroppedBaseline = report['packetsLost']
             framesDroppedBaseline = report['framesDropped']
 
