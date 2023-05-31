@@ -130,6 +130,7 @@ function Settings() {
             ({ settings.xcloud_bitrate == 0 ? settings.xcloud_bitrate + " (unlimited)" : Math.floor(settings.xcloud_bitrate / 1024) + " mbps" })
           </p>
 
+          <!-- credit: https://greasyfork.org/en/scripts/455261-xbox-cloud-gaming-region-unlocker -->
           <p>
             Force Region:
             <select value={ settings.force_region } defaultValue={ "" } onChange={ (e) => setForceRegion(e.target.value) }>
