@@ -1,6 +1,6 @@
 # Changelog
 
-## v2.0.0-beta8 - 2023-05-xx
+## v2.0.0-beta8 - 2023-05-31
 - Add --connect=<value> option to start a stream op startup #805 #509 
 - Add video zoom option (Credits to @adolmarro) #667
 - Fix app not closing on Windows and Linux when using OS close button (PR#843, credits to @kohanyirobert)
