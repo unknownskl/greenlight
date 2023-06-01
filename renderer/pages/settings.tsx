@@ -74,6 +74,16 @@ function Settings() {
     })
   }
 
+  function setForceRegion(e){
+    setSettings({
+      ...settings,
+      force_region: e
+    })
+    ipcRenderer.send('auth', {
+      type: 'restart'
+    })
+  }
+
   function drawControllers(){
     const gamepads = navigator.getGamepads()
     let controllerHtml = '<h1>Gamepads detected</h1> '
@@ -120,6 +130,18 @@ function Settings() {
           <p>
             Bitrate: <input type="range" min="0" max="102400" step="1024" value={settings.xcloud_bitrate} onChange={ setxCloudBitrate } />
             ({ settings.xcloud_bitrate == 0 ? settings.xcloud_bitrate + " (unlimited)" : Math.floor(settings.xcloud_bitrate / 1024) + " mbps" })
+          </p>
+          <p>
+            Force Region:
+            <select value={ settings.force_region } defaultValue={ "" } onChange={ (e) => setForceRegion(e.target.value) }>
+              <option value="">Disabled</option>
+              <option value="203.41.44.20">Australia</option>
+              <option value="200.221.11.101">Brazil</option>
+              <option value="194.25.0.68">Europe</option>
+              <option value="122.1.0.154">Japan</option>
+              <option value="203.253.64.1">Korea</option>
+              <option value="4.2.2.2">United States</option>
+            </select>
           </p>
         </Card>
 

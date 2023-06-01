@@ -1,5 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react'
 
+const Store = require("electron-store")
+const store = new Store({ name: 'helper_authentication' })
+
 export const UserContext = React.createContext({
     consoles: [],
     setConsoles: (consoles) => null,
@@ -37,7 +40,8 @@ export const UserProvider = ({ children }) => {
         xhome_bitrate: 0,
         xcloud_bitrate: 0,
         controller_vibration: true,
-        video_size: 'default'
+        video_size: 'default',
+        force_region: ''
     })
     const [achievements, setAchievements] = useState([])
 
@@ -52,7 +56,9 @@ export const UserProvider = ({ children }) => {
         const settings = localStorage.getItem("settings")
         console.log('Loading settings from localStorage', settings)
         if (settings) {
-            setSettings(JSON.parse(settings))
+            let settingsObj = JSON.parse(settings);
+            setSettings(settingsObj)
+            store.set('force_region', settingsObj.force_region);
         }
     }, [])
 

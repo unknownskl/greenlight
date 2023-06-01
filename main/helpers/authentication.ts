@@ -114,6 +114,9 @@ export default class Authentication {
                     this.startHooks()
                     this.startAuthflow(true)
                 // }
+            } else if(arg.type === 'restart'){
+                console.log('Restarting application...')
+                this._application.restart()
             }
         });
     }
@@ -308,7 +311,15 @@ export default class Authentication {
                 path: '/v2/login/user',
             }
 
-            this.request(options, data).then((response:any) => {
+            let headers = {};
+
+            if (store.get("force_region") !== "") {
+                headers = {
+                    "X-Forwarded-For": store.get("force_region"),
+                };
+            }
+
+            this.request(options, data, headers).then((response:any) => {
                 this._tokens.xcloud.token = response.gsToken
                 this._tokens.xcloud.expires = (Date.now()+response.durationInSeconds)
                 this._tokens.xcloud.market = response.market
