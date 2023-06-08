@@ -18,6 +18,7 @@ export default class Application {
   _mainWindow:BrowserWindow
   _fullscreenMode = false
   _autostartStream = ''
+  _autostartStreamXcloud = false
 
   _isQuitting = false
 
@@ -42,6 +43,13 @@ export default class Application {
 
         console.log('- Connect switch is active, key:', key)
         this._autostartStream = key
+      }
+      else if(process.argv[arg].includes('--connectXcloud=')){
+        let key = process.argv[arg].substring(16)
+
+        console.log('- Connect switch is active, key:', key)
+        this._autostartStream = key
+        this._autostartStreamXcloud = true
       }
     }
 
@@ -72,8 +80,12 @@ export default class Application {
 
   getAutoStreamStart(){
     if(this._autostartStream !== ''){
-      const key = this._autostartStream
+      let key = this._autostartStream
+      if(this._autostartStreamXcloud){
+        key = "xcloud_" + key
+      }
       this._autostartStream = ''
+      this._autostartStreamXcloud = false
       return key
     } else {
       return false
