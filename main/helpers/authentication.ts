@@ -1,10 +1,34 @@
 import Store from 'electron-store'
 import https from 'https'
-import { app, session, BrowserWindow, ipcMain } from 'electron';
+import { app, session, BrowserWindow, ipcMain, dialog } from 'electron';
 import { createWindow } from './index'
 import Application from '../background'
-import XalLibrary from '../../xal-node/src_ts/lib'
-let xalAuthenticator = new XalLibrary.XalAuthenticator()
+// import XalLibrary from '../../xal-node/src_ts/lib'
+let XalLibrary = null
+let xalAuthenticator = null
+
+
+try {
+    XalLibrary = require('../../xal-node/src_ts/lib')
+    console.log(XalLibrary.default)
+
+    if(XalLibrary.default.XalAuthenticator !== null){
+        try {
+            xalAuthenticator = new XalLibrary.default.XalAuthenticator()
+
+        } catch(error) {
+            console.log('error 2222')
+            dialog.showErrorBox('Startup error', 'XAL Authentication library loaded but was unable to call XalAuthnticator class. Error: ' + XalLibrary)
+            app.quit()
+        }
+    } else {
+        dialog.showErrorBox('Startup error', 'XAL Authentication library loaded but was unable to find the XalAuthenticator class. Error: ' + XalLibrary)
+        app.quit()
+    }
+} catch(error) {
+    dialog.showErrorBox('Startup error', 'XAL Authentication library failed to load. Error: ' + error)
+    app.quit()
+}
 
 const isProd: boolean = process.env.NODE_ENV === 'production';
 const store = new Store({ name: 'helper_authentication' })
