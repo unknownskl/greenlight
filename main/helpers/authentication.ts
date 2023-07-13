@@ -233,7 +233,7 @@ export default class Authentication {
         }).catch((error7) => {
             console.log('[SISU] Retrieved error from XalAuthenticator. Tokens are probably expired:', error7)
 
-            xalAuthenticator = new XalLibrary.XalAuthenticator()
+            xalAuthenticator = new XalLibrary.default.XalAuthenticator()
             this.startAuthflow(true)
         })
     }
