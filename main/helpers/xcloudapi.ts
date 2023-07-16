@@ -1,5 +1,5 @@
 import https from 'https'
-import Application from '../background'
+import Application from '../application'
 
 export default class xCloudApi {
 

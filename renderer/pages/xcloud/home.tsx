@@ -169,7 +169,7 @@ function xCloudLibrary() {
               }} />
 
               <Link href={ `/stream/xcloud_${item.xcloudInfo.titleId}` }>
-                <Button label="Start stream" className='btn-primary' />
+                <Button label="Start stream" className='btn-primary' key={ item.xcloudInfo.titleId } />
               </Link>
             </Card>
           )

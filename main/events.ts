@@ -3,9 +3,9 @@ import EventEmitter from 'events'
 import { ipcMain } from 'electron'
 import { xCloudApi, xCloudBrowser } from './helpers'
 import xboxWebApi from 'xbox-webapi'
-import Application from './background'
+import Application from './application'
 
-const authStore = new Store({ name: 'helper_authentication' })
+const authStore = new Store()
 
 const REQ_TYPE_STREAM_GET_CONSOLES = 'get_consoles'
 const REQ_TYPE_STREAM_START_STREAM = 'start_stream'
@@ -57,12 +57,12 @@ export default class Events extends EventEmitter {
 
             this._webApi.getProvider('profile').get('/users/me/profile/settings?settings=GameDisplayName,GameDisplayPicRaw,Gamerscore,Gamertag').then((result) => {
                 this._webApi.getProvider('userpresence').get('/users/me').then((result) => {
+                    console.log('events.ts: Retrieved xuid:', result)
                     // Set xuid hack
                     this._webApi._authentication._user = { xid: result.xuid }
                 }).catch((error) => {
                     console.log('events.ts: Error: Failed to retrieve current user profile (2):', error)
                 })
-
                 if(result.profileUsers.length > 0) {
                     for(const setting in result.profileUsers[0].settings){
 
@@ -106,8 +106,8 @@ export default class Events extends EventEmitter {
             if(arg.type == REQ_TYPE_STREAM_GET_CONSOLES){
 
                 // Check for autoStream params
-                const autostartStream = this._application.getAutoStreamStart()
-                if(autostartStream !== false){
+                const autostartStream = this._application.getStartupFlags().autoStream
+                if(autostartStream !== ''){
                     event.sender.send('do_action', {
                         type: 'startStream',
                         data: {
