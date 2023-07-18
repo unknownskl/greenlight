@@ -1,5 +1,10 @@
 # Changelog
 
+## v2.0.0-beta9 - 2023-07-18
+- Partial backend refactor and improvements to authentication flow. 
+- Fixed broken login button after starting the app sometimes #815
+- Fixed an issue where the authentication windows keeps loading when trying to login the first time.
+
 ## v2.0.0-beta8 - 2023-05-31
 - Add --connect=<value> option to start a stream op startup #805 #509 
 - Add video zoom option #667 (PR#835, Credits to @adolmarro)
