@@ -166,7 +166,7 @@ export default class Authentication {
         session.defaultSession.webRequest.onBeforeRedirect({
             urls: [
                 'https://login.live.com/oauth20_authorize.srf?*',
-                'https://login.live.com/ppsecure/post.srf?*&route=R3_BL2'
+                'https://login.live.com/ppsecure/post.srf?*'
             ]
         }, (details) => {
             this._application.log('authentication', __filename+'[startWebviewHooks()] Got response:', details.redirectURL)
