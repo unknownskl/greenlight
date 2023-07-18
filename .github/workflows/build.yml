@@ -36,7 +36,7 @@ jobs:
       - run: rustup target add aarch64-apple-darwin
         if: matrix.os == 'macos-latest'
 
-      - run: wget https://fossies.org/windows/misc/nasm-2.16.01-win64.zip -o C:\Users\runneradmin\AppData\Local\vcpkg\archives\
+      - run: Invoke-WebRequest -Uri https://fossies.org/windows/misc/nasm-2.16.01-win64.zip -OutFile C:\Users\runneradmin\AppData\Local\vcpkg\archives\nasm-2.16.01-win64.zip
         if: runner.os == 'Windows'
       - name: Set up vcpkg cache
         uses: actions/cache@v3
