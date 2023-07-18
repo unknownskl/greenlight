@@ -53,6 +53,10 @@ export default class Application {
         return this._startupFlags
     }
 
+    resetAutostream(){
+        this._startupFlags.autoStream = ''
+    }
+
     readStartupFlags(){
         this.log('application',__filename+'[readStartupFlags()] Program args detected:', process.argv)
 

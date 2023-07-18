@@ -114,6 +114,7 @@ export default class Events extends EventEmitter {
                             titleId: autostartStream
                         },
                     })
+                    this._application.resetAutostream()
                 }
 
                 this._webApi.getProvider('smartglass').getConsolesList().then((consoles) => {
