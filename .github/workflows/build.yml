@@ -42,15 +42,18 @@ jobs:
         if: runner.os == 'Windows'
       - run: cd $env:VCPKG_INSTALLATION_ROOT && dir && dir $env:VCPKG_INSTALLATION_ROOT
         if: runner.os == 'Windows'
+        
       - name: Set up vcpkg cache
         uses: actions/cache@v3
         continue-on-error: false
         with:
           path: |
-            C:\Users\runneradmin\AppData\Local\vcpkg\archives\
+            $env:VCPKG_INSTALLATION_ROOT\downloads\
+            $env:VCPKG_DEFAULT_BINARY_CACHE
           key: ${{ runner.os }}-${{ runner.arch }}-vcpkg
           restore-keys: ${{ runner.os }}-${{ runner.arch }}-vcpkg-
         if: runner.os == 'Windows'
+
       - run: echo "VCPKG_ROOT=$env:VCPKG_INSTALLATION_ROOT" | Out-File -FilePath $env:GITHUB_ENV -Append
         if: runner.os == 'Windows'
       - run: vcpkg install openssl:x64-windows-static-md
