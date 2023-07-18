@@ -81,6 +81,12 @@ export default class Application {
         }
 
         ElectronApp.whenReady().then(() => {
+            updater({
+                // debug: true,
+                silent: true,
+                prereleases: (ElectronApp.getVersion().includes('beta')) ? true : false,
+            }, this)
+
             this.log('electron', __filename+'[loadApplicationDefaults()] Electron has been fully loaded. Ready to open windows')
 
             this.openMainWindow()
