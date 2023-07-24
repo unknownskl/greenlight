@@ -32,7 +32,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.21.4",
-    "@storybook/addon-actions": "^6.5.16",
+    "@storybook/addon-actions": "^7.1.0",
     "@storybook/addon-essentials": "^6.5.16",
     "@storybook/addon-interactions": "^6.5.16",
     "@storybook/addon-links": "^6.5.16",
