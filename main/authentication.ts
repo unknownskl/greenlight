@@ -251,6 +251,7 @@ export default class Authentication {
 
         }).catch((error7) => {
             this._application.log('authentication', __filename+'[retrieveTokens()] do_xsts_authorization error returned. Probably tokens expired:')
+            this._isAuthenticating = false
             this.startAuthflow()
 
             xalAuth.close()
