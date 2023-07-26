@@ -1,5 +1,8 @@
 # Changelog
 
+## v2.0.0-beta10 - 2023-07-26
+- Fixed broken login button after starting the app sometimes #815 (again, for real this time)
+
 ## v2.0.0-beta9 - 2023-07-18
 - Partial backend refactor and improvements to authentication flow. 
 - Fixed broken login button after starting the app sometimes #815
