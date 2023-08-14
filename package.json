@@ -16,7 +16,7 @@
     "publish": "electron-builder -p onTag",
     "storybook": "start-storybook -p 6006 -s ./renderer/public",
     "build-storybook": "build-storybook",
-    "build-deps": "cd xal-node/dist || npm run rebuild-deps",
+    "build-deps": "ls xal-node/dist/xal-node.node || npm run rebuild-deps",
     "rebuild-deps": "cd xal-node && npm ci"
   },
   "dependencies": {
