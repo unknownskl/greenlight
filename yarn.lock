@@ -11889,10 +11889,10 @@ xbox-webapi@^1.4.1:
     express "^4.17.1"
     uuid4 "^2.0.2"
 
-xbox-xcloud-player@0.2.0-beta7:
-  version "0.2.0-beta7"
-  resolved "https://registry.yarnpkg.com/xbox-xcloud-player/-/xbox-xcloud-player-0.2.0-beta7.tgz#bbcad4580f5b862503d159952e5dd4b1a5a550d7"
-  integrity sha512-xqK8boN0MJ8q8NKtItT9E50r2DuUxa1CYFKyu7tdnjKXucoKZHY/83E06Kn8nc1Vyws0nvdLxsuS62PjqfgkTg==
+xbox-xcloud-player@0.2.0-beta10:
+  version "0.2.0-beta10"
+  resolved "https://registry.yarnpkg.com/xbox-xcloud-player/-/xbox-xcloud-player-0.2.0-beta10.tgz#609b83124a24cb659ceeebad367f77e4e9fb5cc3"
+  integrity sha512-1YXCa5/qD7Jr7FaozW7nosl1qylyns/VjbekLm3567/erlsBXfFPyB7pv2AQtgJMBMfa4LPmNSZpr2wH1/TtTg==
 
 xmlbuilder@>=11.0.1, xmlbuilder@^15.1.1:
   version "15.1.1"

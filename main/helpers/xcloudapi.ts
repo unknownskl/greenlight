@@ -468,7 +468,7 @@ export default class xCloudApi {
                    },
                    "input":{
                       "minVersion":1,
-                      "maxVersion":7
+                      "maxVersion":8
                    },
                    "message":{
                       "minVersion":1,

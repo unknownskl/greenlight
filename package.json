@@ -28,7 +28,7 @@
     "github-url-to-object": "^4.0.6",
     "uplot": "^1.6.24",
     "xbox-webapi": "^1.4.1",
-    "xbox-xcloud-player": "0.2.0-beta7"
+    "xbox-xcloud-player": "0.2.0-beta10"
   },
   "devDependencies": {
     "@babel/core": "^7.21.4",

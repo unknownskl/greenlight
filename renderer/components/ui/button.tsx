@@ -3,14 +3,16 @@ import Link from 'next/link';
 
 interface ButtonProps {
   label: string;
+  icon?: string;
   title?: string;
   disabled?: boolean;
   className?: string;
-  onClick?: () => void;
+  onClick?: (e) => void;
 }
 
 function Button({
   label,
+  icon,
   title,
   disabled,
   className,
@@ -25,7 +27,14 @@ function Button({
 
   return (
     <React.Fragment>
-        <button className={className} title={title} onClick={onClick} disabled={disabled}>{label}</button>
+        <button className={className} title={title} onClick={onClick} disabled={disabled} style={(icon) ? {
+          backgroundImage: `url(${icon})`,
+          backgroundRepeat: 'no-repeat, no-repeat',
+          backgroundPosition: 'left 10px bottom  50%',
+          backgroundSize: 18,
+          paddingLeft: 35,
+          // height: 41,
+        }:{}}>{label}</button>
     </React.Fragment>
   );
 };

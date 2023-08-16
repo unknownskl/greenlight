@@ -1,6 +1,3 @@
-import { ipcRenderer } from 'electron'
-import Link from 'next/link'
-import Router from 'next/router'
 import React from 'react'
 import Button from './button'
 import xPlayer from 'xbox-xcloud-player'
@@ -11,7 +8,7 @@ import uPlot from 'uplot'
 interface StreamComponentProps {
   hidden?: boolean;
   onDisconnect?: () => void;
-  onMenu?: () => void;
+  onMenu?: (e) => void;
   xPlayer: xPlayer;
 }
 
@@ -27,6 +24,8 @@ function StreamComponent({
   let gamebarElement = document.getElementById('component_streamcomponent_gamebar')
   let debugElement = document.getElementById('component_streamcomponent_debug')
   let webRtcStatsInterval
+
+  const [micStatus, setMicStatus] = React.useState(false);
 
   let jitterData = [new Float32Array([performance.now()]), new Float32Array([0.0])]
   let droppedData = [new Float32Array([performance.now()]), new Float32Array([0.0]), new Float32Array([0.0])]
@@ -195,6 +194,16 @@ function StreamComponent({
     };
   }, []);
 
+  function toggleMic(){
+    if(xPlayer.getChannelProcessor('chat').isPaused === true){
+      xPlayer.getChannelProcessor('chat').startMic()
+      setMicStatus(true)
+    } else {
+      xPlayer.getChannelProcessor('chat').stopMic()
+      setMicStatus(false)
+    }
+  }
+
   function streamDisconnect(){
     // ipcRenderer.send('stream', {
     //   type: 'stop_stream'
@@ -237,14 +246,26 @@ function StreamComponent({
 
         <div id="component_streamcomponent_gamebar">
           <div id="component_streamcomponent_gamebar_menu">
-            <Button label="Disconnect" className='btn-cancel' onClick={ () => { streamDisconnect() } }></Button>
-            <Button label="Menu" onClick={ onMenu }></Button>
+          <div style={{
+              width: '25%'
+            }}>
+              <Button label="Disconnect" className='btn-cancel' onClick={ () => { streamDisconnect() } }></Button>
+            </div>
 
             <div style={{
               marginLeft: 'auto',
-              marginRight: 20
+              marginRight: 'auto'
             }}>
-              <Button label="Debug" onClick={ () => { toggleDebug() } }></Button>
+              <Button label="Menu" onClick={ (e) => { e.target.blur(); onMenu(e) }}></Button> &nbsp;
+              <Button label='Mic' icon={ (micStatus === false) ? '/images/icons/muted.png' : '/images/icons/unmuted.png' } className={ (micStatus === false) ? 'btn-cancel' : 'btn-primary' } onClick={ (e) => { e.target.blur(); toggleMic() }}></Button>
+            </div>
+
+            <div style={{
+              marginRight: 20,
+              width: '25%',
+              textAlign: 'right'
+            }}>
+              <Button label="Debug" onClick={ (e) => { e.target.blur(); toggleDebug() } }></Button>
             </div>
           </div>
         </div>
