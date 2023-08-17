@@ -21,6 +21,8 @@
     -moz-transition: all 1s linear;
     -o-transition: all 1s linear;
     transition: all 1s linear; */
+
+    box-shadow: 0px 10px 20px rgb(0 0 0 / 20%);
 }
 
 #component_header.disabled {

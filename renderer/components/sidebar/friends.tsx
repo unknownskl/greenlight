@@ -1,7 +1,5 @@
 import React from 'react';
 import { ipcRenderer } from 'electron';
-
-
 import SidebarFriendItem from './frienditem'
 
 interface SidebarFriendsProps {
@@ -28,11 +26,11 @@ function SidebarFriends({
   return (
     <React.Fragment>
       <div id="components_sidebarfriends" key="components_sidebarfriends">
-        {onlineFriends.map((item:any, i) => {               
+        {(onlineFriends.length > 0) ? onlineFriends.map((item:any, i) => {               
            return (
             <SidebarFriendItem key={ item.xuid } userinfo={ item }></SidebarFriendItem>
            ) 
-        })}
+        }) : <span></span> }
       </div>
     </React.Fragment>
   );

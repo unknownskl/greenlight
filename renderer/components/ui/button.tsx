@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 
 interface ButtonProps {
-  label: string;
+  label: string | any;
   icon?: string;
   title?: string;
   disabled?: boolean;

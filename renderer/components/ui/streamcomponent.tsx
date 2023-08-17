@@ -249,15 +249,15 @@ function StreamComponent({
           <div style={{
               width: '25%'
             }}>
-              <Button label="Disconnect" className='btn-cancel' onClick={ () => { streamDisconnect() } }></Button>
+              <Button label={<span><i className="fa-solid fa-xmark"></i> Disconnect</span>} className='btn-cancel' onClick={ () => { streamDisconnect() } }></Button>
             </div>
 
             <div style={{
               marginLeft: 'auto',
               marginRight: 'auto'
             }}>
-              <Button label="Menu" onClick={ (e) => { e.target.blur(); onMenu(e) }}></Button> &nbsp;
-              <Button label='Mic' icon={ (micStatus === false) ? '/images/icons/muted.png' : '/images/icons/unmuted.png' } className={ (micStatus === false) ? 'btn-cancel' : 'btn-primary' } onClick={ (e) => { e.target.blur(); toggleMic() }}></Button>
+              <Button label={ <span><i className="fa-brands fa-xbox"></i> Menu</span> } onClick={ (e) => { e.target.blur(); onMenu(e) }}></Button> &nbsp;
+              <Button label={ (micStatus === false) ? <span><i className="fa-solid fa-microphone-slash"></i> Muted</span> : <span><i className="fa-solid fa-microphone"></i> Active</span> } className={ (micStatus === false) ? 'btn-cancel' : 'btn-primary' } onClick={ (e) => { e.target.blur(); toggleMic() }}></Button>
             </div>
 
             <div style={{
@@ -265,7 +265,7 @@ function StreamComponent({
               width: '25%',
               textAlign: 'right'
             }}>
-              <Button label="Debug" onClick={ (e) => { e.target.blur(); toggleDebug() } }></Button>
+              <Button label={ <i className="fa-solid fa-bug"></i> } onClick={ (e) => { e.target.blur(); toggleDebug() } }></Button>
             </div>
           </div>
         </div>

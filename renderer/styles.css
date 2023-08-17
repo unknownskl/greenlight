@@ -8,6 +8,10 @@ body, * {
        -moz-user-select: none; /* Old versions of Firefox */
         -ms-user-select: none; /* Internet Explorer/Edge */
             user-select: none;
+
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
 }
 
 body {
@@ -19,6 +23,10 @@ body {
 a {
     text-decoration: none;
 }
+
+@import '@fortawesome/fontawesome-free/css/fontawesome.min.css';
+@import '@fortawesome/fontawesome-free/css/brands.min.css';
+@import '@fortawesome/fontawesome-free/css/solid.min.css';
 
 @import 'components/header.css';
 @import 'components/footer.css';
