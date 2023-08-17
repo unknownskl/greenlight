@@ -159,7 +159,7 @@ function xCloudLibrary() {
 
         {filterTitles(xcloudTitles, filter).slice(page*resultsPerPage, ((page*resultsPerPage)+resultsPerPage)).map((item, i) => {
           return (
-            <Card className='padbottom fixedsize' key={i}>
+            <Card className='padbottom fixedsize' key={ page+'_'+i}>
               <p style={{ height: '40px' }}>{item.LocalizedProperties[0].ProductTitle}</p>
 
               <img src={ getBoxArt(item.LocalizedProperties[0].Images) } loading='lazy' style={{
