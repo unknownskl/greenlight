@@ -38,9 +38,19 @@
     padding: 19px;
     opacity: 0.5;
     transition: 0.3s;
+    cursor: pointer;
 }
 
-#component_header a#actionBarLogo:hover img, #component_header a#actionBarLogo:hover svg {
+#component_header a#actionBarLogo i {
+    fill: #ffffff;
+    padding: 19px;
+    opacity: 0.5;
+    transition: 0.3s;
+    font-size: 34px;
+    cursor: pointer;
+}
+
+#component_header a#actionBarLogo:hover img, #component_header a#actionBarLogo:hover svg, #component_header a#actionBarLogo:hover i {
     opacity: 1;
 }
 
