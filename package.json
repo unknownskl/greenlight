@@ -32,7 +32,7 @@
     "@babel/core": "^7.21.4",
     "@fortawesome/fontawesome-free": "^6.4.2",
     "@types/node": "^18.15.11",
-    "@types/react": "^18.0.32",
+    "@types/react": "^18.2.20",
     "babel-loader": "^9.1.2",
     "electron": "21",
     "electron-builder": "^23.6.0",
