@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.0.0-beta11 - 2023-08-25
+- Added microphone support (Experimental) #365 #786
+- Updated friendslist UI
+- Performance improvements for xcloud page
+- Updated streaming menu
+
 ## v2.0.0-beta10 - 2023-07-26
 - Fixed broken login button after starting the app sometimes #815 (again, for real this time)
 
