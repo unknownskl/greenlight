@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "axios": "^1.4.0",
-    "compare-versions": "^5.0.3",
+    "compare-versions": "^6.1.0",
     "debug": "^4.3.4",
     "electron-serve": "^1.1.0",
     "electron-store": "^8.0.1",
