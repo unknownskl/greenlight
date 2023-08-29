@@ -37,7 +37,10 @@ export const UserProvider = ({ children }) => {
         xhome_bitrate: 0,
         xcloud_bitrate: 0,
         controller_vibration: true,
-        video_size: 'default'
+        video_size: 'default',
+        input_touch: false,
+        input_mousekeyboard: false,
+        input_newgamepad: false,
     })
     const [achievements, setAchievements] = useState([])
 

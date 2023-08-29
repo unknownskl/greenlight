@@ -1,5 +1,10 @@
 # Changelog
 
+## v2.0.0-beta12 - 2023-08-30
+- Added experimental Touch input support (works on touchscreen only) #404
+- Added experimental Mouse & Keyboard support (Mouse is not working in games yet)
+- Added new settings to enable and disable input methods.
+
 ## v2.0.0-beta11 - 2023-08-25
 - Added microphone support (Experimental) #365 #786
 - Updated friendslist UI

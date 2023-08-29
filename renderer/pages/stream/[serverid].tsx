@@ -23,7 +23,10 @@ function Stream() {
   let keepaliveInterval
 
   let xPlayer = new xCloudPlayer('streamComponent', {
-    ui_systemui: []
+    ui_systemui: [],
+    input_touch: settings.input_touch || false,
+    input_mousekeyboard: settings.input_mousekeyboard || false,
+    input_legacykeyboard: (settings.input_newgamepad) ? false : true
   })
 
   xPlayer.setControllerRumble(settings.controller_vibration)

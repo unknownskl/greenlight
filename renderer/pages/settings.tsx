@@ -67,6 +67,27 @@ function Settings() {
     })
   }
 
+  function setTouchInput(e){
+    setSettings({
+      ...settings,
+      input_touch: (! settings.input_touch)
+    })
+  }
+
+  function setMKBInput(e){
+    setSettings({
+      ...settings,
+      input_mousekeyboard: (! settings.input_mousekeyboard)
+    })
+  }
+
+  function setLegacyInput(e){
+    setSettings({
+      ...settings,
+      input_newgamepad: (! settings.input_newgamepad)
+    })
+  }
+
   function setVideoSize(e){
     setSettings({
       ...settings,
@@ -77,7 +98,7 @@ function Settings() {
   function drawControllers(){
     const gamepads = navigator.getGamepads()
     let controllerHtml = '<h1>Gamepads detected</h1> '
-    controllerHtml += '<p>Below you can view the detected controllers with the amount of axes and buttons. The default Xbox controller has 4 axes, 17 buttons and dual-rumble.</p> <div style="padding-left: 20px; padding-top: 10px;">'
+    controllerHtml += '<p>Below you can view the detected controllers with the amount of axes and buttons. The default Xbox controller has 4 axes, 17 buttons and dual-rumble. Press a button on the controller to active it</p> <div style="padding-left: 20px; padding-top: 10px;">'
     for(const gamepad in gamepads){
 
       if(gamepads[gamepad] !== null){
@@ -92,7 +113,6 @@ function Settings() {
 
     document.getElementById('settings_gamepad_layout').innerHTML = controllerHtml
   }
-  console.log(settings.video_size);
   
   return (
     <React.Fragment>
@@ -137,7 +157,7 @@ function Settings() {
         </Card>
 
         <Card className='padbottom'>
-          <h1>Gamepad</h1>
+          <h1>Inputs</h1>
 
           <p>
             Enable vibration: &nbsp; 
@@ -145,6 +165,30 @@ function Settings() {
               <input type='checkbox' onChange={ setControllerVibration } checked={settings.controller_vibration} />&nbsp;
               Enable
             </label>
+          </p>
+
+          <p>
+            Enable Touch input: &nbsp; 
+            <label>
+              <input type='checkbox' onChange={ setTouchInput } checked={settings.input_touch} />&nbsp;
+              Enable
+            </label>
+          </p>
+
+          <p>
+            Enable Mouse & Keyboard: &nbsp; 
+            <label>
+              <input type='checkbox' onChange={ setMKBInput } checked={settings.input_mousekeyboard} />&nbsp;
+              Enable
+            </label>
+          </p>
+
+          <p>
+            Enable new Gamepad driver: &nbsp; 
+            <label>
+              <input type='checkbox' onChange={ setLegacyInput } checked={settings.input_newgamepad} />&nbsp;
+              Enable
+            </label> <small>(Enable this if you want to use the Keyboard & Mouse input to avoid double input)</small>
           </p>
 
           <br />

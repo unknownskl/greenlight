@@ -2397,6 +2397,11 @@ dotenv-expand@^5.1.0:
   resolved "https://registry.npmjs.org/dotenv-expand/-/dotenv-expand-5.1.0.tgz"
   integrity sha512-YXQl1DSa4/PQyRfgrv6aoNjhasp/p4qs9FjJ4q4cQk+8m4r6k4ZSiEyytKG8f8W9gi8WsQtIObNmKd+tMzNTmA==
 
+dotenv@^16.3.1:
+  version "16.3.1"
+  resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-16.3.1.tgz#369034de7d7e5b120972693352a3bf112172cc3e"
+  integrity sha512-IPzF4w4/Rd94bA9imS68tZBaYyBWSCE47V1RGuMrB94iyTOIEwRmVL2x/4An+6mETpLrKJ5hQkB8W4kFAadeIQ==
+
 dotenv@^9.0.2:
   version "9.0.2"
   resolved "https://registry.npmjs.org/dotenv/-/dotenv-9.0.2.tgz"
@@ -4718,10 +4723,12 @@ xbox-webapi@^1.4.1:
     express "^4.17.1"
     uuid4 "^2.0.2"
 
-xbox-xcloud-player@0.2.0-beta11:
-  version "0.2.0-beta11"
-  resolved "https://registry.npmjs.org/xbox-xcloud-player/-/xbox-xcloud-player-0.2.0-beta11.tgz"
-  integrity sha512-7IFmq6v78JkwGAtiMS6ICCMlt2koRwzNR0vGdoOfkqhmBsW3p6lnquC2hFPTAjY3PM3TU9hojbwXiHB27GKjDA==
+xbox-xcloud-player@0.2.0-beta12:
+  version "0.2.0-beta12"
+  resolved "https://registry.yarnpkg.com/xbox-xcloud-player/-/xbox-xcloud-player-0.2.0-beta12.tgz#8b185f2c2ff003bfcc5b0a9756a2b65e8ce69e4f"
+  integrity sha512-Lxeu2TMAW3p02OMy5Ok5C3i9DHzkk6FQW6994Nj44a2On1etWDwh2fs0a9oe/rsnGOQ6B70LZYEDMeQr7+qM/A==
+  dependencies:
+    dotenv "^16.3.1"
 
 xmlbuilder@>=11.0.1, xmlbuilder@^15.1.1:
   version "15.1.1"
