@@ -13,10 +13,6 @@ import StreamComponent from '../../components/ui/streamcomponent'
 
 function Stream() {
   const router = useRouter()
-  // const [streamStarted, setStreamStarted] = React.useState(false)
-  // const [xPlayer, setxPlayer] = React.useState(new xCloudPlayer('videoHolder', {
-  //   ui_systemui: [19]
-  // }));
   const { settings, setSettings} = useSettings()
 
   // let rerenderTimeout
@@ -56,7 +52,6 @@ function Stream() {
 
       } else if(event.state == 'closed') {
         // Client has been disconnected. Lets return to home.
-        // (Router as any).back()
         xPlayer.reset()
       }
     }
@@ -134,21 +129,10 @@ function Stream() {
       }
     })
 
-    // Keyboard events
-    const keyboardDownEvent = (e) => {
-      switch(e.keyCode){
-        case 48:
-          xPlayer.getChannelProcessor('audio')._softReset()
-          break;
-      }
-    }
-    window.addEventListener('keydown', keyboardDownEvent)
-
     // Modal window
-
     return () => {
       ipcRenderer.removeAllListeners(ipc_channel);
-      window.removeEventListener('keydown', keyboardDownEvent)
+      // window.removeEventListener('keydown', keyboardDownEvent)
       // xPlayer.reset()
 
       if(keepaliveInterval){ clearInterval(keepaliveInterval) }
@@ -156,7 +140,6 @@ function Stream() {
   })
 
   function gamepadSend(button){
-    console.log('Press button:', button)
     xPlayer.getChannelProcessor('input').pressButton(0, { Nexus: 1 })
   }
 
@@ -166,7 +149,6 @@ function Stream() {
         <title>Greenlight - Streaming {router.query.serverid}</title>
       </Head>
 
-      {/* <StreamComponent onDisconnect={ () => { xPlayer.reset() }}></StreamComponent> */}
       <StreamComponent onMenu={ () => { gamepadSend('nexus') } } xPlayer={ xPlayer }></StreamComponent>
     </React.Fragment>
   );

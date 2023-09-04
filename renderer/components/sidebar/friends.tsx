@@ -30,7 +30,7 @@ function SidebarFriends({
            return (
             <SidebarFriendItem key={ item.xuid } userinfo={ item }></SidebarFriendItem>
            ) 
-        }) : <span></span> }
+        }) : <div className='components_sidebarfrienditem'><div className='components_sidebarfrienditem_userdetails'><p>All your friends are offline</p></div></div> }
       </div>
     </React.Fragment>
   );

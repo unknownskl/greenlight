@@ -13,6 +13,7 @@ export default class xCloudApi {
 
     _exchangeCounter = 0
     _exchangeUrl = ''
+    _currentGame = ''
 
     constructor(application:Application, host:string, token: string, type:'home'|'cloud' = 'home'){
         this._application = application
@@ -22,27 +23,66 @@ export default class xCloudApi {
     }
 
     get(url: string) {
+        // return new Promise((resolve, reject) => {
+        //     fetch(url, {
+        //         method: 'GET', // *GET, POST, PUT, DELETE, etc.
+        //         headers: {
+        //             'Authorization': 'Bearer '+this._token,
+        //             'Accept-Language': 'en-US',
+        //             'Content-Type': 'application/json',
+        //         }
+        //     }).then((response) => {
+        //         if(response.status !== 200){
+        //             console.log('xCloudPlayer Client - get() Error loading page. Status:', response.status, 'Body:', response.body)
+        //         } else {
+        //             response.json().then((data) => {
+        //                 resolve(data)
+        //             }).catch((error) => {
+        //                 reject(error)
+        //             })
+        //         }
+        //     }).catch((error) => {
+        //         reject(error)
+        //     });
+        // })
+
         return new Promise((resolve, reject) => {
-            fetch(url, {
-                method: 'GET', // *GET, POST, PUT, DELETE, etc.
+            let responseData = ''
+
+            const req = https.request({
+                host: this._host,
+                path: url,
+                method: 'GET',
                 headers: {
-                    'Authorization': 'Bearer '+this._token,
-                    'Accept-Language': 'en-US',
-                }
-            }).then((response) => {
-                if(response.status !== 200){
-                    console.log('Error fetching consoles. Status:', response.status, 'Body:', response.body)
-                } else {
-                    response.json().then((data) => {
-                        resolve(data)
-                    }).catch((error) => {
-                        reject(error)
-                    })
-                }
-            }).catch((error) => {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer '+this._token
+                },
+            }, (response:any) => {
+                response.on('data', (data:any) => {
+                    responseData += data
+                });
+
+                response.on('end', (data:any) => {
+                    if(response.statusCode === 200){
+                        console.log('xCloudApi - get() response: 200')
+                        resolve(JSON.parse(responseData))
+                    } else {
+                        reject({
+                            status: response.statusCode
+                        })
+                    }
+                });
+            })
+
+            req.on('error', (error) => {
                 reject(error)
             });
+            req.end();
         })
+    }
+
+    getWaitingTimes(titleId){
+        return this.get('/v1/waittime/'+titleId)
     }
 
     getTitles() {
@@ -156,6 +196,8 @@ export default class xCloudApi {
                     "serverId": "",
                     "fallbackRegionNames": [Array]
                 }
+
+                this._currentGame = inputId
             }
 
             const deviceInfo = JSON.stringify({
@@ -245,7 +287,7 @@ export default class xCloudApi {
                                     }).catch((error) =>{
                                         reject(error)
                                     })
-    
+
                                 } else {
                                     // Lets connect
                                     resolve(state)
@@ -336,6 +378,8 @@ export default class xCloudApi {
         })
     }
 
+    _provisioningPreviousState = ''
+
     isProvisioningReady(url:string) {
         return new Promise((resolve, reject) => {
 
@@ -375,6 +419,24 @@ export default class xCloudApi {
                         } else {
                             console.log('xCloudPlayer Client - '+url+' -', data)
 
+                            if(this._provisioningPreviousState !== 'WaitingForResources' && data.state === 'WaitingForResources'){
+                                console.log('Waiting for xCloud resources...')
+
+                                this.getWaitingTimes(this._currentGame).then((waitingtimes) => {
+
+                                    console.log('Retrieved loading times:', waitingtimes)
+
+                                    // Send waiting times to client
+                                    this._application._events.sendIpc('xcloud', {
+                                        type: 'waitingtimes',
+                                        message: waitingtimes || 'Error in Promise',
+                                        data: waitingtimes,
+                                    })
+                                }).catch((error) => {
+                                    console.log('xCloudPlayer Client - Failed to retrieve waiting times:', error)
+                                })
+                            }
+
                             setTimeout(() => {
                                 this.isProvisioningReady(url).then((data:any) => {
                                     resolve(data)
@@ -382,6 +444,8 @@ export default class xCloudApi {
                                     reject(error)
                                 })
                             }, 1000)
+
+                            this._provisioningPreviousState = data.state
                         }
                     }
                 })

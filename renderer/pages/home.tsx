@@ -46,7 +46,7 @@ function Home() {
         alignItems: 'stretch',
         paddingTop: '20px'
       }}>
-        {consoles && consoles.map((item, i) => {               
+        {consoles.length > 0 ? consoles.map((item, i) => {               
            return (
             <Card className='padbottom' key={i}>
               <h1>{item.name}</h1>
@@ -96,7 +96,8 @@ function Home() {
               </div>
             </Card>
            ) 
-        })}
+        }) : <Card className='padbottom' key='noconsoles'>No consoles found on account. If you do have an Xbox console then make sure that remote playing is enabled and is visible in the official Xbox App.</Card>
+        }
       </div>
 
     </React.Fragment>

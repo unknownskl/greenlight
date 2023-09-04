@@ -4,6 +4,8 @@ import xPlayer from 'xbox-xcloud-player'
 import Loader from './loader'
 import Card from './card'
 import uPlot from 'uplot'
+import { ipcRenderer } from 'electron'
+
 
 interface StreamComponentProps {
   hidden?: boolean;
@@ -26,6 +28,7 @@ function StreamComponent({
   let webRtcStatsInterval
 
   const [micStatus, setMicStatus] = React.useState(false);
+  const [waitingSeconds, setWaitingSeconds] = React.useState(0);
 
   let jitterData = [new Float32Array([performance.now()]), new Float32Array([0.0])]
   let droppedData = [new Float32Array([performance.now()]), new Float32Array([0.0]), new Float32Array([0.0])]
@@ -44,6 +47,17 @@ function StreamComponent({
   }
 
   React.useEffect(() => {
+
+    ipcRenderer.on('xcloud', (event, args) => {
+      console.log('GOT EVENT:', event, args)
+
+      if(args.type === 'waitingtimes'){
+        // Render countdown
+        console.log('Seconds waiting time:', args.data.estimatedTotalWaitTimeInSeconds)
+        // setWaitingTimes(args.data)
+        drawWaitingTimes(args.data.estimatedTotalWaitTimeInSeconds)
+      }
+    })
 
     let jitterUplot = new uPlot({
       id: "component_streamcomponent_debug_webrtc_jitter",
@@ -188,6 +202,8 @@ function StreamComponent({
       window.removeEventListener('keypress', keyboardPressEvent)
       clearInterval(mouseInterval)
 
+      ipcRenderer.removeAllListeners('xcloud');
+
       if(webRtcStatsInterval){ clearInterval(webRtcStatsInterval) }
       (document.getElementById('component_streamcomponent_debug_webrtc_jitter') !== null) ? document.getElementById('component_streamcomponent_debug_webrtc_jitter').innerHTML = '' : false;
       (document.getElementById('component_streamcomponent_debug_webrtc_dropped') !== null) ? document.getElementById('component_streamcomponent_debug_webrtc_dropped').innerHTML = '' : false;
@@ -227,6 +243,24 @@ function StreamComponent({
     }
   }
 
+  function drawWaitingTimes(seconds){
+    if(seconds !== false){
+      setWaitingSeconds(seconds)
+      const html = '<div>Waiting time: <span id="component_streamcomponent_waitingtimes_seconds">'+seconds+'</span></div>'
+
+      document.getElementById('component_streamcomponent_waitingtimes').innerHTML = html
+
+      const secondsInterval = setInterval(() => {
+        seconds--;
+        setWaitingSeconds(seconds)
+
+        document.getElementById('component_streamcomponent_waitingtimes_seconds').innerText = seconds
+
+        clearInterval(secondsInterval)
+      })
+    }
+  }
+
   return (
     <React.Fragment>
       <div>
@@ -241,6 +275,8 @@ function StreamComponent({
 
             <p>We are getting your stream ready...</p>
             <p id="component_streamcomponent_connectionstatus"></p>
+
+            <p id="component_streamcomponent_waitingtimes"></p>
           </Card>
         </div>
 
