@@ -223,6 +223,12 @@ export default class Authentication {
             }).catch((error) => {
                 // Supports xHome only
                 this._appLevel = 1
+
+                this.requestxCloudToken(xsts_token.Token, true).then((result) => {
+                    this._appLevel = 2
+                }).catch((error) => {
+                    this._appLevel = 1
+                })
             })
 
 
@@ -351,18 +357,18 @@ export default class Authentication {
         })
     }
 
-    requestxCloudToken(streamingToken){
+    requestxCloudToken(streamingToken, f2p = false){
         return new Promise((resolve, reject) => {
             this._application.log('authentication', __filename+'[requestxCloudToken()] Requesting xHome streaming tokens')
 
             // Get xHomeStreaming Token
             const data = JSON.stringify({
                 "token": streamingToken,
-                "offeringId": "xgpuweb"
+                "offeringId": (f2p === true) ? "xgpuwebf2p" : "xgpuweb"
             })
         
             const options = {
-                hostname: 'xgpuweb.gssv-play-prod.xboxlive.com',
+                hostname: (f2p === true) ? 'xgpuwebf2p.gssv-play-prod.xboxlive.com' : 'xgpuweb.gssv-play-prod.xboxlive.com',
                 method: 'POST',
                 path: '/v2/login/user',
             }
