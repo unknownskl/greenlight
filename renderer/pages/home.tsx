@@ -2,6 +2,7 @@ import React from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { ipcRenderer } from 'electron'
+import Ipc from '../lib/ipc'
 
 import Header from '../components/header'
 import Button from '../components/ui/button'
@@ -15,22 +16,13 @@ function Home() {
   const { consoles, setConsoles} = useUser()
 
   React.useEffect(() => {
-    ipcRenderer.send('stream', {
-      type: 'get_consoles'
+    Ipc.send('consoles', 'get').then((consoles) => {
+      setConsoles(consoles)
     })
 
-    ipcRenderer.on('stream', (event, args) => {
-      if(args.type === 'error'){
-        alert((args.data !== undefined) ? args.message+': '+JSON.stringify(args.data) : args.message)
-
-      } else if(args.type === 'get_consoles'){
-        setConsoles(args.data)
-      }
-    })
-
-    return () => {
-      ipcRenderer.removeAllListeners('stream');
-    };
+    // return () => {
+    //   // ipcRenderer.removeAllListeners('stream');
+    // };
   }, []);
   
   return (
@@ -90,9 +82,6 @@ function Home() {
                 <Link href={ `stream/${item.id}` }>
                   <Button label="Start stream" className='btn-primary' />
                 </Link>
-                {/* <Link href={ `stream/${item.id}` }>
-                  <Button label="Remote Control" />
-                </Link> */}
               </div>
             </Card>
            ) 

@@ -3,6 +3,7 @@ import Head from 'next/head';
 import Link from 'next/link';
 
 import { ipcRenderer } from 'electron'
+import Ipc from '../../lib/ipc'
 
 import Header from '../../components/header'
 import Card from '../../components/ui/card'
@@ -21,23 +22,17 @@ function xCloudLibrary() {
 
   React.useEffect(() => {
     if(xcloudTitles.length == 0){
-      ipcRenderer.send('xcloud', {
-        type: 'get_titles'
+      Ipc.send('store', 'getxCloudTitles').then((titles) => {
+        setXcloudTitles(titles)
       })
     }
 
-    ipcRenderer.on('xcloud', (event, args) => {
-      if(args.type === 'error'){
-        alert((args.data !== undefined) ? args.message+': '+JSON.stringify(args.data) : args.message)
-
-      } else if(args.type === 'get_titles'){
-        // console.log('xCloud titles response:', args)
-        setXcloudTitles(args.data)
-      }
+    const ipcListener = Ipc.onAction('store', 'updatePage', (event, action, args) => {
+      console.log('Received IPC Event from backend:', event, action, args)
     })
 
     return () => {
-      ipcRenderer.removeAllListeners('stream');
+      Ipc.removeListener('store', ipcListener)
     };
   })
 

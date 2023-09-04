@@ -5,6 +5,7 @@ import Debug from 'debug'
 import { createWindow, xboxWorker, updater } from './helpers';
 import Events from './events'
 import Authentication from './authentication'
+import Ipc from './ipc'
 
 import pkg from '../package.json'
 
@@ -28,6 +29,7 @@ export default class Application {
 
     private _mainWindow
     public _events:Events
+    public _ipc:Ipc
     public _authentication:Authentication
     public _xboxWorker:xboxWorker
 
@@ -41,6 +43,7 @@ export default class Application {
         // ElectronApp.removeAsDefaultProtocolClient('ms-xal-public-beta-000000004c20a908')
         
         this._events = new Events(this)
+        this._ipc = new Ipc(this)
         this._authentication = new Authentication(this)
         this._xboxWorker = new xboxWorker(this)
     }
