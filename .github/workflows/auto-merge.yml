@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.actor == 'dependabot[bot]'
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ahmadnassri/action-dependabot-auto-merge@v2
         with:
           target: minor
