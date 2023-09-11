@@ -44,7 +44,7 @@ export default {
 
         const wrapEvent = (event, args) => {
             if(args.action === action){
-                listener(event, args.action, args.data)
+                listener(event, args.data)
             }
         }
 

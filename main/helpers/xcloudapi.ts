@@ -1,6 +1,26 @@
 import https from 'https'
 import Application from '../application'
 
+export interface playResult {
+    sessionPath:string,
+    sessionId?:string,
+    state?:string,
+}
+
+export interface playResult {
+    sessionPath:string,
+    sessionId?:string,
+    state?:string,
+}
+
+export interface exchangeResult {
+    exchangeResponse:string,
+    errorDetails: {
+        code: any
+        message: any
+    }
+}
+
 export default class xCloudApi {
 
     _application
@@ -22,37 +42,14 @@ export default class xCloudApi {
         this._type = type
     }
 
-    get(url: string) {
-        // return new Promise((resolve, reject) => {
-        //     fetch(url, {
-        //         method: 'GET', // *GET, POST, PUT, DELETE, etc.
-        //         headers: {
-        //             'Authorization': 'Bearer '+this._token,
-        //             'Accept-Language': 'en-US',
-        //             'Content-Type': 'application/json',
-        //         }
-        //     }).then((response) => {
-        //         if(response.status !== 200){
-        //             console.log('xCloudPlayer Client - get() Error loading page. Status:', response.status, 'Body:', response.body)
-        //         } else {
-        //             response.json().then((data) => {
-        //                 resolve(data)
-        //             }).catch((error) => {
-        //                 reject(error)
-        //             })
-        //         }
-        //     }).catch((error) => {
-        //         reject(error)
-        //     });
-        // })
-
+    get(url: string, method = 'GET') {
         return new Promise((resolve, reject) => {
             let responseData = ''
 
             const req = https.request({
                 host: this._host,
                 path: url,
-                method: 'GET',
+                method: method,
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': 'Bearer '+this._token
@@ -63,12 +60,32 @@ export default class xCloudApi {
                 });
 
                 response.on('end', (data:any) => {
-                    if(response.statusCode === 200){
-                        console.log('xCloudApi - get() response: 200')
-                        resolve(JSON.parse(responseData))
+                    if(response.statusCode >= 200 && response.statusCode <= 299){
+                        this._application.log('xCloudApi', 'get('+url+', '+method+') resolve:', response.statusCode)
+                        let returnData = responseData
+                        try {
+                            returnData = JSON.parse(responseData)
+                        } catch(error){
+                        }
+
+                        if(response.statusCode === 204){
+                            // We have to retry..
+                            setTimeout(() => {
+                                this.get(url, method).then((result) => {
+                                    resolve(result)
+
+                                }).catch((error) => {
+                                    reject(error)
+                                })
+                            }, 750)
+                        } else {
+                          resolve(returnData)
+                        }
                     } else {
+                        this._application.log('xCloudApi', 'get('+url+') reject:', response.statusCode)
                         reject({
-                            status: response.statusCode
+                            status: response.statusCode,
+                            body: responseData,
                         })
                     }
                 });
@@ -77,6 +94,56 @@ export default class xCloudApi {
             req.on('error', (error) => {
                 reject(error)
             });
+            req.end();
+        })
+    }
+
+    post(url: string, postData = {}, headers = {}) {
+        return new Promise((resolve, reject) => {
+            let responseData = ''
+            const mergedHeaders = Object.assign({}, {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer '+this._token,
+            }, headers)
+
+            const req = https.request({
+                host: this._host,
+                path: url,
+                method: 'POST',
+                headers: mergedHeaders,
+            }, (response:any) => {
+
+                response.on('data', (data:any) => {
+                    responseData += data
+                });
+
+                response.on('end', (data:any) => {
+                    if(response.statusCode >= 200 && response.statusCode <= 299){
+                        this._application.log('xCloudApi', 'post('+url+') resolve:', response.statusCode, responseData)
+
+                        let returnData = responseData
+                        try {
+                            returnData = JSON.parse(responseData)
+                        } catch(error){
+                        }
+                        
+                        resolve(returnData)
+                    } else {
+                        this._application.log('xCloudApi', 'post('+url+') reject:', response.statusCode)
+                        reject({
+                            status: response.statusCode,
+                            body: responseData,
+                        })
+                    }
+                });
+            })
+
+            req.on('error', (error) => {
+                reject(error)
+            });
+
+            req.write(JSON.stringify(postData))
+
             req.end();
         })
     }
@@ -86,78 +153,202 @@ export default class xCloudApi {
     }
 
     getTitles() {
-        return new Promise((resolve, reject) => {
-            let responseData = ''
+        return this.get('/v1/titles')
+    }
 
-            const req = https.request({
-                host: this._host,
-                path: '/v1/titles',
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer '+this._token
+    stopStream(sessionId) {
+        return this.get('/v5/sessions/'+this._type+'/'+sessionId, 'DELETE')
+    }
+
+    startStream(target:string){
+        const deviceInfo = JSON.stringify({
+            "appInfo": {
+                "env": {
+                    "clientAppId": "Microsoft.GamingApp",
+                    "clientAppType": "native",
+                    "clientAppVersion": "2203.1001.4.0",
+                    "clientSdkVersion": "5.3.0",
+                    "httpEnvironment": "prod",
+                    "sdkInstallId": ""
+                }
+            },
+            "dev": {
+                "hw": {
+                    "make": "Micro-Star International Co., Ltd.",
+                    "model": "GS66 Stealth 10SGS",
+                    "sdktype": "native"
                 },
-            }, (response:any) => {
-                response.on('data', (data:any) => {
-                    // console.log('data', data)
-                    responseData += data
-                });
-
-                response.on('end', (data:any) => {
-                    if(response.statusCode === 200){
-                        console.log('xCloudApi - getTitles() response: 200')
-                        resolve(JSON.parse(responseData))
-                    } else {
-                        reject({
-                            status: response.statusCode
-                        })
+                "os": {
+                    "name": "Windows 10 Pro",
+                    "ver": "19041.1.amd64fre.vb_release.191206-1406"
+                },
+                "displayInfo": {
+                    "dimensions": {
+                        "widthInPixels": 1920,
+                        "heightInPixels": 1080
+                    },
+                    "pixelDensity": {
+                        "dpiX": 1,
+                        "dpiY": 1
                     }
-                });
-            })
+                }
+            }
+        })
 
-            req.on('error', (error) => {
-                reject(error)
-            });
-            req.end();
+        const postData = {
+            'titleId': (this._type === 'cloud') ? target : '',
+            'systemUpdateGroup': '',
+            'clientSessionId': '',
+            'settings': {
+                'nanoVersion': 'V3;WebrtcTransport.dll',
+                'enableTextToSpeech': false,
+                'highContrast': 0,
+                'locale': 'en-US',
+                'useIceConnection': false,
+                'timezoneOffsetMinutes': 120,
+                'sdkType': 'web',
+                'osName': 'windows'
+            },
+            'serverId': (this._type === 'home') ? target : '',
+            'fallbackRegionNames': []
+        }
+
+        return this.post('/v5/sessions/'+this._type+'/play', postData, {
+            'X-MS-Device-Info': deviceInfo,
+            // 'User-Agent': deviceInfo
         })
     }
 
-    getConsoles() {
+    getStreamState(sessionId:string) {
+        return this.get('/v5/sessions/'+this._type+'/'+sessionId+'/state')
+    }
+
+    sendSdpNew(sessionId:string, sdp: string){
         return new Promise((resolve, reject) => {
-            let responseData = ''
+            const postData = {
+                "messageType":"offer",
+                "sdp": sdp,
+                "configuration":{
+                    "chatConfiguration":{
+                      "bytesPerSample":2,
+                      "expectedClipDurationMs":20,
+                      "format":{
+                         "codec":"opus",
+                         "container":"webm"
+                      },
+                      "numChannels":1,
+                      "sampleFrequencyHz":24000
+                   },
+                   "chat":{
+                      "minVersion":1,
+                      "maxVersion":1
+                   },
+                   "control":{
+                      "minVersion":1,
+                      "maxVersion":3
+                   },
+                   "input":{
+                      "minVersion":1,
+                      "maxVersion":8
+                   },
+                   "message":{
+                      "minVersion":1,
+                      "maxVersion":1
+                   },
+                }
+            }
 
-            const req = https.request({
-                host: this._host,
-                path: '/v6/servers/home',
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer '+this._token
-                },
-            }, (response:any) => {
-                response.on('data', (data:any) => {
-                    console.log('xCloudApi - getConsoles() response: 200')
-                    // console.log('data', data)
-                    responseData += data
-                });
+            this.post('/v5/sessions/'+this._type+'/'+sessionId+'/sdp', postData).then((result) => {
 
-                response.on('end', (data:any) => {
-                    if(response.statusCode === 200){
-                        resolve(JSON.parse(responseData))
-                    } else {
-                        reject({
-                            status: response.statusCode
-                        })
-                    }
-                });
-            })
+                this.get('/v5/sessions/'+this._type+'/'+sessionId+'/sdp').then((sdpResult:exchangeResult) => {
+                    const exchangeSdp = JSON.parse(sdpResult.exchangeResponse)
+                    
+                    resolve(exchangeSdp)
 
-            req.on('error', (error) => {
+                }).catch((error) => {
+                    reject(error)
+                })
+
+            }).catch((error) => {
                 reject(error)
-            });
-            req.end();
+            })
         })
     }
+
+    sendIceNew(sessionId:string, ice:any){
+        return new Promise((resolve, reject) => {
+            const postData = {
+                "messageType": "iceCandidate",
+                "candidate": ice
+            }
+
+            this.post('/v5/sessions/'+this._type+'/'+sessionId+'/ice', postData).then((result) => {
+
+                this.get('/v5/sessions/'+this._type+'/'+sessionId+'/ice').then((iceResult:exchangeResult) => {
+                    const exchangeIce = JSON.parse(iceResult.exchangeResponse)
+                    
+                    resolve(exchangeIce)
+
+                }).catch((error) => {
+                    reject(error)
+                })
+
+            }).catch((error) => {
+                reject(error)
+            })
+        })
+    }
+
+    sendMSALAuth(sessionId:string, userToken:string){
+        return this.post('/v5/sessions/'+this._type+'/'+sessionId+'/connect', {
+            "userToken": userToken
+        })
+    }
+
+    sendKeepalive(sessionId:string){
+        return this.post('/v5/sessions/'+this._type+'/'+sessionId+'/keepalive')
+    }
+
+    getActiveSessions(){
+        return this.get('/v5/sessions/'+this._type+'/active')
+    }
+
+    // getConsoles() {
+    //     return new Promise((resolve, reject) => {
+    //         let responseData = ''
+
+    //         const req = https.request({
+    //             host: this._host,
+    //             path: '/v6/servers/home',
+    //             method: 'GET',
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //                 'Authorization': 'Bearer '+this._token
+    //             },
+    //         }, (response:any) => {
+    //             response.on('data', (data:any) => {
+    //                 console.log('xCloudApi - getConsoles() response: 200')
+    //                 responseData += data
+    //             });
+
+    //             response.on('end', (data:any) => {
+    //                 if(response.statusCode === 200){
+    //                     resolve(JSON.parse(responseData))
+    //                 } else {
+    //                     reject({
+    //                         status: response.statusCode
+    //                     })
+    //                 }
+    //             });
+    //         })
+
+    //         req.on('error', (error) => {
+    //             reject(error)
+    //         });
+    //         req.end();
+    //     })
+    // }
+
 
     startSession(inputId:string){
         return new Promise((resolve, reject) => {
@@ -622,34 +813,34 @@ export default class xCloudApi {
         })
     }
 
-    sendKeepalive(){
-        return new Promise((resolve, reject) => {
-            const req = https.request({
-                host: this._host,
-                path: '/'+this._sessionPath+'/keepalive',
-                method: 'POST', // *GET, POST, PUT, DELETE, etc.
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer '+this._token
-                }
-            }, (response) => {
-                if(response.statusCode !== 200){
-                    console.log('StreamClient.js: Error sending keepalive signal. Status:', response.statusCode)
-                    reject({
-                        status: response.statusCode
-                    })
-                } else {
-                    resolve('ok')
-                }
-            })
+    // sendKeepalive(){
+    //     return new Promise((resolve, reject) => {
+    //         const req = https.request({
+    //             host: this._host,
+    //             path: '/'+this._sessionPath+'/keepalive',
+    //             method: 'POST', // *GET, POST, PUT, DELETE, etc.
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //                 'Authorization': 'Bearer '+this._token
+    //             }
+    //         }, (response) => {
+    //             if(response.statusCode !== 200){
+    //                 console.log('StreamClient.js: Error sending keepalive signal. Status:', response.statusCode)
+    //                 reject({
+    //                     status: response.statusCode
+    //                 })
+    //             } else {
+    //                 resolve('ok')
+    //             }
+    //         })
 
-            req.on('error', (error:any) => {
-                reject(error)
-            });
+    //         req.on('error', (error:any) => {
+    //             reject(error)
+    //         });
 
-            req.write('')
+    //         req.write('')
 
-            req.end()
-        })
-    }
+    //         req.end()
+    //     })
+    // }
 }

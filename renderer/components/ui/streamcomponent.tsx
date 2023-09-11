@@ -5,6 +5,8 @@ import Loader from './loader'
 import Card from './card'
 import uPlot from 'uplot'
 import { ipcRenderer } from 'electron'
+import Ipc from '../../lib/ipc'
+
 
 
 interface StreamComponentProps {
@@ -12,6 +14,7 @@ interface StreamComponentProps {
   onDisconnect?: () => void;
   onMenu?: (e) => void;
   xPlayer: xPlayer;
+  sessionId: string;
 }
 
 function StreamComponent({
@@ -19,6 +22,7 @@ function StreamComponent({
   onDisconnect,
   onMenu,
   xPlayer,
+  sessionId,
   ...props
 }: StreamComponentProps) {
 
@@ -48,16 +52,21 @@ function StreamComponent({
 
   React.useEffect(() => {
 
-    ipcRenderer.on('xcloud', (event, args) => {
-      console.log('GOT EVENT:', event, args)
-
-      if(args.type === 'waitingtimes'){
-        // Render countdown
-        console.log('Seconds waiting time:', args.data.estimatedTotalWaitTimeInSeconds)
-        // setWaitingTimes(args.data)
-        drawWaitingTimes(args.data.estimatedTotalWaitTimeInSeconds)
-      }
+    Ipc.onAction('streaming', 'onQueue', (event, waitingTimes) => {
+      console.log('Waiting times:', waitingTimes)
+      drawWaitingTimes(waitingTimes.estimatedTotalWaitTimeInSeconds)
     })
+
+    // ipcRenderer.on('xcloud', (event, args) => {
+    //   console.log('GOT EVENT:', event, args)
+
+    //   if(args.type === 'waitingtimes'){
+    //     // Render countdown
+    //     console.log('Seconds waiting time:', args.data.estimatedTotalWaitTimeInSeconds)
+    //     // setWaitingTimes(args.data)
+    //     drawWaitingTimes(args.data.estimatedTotalWaitTimeInSeconds)
+    //   }
+    // })
 
     let jitterUplot = new uPlot({
       id: "component_streamcomponent_debug_webrtc_jitter",
@@ -221,10 +230,8 @@ function StreamComponent({
   }
 
   function streamDisconnect(){
-    // ipcRenderer.send('stream', {
-    //   type: 'stop_stream'
-    // })
     document.getElementById('streamComponentHolder').innerHTML = '';
+    onDisconnect()
     // (Router as any).back()
     // window.history.back()
     window.history.back()
@@ -246,18 +253,25 @@ function StreamComponent({
   function drawWaitingTimes(seconds){
     if(seconds !== false){
       setWaitingSeconds(seconds)
-      const html = '<div>Waiting time: <span id="component_streamcomponent_waitingtimes_seconds">'+seconds+'</span></div>'
+      const html = '<div>Estimated waiting time in queue: <span id="component_streamcomponent_waitingtimes_seconds">'+seconds+'</span> seconds</div>'
 
+      
       document.getElementById('component_streamcomponent_waitingtimes').innerHTML = html
 
       const secondsInterval = setInterval(() => {
         seconds--;
         setWaitingSeconds(seconds)
+        
+        if(document.getElementById('component_streamcomponent_waitingtimes') !== null){
+          document.getElementById('component_streamcomponent_waitingtimes_seconds').innerText = seconds
+        } else {
+          clearInterval(secondsInterval)
+        }
 
-        document.getElementById('component_streamcomponent_waitingtimes_seconds').innerText = seconds
-
-        clearInterval(secondsInterval)
-      })
+        if(seconds === 0){
+          clearInterval(secondsInterval)
+        }
+      }, 1000)
     }
   }
 
