@@ -68,7 +68,7 @@ export default class Authentication {
             expires: false,
         },
         msal: {
-            token: false,
+            token: '',
             refresh_token: false,
             id_token: false,
             client_info: false,
@@ -220,39 +220,21 @@ export default class Authentication {
             this.requestxCloudToken(xsts_token.Token).then((result) => {
                 // Supports xCloud
                 this._appLevel = 2
+
+                this.retrieveMSALTokens(code_token, sisu_token, xsts_token, xalAuth)
             }).catch((error) => {
                 // Supports xHome only
                 this._appLevel = 1
 
                 this.requestxCloudToken(xsts_token.Token, true).then((result) => {
                     this._appLevel = 2
+
+                    this.retrieveMSALTokens(code_token, sisu_token, xsts_token, xalAuth)
                 }).catch((error) => {
                     this._appLevel = 1
+
+                    this.retrieveMSALTokens(code_token, sisu_token, xsts_token, xalAuth)
                 })
-            })
-
-
-            Promise.all([
-                xalAuthenticator.exchange_refresh_token_for_xcloud_transfer_token(code_token.refresh_token),
-                xalAuthenticator.do_xsts_authorization(sisu_token.DeviceToken, sisu_token.TitleToken.Token, sisu_token.UserToken.Token, "http://xboxlive.com"),
-                this.requestxHomeToken(xsts_token.Token)
-            ]).then((values) => {
-                this._tokens.msal.token = values[0].lpt
-
-                this._tokens.web.uhs = values[1].DisplayClaims.xui[0].uhs
-                this._tokens.web.token = values[1].Token
-                this._tokens.web.expires = values[1].expires
-
-                // Finished auth flow
-                this._application.log('authentication', __filename+'[retrieveTokens()] Authentication successful:', this._tokens)
-                this._isAuthenticated = true
-                this._isAuthenticating = false
-                this._application._events.emit('start', this._tokens)
-
-                xalAuth.close()
-            }).catch((error) => {
-                this._application.log('authentication', __filename+'[retrieveTokens()] Failed to retrieve tokens')
-                xalAuth.close()
             })
 
         }).catch((error7) => {
@@ -260,6 +242,31 @@ export default class Authentication {
             this._isAuthenticating = false
             this.startAuthflow()
 
+            xalAuth.close()
+        })
+    }
+
+    retrieveMSALTokens(code_token, sisu_token, xsts_token, xalAuth){
+        Promise.all([
+            xalAuthenticator.exchange_refresh_token_for_xcloud_transfer_token(code_token.refresh_token),
+            xalAuthenticator.do_xsts_authorization(sisu_token.DeviceToken, sisu_token.TitleToken.Token, sisu_token.UserToken.Token, "http://xboxlive.com"),
+            this.requestxHomeToken(xsts_token.Token)
+        ]).then((values) => {
+            this._tokens.msal.token = values[0].lpt
+
+            this._tokens.web.uhs = values[1].DisplayClaims.xui[0].uhs
+            this._tokens.web.token = values[1].Token
+            this._tokens.web.expires = values[1].expires
+
+            // Finished auth flow
+            this._application.log('authentication', __filename+'[retrieveTokens()] Authentication successful:', this._tokens)
+            this._isAuthenticated = true
+            this._isAuthenticating = false
+            this._application._events.emit('start', this._tokens)
+
+            xalAuth.close()
+        }).catch((error) => {
+            this._application.log('authentication', __filename+'[retrieveTokens()] Failed to retrieve tokens')
             xalAuth.close()
         })
     }

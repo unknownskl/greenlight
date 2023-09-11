@@ -16,8 +16,7 @@ export default class IpcBase {
     onEvent(channel, event, args:EventArgs){
         this._application.log('Ipc', 'Received event: ['+channel+']', args)
         if(typeof this[args.action] === 'function') {
-
-            const response = (args.data.length > 0) ? this[args.action](args.data) : this[args.action]()
+            const response = (Object.keys(args.data).length > 0) ? this[args.action](args.data) : this[args.action]()
             response.then((result) => {
                 this.send(channel, {
                     action: args.action,
@@ -29,7 +28,7 @@ export default class IpcBase {
             })
 
         } else {
-            this._application.log('Ipc', 'Action was not found:', args.action)
+            this._application.log('Ipc', 'ERROR: Action was not found:', args.action, 'on channel', channel)
         }
     }
 

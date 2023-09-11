@@ -27,13 +27,13 @@ function xCloudLibrary() {
       })
     }
 
-    const ipcListener = Ipc.onAction('store', 'updatePage', (event, action, args) => {
-      console.log('Received IPC Event from backend:', event, action, args)
-    })
+    // const ipcListener = Ipc.onAction('store', 'updatePage', (event, action, args) => {
+    //   console.log('Received IPC Event from backend:', event, action, args)
+    // })
 
-    return () => {
-      Ipc.removeListener('store', ipcListener)
-    };
+    // return () => {
+    //   Ipc.removeListener('store', ipcListener)
+    // };
   })
 
   function getBoxArt(images){
