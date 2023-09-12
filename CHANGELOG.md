@@ -1,5 +1,12 @@
 # Changelog
 
+## v2.0.0-beta13 - 2023-09-xx
+- Added support for Free 2 play games on xCloud #918
+- Added support for estimated waiting times (Experimental, times may be way off)
+- Rewrote stream IPC Communication backend for better data exchange and improved stream handling
+- Fixed vibration not working since beta 11 #924
+- Fixed an issue which prevented the tokens to be loaded properly and results in problems when streaming #896
+
 ## v2.0.0-beta12 - 2023-08-30
 - Added experimental Touch input support (works on touchscreen only) #404
 - Added experimental Mouse & Keyboard support (Mouse is not working in games yet)
