@@ -92,7 +92,7 @@ export default class StreamManager {
                 return;
             }
 
-            this.getApi(session.type).sendSdpNew(sessionId, sdp).then((result) => {
+            this.getApi(session.type).sendSdp(sessionId, sdp).then((result) => {
 
                 resolve(result)
             }).catch((error) => {
@@ -109,7 +109,7 @@ export default class StreamManager {
                 return;
             }
 
-            this.getApi(session.type).sendIceNew(sessionId, ice).then((result) => {
+            this.getApi(session.type).sendIce(sessionId, ice).then((result) => {
 
                 resolve(result)
             }).catch((error) => {
