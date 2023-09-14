@@ -4,7 +4,9 @@ import React from 'react'
 import Head from 'next/head'
 // import { ipcRenderer } from 'electron'
 import Ipc from '../lib/ipc'
-import Router from 'next/router'
+// import Router from 'next/router'
+import { useRouter } from 'next/navigation'
+
 
 import Header from '../components/header'
 import Footer from '../components/footer'
@@ -16,6 +18,8 @@ import { UserProvider } from '../context/userContext'
 
 // This default export is required in a new `pages/_app.js` file.
 export default function MyApp({ Component, pageProps }) {
+  const router = useRouter()
+
   const [loggedIn, setLoginState] = React.useState(false);
   const [prevUserState, setPrevUserState] = React.useState({
     signedIn: false,
@@ -43,35 +47,22 @@ export default function MyApp({ Component, pageProps }) {
       
       if(args.isAuthenticating === true){
         setIsLoading(true)
-        setPrevUserState({ ...prevUserState, level: args.level})
+        setPrevUserState({ ...prevUserState, ...args.user})
 
       } else if(args.isAuthenticated === true){
+        if(loggedIn === false){
+          Ipc.send('app', 'onUiShown').then((result) => {
+            if(result.autoStream !== '')
+              setTimeout(() => {
+                router.push('stream/'+result.autoStream)
+              }, 1000)
+          })
+        }
+        
         setLoginState(true)
-        setPrevUserState({ ...prevUserState, level: args.level})
+        setPrevUserState({ ...prevUserState, ...args.user})
       }
     })
-
-  //   // ipcRenderer.on('xbox_friends', (event, friends) => {
-  //   //   setOnlineFriends(friends)
-  //   // })
-
-  //   ipcRenderer.on('app_view', (event, data) => {
-  //     if(data.streamingMode !== undefined){
-  //       setStreamingMode(data.streamingMode)
-  //     }
-  //   })
-
-  //   ipcRenderer.on('app_loading', (event, data) => {
-  //     setIsLoading(true)
-  //   })
-
-  //   ipcRenderer.on('do_action', (event, data) => {
-  //     console.log('Got do_action event:', event, data)
-      
-  //     if(data.type == 'startStream'){
-  //       Router.push('stream/' + data.data.titleId)
-  //     }
-  //   })
 
     // cleanup this component
     return () => {
@@ -84,7 +75,7 @@ export default function MyApp({ Component, pageProps }) {
   }
 
   let appBody
-  if(loggedIn){
+  if(loggedIn && prevUserState.gamertag != ''){
     appBody = (
       <React.Fragment>
         <Header gamertag={ prevUserState.gamertag } hidden={ isStreaming() } level={ parseInt(prevUserState.level) } />

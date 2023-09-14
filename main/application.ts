@@ -101,7 +101,6 @@ export default class Application {
         
             // Check authentication
             if(! this._authentication.checkAuthentication()){
-                // this._authentication.startHooks()
                 this._authentication.startAuthflow()
             }
 

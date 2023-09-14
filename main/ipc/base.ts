@@ -14,7 +14,7 @@ export default class IpcBase {
     }
 
     onEvent(channel, event, args:EventArgs){
-        this._application.log('Ipc', 'Received event: ['+channel+']', args)
+        this._application.log('Ipc:Recv', 'Received event: ['+channel+']', args)
         if(typeof this[args.action] === 'function') {
             const response = (Object.keys(args.data).length > 0) ? this[args.action](args.data) : this[args.action]()
             response.then((result) => {
@@ -33,7 +33,7 @@ export default class IpcBase {
     }
 
     send(channel, args:EventArgs){
-        this._application.log('Ipc', 'Sending event: ['+channel+']', args)
+        this._application.log('Ipc:Send', 'Sending event: ['+channel+']', args)
         this._application._mainWindow.webContents.send(channel, {
             action: args.action,
             id: args.id,

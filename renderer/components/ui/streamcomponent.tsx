@@ -231,11 +231,20 @@ function StreamComponent({
 
   function streamDisconnect(){
     document.getElementById('streamComponentHolder').innerHTML = '';
-    onDisconnect()
-    // (Router as any).back()
-    // window.history.back()
+    // onDisconnect()
+
     window.history.back()
     xPlayer.reset()
+  }
+
+  function endStream(){
+    if(confirm('Are you sure you want to end your stream?')){
+      document.getElementById('streamComponentHolder').innerHTML = '';
+      onDisconnect()
+      
+      window.history.back()
+      xPlayer.reset()
+    }
   }
 
   function toggleDebug(){
@@ -299,7 +308,8 @@ function StreamComponent({
           <div style={{
               width: '25%'
             }}>
-              <Button label={<span><i className="fa-solid fa-xmark"></i> Disconnect</span>} className='btn-cancel' onClick={ () => { streamDisconnect() } }></Button>
+              <Button label={<span><i className="fa-solid fa-xmark"></i> End Stream</span>} className='btn-cancel' onClick={ () => { endStream() } }></Button> &nbsp;
+              <Button label={<span><i className="fa-solid fa-xmark"></i> Disconnect</span>} className='btn' onClick={ () => { streamDisconnect() } }></Button>
             </div>
 
             <div style={{

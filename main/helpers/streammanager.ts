@@ -201,6 +201,7 @@ export default class StreamManager {
 
             }).catch((error) => {
                 console.log('Streammanager - error checking state:', sessionId, error)
+                this.monitorSession(sessionId)
             })
         }, 1000)
     }

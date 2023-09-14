@@ -6,21 +6,27 @@ export default class IpcApp extends IpcBase {
 
     loadCachedUser(){
         return new Promise((resolve, reject) => {
-            const gamertag = this._application._store.get('user.gamertag')
-            const gamerpic = this._application._store.get('user.gamerpic')
-            const gamerscore = this._application._store.get('user.gamerscore')
+            const user = this.getUserState()
 
-            resolve({
-                signedIn: gamertag ? true : false,
-                type: 'user',
-                gamertag: gamertag ? gamertag : '',
-                gamerpic: gamerpic ? gamerpic : '',
-                gamerscore: gamerscore ? gamerscore : '',
-                level: this._application._authentication._appLevel,
-            })
+            resolve(user)
 
             this.sendAuthState()
         })
+    }
+
+    getUserState(){
+        const gamertag = this._application._store.get('user.gamertag')
+        const gamerpic = this._application._store.get('user.gamerpic')
+        const gamerscore = this._application._store.get('user.gamerscore')
+
+        return {
+            signedIn: gamertag ? true : false,
+            type: 'user',
+            gamertag: gamertag ? gamertag : '',
+            gamerpic: gamerpic ? gamerpic : '',
+            gamerscore: gamerscore ? gamerscore : '',
+            level: this._application._authentication._appLevel,
+        }
     }
 
     login(){
@@ -61,7 +67,7 @@ export default class IpcApp extends IpcBase {
             data: {
                 isAuthenticating: this._application._authentication._isAuthenticating,
                 isAuthenticated: this._application._authentication._isAuthenticated,
-                level: this._application._authentication._appLevel,
+                user: this.getUserState()
             }
         })
     }
@@ -72,5 +78,15 @@ export default class IpcApp extends IpcBase {
             action: 'onlineFriends',
             data: onlineFriends
         })
+    }
+
+    onUiShown(){
+
+        return new Promise((resolve, reject) => {
+            resolve({
+                autoStream: this._application.getStartupFlags().autoStream
+            })
+            this._application.getStartupFlags().autoStream = ''
+        }) 
     }
 }
