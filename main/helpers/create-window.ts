@@ -3,7 +3,8 @@ import {
   BrowserWindow,
   BrowserWindowConstructorOptions,
 } from 'electron';
-import Store from 'electron-store';
+import Store from 'electron-store'
+import path from 'node:path'
 
 export default (windowName: string, options: BrowserWindowConstructorOptions): BrowserWindow => {
   const key = 'window-state';
@@ -72,8 +73,13 @@ export default (windowName: string, options: BrowserWindowConstructorOptions): B
     ...options,
     ...state,
     webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
+      // nodeIntegration: true,
+      // contextIsolation: false,
+      nodeIntegration: false,
+      contextIsolation: true,
+      enableBlinkFeatures: '',
+      sandbox: false,
+      preload: path.join(__dirname, 'preload.js'),
       ...options.webPreferences,
     },
     autoHideMenuBar: true,

@@ -2,7 +2,8 @@ import '../styles.css'
 
 import React from 'react'
 import Head from 'next/head'
-import { ipcRenderer } from 'electron'
+// import { ipcRenderer } from 'electron'
+import Ipc from '../lib/ipc'
 import Router from 'next/router'
 
 import Header from '../components/header'
@@ -15,7 +16,6 @@ import { UserProvider } from '../context/userContext'
 
 // This default export is required in a new `pages/_app.js` file.
 export default function MyApp({ Component, pageProps }) {
-  // return <Component {...pageProps} />
   const [loggedIn, setLoginState] = React.useState(false);
   const [prevUserState, setPrevUserState] = React.useState({
     signedIn: false,
@@ -29,56 +29,53 @@ export default function MyApp({ Component, pageProps }) {
   const [isLoading, setIsLoading] = React.useState(false)
 
   React.useEffect(() => {
-    const tokenInterval = setInterval(() => {
-      ipcRenderer.send('auth', {
-        type: 'init'
-      })
-    }, 500)
-
-    // ipcRenderer.on('xbox_friends', (event, friends) => {
-    //   setOnlineFriends(friends)
-    // })
-
-    ipcRenderer.on('app_view', (event, data) => {
-      if(data.streamingMode !== undefined){
-        setStreamingMode(data.streamingMode)
-      }
-    })
-
-    ipcRenderer.on('app_loading', (event, data) => {
-      setIsLoading(true)
-    })
-
-    ipcRenderer.on('do_action', (event, data) => {
-      console.log('Got do_action event:', event, data)
-      
-      if(data.type == 'startStream'){
-        Router.push('stream/' + data.data.titleId)
-      }
-    })
-
-
-    ipcRenderer.on('auth', (event, data) => {
+    Ipc.send('app', 'loadCachedUser').then((user) => {
       setPrevUserState({
-        signedIn: data.signedIn,
-        gamertag: data.gamertag,
-        gamerpic: data.gamerpic,
-        gamerscore: data.gamerscore,
-        level: data.level,
+        signedIn: user.signedIn,
+        gamertag: user.gamertag,
+        gamerpic: user.gamerpic,
+        gamerscore: user.gamerscore,
+        level: user.level,
       })
+    })
 
-      if(data.loggedIn === true){
-        // We are logged in!
+    const authState = Ipc.onAction('app', 'authState', (event, args) => {
+      
+      if(args.isAuthenticating === true){
+        setIsLoading(true)
+        setPrevUserState({ ...prevUserState, level: args.level})
+
+      } else if(args.isAuthenticated === true){
         setLoginState(true)
-        clearInterval(tokenInterval)
-
+        setPrevUserState({ ...prevUserState, level: args.level})
       }
     })
+
+  //   // ipcRenderer.on('xbox_friends', (event, friends) => {
+  //   //   setOnlineFriends(friends)
+  //   // })
+
+  //   ipcRenderer.on('app_view', (event, data) => {
+  //     if(data.streamingMode !== undefined){
+  //       setStreamingMode(data.streamingMode)
+  //     }
+  //   })
+
+  //   ipcRenderer.on('app_loading', (event, data) => {
+  //     setIsLoading(true)
+  //   })
+
+  //   ipcRenderer.on('do_action', (event, data) => {
+  //     console.log('Got do_action event:', event, data)
+      
+  //     if(data.type == 'startStream'){
+  //       Router.push('stream/' + data.data.titleId)
+  //     }
+  //   })
 
     // cleanup this component
     return () => {
-        clearInterval(tokenInterval)
-        ipcRenderer.removeAllListeners('auth');
+      Ipc.removeListener('app', authState)
     };
   }, []);
 

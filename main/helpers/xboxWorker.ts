@@ -1,4 +1,4 @@
-import Application from '../background'
+import Application from '../application'
 import { Notification } from 'electron'
 
 export default class xboxWorker {
@@ -36,7 +36,7 @@ export default class xboxWorker {
             }
 
             // console.log('Online friends:', JSON.stringify(onlineFriends))
-            this._application._events.sendIpc('xbox_friends', onlineFriends)
+            this._application._ipc._channels.app.sendOnlineFriends(onlineFriends)
 
         }).catch((error) => {
             console.log('xboxWorker - Error updating friends:', error)

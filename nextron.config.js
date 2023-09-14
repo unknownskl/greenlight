@@ -7,6 +7,7 @@ module.exports = {
     // main process' webpack config
     webpack: (config, env) => {
         config.entry.background = './main/application.ts'
+        config.entry.preload = './main/preload.ts'
         config.module.rules.push({
             test: /\.node$/,
             loader: "node-loader",

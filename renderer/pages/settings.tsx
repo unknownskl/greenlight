@@ -1,7 +1,8 @@
 import React from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
-import { ipcRenderer } from 'electron'
+// import { ipcRenderer } from 'electron'
+import Ipc from '../lib/ipc'
 
 import { useSettings } from '../context/userContext'
 
@@ -13,34 +14,40 @@ function Settings() {
   const { settings, setSettings} = useSettings()
 
   React.useEffect(() => {
-    ipcRenderer.send('auth', {
-      type: 'get_user'
+
+    Ipc.send('app', 'loadCachedUser').then((user) => {
+      console.log('Set user:', user)
+      setGamertag(user.gamertag)
     })
 
-    ipcRenderer.on('auth', (event, args) => {
-      if(args.type === 'error'){
-        alert((args.data !== undefined) ? args.message+': '+JSON.stringify(args.data) : args.message)
 
-      } else if(args.type === 'user') {
-        setGamertag(args.gamertag)
-      }
-    })
+
+    // ipcRenderer.send('auth', {
+    //   type: 'get_user'
+    // })
+
+    // ipcRenderer.on('auth', (event, args) => {
+    //   if(args.type === 'error'){
+    //     alert((args.data !== undefined) ? args.message+': '+JSON.stringify(args.data) : args.message)
+
+    //   } else if(args.type === 'user') {
+    //     setGamertag(args.gamertag)
+    //   }
+    // })
 
     const controllerInterval = setInterval(() => {
       drawControllers()
     }, 200)
 
     return () => {
-      ipcRenderer.removeAllListeners('auth');
+      // ipcRenderer.removeAllListeners('auth');
       clearInterval(controllerInterval)
     };
   }, []);
 
   function confirmLogout() {
     if(confirm('Are you sure you want to logout?')){
-      ipcRenderer.send('auth', {
-        type: 'logout'
-      })
+      Ipc.send('app', 'logout')
     }
   }
 

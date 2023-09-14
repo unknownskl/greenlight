@@ -4,7 +4,7 @@ import xPlayer from 'xbox-xcloud-player'
 import Loader from './loader'
 import Card from './card'
 import uPlot from 'uplot'
-import { ipcRenderer } from 'electron'
+// import { ipcRenderer } from 'electron'
 import Ipc from '../../lib/ipc'
 
 
@@ -211,7 +211,7 @@ function StreamComponent({
       window.removeEventListener('keypress', keyboardPressEvent)
       clearInterval(mouseInterval)
 
-      ipcRenderer.removeAllListeners('xcloud');
+      // ipcRenderer.removeAllListeners('xcloud');
 
       if(webRtcStatsInterval){ clearInterval(webRtcStatsInterval) }
       (document.getElementById('component_streamcomponent_debug_webrtc_jitter') !== null) ? document.getElementById('component_streamcomponent_debug_webrtc_jitter').innerHTML = '' : false;

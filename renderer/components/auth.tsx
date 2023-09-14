@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { ipcRenderer } from 'electron';
+import Ipc from '../lib/ipc'
 
 import Card from '../components/ui/card'
 import Button from './ui/button';
@@ -24,24 +25,18 @@ function Auth({
 }: AuthProps) {
 
   function startAuthFlow(){
-    ipcRenderer.send('auth', {
-      type: 'login'
-    })
+    Ipc.send('app', 'login')
   }
 
   function logout(){
     if(confirm('Are you sure you want to logout?')){
-      ipcRenderer.send('auth', {
-        type: 'logout'
-      })
+      Ipc.send('app', 'logout')
     }
   }
 
   function clearData(){
     if(confirm('This will remove all application data. Sometimes helpful when you are stuck in a login loop. Do you want to continue?')){
-      ipcRenderer.send('auth', {
-        type: 'logout'
-      })
+      Ipc.send('app', 'logout')
     }
   }
   

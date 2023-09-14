@@ -1,7 +1,8 @@
 import React from 'react';
 import Link from 'next/link';
+import Ipc from '../lib/ipc'
 
-import { ipcRenderer } from 'electron'
+// import { ipcRenderer } from 'electron'
 
 interface HeaderProps {
   hidden?: boolean;
@@ -22,51 +23,54 @@ function Header({
 }: HeaderProps) {
 
   console.log('level:', level)
-  const [headerLinks, setHeaderLinks] = React.useState((level > 1) ? [
-    {
-      name: 'My Consoles',
-      title: 'View consoles',
-      url: '/home',
-      active: true,
-    },{
-      name: 'xCloud Library',
-      title: 'Browse xCloud library',
-      url: '/xcloud/home'
-    // },{
-    //   name: 'Debug',
-    //   title: 'Debug page',
-    //   url: '/debug'
-    },{
-      name: 'Settings',
-      title: 'Change application settings',
-      url: '/settings'
-    },{
-      name: gamertag,
-      title: 'View profile',
-      url: '/profile'
-    }
-  ] : [
-    {
-      name: 'My Consoles',
-      title: 'View consoles',
-      url: '/home',
-      active: true,
-    },{
-      name: 'Settings',
-      title: 'Change application settings',
-      url: '/settings'
-    },{
-      name: gamertag,
-      title: 'View profile',
-      url: '/profile'
-    }
-  ])
+  const [headerLinks, setHeaderLinks] = React.useState([])
+
+  function createLinks(level){
+    return (level > 1) ? [
+      {
+        name: 'My Consoles',
+        title: 'View consoles',
+        url: '/home',
+      },{
+        name: 'xCloud Library',
+        title: 'Browse xCloud library',
+        url: '/xcloud/home'
+      // },{
+      //   name: 'Debug',
+      //   title: 'Debug page',
+      //   url: '/debug'
+      },{
+        name: 'Settings',
+        title: 'Change application settings',
+        url: '/settings'
+      },{
+        name: gamertag,
+        title: 'View profile',
+        url: '/profile'
+      }
+    ] : [
+      {
+        name: 'My Consoles',
+        title: 'View consoles',
+        url: '/home',
+        active: true,
+      },{
+        name: 'Settings',
+        title: 'Change application settings',
+        url: '/settings'
+      },{
+        name: gamertag,
+        title: 'View profile',
+        url: '/profile'
+      }
+    ]
+  }
 
   function setMenuActive(id) {
-    for(const link in headerLinks){
-      headerLinks[link].active = false
-    }
-    headerLinks[id].active = true
+    const links = createLinks(level)
+    links[id].active = true
+
+    setHeaderLinks(links)
     return null
   }
 
@@ -75,7 +79,7 @@ function Header({
 
     for(const link in headerLinks){
       linksHtml.push(<li key={ link }>
-        <Link legacyBehavior href={ headerLinks[link].url }>
+        <Link legacyBehavior href={ headerLinks[link].url } key={ headerLinks[link].url }>
           <a title={ headerLinks[link].title } onClick={ () => {setMenuActive(link)} } className={headerLinks[link].active === true ? 'active' : ''}>{ headerLinks[link].name }</a>
         </Link>
       </li>)
@@ -86,11 +90,17 @@ function Header({
 
   function confirmQuit() {
     if(confirm('Are you sure you want to quit?')){
-      ipcRenderer.send('auth', {
-        type: 'quit'
-      })
+      Ipc.send('app', 'quit')
     }
   }
+
+  React.useEffect(() => {
+    if(headerLinks.length <= 0 && !isNaN(level)){
+      const links = createLinks(level)
+      links[0].active = true
+      setHeaderLinks(links)
+    }
+  })
   
   return (
     <React.Fragment>

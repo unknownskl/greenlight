@@ -1,5 +1,6 @@
 import React from 'react';
-import { ipcRenderer } from 'electron';
+// import { ipcRenderer } from 'electron';
+import Ipc from '../../lib/ipc'
 import SidebarFriendItem from './frienditem'
 
 interface SidebarFriendsProps {
@@ -14,12 +15,17 @@ function SidebarFriends({
 
   React.useEffect(() => {
 
-    ipcRenderer.on('xbox_friends', (event, friends) => {
-      setOnlineFriends(friends)
+    // ipcRenderer.on('xbox_friends', (event, friends) => {
+    //   setOnlineFriends(friends)
+    // })
+
+    const ipcListener = Ipc.onAction('app', 'onlineFriends', (event, onlineFriends) => {
+      setOnlineFriends(onlineFriends)
     })
 
     return () => {
-      ipcRenderer.removeAllListeners('stream');
+      // ipcRenderer.removeAllListeners('stream');
+      Ipc.removeListener('app', ipcListener)
     };
   }, []);
   

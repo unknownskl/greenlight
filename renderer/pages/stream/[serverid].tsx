@@ -2,12 +2,10 @@ import React from 'react';
 import Head from 'next/head'
 import Link from 'next/link'
 import { Router, useRouter } from 'next/router'
-import { ipcRenderer } from 'electron'
+// import { ipcRenderer } from 'electron'
 import xCloudPlayer from 'xbox-xcloud-player'
 
 import { useSettings } from '../../context/userContext'
-
-import Header from '../../components/header'
 import StreamComponent from '../../components/ui/streamcomponent'
 import Ipc from '../../lib/ipc';
 
@@ -199,7 +197,7 @@ function Stream() {
     // Modal window
     return () => {
       Ipc.removeListener('streaming', ipcListener)
-      ipcRenderer.removeAllListeners(ipc_channel);
+      // ipcRenderer.removeAllListeners(ipc_channel);
       // window.removeEventListener('keydown', keyboardDownEvent)
       // xPlayer.reset()
 
