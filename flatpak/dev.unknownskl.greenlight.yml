@@ -34,7 +34,7 @@ modules:
     build-commands:
       # - yarn config --offline set yarn-offline-mirror $FLATPAK_BUILDER_BUILDDIR/flatpak-node/yarn-mirror
       # Install npm dependencies
-      # - yarn --offline
+      - yarn --offline
       # - mkdir -p /usr/local/share/ && touch /usr/local/share/.yarnrc && touch /tmp/.yarnrc && HOME=/tmp/ yarn config --offline set yarn-offline-mirror $FLATPAK_BUILDER_BUILDDIR/flatpak-node/yarn-mirror/ && HOME=/tmp/ yarn --offline
       # - touch /tmp/.yarnrc && HOME=/tmp/ yarn config --offline set yarn-offline-mirror $FLATPAK_BUILDER_BUILDDIR/flatpak-node/yarn-mirror/ && HOME=/tmp/ yarn --offline
       # Build the app; in this example the `dist` script
