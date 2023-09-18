@@ -29,7 +29,7 @@
     "xbox-xcloud-player": "0.2.0-beta14"
   },
   "devDependencies": {
-    "@babel/core": "^7.22.17",
+    "@babel/core": "^7.22.20",
     "@fortawesome/fontawesome-free": "^6.4.2",
     "@types/node": "^20.6.2",
     "@types/react": "^18.2.21",
