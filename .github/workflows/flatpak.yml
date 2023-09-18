@@ -28,6 +28,9 @@ jobs:
       - name: Install flatpak-builder-tools
         run: pipx install ./node/
 
+      - name: Copy cargo script
+        run: cp cargo/flatpak-cargo-generator.py ../flatpak-cargo-generator.py
+
       # Generate sources
       - name: Checkout Git repository
         uses: actions/checkout@v4
@@ -45,7 +48,7 @@ jobs:
         run: flatpak-node-generator npm xal-node/package-lock.json -o ./deps-dist/npm-sources.json
 
       - name: Build cargo cache
-        run: python3 cargo/flatpak-cargo-generator.py xal-node/Cargo.lock -o ./deps-dist/cargo-sources.json
+        run: python3 ../flatpak-cargo-generator.py xal-node/Cargo.lock -o ./deps-dist/cargo-sources.json
 
       - uses: actions/upload-artifact@master
         with:
