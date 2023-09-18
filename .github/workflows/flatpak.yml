@@ -20,8 +20,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - uses: actions/checkout@v4
+      with:
+        repository: 'flatpak/flatpak-builder-tools'
+
     - name: Install flatpak-builder-tools
-      run: pipx install git@github.com:flatpak/flatpak-builder-tools.git
+      run: pipx install ./node/
 
   flatpak:
     name: Flatpak Build
