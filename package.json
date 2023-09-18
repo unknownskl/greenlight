@@ -37,7 +37,7 @@
     "electron": "26",
     "electron-builder": "^24.6.4",
     "next": "^13.4.19",
-    "nextron": "^8.6.0",
+    "nextron": "^8.7.0",
     "node-loader": "^2.0.0",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
