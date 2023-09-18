@@ -3,6 +3,7 @@
 ## v2.0.0-beta13 - 2023-09-xx
 - Added support for Free 2 play games on xCloud #918
 - Added support for estimated waiting times (Experimental, times may be way off)
+- Added (not-tested) experimental flatpak builds
 - Rewrote stream IPC Communication backend for better data exchange and improved stream handling
 - Rewrote all IPC Communications in the frontend code for better portability
 - Upgraded electron base from v21 to v26

@@ -32,18 +32,9 @@ modules:
         npm_config_offline: 'true'
         yarn_config_cache: /run/build/greenlight/flatpak-node/yarn-mirror
     build-commands:
-      # - yarn config --offline set yarn-offline-mirror $FLATPAK_BUILDER_BUILDDIR/flatpak-node/yarn-mirror
-      # Install npm dependencies
       - yarn --offline
-      # - mkdir -p /usr/local/share/ && touch /usr/local/share/.yarnrc && touch /tmp/.yarnrc && HOME=/tmp/ yarn config --offline set yarn-offline-mirror $FLATPAK_BUILDER_BUILDDIR/flatpak-node/yarn-mirror/ && HOME=/tmp/ yarn --offline
-      # - touch /tmp/.yarnrc && HOME=/tmp/ yarn config --offline set yarn-offline-mirror $FLATPAK_BUILDER_BUILDDIR/flatpak-node/yarn-mirror/ && HOME=/tmp/ yarn --offline
-      # Build the app; in this example the `dist` script
-      # in package.json runs electron-builder
-      # - cp flatpak/cargo.xal-rs.lock xal-node/xal-rs/Cargo.lock
       - |
         # . ../flatpak-node/electron-builder-arch-args.sh
-        ls -la xal-node/xal-rs
-        ls -la /run/build/greenlight/flatpak-node
         yarn run flatpak-build --offline -- $ELECTRON_BUILDER_ARCH_ARGS --linux
       # Bundle app and dependencies
       - cp -a dist/linux*unpacked /app/main
@@ -52,16 +43,9 @@ modules:
       - ls -la /app /app/bin /app/main
     subdir: main
     sources:
-      #- type: archive
-      #  url: https://github.com/flathub/electron-sample-app/archive/1.0.1.tar.gz
-      #  sha256: a2feb3f1cf002a2e4e8900f718cc5c54db4ad174e48bfcfbddcd588c7b716d5b
       - type: dir
         path: ..
         dest: main
-      # - type: dir
-      #   path: ../xal-node/xal-rs
-      #   dest: xal-rs
-
       - yarn-sources.json
       - npm-sources.json
       - cargo-sources.json
