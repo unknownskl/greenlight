@@ -20,12 +20,34 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-      with:
-        repository: 'flatpak/flatpak-builder-tools'
+      # Intsall node tools
+      - uses: actions/checkout@v4
+        with:
+          repository: 'flatpak/flatpak-builder-tools'
 
-    - name: Install flatpak-builder-tools
-      run: pipx install ./node/
+      - name: Install flatpak-builder-tools
+        run: pipx install ./node/
+
+      # Generate sources
+      - name: Checkout Git repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          clean: true
+
+      - name: Prep artifacts dir
+        run: mkdir ./deps-dist/
+
+      - name: Build yarn cache
+        run: flatpak-node-generator yarn yarn.lock -o ./deps-dist/yarn-sources.json
+
+      - name: Build npm cache
+        run: flatpak-node-generator yarn xal-node/package-lock.json -o ./deps-dist/npm-sources.json
+
+      - uses: actions/upload-artifact@master
+        with:
+          name: node-sources
+          path: ./deps-dist/
 
   flatpak:
     name: Flatpak Build
