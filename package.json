@@ -15,7 +15,8 @@
     "postinstall": "electron-builder install-app-deps",
     "publish": "electron-builder -p onTag",
     "build-deps": "ls xal-node/dist/xal-node.node || npm run rebuild-deps",
-    "rebuild-deps": "cd xal-node && npm ci"
+    "rebuild-deps": "cd xal-node && npm ci",
+    "flatpak-build": "yarn run build-deps && nextron build --no-pack && electron-builder --dir"
   },
   "dependencies": {
     "axios": "^1.5.0",
