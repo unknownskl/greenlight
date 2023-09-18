@@ -2,7 +2,7 @@
   "private": true,
   "name": "greenlight",
   "description": "Greenlight is a streaming application for Xbox and xCloud",
-  "version": "2.0.0-beta12",
+  "version": "2.0.0-beta13",
   "author": "UnknownSKL <info+github@jimkroon.nl>",
   "main": "app/background.js",
   "repository": {
@@ -20,21 +20,21 @@
     "flatpak-build": "yarn run build-deps && nextron build --no-pack && electron-builder --dir"
   },
   "dependencies": {
-    "@next/eslint-plugin-next": "^13.4.19",
-    "@typescript-eslint/eslint-plugin": "^6.7.2",
-    "@typescript-eslint/parser": "^6.7.2",
     "axios": "^1.5.0",
     "compare-versions": "^6.1.0",
     "debug": "^4.3.4",
     "electron-serve": "^1.1.0",
     "electron-store": "^8.0.1",
-    "eslint": "^8.49.0",
     "github-url-to-object": "^4.0.6",
     "uplot": "^1.6.25",
     "xbox-webapi": "^1.4.1",
     "xbox-xcloud-player": "0.2.0-beta14"
   },
   "devDependencies": {
+    "eslint": "^8.49.0",
+    "@next/eslint-plugin-next": "^13.4.19",
+    "@typescript-eslint/eslint-plugin": "^6.7.2",
+    "@typescript-eslint/parser": "^6.7.2",
     "@babel/core": "^7.22.20",
     "@fortawesome/fontawesome-free": "^6.4.2",
     "@types/node": "^20.6.2",
