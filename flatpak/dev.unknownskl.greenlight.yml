@@ -65,6 +65,9 @@ modules:
       - npm-sources.json
       - cargo-sources.json
       # Wrapper to launch the app
+      - type: file
+        path: yarnrc
+        dest-filename: .yarnrc
       - type: script
         dest-filename: run.sh
         commands:
