@@ -20,6 +20,7 @@
     "flatpak-build": "yarn run build-deps && nextron build --no-pack && electron-builder --dir"
   },
   "dependencies": {
+    "@next/eslint-plugin-next": "^13.4.19",
     "@typescript-eslint/eslint-plugin": "^6.7.2",
     "@typescript-eslint/parser": "^6.7.2",
     "axios": "^1.5.0",
