@@ -26,7 +26,7 @@ jobs:
           repository: 'flatpak/flatpak-builder-tools'
 
       - name: Install Python deps
-        run: pip3 install aiohttp
+        run: pip3 install aiohttp toml
 
       - name: Install flatpak-builder-tools
         run: pipx install ./node/
