@@ -15,9 +15,18 @@ on:
 #   DEBUG: '*'
 
 jobs:
+  cachedeps:
+    name: Generate cached sources
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Install flatpak-builder-tools
+      run: pipx install git@github.com:flatpak/flatpak-builder-tools.git
+
   flatpak:
     name: Flatpak Build
     runs-on: ubuntu-latest
+    needs: [cachedeps]
 
     container:
       image: bilelmoussaoui/flatpak-github-actions:gnome-44
