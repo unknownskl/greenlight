@@ -44,7 +44,6 @@ jobs:
 
       - name: Lint code
         run: yarn lint
-        continue-on-error: true # Temporary allow error in linting till we cleaned it up
 
 
   cachedeps:
@@ -116,29 +115,13 @@ jobs:
         with:
           node-version: 18
 
-      # - name: Set up node_modules cache
-      #   uses: actions/cache@v3
-      #   continue-on-error: false
-      #   with:
-      #     path: |
-      #       node_modules/           
-      #       xal-node/node_modules/           
-      #     key: ${{ runner.os }}-${{ runner.arch }}-npm-${{ hashFiles('**/package.json') }}-${{ hashFiles('**/yarn.lock') }}
-      #     restore-keys: ${{ runner.os }}-${{ runner.arch }}-npm-
-
-      # - name: Install yarn
-      #   run: npm install -g yarn
-
-      # - name: Install yarn dependencies
-      #   run: yarn
-
       - name: Set up flatpak build cache
         uses: actions/cache@v3
         continue-on-error: false
         with:
           path: |
-            build/           
-            .flatpak-builder/           
+            build/
+            .flatpak-builder/
           key: ${{ runner.os }}-${{ runner.arch }}-flatpak-builder-${{ hashFiles('flatpak/*') }}
           restore-keys: ${{ runner.os }}-${{ runner.arch }}-flatpak-builder-
 

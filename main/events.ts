@@ -7,23 +7,6 @@ import Application from './application'
 
 const authStore = new Store()
 
-const REQ_TYPE_STREAM_GET_CONSOLES = 'get_consoles'
-const REQ_TYPE_STREAM_START_STREAM = 'start_stream'
-const REQ_TYPE_STREAM_START_STREAM_SDP = 'start_stream_sdp'
-const REQ_TYPE_STREAM_START_STREAM_ICE = 'start_stream_ice'
-const REQ_TYPE_STREAM_STOP_STREAM = 'stop_stream'
-const REQ_TYPE_STREAM_KEEPALIVE = 'keepalive'
-
-const REQ_TYPE_XCLOUD_GET_TITLES = 'get_titles'
-
-const REQ_TYPE_WEB_GET_RECENT_ACHIEVEMENTS = 'get_recent_achievements'
-const REQ_TYPE_WEB_GET_RECENT_ACHIEVEMENTS_TITLEID = 'get_recent_achievements_titleid'
-
-const REQ_TYPE_MARKET_GET_PRODUCT = 'get_product'
-
-
-const RES_TYPE_ERROR = 'error'
-
 export default class Events extends EventEmitter {
     _application:Application
 
