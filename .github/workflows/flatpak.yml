@@ -42,7 +42,7 @@ jobs:
         run: flatpak-node-generator yarn yarn.lock -o ./deps-dist/yarn-sources.json
 
       - name: Build npm cache
-        run: flatpak-node-generator yarn xal-node/package-lock.json -o ./deps-dist/npm-sources.json
+        run: flatpak-node-generator npm xal-node/package-lock.json -o ./deps-dist/npm-sources.json
 
       - uses: actions/upload-artifact@master
         with:
