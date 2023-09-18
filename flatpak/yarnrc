@@ -2,5 +2,6 @@
 # yarn lockfile v1
 
 
-yarn-offline-mirror "/run/build/electron-quick-start/yarn-mirror"
+# yarn-offline-mirror "/run/build/greenlight/yarn-mirror"
+yarn-offline-mirror "/run/build/greenlight/flatpak-node/yarn-mirror"
 yarn-offline-mirror-pruning true

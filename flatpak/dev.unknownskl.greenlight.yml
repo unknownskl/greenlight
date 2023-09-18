@@ -43,6 +43,7 @@ modules:
       - |
         # . ../flatpak-node/electron-builder-arch-args.sh
         ls -la xal-node/xal-rs
+        ls -la /run/build/greenlight/flatpak-node
         yarn run flatpak-build --offline -- $ELECTRON_BUILDER_ARCH_ARGS --linux
       # Bundle app and dependencies
       - cp -a dist/linux*unpacked /app/main
