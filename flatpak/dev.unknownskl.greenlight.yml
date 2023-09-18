@@ -39,7 +39,7 @@ modules:
       # - touch /tmp/.yarnrc && HOME=/tmp/ yarn config --offline set yarn-offline-mirror $FLATPAK_BUILDER_BUILDDIR/flatpak-node/yarn-mirror/ && HOME=/tmp/ yarn --offline
       # Build the app; in this example the `dist` script
       # in package.json runs electron-builder
-      - cp flatpak/cargo.xal-rs.lock xal-node/xal-rs/Cargo.lock
+      # - cp flatpak/cargo.xal-rs.lock xal-node/xal-rs/Cargo.lock
       - |
         # . ../flatpak-node/electron-builder-arch-args.sh
         ls -la xal-node/xal-rs
@@ -64,7 +64,6 @@ modules:
       - yarn-sources.json
       - npm-sources.json
       - cargo-sources.json
-      - cargo-xal-sources.json
       # Wrapper to launch the app
       - type: script
         dest-filename: run.sh

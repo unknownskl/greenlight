@@ -33,7 +33,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
-          clean: true
+          # clean: true
 
       - name: Prep artifacts dir
         run: mkdir ./deps-dist/
@@ -44,9 +44,12 @@ jobs:
       - name: Build npm cache
         run: flatpak-node-generator npm xal-node/package-lock.json -o ./deps-dist/npm-sources.json
 
+      - name: Build cargo cache
+        run: python3 cargo/flatpak-cargo-generator.py xal-node/Cargo.lock -o ./deps-dist/cargo-sources.json
+
       - uses: actions/upload-artifact@master
         with:
-          name: node-sources
+          name: flatpak-sources
           path: ./deps-dist/
 
   flatpak:
@@ -63,6 +66,11 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
+
+      - uses: actions/download-artifact@master
+        with:
+          name: flatpak-sources
+          path: flatpak/
 
       - name: Install Node.js, NPM and Yarn
         uses: actions/setup-node@v3.8.1
