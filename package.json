@@ -2,7 +2,7 @@
   "private": true,
   "name": "greenlight",
   "description": "Greenlight is a streaming application for Xbox and xCloud",
-  "version": "2.0.0-beta13",
+  "version": "2.0.0-beta14",
   "author": "UnknownSKL <info+github@jimkroon.nl>",
   "main": "app/background.js",
   "repository": {
@@ -30,7 +30,7 @@
     "github-url-to-object": "^4.0.6",
     "uplot": "^1.6.25",
     "xbox-webapi": "^1.4.1",
-    "xbox-xcloud-player": "0.2.0-beta14"
+    "xbox-xcloud-player": "0.2.0-beta16"
   },
   "devDependencies": {
     "@babel/core": "^7.22.20",

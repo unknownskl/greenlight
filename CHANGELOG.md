@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.0.0-beta14 - 2023-09-20
+- Fixed logout and clear data buttons
+- Fixed reliability of the nexus menu button
+- Fixed chataudio by upgrading to WebRTC tracks #786 #365
+- Improved error handling when starting a new stream
+
 ## v2.0.0-beta13 - 2023-09-18
 - Added support for Free 2 play games on xCloud #918
 - Added support for estimated waiting times (Experimental, times may be way off)

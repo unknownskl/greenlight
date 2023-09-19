@@ -47,7 +47,7 @@ function Settings() {
 
   function confirmLogout() {
     if(confirm('Are you sure you want to logout?')){
-      Ipc.send('app', 'logout')
+      Ipc.send('app', 'clearData')
     }
   }
 

@@ -101,6 +101,23 @@ export default class StreamManager {
         })
     }
 
+    sendChatSdp(sessionId:string, sdp:any){
+        return new Promise((resolve, reject) => {
+            const session = this.getSession(sessionId)
+            if(session == undefined){
+                reject('Session not found: '+sessionId)
+                return;
+            }
+
+            this.getApi(session.type).sendChatSdp(sessionId, sdp).then((result) => {
+
+                resolve(result)
+            }).catch((error) => {
+                reject(error)
+            })
+        })
+    }
+
     sendIce(sessionId:string, ice:any){
         return new Promise((resolve, reject) => {
             const session = this.getSession(sessionId)
@@ -201,7 +218,13 @@ export default class StreamManager {
 
             }).catch((error) => {
                 console.log('Streammanager - error checking state:', sessionId, error)
-                this.monitorSession(sessionId)
+
+                if(error.status === 404){
+                    this._application.log('StreamManager', 'Session not found on server. Removing session...')
+                    delete this._sessions[sessionId]
+                } else {
+                    this.monitorSession(sessionId)
+                }
             })
         }, 1000)
     }

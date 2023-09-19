@@ -48,6 +48,10 @@ export default class IpcStreaming extends IpcBase {
         return this._streamManager.sendSdp(args.sessionId, args.sdp)
     }
 
+    sendChatSdp(args:sendSdpArgs){
+        return this._streamManager.sendChatSdp(args.sessionId, args.sdp)
+    }
+
     sendIce(args:sendIceArgs){
         return this._streamManager.sendIce(args.sessionId, args.ice)
     }

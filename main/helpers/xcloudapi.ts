@@ -84,6 +84,7 @@ export default class xCloudApi {
                     } else {
                         this._application.log('xCloudApi', 'get('+url+') reject:', response.statusCode)
                         reject({
+                            url: url,
                             status: response.statusCode,
                             body: responseData,
                         })
@@ -131,6 +132,7 @@ export default class xCloudApi {
                     } else {
                         this._application.log('xCloudApi', 'post('+url+') reject:', response.statusCode)
                         reject({
+                            url: url,
                             status: response.statusCode,
                             body: responseData,
                         })
@@ -255,6 +257,33 @@ export default class xCloudApi {
                       "minVersion":1,
                       "maxVersion":1
                    },
+                }
+            }
+
+            this.post('/v5/sessions/'+this._type+'/'+sessionId+'/sdp', postData).then((result) => {
+
+                this.get('/v5/sessions/'+this._type+'/'+sessionId+'/sdp').then((sdpResult:exchangeResult) => {
+                    const exchangeSdp = JSON.parse(sdpResult.exchangeResponse)
+                    
+                    resolve(exchangeSdp)
+
+                }).catch((error) => {
+                    reject(error)
+                })
+
+            }).catch((error) => {
+                reject(error)
+            })
+        })
+    }
+
+    sendChatSdp(sessionId:string, sdp: string){
+        return new Promise((resolve, reject) => {
+            const postData = {
+                "messageType":"offer",
+                "sdp": sdp,
+                "configuration":{
+                    'isMediaStreamsChatRenegotiation': true,
                 }
             }
 

@@ -30,13 +30,13 @@ function Auth({
 
   function logout(){
     if(confirm('Are you sure you want to logout?')){
-      Ipc.send('app', 'logout')
+      Ipc.send('app', 'clearData')
     }
   }
 
   function clearData(){
     if(confirm('This will remove all application data. Sometimes helpful when you are stuck in a login loop. Do you want to continue?')){
-      Ipc.send('app', 'logout')
+      Ipc.send('app', 'clearData')
     }
   }
   

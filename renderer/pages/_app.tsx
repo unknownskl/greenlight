@@ -44,6 +44,7 @@ export default function MyApp({ Component, pageProps }) {
     })
 
     const authState = Ipc.onAction('app', 'authState', (event, args) => {
+      console.log('Received AuthState:', args)
       
       if(args.isAuthenticating === true){
         setIsLoading(true)
