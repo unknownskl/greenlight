@@ -28,7 +28,7 @@
     "github-url-to-object": "^4.0.6",
     "uplot": "^1.6.25",
     "xbox-webapi": "^1.4.1",
-    "xbox-xcloud-player": "0.2.0-beta14"
+    "xbox-xcloud-player": "0.2.0-beta16"
   },
   "devDependencies": {
     "eslint": "^8.49.0",

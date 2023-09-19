@@ -16,7 +16,11 @@ export const Preload = {
             const callbackFunction = (event, args) => {
                 if(args.action === action && args.id === requestId){
                     ipcRenderer.removeListener(channel, callbackFunction)
-                    resolve(args.data)
+                    
+                    if(args.error === undefined)
+                        resolve(args.data)
+                    else
+                        reject(args.error)
                 }
             }
 

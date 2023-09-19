@@ -26,6 +26,18 @@ function Stream() {
   let keepaliveInterval
 
   xPlayer.setControllerRumble(settings.controller_vibration)
+  xPlayer.setSdpHandler((client, offer) => {
+    Ipc.send('streaming', 'sendChatSdp', {
+      sessionId: sessionId,
+      sdp: offer.sdp
+    }).then((sdpResponse) => {
+      xPlayer.setRemoteOffer(sdpResponse.sdp)
+
+    }).catch((error) => {
+      console.log('ChatSDP Exchange error:', error)
+      alert('ChatSDP Exchange error:'+ JSON.stringify(error))
+    })
+  })
 
   xPlayer.getEventBus().on('connectionstate', (event) => {
     console.log('connectionstate changed:', event)
@@ -92,6 +104,8 @@ function Stream() {
     }).then((result:string) => {
       console.log('StartStream session:', result)
       sessionId = result
+    }).catch((error) => {
+      alert('Failed to start new stream. Error details:\n'+JSON.stringify(error))
     })
 
     const ipcListener = Ipc.onAction('streaming', 'startStreamResult', (event, args) => {
@@ -127,13 +141,13 @@ function Stream() {
               xPlayer.setIceCandidates(iceResult)
 
             }).catch((error) => {
-              console.log('sendIce error:', error)
-              alert('ICE Echange error:'+ error)
+              console.log('ICE Exchange error:', error)
+              alert('ICE Exchange error:'+ JSON.stringify(error))
             })
 
           }).catch((error) => {
-            console.log('sendSdp error:', error)
-            alert('SDP Echange error:'+ error)
+            console.log('SDP Exchange error:', error)
+            alert('SDP Exchange error:'+ JSON.stringify(error))
           })
         })
       }
@@ -206,7 +220,8 @@ function Stream() {
   })
 
   function gamepadSend(button){
-    xPlayer.getChannelProcessor('input').pressButton(0, { Nexus: 1 })
+    console.log('Pressed nexus...')
+    xPlayer.getChannelProcessor('input').pressButton(0, 'Nexus')
   }
 
   function onDisconnect(){  

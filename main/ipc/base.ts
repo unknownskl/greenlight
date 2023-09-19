@@ -4,6 +4,7 @@ interface EventArgs {
     action: string,
     id: number,
     data: any,
+    error?: any
 }
 
 export default class IpcBase {
@@ -25,6 +26,12 @@ export default class IpcBase {
                 })
             }).catch((error) => {
                 console.log('ERROR: IPC communication error from backend:', error)
+                this.send(channel, {
+                    action: args.action,
+                    id: args.id,
+                    data: {},
+                    error: error,
+                })
             })
 
         } else {
@@ -38,6 +45,7 @@ export default class IpcBase {
             action: args.action,
             id: args.id,
             data: args.data,
+            error: args.error,
         })
     }
 }
