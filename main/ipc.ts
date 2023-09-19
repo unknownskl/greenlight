@@ -28,11 +28,13 @@ export default class Ipc {
             consoles: new IpcConsoles(this._application),
             app: new IpcApp(this._application),
         }
+        
+    }
 
+    startIpcListener(){
         for(const channel in this._channels){
             ipcMain.on(channel, (event, args) => { this._channels[channel].onEvent(channel, event, args) })
         }
-        
     }
 
     // sendIpc(name, value){

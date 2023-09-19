@@ -5,6 +5,7 @@ import Debug from 'debug'
 import { createWindow, xboxWorker, updater } from './helpers';
 import Events from './events'
 import Authentication from './authentication'
+import WebUI from './webui'
 import Ipc from './ipc'
 
 import pkg from '../package.json'
@@ -32,6 +33,7 @@ export default class Application {
     public _ipc:Ipc
     public _authentication:Authentication
     public _xboxWorker:xboxWorker
+    public _webUI:WebUI
 
     constructor(){
         console.log(__filename+'[constructor()] Starting Greenlight v'+pkg.version)
@@ -44,8 +46,11 @@ export default class Application {
         
         this._events = new Events(this)
         this._ipc = new Ipc(this)
+        this._ipc.startIpcListener()
         this._authentication = new Authentication(this)
         this._xboxWorker = new xboxWorker(this)
+        this._webUI = new WebUI(this)
+        this._webUI.startServer(3001)
     }
 
     log(namespace = 'application', ...args){
