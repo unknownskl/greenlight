@@ -48,6 +48,7 @@ export default class Events extends EventEmitter {
                     this.emit('loaded', {
                         gamertag: authStore.get('user.gamertag')
                     })
+                    this._application._ipc._channels.app.sendAuthState()
                 }
         
             }).catch(function(error){
