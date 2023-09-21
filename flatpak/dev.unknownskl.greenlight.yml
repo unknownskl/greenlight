@@ -16,6 +16,7 @@ finish-args:
   - --share=network
   - --allow=bluetooth
   - --device=all
+  - --device=dri
   - --allow=per-app-dev-shm
   - --filesystem=/run/udev:ro
 build-options:
