@@ -17,6 +17,7 @@ finish-args:
   - --allow=bluetooth
   - --device=all
   - --allow=per-app-dev-shm
+  - --filesystem=/run/udev:ro
 build-options:
   append-path: /usr/lib/sdk/node18/bin:/usr/lib/sdk/rust-stable/bin
   env:
