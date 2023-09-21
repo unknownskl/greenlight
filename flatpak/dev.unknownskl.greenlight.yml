@@ -16,7 +16,7 @@ finish-args:
   - --share=network
   - --allow=bluetooth
   - --device=all
-  - --device=dri
+  - --allow=per-app-dev-shm
 build-options:
   append-path: /usr/lib/sdk/node18/bin:/usr/lib/sdk/rust-stable/bin
   env:
