@@ -125,7 +125,7 @@ jobs:
           key: ${{ runner.os }}-${{ runner.arch }}-flatpak-builder-${{ hashFiles('flatpak/*') }}
           restore-keys: ${{ runner.os }}-${{ runner.arch }}-flatpak-builder-
 
-      - uses: flatpak/flatpak-github-actions/flatpak-builder@v4
+      - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
         with:
           bundle: greenlight.flatpak
           manifest-path: flatpak/dev.unknownskl.greenlight.yml
