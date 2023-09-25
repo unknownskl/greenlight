@@ -42,7 +42,7 @@
     "babel-loader": "^9.1.3",
     "electron": "25",
     "electron-builder": "^24.6.4",
-    "next": "^13.4.19",
+    "next": "^13.5.3",
     "nextron": "^8.9.0",
     "node-loader": "^2.0.0",
     "react": "^18.1.0",
