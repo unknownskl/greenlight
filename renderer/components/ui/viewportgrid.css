@@ -1,0 +1,9 @@
+div#component_viewportgrid_pagination {
+    text-align: center;
+    padding-bottom: 7px;
+    margin-top: -7px;
+}
+
+div#component_viewportgrid_pagination button {
+    margin-right: 5px;
+}

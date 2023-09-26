@@ -1,0 +1,38 @@
+a.component_gametitle {
+    position: relative;
+}
+
+a.component_gametitle div.component_gametitle_title {
+    background: #000000;
+    background: linear-gradient(0deg, rgba(0,135,70,0.5) 50%, rgba(0,0,0,0) 100%);
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    bottom: 3px;
+    z-index: 50;
+    opacity: 1;
+    min-height: 100px;
+    vertical-align: bottom;
+    border-radius: 4px;
+    opacity: 0
+}
+
+a.component_gametitle:hover div.component_gametitle_title {
+    opacity: 1;
+}
+
+a.component_gametitle div.component_gametitle_title p {
+    font-size: 13px;
+    text-align: center;
+    vertical-align: bottom;
+    text-transform: uppercase;
+    font-weight: bold;
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+    right: 5px;
+}
+
+a.component_gametitle:hover div.component_gametitle_title p {
+    color: #ffffff;
+}

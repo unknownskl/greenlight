@@ -10,9 +10,13 @@ import Card from '../../components/ui/card'
 import { useXcloud } from '../../context/userContext'
 import Button from '../../components/ui/button'
 import Loader from '../../components/ui/loader'
+import Image from 'next/image';
+import ViewportGrid from '../../components/ui/viewportgrid';
+import GameTitle from '../../components/ui/game/title';
 
 function xCloudLibrary() {
   const { xcloudTitles, setXcloudTitles} = useXcloud()
+  const [xcloudRecentTitles, setXcloudRecentTitles] = React.useState([])
   const [filter, setFilter] = React.useState({
     name: ''
   });
@@ -24,6 +28,24 @@ function xCloudLibrary() {
     if(xcloudTitles.length == 0){
       Ipc.send('store', 'getxCloudTitles').then((titles) => {
         setXcloudTitles(titles)
+      })
+    }
+
+    // console.log(xcloudTitles.length, xcloudRecentTitles.length)
+    if(xcloudTitles.length > 0 && xcloudRecentTitles.length === 0){
+      Ipc.send('store', 'getRecentTitles').then((recentTitles) => {
+        const returnTitles = []
+
+        for(const recentTitle in recentTitles.results){
+          // Match titles..
+          for(const title in xcloudTitles){
+            if(xcloudTitles[title].titleId === recentTitles.results[recentTitle].titleId){
+              returnTitles.push(xcloudTitles[title])
+            }
+          }
+        }
+        
+        setXcloudRecentTitles(returnTitles)
       })
     }
 
@@ -47,7 +69,7 @@ function xCloudLibrary() {
   }
 
   function filterProducts(e){
-    console.log('Search value:', e.target.value)
+    // console.log('Search value:', e.target.value)
 
     setPage(0)
     setFilter({
@@ -98,7 +120,7 @@ function xCloudLibrary() {
     for(const title in titles){
       if(filter.name !== ''){
         filterActive = true
-        if(titles[title].LocalizedProperties[0].ProductTitle.toLowerCase().includes(filter.name.toLowerCase())){
+        if(titles[title].catalogDetails.ProductTitle.toLowerCase().includes(filter.name.toLowerCase())){
           returnTitles.push(titles[title])
         }
       }
@@ -108,6 +130,7 @@ function xCloudLibrary() {
       returnTitles = titles
     }
 
+    // console.log('returnTitles', returnTitles)
     return returnTitles
   }
 
@@ -117,7 +140,51 @@ function xCloudLibrary() {
         <title>Greenlight - xCloud Library</title>
       </Head>
 
-      <div style={{ 
+      {(xcloudRecentTitles.length == 0) ? '' : <React.Fragment>
+        <h2 className="title">Recent games</h2><ViewportGrid maxHeight={ 140 }>{
+          xcloudRecentTitles.map((item, i) => {
+            // console.log(item.catalogDetails)
+            return (
+                <GameTitle
+                  src={ 'https:'+item.catalogDetails.Image_Tile.URL }
+                  name={ item.catalogDetails.ProductTitle}
+                  titleId={ item.titleId }
+                  key={ item.titleId }
+                ></GameTitle>
+            )
+          })
+        }</ViewportGrid></React.Fragment> }
+
+      {(xcloudTitles.length == 0) ? <Card className='padbottom fullsize'>
+
+          <div style={{
+            display: 'flex'
+          }}>
+            <div style={{
+              paddingRight: 20
+            }}>
+              <Loader></Loader>
+            </div>
+            <div>
+              <h1>Loading xCloud library</h1>
+              <p>Please wait while we retrieve your xCloud library...</p>
+            </div>
+          </div>
+        </Card> : <React.Fragment><h2 className="title">Library</h2><ViewportGrid drawPagination={true}>{
+        xcloudTitles.map((item, i) => {
+          // console.log(item.catalogDetails)
+          return (
+            <GameTitle
+              src={ 'https:'+item.catalogDetails.Image_Tile.URL }
+              name={ item.catalogDetails.ProductTitle}
+              titleId={ item.titleId }
+              key={ item.titleId }
+            ></GameTitle>
+          )
+        })
+      }</ViewportGrid></React.Fragment> }
+
+      {/* <div style={{ 
         display: 'flex',
         flexDirection: 'row',
         flexWrap: 'wrap',
@@ -153,20 +220,15 @@ function xCloudLibrary() {
         </Card> }
 
         {filterTitles(xcloudTitles, filter).slice(page*resultsPerPage, ((page*resultsPerPage)+resultsPerPage)).map((item, i) => {
+          console.log(item.catalogDetails)
           return (
-            <Card className='padbottom fixedsize' key={ page+'_'+i}>
-              <p style={{ height: '40px' }}>{item.LocalizedProperties[0].ProductTitle}</p>
-
-              <img src={ getBoxArt(item.LocalizedProperties[0].Images) } loading='lazy' style={{
-                width: 144,
-                height: 144,
+            <Link href={ `/stream/xcloud_${item.titleId}` } key={ page+'_'+i}>
+              <Image src={ `https:${item.catalogDetails.Image_Tile.URL}` } alt={ item.catalogDetails.ProductTitle } loading="lazy" width='144' height='144' style={{
                 marginBottom: 10,
-              }} />
+              }} ></Image>
 
-              <Link href={ `/stream/xcloud_${item.xcloudInfo.titleId}` }>
-                <Button label="Start stream" className='btn-primary' key={ item.xcloudInfo.titleId } />
-              </Link>
-            </Card>
+              {/* <p style={{ height: '40px' }}>{item.catalogDetails.ProductTitle}</p> */}
+            {/* </Link>
           )
         })}
 
@@ -184,7 +246,7 @@ function xCloudLibrary() {
           </div>
         </Card> }
           
-      </div>
+      </div> */}
     </React.Fragment>
   );
 };

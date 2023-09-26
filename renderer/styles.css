@@ -40,6 +40,8 @@ a {
 @import 'components/ui/label.css';
 @import 'components/ui/streamcomponent.css';
 @import 'components/ui/progressbar.css';
+@import 'components/ui/viewportgrid.css';
+@import 'components/ui/game/title.css';
 
 @import 'components/sidebar/friends.css';
 @import 'components/sidebar/frienditem.css';
@@ -72,6 +74,14 @@ div#app_sidebar {
 
     backdrop-filter: blur(20px);
     background: rgba(0, 0, 0, 0.3);
+}
+
+h2.title {
+    font-weight: 400;
+    padding-top: 15px;
+    padding-left: 10px;
+    margin: 0px;
+    font-size: 20px;
 }
 
 /**
