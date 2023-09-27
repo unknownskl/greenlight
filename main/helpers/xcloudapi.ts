@@ -1,5 +1,6 @@
 import https from 'https'
 import Application from '../application'
+import { Address6 } from 'ip-address'
 
 export interface playResult {
     sessionPath:string,
@@ -315,8 +316,35 @@ export default class xCloudApi {
 
                 this.get('/v5/sessions/'+this._type+'/'+sessionId+'/ice').then((iceResult:exchangeResult) => {
                     const exchangeIce = JSON.parse(iceResult.exchangeResponse)
+
+                    const computedCandidates = []
+
+                    // Find Teredo Address and extract remote ip
+                    for(const candidate in exchangeIce){
+                        const candidateAddress = exchangeIce[candidate].candidate.split(' ')
+                        
+                        if(candidateAddress.length > 4 && candidateAddress[4].substr(0, 4) === '2001'){
+                            const address = new Address6(candidateAddress[4])
+                            const teredo = address.inspectTeredo()
+
+                            computedCandidates.push({
+                                candidate: 'a=candidate:10 1 UDP 1 '+teredo.client4+' 9002 typ host ',
+                                messageType: 'iceCandidate',
+                                sdpMLineIndex: '0',
+                                sdpMid: '0'
+                            })
+                            computedCandidates.push({
+                                candidate: 'a=candidate:11 1 UDP 1 '+teredo.client4+' '+teredo.udpPort+' typ host ',
+                                messageType: 'iceCandidate',
+                                sdpMLineIndex: '0',
+                                sdpMid: '0'
+                            })
+                        }
+
+                        computedCandidates.push(exchangeIce[candidate])
+                    }
                     
-                    resolve(exchangeIce)
+                    resolve(computedCandidates)
 
                 }).catch((error) => {
                     reject(error)
