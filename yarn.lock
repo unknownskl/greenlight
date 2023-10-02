@@ -5054,10 +5054,10 @@ update-browserslist-db@^1.0.11:
     escalade "^3.1.1"
     picocolors "^1.0.0"
 
-uplot@^1.6.25:
-  version "1.6.25"
-  resolved "https://registry.npmjs.org/uplot/-/uplot-1.6.25.tgz"
-  integrity sha512-eWLAhEaGtIcVBiS67mC2UC0yV+G6eYLS2rU67N4F2JVWjt7uBMg4xKXUYGW0dEz9G+m7fNatjCVXHts4gjyuMQ==
+uplot@^1.6.26:
+  version "1.6.26"
+  resolved "https://registry.yarnpkg.com/uplot/-/uplot-1.6.26.tgz#a6012fd141ad4a71741c75af0c71283d0ade45a7"
+  integrity sha512-qN0mveL6UsP40TnHzHAJkUQvpfA3y8zSLXtXKVlJo/sLfj2+vjan/Z3g81MCZjy/hEDUFNtnLftPmETDA4s7Rg==
 
 uri-js@^4.2.2:
   version "4.4.1"
