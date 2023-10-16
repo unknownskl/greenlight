@@ -44,7 +44,7 @@
     "electron-builder": "^24.6.4",
     "eslint": "^8.49.0",
     "next": "^13.5.3",
-    "nextron": "^8.9.0",
+    "nextron": "^8.12.0",
     "node-loader": "^2.0.0",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
