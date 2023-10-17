@@ -19,10 +19,9 @@ cargo update
 popd
 popd
 
-mkdir deps-dist
-flatpak-node-generator yarn yarn.lock -o ./yarn-sources.json
-flatpak-node-generator npm xal-node/package-lock.json -o ./npm-sources.json
-python3 ${fbtPath}/cargo/flatpak-cargo-generator.py xal-node/Cargo.lock -o ./cargo-sources.json
+flatpak-node-generator yarn ../yarn.lock -o ./yarn-sources.json
+flatpak-node-generator npm ../xal-node/package-lock.json -o ./npm-sources.json
+python3 ${fbtPath}/cargo/flatpak-cargo-generator.py ../xal-node/Cargo.lock -o ./cargo-sources.json
 flatpak-builder --force-clean build-dir ./dev.unknownskl.greenlight.yml
 flatpak build-export export-dir build-dir
 flatpak build-bundle export-dir Greenlight.flatpak dev.unknownskl.greenlight --runtime-repo=https://flathub.org/repo/flathub.flatpakrepo
