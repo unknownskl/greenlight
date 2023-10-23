@@ -36,7 +36,7 @@
     "@fortawesome/fontawesome-free": "^6.4.2",
     "@next/eslint-plugin-next": "^13.5.3",
     "@types/node": "^20.8.7",
-    "@types/react": "^18.2.28",
+    "@types/react": "^18.2.31",
     "@typescript-eslint/eslint-plugin": "^6.7.5",
     "@typescript-eslint/parser": "^6.8.0",
     "babel-loader": "^9.1.3",
