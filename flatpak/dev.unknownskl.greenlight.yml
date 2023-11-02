@@ -37,11 +37,11 @@ modules:
         yarn_config_cache: /run/build/greenlight/flatpak-node/yarn-mirror
     build-commands:
       - pwd
-      - ls -alF
-      - cp -a extralib -t /app/
+      - ls -alF ../ ./
+      - cp -a ../extralib -t /app/
       - yarn --offline
       - |
-        # . ../flatpak-node/electron-builder-arch-a rgs.sh
+        # . ../flatpak-node/electron-builder-arch-args.sh
         yarn run flatpak-build --offline -- $ELECTRON_BUILDER_ARCH_ARGS --linux
       # Bundle app and dependencies
       - cp -a dist/linux*unpacked /app/main
