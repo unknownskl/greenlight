@@ -145,8 +145,7 @@ jobs:
         continue-on-error: false
         with:
           path: |
-            node_modules/           
-            xal-node/node_modules/           
+            node_modules/
           key: ${{ runner.os }}-${{ runner.arch }}-npm-${{ hashFiles('**/package.json') }}-${{ hashFiles('**/yarn.lock') }}
           restore-keys: ${{ runner.os }}-${{ runner.arch }}-npm-
 
