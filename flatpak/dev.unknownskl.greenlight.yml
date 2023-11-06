@@ -49,8 +49,6 @@ modules:
         path: ..
         dest: main
       - yarn-sources.json
-      - npm-sources.json
-      - cargo-sources.json
       # Wrapper to launch the app
       - type: file
         path: yarnrc

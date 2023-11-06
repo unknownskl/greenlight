@@ -35,7 +35,6 @@ jobs:
         with:
           path: |
             node_modules/
-            xal-node/node_modules/
           key: ${{ runner.os }}-${{ runner.arch }}-npm-${{ hashFiles('**/package.json') }}-${{ hashFiles('**/yarn.lock') }}
           restore-keys: ${{ runner.os }}-${{ runner.arch }}-npm-
 
@@ -63,9 +62,6 @@ jobs:
       - name: Install flatpak-builder-tools
         run: pipx install ./node/
 
-      - name: Copy cargo script
-        run: cp cargo/flatpak-cargo-generator.py ../flatpak-cargo-generator.py
-
       # Generate sources
       - name: Checkout Git repository
         uses: actions/checkout@v4
@@ -78,12 +74,6 @@ jobs:
 
       - name: Build yarn cache
         run: flatpak-node-generator yarn yarn.lock -o ./deps-dist/yarn-sources.json
-
-      - name: Build npm cache
-        run: flatpak-node-generator npm xal-node/package-lock.json -o ./deps-dist/npm-sources.json
-
-      - name: Build cargo cache
-        run: python3 ../flatpak-cargo-generator.py xal-node/Cargo.lock -o ./deps-dist/cargo-sources.json
 
       - uses: actions/upload-artifact@master
         with:
@@ -149,48 +139,6 @@ jobs:
         uses: actions/setup-node@v3.8.2
         with:
           node-version: 18
-
-      - run: rustup target add aarch64-apple-darwin
-        if: matrix.os == 'macos-latest'
-
-      - run: New-Item -Name downloads -Path $env:VCPKG_INSTALLATION_ROOT -ItemType Directory
-        if: runner.os == 'Windows'
-      - run: New-Item -Name archives -Path $env:VCPKG_INSTALLATION_ROOT -ItemType Directory
-        if: runner.os == 'Windows'
-      - run: Invoke-WebRequest -Uri https://fossies.org/windows/misc/nasm-2.16.01-win64.zip -OutFile $env:VCPKG_INSTALLATION_ROOT\downloads\nasm-2.16.01-win64.zip
-        if: runner.os == 'Windows'
-      - run: cd $env:VCPKG_INSTALLATION_ROOT && dir && dir $env:VCPKG_INSTALLATION_ROOT
-        if: runner.os == 'Windows'
-
-      - name: Set up vcpkg cache
-        uses: actions/cache@v3
-        continue-on-error: false
-        with:
-          path: |
-            $env:VCPKG_INSTALLATION_ROOT\downloads\
-            $env:VCPKG_INSTALLATION_ROOT\archives\
-          key: ${{ runner.os }}-${{ runner.arch }}-vcpkg
-          restore-keys: ${{ runner.os }}-${{ runner.arch }}-vcpkg-
-        if: runner.os == 'Windows'
-
-      - run: echo "VCPKG_ROOT=$env:VCPKG_INSTALLATION_ROOT" | Out-File -FilePath $env:GITHUB_ENV -Append
-        if: runner.os == 'Windows'
-      - run: vcpkg install openssl:x64-windows-static-md
-        if: runner.os == 'Windows'
-
-      - name: Set up cargo cache
-        uses: actions/cache@v3
-        continue-on-error: false
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/
-            xal-node/target/
-          key: ${{ runner.os }}-${{ runner.arch }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: ${{ runner.os }}-${{ runner.arch }}-cargo-
 
       - name: Set up node_modules cache
         uses: actions/cache@v3
