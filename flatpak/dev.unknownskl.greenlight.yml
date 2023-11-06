@@ -23,7 +23,6 @@ build-options:
   append-path: /usr/lib/sdk/node18/bin:/usr/lib/sdk/rust-stable/bin
   env:
     NPM_CONFIG_LOGLEVEL: info
-    CARGO_HOME: /run/build/greenlight/cargo
 modules:
   - name: greenlight
     buildsystem: simple
@@ -35,9 +34,7 @@ modules:
         yarn_config_cache: /run/build/greenlight/flatpak-node/yarn-mirror
     build-commands:
       - yarn --offline
-      - |
-        # . ../flatpak-node/electron-builder-arch-args.sh
-        yarn run flatpak-build --offline -- $ELECTRON_BUILDER_ARCH_ARGS --linux
+      - yarn run flatpak-build --offline -- $ELECTRON_BUILDER_ARCH_ARGS --linux
       # Bundle app and dependencies
       - cp -a dist/linux*unpacked /app/main
       # Install app wrapper
