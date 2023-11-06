@@ -15,8 +15,7 @@
     "lint": "eslint . --ext .ts",
     "postinstall": "electron-builder install-app-deps",
     "publish": "electron-builder -p onTag",
-    "build-deps": "ls xal-node/dist/xal-node.node || npm run rebuild-deps",
-    "rebuild-deps": "cd xal-node && npm ci",
+    "build-deps": "ls",
     "flatpak-build": "yarn run build-deps && nextron build --no-pack && electron-builder --dir"
   },
   "dependencies": {
@@ -28,6 +27,7 @@
     "github-url-to-object": "^4.0.6",
     "ip-address": "^9.0.5",
     "uplot": "^1.6.27",
+    "xal-node": "^1.0.0-beta1",
     "xbox-webapi": "^1.4.1",
     "xbox-xcloud-player": "0.2.0-beta16"
   },
