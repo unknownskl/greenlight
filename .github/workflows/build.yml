@@ -112,6 +112,7 @@ jobs:
           path: |
             build/
             .flatpak-builder/
+            flatpak-node/
           key: ${{ runner.os }}-${{ runner.arch }}-flatpak-builder-${{ hashFiles('flatpak/*') }}
           restore-keys: ${{ runner.os }}-${{ runner.arch }}-flatpak-builder-
 
