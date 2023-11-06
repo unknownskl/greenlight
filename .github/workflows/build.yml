@@ -86,7 +86,7 @@ jobs:
     needs: [cachedeps]
 
     container:
-      image: bilelmoussaoui/flatpak-github-actions:gnome-44
+      image: bilelmoussaoui/flatpak-github-actions:gnome-45
       options: --privileged
 
     steps:
