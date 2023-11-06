@@ -6,7 +6,6 @@ base: org.electronjs.Electron2.BaseApp
 base-version: '22.08'
 sdk-extensions:
   - org.freedesktop.Sdk.Extension.node18
-  - org.freedesktop.Sdk.Extension.rust-stable
 command: run.sh
 separate-locales: false
 finish-args:
@@ -20,7 +19,7 @@ finish-args:
   - --allow=per-app-dev-shm
   - --filesystem=/run/udev:ro
 build-options:
-  append-path: /usr/lib/sdk/node18/bin:/usr/lib/sdk/rust-stable/bin
+  append-path: /usr/lib/sdk/node18/bin
   env:
     NPM_CONFIG_LOGLEVEL: info
 modules:
