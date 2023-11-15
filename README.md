@@ -44,7 +44,9 @@ The application also provides a way to see which of your friends are online. Thi
 
 ## Steam Deck Setup
 
-This application is reported to be working on the Steam Deck with some small bugs and side-effects. You can map one of the Steam Deck back buttons to the 'N' key to simulate the Xbox button.
+This application is reported to be working on the Steam Deck with some small bugs and side-effects. You can map one of the Steam Deck back buttons to the 'N' key to simulate the Xbox button. 
+
+Some users have reported being unable to launch Greenlight from the Steam Deck UI (being stuck in an endless loading screen that requires rebooting the system). To prevent this, add `LD_PRELOAD= %command%` to the launch arguments, listed before any other launch arguments. 
 
 ### Optional launch arguments
 
