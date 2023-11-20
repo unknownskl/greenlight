@@ -23,7 +23,7 @@
     "axios": "^1.6.0",
     "compare-versions": "^6.1.0",
     "debug": "^4.3.4",
-    "electron-serve": "^1.1.0",
+    "electron-serve": "^1.2.0",
     "electron-store": "^8.0.1",
     "github-url-to-object": "^4.0.6",
     "ip-address": "^9.0.5",
