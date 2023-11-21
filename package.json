@@ -13,7 +13,7 @@
     "dev": "DEBUG=greenlight:* nextron",
     "build": "nextron build",
     "lint": "eslint . --ext .ts",
-    "test": "CI=true nextron build --no-pack && NODE_ENV=production playwright test -c playwright.config.ts",
+    "test": "CI=true nextron build --no-pack && NODE_ENV=production xvfb-maybe -- playwright test -c playwright.config.ts",
     "test-serve": "npx http-server app/ -p 3000",
     "postinstall": "electron-builder install-app-deps",
     "publish": "electron-builder -p onTag",
@@ -32,7 +32,8 @@
     "uplot": "^1.6.27",
     "xal-node": "^1.0.0-beta1",
     "xbox-webapi": "^1.4.1",
-    "xbox-xcloud-player": "0.2.0-beta16"
+    "xbox-xcloud-player": "0.2.0-beta16",
+    "xvfb-maybe": "^0.2.1"
   },
   "devDependencies": {
     "@babel/core": "^7.23.3",
