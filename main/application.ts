@@ -23,6 +23,7 @@ export default class Application {
         autoStream: '',
     }
     private _isProduction:boolean = (process.env.NODE_ENV === 'production')
+    private _isCi:boolean = (process.env.CI !== 'false')
     private _isMac:boolean = (process.platform === 'darwin')
     private _isWindows:boolean = (process.platform === 'win32')
     private _isQuitting:boolean = false
@@ -154,12 +155,15 @@ export default class Application {
             }
         })
 
-        if (this._isProduction === true) {
+        if (this._isProduction === true && this._isCi === false) {
             this._mainWindow.loadURL('app://./home.html');
         } else {
-            const port = process.argv[2];
+            const port = process.argv[2] || 3000;
             this._mainWindow.loadURL(`http://localhost:${port}/home`);
-            this._mainWindow.webContents.openDevTools();
+            
+            if(this._isCi !== true){
+                this._mainWindow.webContents.openDevTools();
+            }
         }
     }
 
