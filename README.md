@@ -67,7 +67,6 @@ You can either compile the project yourself or download the (unsigned) executabl
 
 ### Requirements
 
-- Rust ([https://rustup.rs/](https://rustup.rs/))
 - NodeJS ([https://nodejs.org/](https://nodejs.org/))
 - Yarn ([https://yarnpkg.com/](https://yarnpkg.com/))
 
