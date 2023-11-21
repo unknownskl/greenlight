@@ -122,16 +122,15 @@ jobs:
           manifest-path: flatpak/dev.unknownskl.greenlight.yml
           cache-key: flatpak-builder-${{ github.sha }}
 
-      - name: list files
-        run: ls -la
-
-      - name: Release
+      - name: Release flatpak
         uses: softprops/action-gh-release@v1
-        # if: startsWith(github.ref, 'refs/tags/v')
+        if: startsWith(github.ref, 'refs/tags/v')
         with:
-          files: Greenlight.flatpak
+          files: greenlight.flatpak
+          draft: true
 
   release:
+    name: Build/release Electron app
     runs-on: ${{ matrix.os }}
     needs: ['lint']
 
