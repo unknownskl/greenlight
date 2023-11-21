@@ -48,6 +48,7 @@ jobs:
   tests:
     name: Run playwright tests
     runs-on: ubuntu-latest
+    needs: ['lint']
     steps:
       - name: Checkout Git repository
         uses: actions/checkout@v4
@@ -78,7 +79,7 @@ jobs:
   cachedeps:
     name: Generate cached sources
     runs-on: ubuntu-latest
-    needs: ['lint']
+    needs: ['tests']
 
     steps:
       # Intsall node tools
@@ -162,7 +163,7 @@ jobs:
   release:
     name: Build/release Electron app
     runs-on: ${{ matrix.os }}
-    needs: ['lint']
+    needs: ['tests']
 
     strategy:
       matrix:
