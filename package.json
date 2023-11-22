@@ -13,7 +13,7 @@
     "dev": "DEBUG=greenlight:* nextron",
     "build": "nextron build",
     "lint": "eslint . --ext .ts",
-    "test": "CI=true nextron build --no-pack && NODE_ENV=production xvfb-maybe -- playwright test -c playwright.config.ts",
+    "test": "CI=true nextron build --no-pack && CI=true xvfb-maybe -- playwright test -c playwright.config.ts",
     "test-serve": "npx http-server app/ -p 3000",
     "postinstall": "electron-builder install-app-deps",
     "publish": "electron-builder -p onTag",

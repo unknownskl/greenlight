@@ -82,7 +82,15 @@ export default class Application {
     }
 
     loadApplicationDefaults(){
-        if(this._isProduction === true) {
+        if(this._isProduction === true && this._isCi !== true) {
+            serve({ directory: 'app' });
+        } else if(this._isCi === true) {
+            const random = Math.random()*100
+            ElectronApp.setPath('userData', `${ElectronApp.getPath('userData')} (${random})`);
+            ElectronApp.setPath('sessionData', `${ElectronApp.getPath('userData')} (${random})`);
+            this._store.delete('user')
+            this._store.delete('auth')
+
             serve({ directory: 'app' });
         } else {
             ElectronApp.setPath('userData', `${ElectronApp.getPath('userData')} (development)`);

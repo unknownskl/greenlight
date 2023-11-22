@@ -74,6 +74,9 @@ jobs:
 
       - name: Run tests
         run: yarn test
+        env:
+          XBOX_USERNAME: ${{ secrets.XBOX_USERNAME }}
+          XBOX_PASSWORD: ${{ secrets.XBOX_PASSWORD }}
 
 
   cachedeps:
