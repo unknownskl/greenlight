@@ -23,7 +23,7 @@ export default class Application {
         autoStream: '',
     }
     private _isProduction:boolean = (process.env.NODE_ENV === 'production')
-    private _isCi:boolean = (process.env.CI !== 'false')
+    private _isCi:boolean = (process.env.CI !== undefined)
     private _isMac:boolean = (process.platform === 'darwin')
     private _isWindows:boolean = (process.platform === 'win32')
     private _isQuitting:boolean = false
@@ -82,7 +82,7 @@ export default class Application {
     }
 
     loadApplicationDefaults(){
-        if(this._isProduction === true && this._isCi !== true) {
+        if(this._isProduction === true && this._isCi === false) {
             serve({ directory: 'app' });
         } else if(this._isCi === true) {
             const random = Math.random()*100
