@@ -1,7 +1,7 @@
 # Changelog
 
 ## v2.0.0-beta15 - 2023-11-28
-- Updated xal-node library and removed Rust dependencie. Fixes #1000 #898 #899 #815
+- Updated xal-node library and removed Rust dependencies. Fixes #1000 #898 #899 #815
 - Added extra ports to when trying to attempt a new connection. Forward port 9002 to allow remote streaming. #593
 - Added MIT license to clear up confusion #992
 
