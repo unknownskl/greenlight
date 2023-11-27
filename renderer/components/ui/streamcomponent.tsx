@@ -259,6 +259,16 @@ function StreamComponent({
     }
   }
 
+  function toggleHideScreen(){
+    let stream = document.getElementById('streamComponent')
+    let elements = stream.children
+
+    for (let element of Array.from(elements)) {
+      let htmlElement = element as HTMLElement
+      htmlElement.hidden = !htmlElement.hidden
+    }
+  }
+
   function drawWaitingTimes(seconds){
     if(seconds !== false){
       setWaitingSeconds(seconds)
@@ -310,6 +320,7 @@ function StreamComponent({
             }}>
               <Button label={<span><i className="fa-solid fa-xmark"></i> End Stream</span>} className='btn-cancel' onClick={ () => { endStream() } }></Button> &nbsp;
               <Button label={<span><i className="fa-solid fa-xmark"></i> Disconnect</span>} className='btn' onClick={ () => { streamDisconnect() } }></Button>
+              <Button label={<span><i className="fa-solid fa-xmark"></i> Toggle Screen</span>} className='btn' onClick={ () => { toggleHideScreen() } }></Button>
             </div>
 
             <div style={{
