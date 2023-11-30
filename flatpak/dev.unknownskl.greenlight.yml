@@ -1,11 +1,13 @@
 app-id: dev.unknownskl.greenlight
 runtime: org.freedesktop.Platform
-runtime-version: '22.08'
+runtime-version: '23.08'
 sdk: org.freedesktop.Sdk
 base: org.electronjs.Electron2.BaseApp
-base-version: '22.08'
+base-version: '23.08'
 sdk-extensions:
   - org.freedesktop.Sdk.Extension.node18
+platform-extensions:
+  - org.freedesktop.Platform.VAAPI.Intel
 command: run.sh
 separate-locales: false
 finish-args:
@@ -32,6 +34,9 @@ modules:
         npm_config_offline: 'true'
         yarn_config_cache: /run/build/greenlight/flatpak-node/yarn-mirror
     build-commands:
+      - pwd
+      - ls -alF ../ ./
+      - cp -a ../extralib -t /app/
       - yarn --offline
       - yarn run flatpak-build --offline -- $ELECTRON_BUILDER_ARCH_ARGS --linux
       # Bundle app and dependencies
@@ -44,6 +49,9 @@ modules:
       - type: dir
         path: ..
         dest: main
+      - type: dir
+        path: ./amd-patched-mesa/extralib
+        dest: extralib
       - yarn-sources.json
       # Wrapper to launch the app
       - type: file
@@ -53,4 +61,9 @@ modules:
         dest-filename: run.sh
         commands:
           - ls -la /app/bin
+          - export LIBGL_DRIVERS_PATH=/app/extralib/dri:/usr/lib/x86_64-linux-gnu/dri/intel-vaapi-driver:/usr/lib/x86_64-linux-gnu/dri:${LIBGL_DRIVERS_PATH}
+          - export LIBVA_DRIVERS_PATH=/app/extralib/dri:/usr/lib/x86_64-linux-gnu/dri/intel-vaapi-driver:/usr/lib/x86_64-linux-gnu/dri:${LIBVA_DRIVERS_PATH}
+          - export VK_ICD_FILENAMES=/app/extralib/icd.d/intel_icd.x86_64.json:/app/extralib/icd.d/radeon_icd.x86_64.json:/app/extralib/icd.d/virtio_icd.x86_64.json:/app/extralib/icd.d/intel_hasvk_icd.x86_64.json:/app/extralib/icd.d/lvp_icd.x86_64.json:${VK_ICD_FILENAMES}
+          - export LD_LIBRARY_PATH=/app/extralib:${LD_LIBRARY_PATH}
+          - echo runtime LD_LIBRARY_PATH = $LD_LIBRARY_PATH
           - zypak-wrapper.sh /app/main/greenlight "$@"
