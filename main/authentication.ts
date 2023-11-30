@@ -305,6 +305,9 @@ export default class Authentication {
 
             } else if(arg.type == 'login') {
                 this.startAuthflow()
+            } else if(arg.type == 'restart'){
+                console.log('Restarting application...')
+                this._application.restart()
             }
         });
     }
@@ -360,7 +363,18 @@ export default class Authentication {
                 path: '/v2/login/user',
             }
 
-            this.request(options, data).then((response:any) => {
+	    let headers_ip = {};
+	    let fri = this._application._store.get('force_region_ip' ,"");
+	    console.log(fri, "loaded from store")
+	    if (fri !== "") {
+                headers_ip = {
+                    "X-Forwarded-For": fri,
+                };
+		console.log("IP spoofed as ", fri)
+            } else {
+		console.log("IP not spoofed")
+	    }
+            this.request(options, data, headers_ip).then((response:any) => {
                 this._tokens.xcloud.token = response.gsToken
                 this._tokens.xcloud.expires = (Date.now()+response.durationInSeconds)
                 this._tokens.xcloud.market = response.market

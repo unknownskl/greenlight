@@ -42,6 +42,13 @@ export default class IpcApp extends IpcBase {
             resolve(true)
         })
     }
+    
+    restart(){
+        return new Promise((resolve, reject) => {
+            this._application.restart()
+            resolve(true)
+        })
+    }
 
     clearData(){
         return new Promise((resolve, reject) => {
