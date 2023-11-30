@@ -55,8 +55,12 @@ export const Preload = {
 
     removeListener(channel:string, listener){
         ipcRenderer.removeListener(channel, listener)
-    }
+    },
 
+    
+    setRegionIp(ip:string) {
+        ipcRenderer.send('force_region_ip', ip)
+    }
 };
 
 contextBridge.exposeInMainWorld('Greenlight', Preload);

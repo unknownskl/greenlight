@@ -1,0 +1,3 @@
+[submodule "flatpak/amd-patched-mesa"]
+	path = flatpak/amd-patched-mesa
+	url = https://github.com/Originalimoc/amd-patched-mesa
