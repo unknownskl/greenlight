@@ -7,7 +7,7 @@ export default {
     //     ipcRenderer.on(channel, listener)
     // },
 
-    send(channel:string, action:string, data = {}){
+    send(channel:string, action:string, data = {}):Promise<any> {
         // return new Promise((resolve, reject) => {
         //     const requestId = Math.round(Math.random()*1000);
 
@@ -31,7 +31,7 @@ export default {
         return window.Greenlight.send(channel, action, data)
     },
 
-    on(channel:string, listener){
+    on(channel:string, listener):Function {
 
         // const wrapEvent = (event, args) => {
         //     listener(event, args.action, args.data)
@@ -43,7 +43,7 @@ export default {
         return window.Greenlight.on(channel, listener)
     }, 
 
-    onAction(channel:string, action:string, listener){
+    onAction(channel:string, action:string, listener):Function {
 
         // const wrapEvent = (event, args) => {
         //     if(args.action === action){
@@ -57,7 +57,7 @@ export default {
         return window.Greenlight.onAction(channel, action, listener)
     },
 
-    removeListener(channel:string, listener){
+    removeListener(channel:string, listener):void {
         // ipcRenderer.removeListener(channel, listener)
         return window.Greenlight.removeListener(channel, listener)
     }

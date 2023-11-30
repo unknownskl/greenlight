@@ -56,13 +56,8 @@ export const UserProvider = ({ children }) => {
         const settings = localStorage.getItem("settings")
         console.log('Loading settings from localStorage', settings)
         if (settings) {
-    	    let settingsObj = JSON.parse(settings);
-            setSettings(settingsObj);
-	    console.log("send force region IP to IPC channel:", settingsObj.force_region_ip)
-	    const greenlightInstance: typeof window.Greenlight = window.Greenlight;
-            greenlightInstance.setRegionIp(settingsObj.force_region_ip);
-
-	}
+            setSettings(JSON.parse(settings))
+	    }
     }, [])
 
     return <UserContext.Provider value={{ consoles, setConsoles }}>

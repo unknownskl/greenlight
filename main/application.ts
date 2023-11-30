@@ -105,11 +105,6 @@ export default class Application {
 
             this.log('electron', __filename+'[loadApplicationDefaults()] Electron has been fully loaded. Ready to open windows')
 
-	    ipcMain.on('force_region_ip', (event, data) => {
-		    console.log("IPC received force region IP data and write to store:", data)
-		    this._store.set('force_region_ip', data);
-  	    });
-
             this.openMainWindow()
             this._authentication.startWebviewHooks()
         

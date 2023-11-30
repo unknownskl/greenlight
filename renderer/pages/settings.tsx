@@ -107,6 +107,10 @@ function Settings() {
       ...settings,
       force_region_ip: e
     });
+
+    Ipc.send('app', 'setForceRegionIp', { ip: e }).then((res) => {
+      console.log('Set force region IP:', res)
+    })
   }
 
   function drawControllers(){
@@ -157,7 +161,7 @@ function Settings() {
           </p>
 	  <p>
             Force Region:
-            <select value={ settings.force_region_ip } defaultValue={ "" } onChange={ (e) => setForceRegionIp(e.target.value) }>
+            <select value={ settings.force_region_ip } defaultValue={ '' } onChange={ (e) => setForceRegionIp(e.target.value) }>
               <option value="">Disabled</option>
               <option value="203.41.44.20">Australia</option>
               <option value="200.221.11.101">Brazil</option>

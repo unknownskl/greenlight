@@ -1,6 +1,10 @@
 import IpcBase from './base'
 import { session } from 'electron'
 
+interface setForceRegionIpArgs {
+    ip:string
+}
+
 export default class IpcApp extends IpcBase {
     // _streamingSessions:any = {}
 
@@ -95,5 +99,17 @@ export default class IpcApp extends IpcBase {
             })
             this._application.getStartupFlags().autoStream = ''
         }) 
+    }
+
+    setForceRegionIp(args:setForceRegionIpArgs){
+        return new Promise((resolve, reject) => {
+            console.log("IPC received force region IP data and write to store:", args.ip)
+            this._application._store.set('force_region_ip', args.ip);
+
+            // Rerun silent flow to retrieve new tokens
+            this._application._authentication.startSilentFlow();
+
+            resolve(true)
+        })
     }
 }

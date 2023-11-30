@@ -363,17 +363,18 @@ export default class Authentication {
                 path: '/v2/login/user',
             }
 
-	    let headers_ip = {};
-	    let fri = this._application._store.get('force_region_ip' ,"");
-	    console.log(fri, "loaded from store")
-	    if (fri !== "") {
+            let headers_ip = {};
+            let fri = this._application._store.get('force_region_ip' ,'')
+            console.log(fri, 'loaded from store')
+            if (fri !== '') {
                 headers_ip = {
                     "X-Forwarded-For": fri,
                 };
-		console.log("IP spoofed as ", fri)
+                console.log("IP spoofed as ", fri)
             } else {
-		console.log("IP not spoofed")
-	    }
+                console.log("IP not spoofed")
+            }
+
             this.request(options, data, headers_ip).then((response:any) => {
                 this._tokens.xcloud.token = response.gsToken
                 this._tokens.xcloud.expires = (Date.now()+response.durationInSeconds)
@@ -387,7 +388,7 @@ export default class Authentication {
                     }
                 }
 
-            this._application.log('authentication', __filename+'[requestxCloudToken()] Retrieved xHome streaming tokens')
+            this._application.log('authentication', __filename+'[requestxCloudToken()] Retrieved xCloud streaming tokens')
 
                 resolve(response)
             }).catch((error) => {
