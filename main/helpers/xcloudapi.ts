@@ -170,20 +170,21 @@ export default class xCloudApi {
                     "clientAppId": "Microsoft.GamingApp",
                     "clientAppType": "native",
                     "clientAppVersion": "2203.1001.4.0",
-                    "clientSdkVersion": "5.3.0",
+                    "clientSdkVersion": "8.5.2",
                     "httpEnvironment": "prod",
                     "sdkInstallId": ""
                 }
             },
             "dev": {
                 "hw": {
-                    "make": "Micro-Star International Co., Ltd.",
-                    "model": "GS66 Stealth 10SGS",
+                    "make": "Microsoft",
+                    "model": "Surface Pro",
                     "sdktype": "native"
                 },
                 "os": {
-                    "name": "Windows 10 Pro",
-                    "ver": "19041.1.amd64fre.vb_release.191206-1406"
+                    "name": "Windows 11",
+                    "ver": "22631.2715",
+                    "platform": "desktop"
                 },
                 "displayInfo": {
                     "dimensions": {
