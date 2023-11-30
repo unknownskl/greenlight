@@ -5285,10 +5285,10 @@ wrappy@1:
   resolved "https://registry.npmjs.org/wrappy/-/wrappy-1.0.2.tgz"
   integrity sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==
 
-xal-node@^1.0.0-beta1:
-  version "1.0.0-beta1"
-  resolved "https://registry.yarnpkg.com/xal-node/-/xal-node-1.0.0-beta1.tgz#6c25aff9bffed936b12dea10f1bc8dfc43373d9f"
-  integrity sha512-GB9uBjQ1XSQdySHU6HZ803wUnLy0kHPU9vTmwIJdlE4WzNxOsa82756IbjcW6YR3YKQCWvF5wvuVV+wVwe62jA==
+xal-node@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/xal-node/-/xal-node-0.2.0.tgz#9575ea34022d7d347f61901a1305a01415588786"
+  integrity sha512-HwHrXVZrOSxI1VMmqfB6N+1I+pd22C/Iu29ArzCnaZNVdvpM+KvMbgzy95rTMjQ3wr6jmm07H3UktGRe9ThlVg==
   dependencies:
     jose "^5.1.0"
     uuid-1345 "^1.0.2"
