@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Greenlight
+Comment=Xbox & xCloud Remote play streaming app
+Icon=dev.unknownskl.greenlight
+Exec=greenlight
+Terminal=false
+Categories=Game;
+Keywords=Game;Streaming;Xbox;xCloud;Console;
