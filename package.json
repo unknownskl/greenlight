@@ -28,7 +28,7 @@
     "electron-store": "^8.0.1",
     "github-url-to-object": "^4.0.6",
     "ip-address": "^9.0.5",
-    "playwright": "^1.40.0",
+    "playwright": "^1.40.1",
     "uplot": "^1.6.27",
     "xal-node": "^0.2.0",
     "xbox-webapi": "^1.4.1",
