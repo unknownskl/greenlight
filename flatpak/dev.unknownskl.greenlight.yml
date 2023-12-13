@@ -49,9 +49,13 @@ modules:
       - type: dir
         path: ..
         dest: main
-      - type: dir
-        path: ./amd-patched-mesa/extralib
+      # - type: dir
+      #   path: ./amd-patched-mesa/extralib
+      #   dest: extralib
+      - type: git
+        url: https://github.com/Originalimoc/amd-patched-mesa
         dest: extralib
+        commit: "dd468982c84d77b1679a45f082af102b665dfd26"
       - yarn-sources.json
       # Wrapper to launch the app
       - type: file
