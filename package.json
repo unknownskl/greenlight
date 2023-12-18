@@ -20,7 +20,7 @@
     "flatpak-build": "nextron build --no-pack && electron-builder --dir"
   },
   "dependencies": {
-    "@playwright/test": "^1.40.0",
+    "@playwright/test": "^1.40.1",
     "axios": "^1.6.0",
     "compare-versions": "^6.1.0",
     "debug": "^4.3.4",
