@@ -116,7 +116,10 @@ function Settings() {
   function drawControllers(){
     const gamepads = navigator.getGamepads()
     let controllerHtml = '<h1>Gamepads detected</h1> '
-    controllerHtml += '<p>Below you can view the detected controllers with the amount of axes and buttons. The default Xbox controller has 4 axes, 17 buttons and dual-rumble. Press a button on the controller to active it</p> <div style="padding-left: 20px; padding-top: 10px;">'
+    controllerHtml += '<p>Below you can view the detected controllers with the amount of axes and buttons. ' +
+                      'The default Xbox controller has 4 axes, 17 buttons and dual-rumble. ' + 
+                      'Press a button on the controller to activate it.</p> <div style="padding-left: 20px; padding-top: 10px;">'
+                      
     for(const gamepad in gamepads){
 
       if(gamepads[gamepad] !== null){
