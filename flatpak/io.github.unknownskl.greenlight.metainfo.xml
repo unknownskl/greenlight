@@ -15,8 +15,8 @@
   </description>
   <screenshots>
     <screenshot type="default">
-      <image type="source">https://raw.githubusercontent.com/unknownskl/flathub/greenlight/screenshots/screenshot1.jpg</image>
-      <image type="source">https://raw.githubusercontent.com/unknownskl/flathub/greenlight/screenshots/screenshot2.jpg</image>
+      <image type="source">https://raw.githubusercontent.com/unknownskl/greenlight/main-v2/images/main-nowindow.jpg</image>
+      <image type="source">https://raw.githubusercontent.com/unknownskl/greenlight/main-v2/images/stream-nowindow.jpg</image>
     </screenshot>
   </screenshots>
   <releases>

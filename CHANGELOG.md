@@ -4,6 +4,7 @@
 - Add patch to remove region restriction on xCloud #850 (credits to @pccr10001)
 - Device info updated to stream true 1080p feed from xCloud (credits to @FatCache)
 - Flatpak manual build script and AMD VAAPI fix (credits to @Originalimoc)
+- Lots of changes and prep for flathub release
 
 ## v2.0.0-beta15 - 2023-11-28
 - Updated xal-node library and removed Rust dependencies. Fixes #1000 #898 #899 #815
