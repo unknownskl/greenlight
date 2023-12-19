@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop">
+  <id>io.github.unknownskl.greenlight</id>
+  <launchable type="desktop-id">io.github.unknownskl.greenlight.desktop</launchable>
+  <name>Greenlight</name>
+  <project_license>MIT</project_license>
+  <developer_name>UnknownSKL</developer_name>
+  <summary>Greenlight is an open-source client for xCloud and Xbox home streaming</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <url type="homepage">https://github.com/unknownskl/greenlight</url>
+  <url type="help">https://github.com/unknownskl/greenlight/issues</url>
+  <url type="bugtracker">https://github.com/unknownskl/greenlight/issues</url>
+  <description>
+    <p>Greenlight is an open-source client for xCloud and Xbox home streaming.</p>
+  </description>
+  <screenshots>
+    <screenshot type="default">
+      <image type="source">https://raw.githubusercontent.com/unknownskl/flathub/greenlight/screenshots/screenshot1.jpg</image>
+      <image type="source">https://raw.githubusercontent.com/unknownskl/flathub/greenlight/screenshots/screenshot2.jpg</image>
+    </screenshot>
+  </screenshots>
+  <releases>
+    <release version="2.0.0" date="2023-12-14"/>
+     <description>
+        <li>First full release</li>
+     </description>
+  </releases>
+  <content_rating type="oars-1.1"/>
+</component>
