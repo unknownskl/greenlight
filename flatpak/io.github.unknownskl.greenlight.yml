@@ -34,9 +34,9 @@ modules:
       - yarn --offline
       - yarn run flatpak-build --offline -- --linux
       # Add icon, metadata and desktop file
-      - install -Dm 644 ../io.github.unknownskl.greenlight.png ${FLATPAK_DEST}/share/icons/hicolor/512x512/apps/${FLATPAK_ID}.png
-      - install -Dm 644 ../io.github.unknownskl.greenlight.desktop ${FLATPAK_DEST}/share/applications/${FLATPAK_ID}.desktop
-      - install -Dm 644 ../io.github.unknownskl.greenlight.metainfo.xml ${FLATPAK_DEST}/share/metainfo/${FLATPAK_ID}.appdata.xml
+      - install -Dm 644 flatpak/io.github.unknownskl.greenlight.png ${FLATPAK_DEST}/share/icons/hicolor/512x512/apps/${FLATPAK_ID}.png
+      - install -Dm 644 flatpak/io.github.unknownskl.greenlight.desktop ${FLATPAK_DEST}/share/applications/${FLATPAK_ID}.desktop
+      - install -Dm 644 flatpak/io.github.unknownskl.greenlight.metainfo.xml ${FLATPAK_DEST}/share/metainfo/${FLATPAK_ID}.appdata.xml
       # Bundle app and dependencies
       - cp -a dist/linux*unpacked /app/main
       # Install app wrapper
@@ -62,12 +62,6 @@ modules:
         contents: |
           yarn-offline-mirror "/run/build/greenlight/flatpak-node/yarn-mirror"
           yarn-offline-mirror-pruning true
-      - type: file
-        path: io.github.unknownskl.greenlight.metainfo.xml
-      - type: file
-        path: io.github.unknownskl.greenlight.png
-      - type: file
-        path: io.github.unknownskl.greenlight.desktop
       # Wrapper to launch the app
       - type: script
         dest-filename: run.sh
