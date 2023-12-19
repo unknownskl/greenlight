@@ -38,6 +38,8 @@ export default class Application {
         console.log(__filename+'[constructor()] Starting Greenlight v'+pkg.version)
         this._log = Debug('greenlight')
 
+        ElectronApp.commandLine.appendSwitch('enable-features', 'VaapiVideoDecoder');
+
         this.readStartupFlags()
         this.loadApplicationDefaults()
 
