@@ -73,7 +73,7 @@ function StreamComponent({
     // })
 
     let jitterUplot = new uPlot({
-      title: "Jitter",
+      title: "Jitter (ms)",
       id: "component_streamcomponent_debug_webrtc_jitter",
       class: "debug-chart",
       width: 600,
@@ -99,14 +99,15 @@ function StreamComponent({
           values: (u, vals, space) => vals.map(v => +v),
         },
         {
-          size: 80,
-          values: (u, vals, space) => vals.map(v => (+v*1000.0).toFixed(2) + " ms"),
+          size: 50,
+          stroke: "red",
+          values: (u, vals, space) => vals.map(v => (+v*1000.0).toFixed(1)),
         },
       ]
     }, jitterData, document.getElementById('component_streamcomponent_debug_webrtc_jitter'));
     
     let droppedUplot = new uPlot({
-      title: "Dropped Packets / Frames",
+      title: "Packets lost / Frames dropped",
       id: "component_streamcomponent_debug_webrtc_dropped",
       class: "debug-chart",
       width: 600,
@@ -140,12 +141,15 @@ function StreamComponent({
           values: (u, vals, space) => vals.map(v => +v),
         },
         {
-          size: 100,
-          values: (u, vals, space) => vals.map(v => +v.toFixed(0) + " dropped"),
+          size: 50,
+          stroke: "green",
+          values: (u, vals, space) => vals.map(v => +v.toFixed(0)),
           grid: {show: false},
         },
         {
-          show: false,
+          side: 1,
+          stroke: "blue",
+          values: (u, vals, space) => vals.map(v => +v.toFixed(0)),
           grid: {show: false},
         },
       ]
