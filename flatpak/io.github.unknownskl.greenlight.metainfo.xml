@@ -20,6 +20,10 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="2.0.1" date="2023-12-20"/>
+     <description>
+        <li>Align internal release version with version released on Github</li>
+     </description>
     <release version="2.0.0" date="2023-12-14"/>
      <description>
         <li>First full release</li>
