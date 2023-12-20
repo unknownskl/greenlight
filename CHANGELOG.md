@@ -1,5 +1,8 @@
 # Changelog
 
+## v2.0.1 - 2023-12-20
+- Bump version to align with Flathub Release
+
 ## v2.0.0 - 2023-12-20
 - Add patch to remove region restriction on xCloud #850 (credits to @pccr10001)
 - Device info updated to stream true 1080p feed from xCloud (credits to @FatCache)

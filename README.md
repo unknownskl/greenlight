@@ -17,7 +17,19 @@ _DISCLAIMER: Greenlight is not affiliated with Microsoft, Xbox or Moonlight. All
 
 <img src="images/main.png" width="400" /> <img src="images/stream.png" width="400" />
 
-### Keyboard controls
+## Install
+
+### Install from Flathub:
+[![Build/release](https://flathub.org/assets/badges/flathub-badge-en.svg)](https://flathub.org/apps/details/io.github.unknownskl.greenlight)
+
+### Download pre-compiled binaries:
+[Latest releases can be found here](https://github.com/unknownskl/greenlight/releases)
+
+### Compile from source
+
+See [Local development](?tab=readme-ov-file#local-development)
+
+## Keyboard controls
 
 The following keys are mapped as following:
 
@@ -31,14 +43,15 @@ The following keys are mapped as following:
     View: V
     Menu: M
 
-### Streaming stats
+## Streaming stats
 
 During the stream you can show extra debug statistics that contain extra data about the buffer queues and other information. To bring this up you have to press `~` on your keyboard.
 
 On the left bottom you can see the status (Altough not always accurate). The right top you can find the FPS of the video and audio decoders including the latency. On the right bottom you can find debug information about the buffer queues and other information that is useful for debugging perposes.
 
 When possible always provide this information with your issue when possible (if it is related).
-### Online friends list
+
+## Online friends list
 
 The application also provides a way to see which of your friends are online. This can be useful when you want to quickly check if anyone is online to play with :)
 
@@ -46,7 +59,7 @@ The application also provides a way to see which of your friends are online. Thi
 
 This application is reported to be working on the Steam Deck with some small bugs and side-effects. You can map one of the Steam Deck back buttons to the 'N' key to simulate the Xbox button.
 
-### Optional launch arguments
+## Optional launch arguments
 
 | Argument | Description |
 |----------|--------------|
@@ -55,13 +68,9 @@ This application is reported to be working on the Steam Deck with some small bug
 
 For console use `F000000000000000` format and for xCloud use `xcloud_<title>`
 
-### To close the application
+## To close the application
 
 Click on the Xbox logo on the left top. It will ask you to confirm to close the window.
-
-## Install
-
-You can either compile the project yourself or download the (unsigned) executable from the [releases](https://github.com/unknownskl/greenlight/releases) page
 
 ## Local Development
 
