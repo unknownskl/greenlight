@@ -29,6 +29,7 @@ export default class Application {
     private _isQuitting:boolean = false
 
     private _mainWindow
+    private _gpuWindow
     public _events:Events
     public _ipc:Ipc
     public _authentication:Authentication
@@ -107,6 +108,19 @@ export default class Application {
 
             this.log('electron', __filename+'[loadApplicationDefaults()] Electron has been fully loaded. Ready to open windows')
 
+            /* for future debugging
+            this._gpuWindow = new BrowserWindow({
+                width: 800,
+                height: 600,
+            });
+
+            // Load chrome://gpu
+            this._gpuWindow.loadURL('chrome://gpu');
+
+            // Open DevTools
+            this._gpuWindow.webContents.openDevTools();
+            */
+            
             this.openMainWindow()
             this._authentication.startWebviewHooks()
         
