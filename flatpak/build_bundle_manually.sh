@@ -13,8 +13,8 @@ export PATH=${PATH}:${HOME}/.local/bin
 cd ..
 
 flatpak-node-generator yarn ../yarn.lock -o ./yarn-sources.json
-flatpak-builder --force-clean build-dir ./dev.unknownskl.greenlight.yml
+flatpak-builder --force-clean build-dir ./io.github.unknownskl.greenlight.yml
 flatpak build-export export-dir build-dir
-flatpak build-bundle export-dir Greenlight.flatpak dev.unknownskl.greenlight --runtime-repo=https://flathub.org/repo/flathub.flatpakrepo
+flatpak build-bundle export-dir Greenlight.flatpak io.github.unknownskl.greenlight --runtime-repo=https://flathub.org/repo/flathub.flatpakrepo
 
 echo done
