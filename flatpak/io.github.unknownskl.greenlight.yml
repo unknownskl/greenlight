@@ -33,8 +33,7 @@ modules:
       - cp -a ../extralib/extralib -t /app/
       - cp -a ../extralib/reduceSoFiles.sh -t /app/extralib
       - gunzip /app/extralib/libLLVM-16.0.6.so.gz
-      - ln -s /app/extralib/libLLVM-16.0.6.so /app/extralib/libLLVM-16.so
-      - pushd /app/extralib && chmod +x reduceSoFiles.sh && ./reduceSoFiles.sh && popd
+      - pushd /app/extralib && ln -s libLLVM-16.0.6.so libLLVM-16.so && chmod +x reduceSoFiles.sh && ./reduceSoFiles.sh && popd
       - yarn --offline
       - yarn run flatpak-build --offline -- --linux
       # Add icon, metadata and desktop file
