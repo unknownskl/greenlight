@@ -40,7 +40,7 @@
     "@fortawesome/fontawesome-free": "^6.5.1",
     "@next/eslint-plugin-next": "^13.5.6",
     "@types/node": "^20.8.7",
-    "@types/react": "^18.2.43",
+    "@types/react": "^18.2.45",
     "@typescript-eslint/eslint-plugin": "^6.10.0",
     "@typescript-eslint/parser": "^6.15.0",
     "babel-loader": "^9.1.3",
