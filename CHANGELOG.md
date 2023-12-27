@@ -1,5 +1,8 @@
 # Changelog
 
+## v2.x.x - 2024-xx-xx
+- Fix vibration detection #1076 #813 (credits to @LostVector and @opencv4nodejs)
+
 ## v2.0.1 - 2023-12-20
 - Bump version to align with Flathub Release
 
