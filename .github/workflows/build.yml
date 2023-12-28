@@ -25,7 +25,7 @@ jobs:
           submodules: recursive
 
       - name: Install Node.js, NPM and Yarn
-        uses: actions/setup-node@v3.8.1
+        uses: actions/setup-node@v4.0.1
         with:
           node-version: 18
       
@@ -35,7 +35,6 @@ jobs:
         with:
           path: |
             node_modules/
-            xal-node/node_modules/
           key: ${{ runner.os }}-${{ runner.arch }}-npm-${{ hashFiles('**/package.json') }}-${{ hashFiles('**/yarn.lock') }}
           restore-keys: ${{ runner.os }}-${{ runner.arch }}-npm-
 
@@ -46,10 +45,44 @@ jobs:
         run: yarn lint
 
 
+  tests:
+    name: Run playwright tests
+    runs-on: ubuntu-latest
+    needs: ['lint']
+    steps:
+      - name: Checkout Git repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Node.js, NPM and Yarn
+        uses: actions/setup-node@v4.0.1
+        with:
+          node-version: 18
+      
+      - name: Set up node_modules cache
+        uses: actions/cache@v3
+        continue-on-error: false
+        with:
+          path: |
+            node_modules/
+          key: ${{ runner.os }}-${{ runner.arch }}-npm-${{ hashFiles('**/package.json') }}-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: ${{ runner.os }}-${{ runner.arch }}-npm-
+
+      - name: Install yarn dependencies
+        run: yarn
+
+      - name: Run tests
+        run: yarn test
+        env:
+          XBOX_USERNAME: ${{ secrets.XBOX_USERNAME }}
+          XBOX_PASSWORD: ${{ secrets.XBOX_PASSWORD }}
+
+
   cachedeps:
     name: Generate cached sources
     runs-on: ubuntu-latest
-    needs: ['lint']
+    needs: ['tests']
 
     steps:
       # Intsall node tools
@@ -62,9 +95,6 @@ jobs:
 
       - name: Install flatpak-builder-tools
         run: pipx install ./node/
-
-      - name: Copy cargo script
-        run: cp cargo/flatpak-cargo-generator.py ../flatpak-cargo-generator.py
 
       # Generate sources
       - name: Checkout Git repository
@@ -79,12 +109,6 @@ jobs:
       - name: Build yarn cache
         run: flatpak-node-generator yarn yarn.lock -o ./deps-dist/yarn-sources.json
 
-      - name: Build npm cache
-        run: flatpak-node-generator npm xal-node/package-lock.json -o ./deps-dist/npm-sources.json
-
-      - name: Build cargo cache
-        run: python3 ../flatpak-cargo-generator.py xal-node/Cargo.lock -o ./deps-dist/cargo-sources.json
-
       - uses: actions/upload-artifact@master
         with:
           name: flatpak-sources
@@ -96,7 +120,7 @@ jobs:
     needs: [cachedeps]
 
     container:
-      image: bilelmoussaoui/flatpak-github-actions:gnome-44
+      image: bilelmoussaoui/flatpak-github-actions:gnome-45
       options: --privileged
 
     steps:
@@ -111,7 +135,7 @@ jobs:
           path: flatpak/
 
       - name: Install Node.js, NPM and Yarn
-        uses: actions/setup-node@v3.8.1
+        uses: actions/setup-node@v4.0.1
         with:
           node-version: 18
 
@@ -122,18 +146,27 @@ jobs:
           path: |
             build/
             .flatpak-builder/
+            flatpak-node/
           key: ${{ runner.os }}-${{ runner.arch }}-flatpak-builder-${{ hashFiles('flatpak/*') }}
           restore-keys: ${{ runner.os }}-${{ runner.arch }}-flatpak-builder-
 
-      - uses: flatpak/flatpak-github-actions/flatpak-builder@v4
+      - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
         with:
           bundle: greenlight.flatpak
-          manifest-path: flatpak/dev.unknownskl.greenlight.yml
+          manifest-path: flatpak/io.github.unknownskl.greenlight.yml
           cache-key: flatpak-builder-${{ github.sha }}
 
+      - name: Release flatpak
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/v')
+        with:
+          files: greenlight.flatpak
+          draft: true
+
   release:
+    name: Build/release Electron app
     runs-on: ${{ matrix.os }}
-    needs: ['lint']
+    needs: ['tests']
 
     strategy:
       matrix:
@@ -146,59 +179,16 @@ jobs:
           submodules: recursive
 
       - name: Install Node.js, NPM and Yarn
-        uses: actions/setup-node@v3.8.1
+        uses: actions/setup-node@v4.0.1
         with:
           node-version: 18
-
-      - run: rustup target add aarch64-apple-darwin
-        if: matrix.os == 'macos-latest'
-
-      - run: New-Item -Name downloads -Path $env:VCPKG_INSTALLATION_ROOT -ItemType Directory
-        if: runner.os == 'Windows'
-      - run: New-Item -Name archives -Path $env:VCPKG_INSTALLATION_ROOT -ItemType Directory
-        if: runner.os == 'Windows'
-      - run: Invoke-WebRequest -Uri https://fossies.org/windows/misc/nasm-2.16.01-win64.zip -OutFile $env:VCPKG_INSTALLATION_ROOT\downloads\nasm-2.16.01-win64.zip
-        if: runner.os == 'Windows'
-      - run: cd $env:VCPKG_INSTALLATION_ROOT && dir && dir $env:VCPKG_INSTALLATION_ROOT
-        if: runner.os == 'Windows'
-
-      - name: Set up vcpkg cache
-        uses: actions/cache@v3
-        continue-on-error: false
-        with:
-          path: |
-            $env:VCPKG_INSTALLATION_ROOT\downloads\
-            $env:VCPKG_INSTALLATION_ROOT\archives\
-          key: ${{ runner.os }}-${{ runner.arch }}-vcpkg
-          restore-keys: ${{ runner.os }}-${{ runner.arch }}-vcpkg-
-        if: runner.os == 'Windows'
-
-      - run: echo "VCPKG_ROOT=$env:VCPKG_INSTALLATION_ROOT" | Out-File -FilePath $env:GITHUB_ENV -Append
-        if: runner.os == 'Windows'
-      - run: vcpkg install openssl:x64-windows-static-md
-        if: runner.os == 'Windows'
-
-      - name: Set up cargo cache
-        uses: actions/cache@v3
-        continue-on-error: false
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/
-            xal-node/target/
-          key: ${{ runner.os }}-${{ runner.arch }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: ${{ runner.os }}-${{ runner.arch }}-cargo-
 
       - name: Set up node_modules cache
         uses: actions/cache@v3
         continue-on-error: false
         with:
           path: |
-            node_modules/           
-            xal-node/node_modules/           
+            node_modules/
           key: ${{ runner.os }}-${{ runner.arch }}-npm-${{ hashFiles('**/package.json') }}-${{ hashFiles('**/yarn.lock') }}
           restore-keys: ${{ runner.os }}-${{ runner.arch }}-npm-
 
@@ -218,7 +208,7 @@ jobs:
         # if: startsWith(github.ref, 'refs/tags/v') 
 
       - name: Publish Linux AppImage
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: greenlight-linux.AppImage
           path: |
@@ -226,7 +216,7 @@ jobs:
         if: matrix.os == 'ubuntu-latest' && contains(github.event.head_commit.message, '[build]')
 
       - name: Publish Linux DEB
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: greenlight-linux.deb
           path: |
@@ -234,7 +224,7 @@ jobs:
         if: matrix.os == 'ubuntu-latest' && contains(github.event.head_commit.message, '[build]')
 
       - name: Publish Mac DMG
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: greenlight-macos.dmg
           path: |
@@ -242,7 +232,7 @@ jobs:
         if: matrix.os == 'macos-latest' && contains(github.event.head_commit.message, '[build]')
 
       - name: Publish Windows EXE
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: greenlight-win.zip
           path: |

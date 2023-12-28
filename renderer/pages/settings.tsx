@@ -102,17 +102,43 @@ function Settings() {
     })
   }
 
+  function setForceRegionIp(e){
+    setSettings({
+      ...settings,
+      force_region_ip: e
+    });
+
+    Ipc.send('app', 'setForceRegionIp', { ip: e }).then((res) => {
+      console.log('Set force region IP:', res)
+    })
+  }
+
   function drawControllers(){
     const gamepads = navigator.getGamepads()
     let controllerHtml = '<h1>Gamepads detected</h1> '
-    controllerHtml += '<p>Below you can view the detected controllers with the amount of axes and buttons. The default Xbox controller has 4 axes, 17 buttons and dual-rumble. Press a button on the controller to active it</p> <div style="padding-left: 20px; padding-top: 10px;">'
+    controllerHtml += '<p>Below you can view the detected controllers with the amount of axes and buttons. ' +
+                      'The default Xbox controller has 4 axes, 17 buttons and dual-rumble. ' + 
+                      'Press a button on the controller to activate it.</p> <div style="padding-left: 20px; padding-top: 10px;">'
+                      
     for(const gamepad in gamepads){
-
-      if(gamepads[gamepad] !== null){
+      let gp_index_one_based = parseInt(gamepad)+1
+      if(gamepads[gamepad] !== null) {
         // console.log(gamepads[gamepad])
-        controllerHtml += '<p>#'+(parseInt(gamepad)+1)+' - '+ gamepads[gamepad].id +' (axes: '+ gamepads[gamepad].axes.length +', buttons: '+ gamepads[gamepad].buttons.length +', rumble: '+ ((gamepads[gamepad] as any).vibrationActuator !== undefined ? (gamepads[gamepad] as any).vibrationActuator.type : 'Not supported') +')</p>'
+        let gp = (gamepads[gamepad] as any)
+        
+        let vibrationActuatorDescription = 'Not Supported'
+        if(gp.vibrationActuator !== null) {
+          vibrationActuatorDescription = gp.vibrationActuator.type
+        }
+        
+        controllerHtml += '<p>#' + gp_index_one_based + ' - '
+        controllerHtml += gp.id + ' ('
+        controllerHtml += 'axes: ' + gp.axes.length
+        controllerHtml += ', buttons: ' + gp.buttons.length
+        controllerHtml += ', rumble: ' + vibrationActuatorDescription
+        controllerHtml += ')' + '</p>'
       } else {
-        controllerHtml += '<p>#'+(parseInt(gamepad)+1)+' - No gamepad detected</p>'
+        controllerHtml += '<p>#' + gp_index_one_based + ' - No gamepad detected</p>'
       }
     }
 
@@ -147,6 +173,18 @@ function Settings() {
           <p>
             Bitrate: <input type="range" min="0" max="102400" step="1024" value={settings.xcloud_bitrate} onChange={ setxCloudBitrate } />
             ({ settings.xcloud_bitrate == 0 ? settings.xcloud_bitrate + " (unlimited)" : Math.floor(settings.xcloud_bitrate / 1024) + " mbps" })
+          </p>
+	  <p>
+            Force Region:
+            <select value={ settings.force_region_ip } defaultValue={ '' } onChange={ (e) => setForceRegionIp(e.target.value) }>
+              <option value="">Disabled</option>
+              <option value="203.41.44.20">Australia</option>
+              <option value="200.221.11.101">Brazil</option>
+              <option value="194.25.0.68">Europe</option>
+              <option value="122.1.0.154">Japan</option>
+              <option value="203.253.64.1">Korea</option>
+              <option value="4.2.2.2">United States</option>
+            </select>
           </p>
         </Card>
 

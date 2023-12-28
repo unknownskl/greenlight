@@ -38,7 +38,8 @@ export const UserProvider = ({ children }) => {
         xcloud_bitrate: 0,
         controller_vibration: true,
         video_size: 'default',
-        input_touch: false,
+        force_region_ip: '',
+	input_touch: false,
         input_mousekeyboard: false,
         input_newgamepad: false,
     })
@@ -56,7 +57,7 @@ export const UserProvider = ({ children }) => {
         console.log('Loading settings from localStorage', settings)
         if (settings) {
             setSettings(JSON.parse(settings))
-        }
+	    }
     }, [])
 
     return <UserContext.Provider value={{ consoles, setConsoles }}>

@@ -3,32 +3,7 @@ import { createWindow } from './helpers'
 import Application from './application'
 import https from 'https'
 
-// Custom loader for xal-node to catch native code errors on stratup
-let XalLibrary = null
-let xalAuthenticator = null
-
-try {
-    XalLibrary = require('../xal-node/src_ts/lib')
-
-    if(XalLibrary.default.XalAuthenticator !== null){
-        try {
-            // Test loading the XalAuthenticator class
-            xalAuthenticator = new XalLibrary.default.XalAuthenticator()
-            // Class loads properly, now lets move the class over..
-            xalAuthenticator.close()
-
-        } catch(error) {
-            dialog.showErrorBox('Startup error', 'XAL Authentication library loaded but was unable to call XalAuthenticator class. Error: ' + XalLibrary)
-            ElectronApp.quit()
-        }
-    } else {
-        dialog.showErrorBox('Startup error', 'XAL Authentication library loaded but was unable to find the XalAuthenticator class. Error: ' + XalLibrary)
-        ElectronApp.quit()
-    }
-} catch(error) {
-    dialog.showErrorBox('Startup error', 'XAL Authentication library failed to load. Error: ' + error)
-    ElectronApp.quit()
-}
+import Xal from 'xal-node'
 
 interface authFlowTokens {
     sisu_local_code_verifier
@@ -79,6 +54,7 @@ export default class Authentication {
 
 
     constructor(application:Application){
+        this._xalAuthenticator = new Xal.XalAuthenticator()
         this._application = application
 
         this.startSilentFlow()
@@ -97,7 +73,6 @@ export default class Authentication {
             this._application.log('authentication', __filename+'[startAuthflow()] Cancelling flow because we are already in an authentication process')
             return
         }
-        this._xalAuthenticator = new XalLibrary.default.XalAuthenticator()
 
         this._xalAuthenticator.get_device_token().then((device_token:any) => {
             this._application.log('authentication', __filename+'[startAuthflow()] get_device_token() returned:', device_token)
@@ -211,7 +186,8 @@ export default class Authentication {
 
     retrieveTokens(code_token, sisu_token){
         this._application.log('authentication', __filename+'[retrieveTokens()] Retrieving tokens...')
-        const xalAuth = xalAuthenticator = new XalLibrary.default.XalAuthenticator()
+        // const xalAuth = xalAuthenticator = new XalLibrary.default.XalAuthenticator()
+        const xalAuth = this._xalAuthenticator
 
         xalAuth.do_xsts_authorization(sisu_token.DeviceToken, sisu_token.TitleToken.Token, sisu_token.UserToken.Token, "http://gssv.xboxlive.com/").then((xsts_token:any) => {
             
@@ -248,6 +224,7 @@ export default class Authentication {
     }
 
     retrieveMSALTokens(code_token, sisu_token, xsts_token, xalAuth){
+        const xalAuthenticator = this._xalAuthenticator
         Promise.all([
             xalAuthenticator.exchange_refresh_token_for_xcloud_transfer_token(code_token.refresh_token),
             xalAuthenticator.do_xsts_authorization(sisu_token.DeviceToken, sisu_token.TitleToken.Token, sisu_token.UserToken.Token, "http://xboxlive.com"),
@@ -328,6 +305,9 @@ export default class Authentication {
 
             } else if(arg.type == 'login') {
                 this.startAuthflow()
+            } else if(arg.type == 'restart'){
+                console.log('Restarting application...')
+                this._application.restart()
             }
         });
     }
@@ -383,7 +363,19 @@ export default class Authentication {
                 path: '/v2/login/user',
             }
 
-            this.request(options, data).then((response:any) => {
+            let headers_ip = {};
+            let fri = this._application._store.get('force_region_ip' ,'')
+            console.log(fri, 'loaded from store')
+            if (fri !== '') {
+                headers_ip = {
+                    "X-Forwarded-For": fri,
+                };
+                console.log("IP spoofed as ", fri)
+            } else {
+                console.log("IP not spoofed")
+            }
+
+            this.request(options, data, headers_ip).then((response:any) => {
                 this._tokens.xcloud.token = response.gsToken
                 this._tokens.xcloud.expires = (Date.now()+response.durationInSeconds)
                 this._tokens.xcloud.market = response.market
@@ -396,7 +388,7 @@ export default class Authentication {
                     }
                 }
 
-            this._application.log('authentication', __filename+'[requestxCloudToken()] Retrieved xHome streaming tokens')
+            this._application.log('authentication', __filename+'[requestxCloudToken()] Retrieved xCloud streaming tokens')
 
                 resolve(response)
             }).catch((error) => {

@@ -55,8 +55,7 @@ export const Preload = {
 
     removeListener(channel:string, listener){
         ipcRenderer.removeListener(channel, listener)
-    }
-
+    },
 };
 
 contextBridge.exposeInMainWorld('Greenlight', Preload);
