@@ -41,6 +41,7 @@ a {
 @import 'components/ui/streamcomponent.css';
 @import 'components/ui/progressbar.css';
 @import 'components/ui/viewportgrid.css';
+@import 'components/ui/breadcrumbbar.css';
 @import 'components/ui/game/title.css';
 
 @import 'components/sidebar/friends.css';

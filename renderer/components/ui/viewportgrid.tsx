@@ -148,7 +148,8 @@ function ViewportGrid({
                 justifyContent: 'space-around',
                 marginTop: 25,
                 // marginBottom: 25,
-                overflow: 'hidden'
+                overflow: 'hidden',
+                height: (maxHeight < 0) ? 'auto' : maxHeight
             }}>
                 { React.Children.map(children, (child, index) => {
                     const offset = (page*showItems)

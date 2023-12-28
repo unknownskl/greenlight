@@ -1,6 +1,9 @@
 import IpcBase from './base'
 import TitleManager from '../helpers/titlemanager'
 
+interface getxCloudTitleArgs {
+    titleId: string
+}
 export default class IpcStore extends IpcBase {
 
     _titleManager = new TitleManager(this._application)
@@ -24,6 +27,13 @@ export default class IpcStore extends IpcBase {
                 reject(error)
             })
 
+        })
+    }
+
+    getxCloudTitle(args:getxCloudTitleArgs){
+        return new Promise((resolve, reject) => {
+            const titles = this._titleManager.findTitle(args.titleId)
+            resolve(titles)
         })
     }
 

@@ -36,6 +36,12 @@ export default class IpcBase {
 
         } else {
             this._application.log('Ipc', 'ERROR: Action was not found:', args.action, 'on channel', channel)
+            this.send(channel, {
+                action: args.action,
+                id: args.id,
+                data: {},
+                error: 'IPC action failure. Action was not found: '+channel+':'+args.action,
+            })
         }
     }
 

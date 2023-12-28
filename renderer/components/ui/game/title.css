@@ -1,8 +1,9 @@
-a.component_gametitle {
+div.component_gametitle {
     position: relative;
+    width: 140px;
 }
 
-a.component_gametitle div.component_gametitle_title {
+div.component_gametitle div.component_gametitle_title {
     background: #000000;
     background: linear-gradient(0deg, rgba(0,135,70,0.5) 50%, rgba(0,0,0,0) 100%);
     position: absolute;
@@ -17,11 +18,11 @@ a.component_gametitle div.component_gametitle_title {
     opacity: 0
 }
 
-a.component_gametitle:hover div.component_gametitle_title {
+div.component_gametitle:hover div.component_gametitle_title {
     opacity: 1;
 }
 
-a.component_gametitle div.component_gametitle_title p {
+div.component_gametitle div.component_gametitle_title p {
     font-size: 13px;
     text-align: center;
     vertical-align: bottom;
@@ -33,6 +34,33 @@ a.component_gametitle div.component_gametitle_title p {
     right: 5px;
 }
 
-a.component_gametitle:hover div.component_gametitle_title p {
+div.component_gametitle:hover div.component_gametitle_title p {
     color: #ffffff;
+}
+
+div.component_gametitle div.component_gametitle_infopage {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    z-index: 100;
+    color: #ffffff;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 12px;
+    opacity: 0;
+    /* z-index: 10; */
+    transition: opacity 0.2s ease-in-out;
+}
+
+div.component_gametitle:hover div.component_gametitle_infopage {
+    opacity: 1;
+}
+
+div.component_gametitle div.component_gametitle_infopage a {
+    color: #ffffff;
+    display: block;
+    border-radius: 10px;
+    width: 18px;
+    height: 18px;
+    border: 1px solid #ffffff;
 }

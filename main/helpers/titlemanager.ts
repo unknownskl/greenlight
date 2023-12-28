@@ -25,6 +25,10 @@ export default class TitleManager {
 
     _xCloudTitles = {}
     _productIdQueue = []
+
+    _xCloudRecentTitles = {}
+    _xCloudRecentTitlesLastUpdate = 0
+
     
     constructor(application){
         this._application = application
@@ -71,7 +75,22 @@ export default class TitleManager {
     }
 
     getRecentTitles(){
-        return this._application._events._xCloudApi.getRecentTitles()
+        return new Promise((resolve, reject) => {
+
+            this._application.log('TitleManager', 'Getting recent titles. Cache expired:', this._xCloudRecentTitlesLastUpdate < Date.now() - 60*1000, 'Remaining:', (this._xCloudRecentTitlesLastUpdate - Date.now() + 60*1000) / 1000)
+            if(this._xCloudRecentTitlesLastUpdate < Date.now() - 60*1000){
+                this._application._events._xCloudApi.getRecentTitles().then((titles:any) => {
+                    this._xCloudRecentTitles = titles
+                    this._xCloudRecentTitlesLastUpdate = Date.now()
+                    resolve(titles)
+                }).catch((error) => {
+                    reject(error)
+                })
+
+            } else {
+                resolve(this._xCloudRecentTitles)
+            }
+        })
     }
 
     populateTitleInfo(titleInfo:titleInfoArgs[]){
@@ -99,6 +118,14 @@ export default class TitleManager {
             if(this._xCloudTitles[title].productId === productId){
                 return this._xCloudTitles[title]
             }
+        }
+
+        return undefined
+    }
+
+    findTitle(titleId:string){
+        if(this._xCloudTitles[titleId] !== undefined){
+            return this._xCloudTitles[titleId]
         }
 
         return undefined

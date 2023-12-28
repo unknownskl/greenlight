@@ -28,15 +28,22 @@ function GameTitle({
 
     return (
         <React.Fragment>
-            <Link href={ `/stream/xcloud_${ titleId }` } className='component_gametitle'>
-              <Image src={ src } alt={ name } width='280' height='280' style={{
-                width: 140,
-                height: 140,
-                borderRadius: '4px',
-              }} ></Image>
+            <div className='component_gametitle'>
+                <div className='component_gametitle_infopage'>
+                    <Link href={ '/xcloud/info/'+titleId } title='View game page'><i className="fa-solid fa-info" /></Link>
+                </div>
 
-              <div className='component_gametitle_title'><p>{ name }</p></div>
-            </Link>
+                <Link href={ `/stream/xcloud_${ titleId }` }>
+
+                    <Image src={ src } alt={ name } width='280' height='280' style={{
+                        width: 140,
+                        height: 140,
+                        borderRadius: '4px',
+                    }} ></Image>
+
+                    <div className='component_gametitle_title'><p>{ name }</p></div>
+                </Link>
+            </div>
         </React.Fragment>
     );
 };
