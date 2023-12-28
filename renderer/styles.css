@@ -18,6 +18,7 @@ body {
     background: rgb(26, 27, 30);
     font-family: "Segoe UI",SegoeUI,"Helvetica Neue",Helvetica,Arial,sans-serif;
     color: #ffffff;
+    text-shadow: 0px 2px 2px rgba(0,0,0,0.5);
 }
 
 a {
@@ -50,6 +51,12 @@ a {
 @import 'components/achievement/row.css';
 @import 'components/achievement/gamerow.css';
 
+/*  
+ * Pages
+ */
+
+@import 'pages/xcloud/info/[titleid].css';
+
 
 div#app_body {
     /* position: fixed; */
@@ -63,6 +70,7 @@ div#app_body {
 
 div#app_body_container{
     padding-top: 70px;
+    position: relative;
 }
 
 div#app_sidebar {

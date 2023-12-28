@@ -9,6 +9,7 @@ import Card from '../../../components/ui/card'
 import { useXcloud } from '../../../context/userContext'
 import BreadcrumbBar from '../../../components/ui/breadcrumbbar';
 import Button from '../../../components/ui/button';
+import Loader from '../../../components/ui/loader';
 
 
 function xCloudInfo() {
@@ -48,14 +49,45 @@ function xCloudInfo() {
         <Link href={ "/xcloud/info/"+router.query.titleid }>{productName}</Link>
       </BreadcrumbBar>
 
-      {(productDetails === undefined) ? <React.Fragment>Loading...</React.Fragment> : <React.Fragment>
-        <div className="product_page">
+      {(productDetails === undefined) ? <React.Fragment><Loader></Loader></React.Fragment> : <React.Fragment>
+      <div id="page_info_background" style={{
+          background: 'linear-gradient(0deg, rgba(26,27,30,1) 0%, rgba(26,27,30,1) 25%, rgba(0,212,255,0) 100%), url(https:'+productDetails?.catalogDetails.Image_Hero.URL+')',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: 'cover'
+        }}></div>
+          
+        <div id="page_info_titleid">
             <h1>{productName}</h1>
-            <Image src={ 'https:'+productDetails?.catalogDetails.Image_Poster.URL } alt={productName} width={ 640/2 } height={ 960/2 } /><br />
+            <h2>by { productDetails.catalogDetails.PublisherName }</h2>
 
-            <Link href={ "/stream/xcloud_"+router.query.titleid }>
-                <Button label={ 'Stream Game' }></Button>
-            </Link>
+            <div id="page_info_titleid_sidebar">
+              <Image src={ 'https:'+productDetails.catalogDetails.Image_Poster.URL } alt={productName} width={ 640/4 } height={ 960/4 } /><br />
+              <br />
+
+              <Link href={ "/stream/xcloud_"+router.query.titleid }>
+                  <Button label={ 'Stream Game' } className='btn-primary'></Button>
+              </Link>
+            </div>
+
+            <div id="page_info_titleid_content">
+              <h3>Description</h3>
+
+              <p>
+                { productDetails.catalogDetails.ProductDescriptionShort }
+              </p>
+
+              <h3>Capabilities</h3>
+
+              <div>
+                {productDetails.catalogDetails.Attributes.map((item, i) => {
+                  if(item.LocalizedName == '')
+                    return;
+
+                  return <span className='page_info_pill' id={ item.Name } key={item.Name }>{item.LocalizedName}</span>
+                })}
+              </div>
+            </div>
         </div>
       </React.Fragment>}
 

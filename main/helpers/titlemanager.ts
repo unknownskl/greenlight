@@ -46,6 +46,7 @@ export default class TitleManager {
 
             const titleIdCache = this._store.get('title.'+titles.results[title].titleId)
             if(titleIdCache === undefined){
+            // if(true){
                 // Item is not stored, lets batch it to load
                 this._productIdQueue.push(titles.results[title].details.productId)
             } else {
@@ -55,7 +56,7 @@ export default class TitleManager {
         }
 
         if(this._productIdQueue.length > 0){
-            this._http.post('catalog.gamepass.com', '/v3/products?market=US&language=en-US&hydration=RemoteLowJade0', {
+            this._http.post('catalog.gamepass.com', '/v3/products?market=US&language=en-US&hydration=RemoteHighSapphire0', { // RemoteLowJade0
                 "Products": this._productIdQueue
             }, {
                 'ms-cv': 0,
