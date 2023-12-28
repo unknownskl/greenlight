@@ -72,7 +72,7 @@ export default class TitleManager {
         }
 
         // We got all info!
-        console.log(this)
+        // console.log(this)
     }
 
     getRecentTitles(){

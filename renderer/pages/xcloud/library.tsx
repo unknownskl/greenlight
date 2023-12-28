@@ -28,8 +28,6 @@ function xCloudLibrary() {
   })
 
   function performFilter(titles){
-    console.log(titles)
-
     if(filter.name != ''){
       titles = titles.filter((item) => {
         return item.catalogDetails.ProductTitle.toLowerCase().includes(filter.name.toLowerCase())
@@ -55,7 +53,6 @@ function xCloudLibrary() {
 
         <input type="text" className="h2-search" placeholder="Search" onChange={
           (e) => {
-            console.log('Applying filter:', e.target.value)
             setFilter({
               name: e.target.value
             })

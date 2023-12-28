@@ -11,7 +11,7 @@ function AchievementGameRow({
   achievement,
   ...props
 }: SidebarFriendItemProps) {
-  console.log(achievement)
+  // console.log(achievement)
 
   return (
     <React.Fragment>
