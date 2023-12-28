@@ -11,6 +11,7 @@ import Loader from '../../components/ui/loader'
 import ViewportGrid from '../../components/ui/viewportgrid';
 import GameTitle from '../../components/ui/game/title';
 import BreadcrumbBar from '../../components/ui/breadcrumbbar';
+import TitleRow from '../../components/xcloud/titleRow';
 
 function xCloudHome() {
   const { xcloudTitles, setXcloudTitles} = useXcloud()
@@ -58,26 +59,9 @@ function xCloudHome() {
         {/* <Link href="/xcloud/library">Library</Link> */}
       </BreadcrumbBar>
 
-      {(xcloudTitles.length == 0) ? '' : <React.Fragment>
-      {/* <React.Fragment> */}
-        <h2 className="title">Recent games</h2><ViewportGrid maxHeight={ 140 }>{
-          (xcloudRecentTitles.length == 0) ? (<p>Loading...</p>) :
-          xcloudRecentTitles.map((item, i) => {
-            // console.log(item.catalogDetails)
-            return (
-                <GameTitle
-                  src={ 'https:'+item.catalogDetails.Image_Tile.URL }
-                  name={ item.catalogDetails.ProductTitle}
-                  titleId={ item.titleId }
-                  key={ item.titleId }
-                ></GameTitle>
-            )
-          })
-        }</ViewportGrid>
-      </React.Fragment>
-      }
+      <TitleRow titles={ xcloudRecentTitles }>Recent Games</TitleRow>
 
-      {(xcloudTitles.length == 0) ? <Card className='padbottom fullsize'>
+      {/* {(xcloudTitles.length == 0) ? <Card className='padbottom fullsize'>
 
           <div style={{
             display: 'flex'
@@ -92,7 +76,9 @@ function xCloudHome() {
               <p>Please wait while we retrieve your xCloud library...</p>
             </div>
           </div>
-        </Card> : <React.Fragment>
+        </Card> :  */}
+        
+        {/* <React.Fragment>
           <h2 className="title">Library &nbsp;
             <Link href="/xcloud/library"><Button label="View Library" className='btn-small'></Button></Link>
           </h2>
@@ -109,7 +95,14 @@ function xCloudHome() {
               )
             })
           }</ViewportGrid>
-        </React.Fragment> }
+        </React.Fragment> */}
+
+        <TitleRow titles={ xcloudTitles }>
+          Library &nbsp;
+          <Link href="/xcloud/library"><Button label="View Library" className='btn-small'></Button></Link>
+        </TitleRow>
+        
+        {/* } */}
 
     </React.Fragment>
   );
