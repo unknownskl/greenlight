@@ -27,6 +27,18 @@ function xCloudLibrary() {
     }
   })
 
+  function performFilter(titles){
+    console.log(titles)
+
+    if(filter.name != ''){
+      titles = titles.filter((item) => {
+        return item.catalogDetails.ProductTitle.toLowerCase().includes(filter.name.toLowerCase())
+      })
+    }
+
+    return titles
+  }
+
   return (
     <React.Fragment>
       <Head>
@@ -38,23 +50,21 @@ function xCloudLibrary() {
         <Link href="/xcloud/library">Library</Link>
       </BreadcrumbBar>
 
-      {(xcloudTitles.length == 0) ? <Card className='padbottom fullsize'>
+      <h2 className="title">
+        Library
 
-          <div style={{
-            display: 'flex'
-          }}>
-            <div style={{
-              paddingRight: 20
-            }}>
-              <Loader></Loader>
-            </div>
-            <div>
-              <h1>Loading xCloud library</h1>
-              <p>Please wait while we retrieve your xCloud library...</p>
-            </div>
-          </div>
-        </Card> : <React.Fragment><h2 className="title">Library</h2><ViewportGrid drawPagination={true}>{
-        xcloudTitles.map((item, i) => {
+        <input type="text" className="h2-search" placeholder="Search" onChange={
+          (e) => {
+            console.log('Applying filter:', e.target.value)
+            setFilter({
+              name: e.target.value
+            })
+          }
+        }></input>
+      </h2>
+      
+      <ViewportGrid drawPagination={true}>{
+        (xcloudTitles.length == 0) ? (<p><Loader></Loader></p>) : performFilter(xcloudTitles).map((item, i) => {
           return (
             <GameTitle
               src={ 'https:'+item.catalogDetails.Image_Tile.URL }
@@ -64,7 +74,7 @@ function xCloudLibrary() {
             ></GameTitle>
           )
         })
-      }</ViewportGrid></React.Fragment> }
+      }</ViewportGrid>
 
     </React.Fragment>
   );

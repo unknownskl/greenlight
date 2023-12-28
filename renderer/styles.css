@@ -93,6 +93,19 @@ h2.title {
     font-size: 20px;
 }
 
+input.h2-search {
+    background: #000000;
+    border-radius: 5px;
+    float: right;
+    padding: 10px;
+    display: block;
+    border: 0px;
+    outline: none;
+    color: #ffffff;
+    margin-right: 10px;
+    min-width: 200px;
+}
+
 /**
  Loading animation
 **/

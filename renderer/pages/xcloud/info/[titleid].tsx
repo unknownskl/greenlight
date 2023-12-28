@@ -51,15 +51,18 @@ function xCloudInfo() {
 
       {(productDetails === undefined) ? <React.Fragment><Loader></Loader></React.Fragment> : <React.Fragment>
       <div id="page_info_background" style={{
-          background: 'linear-gradient(0deg, rgba(26,27,30,1) 0%, rgba(26,27,30,1) 25%, rgba(0,212,255,0) 100%), url(https:'+productDetails?.catalogDetails.Image_Hero.URL+')',
+          background: 'linear-gradient(0deg, rgba(26,27,30,0.7) 0%, rgba(26,27,30,0.7) 90%, rgba(26,27,30,0.7) 100%), url(https:'+productDetails?.catalogDetails.Image_Hero.URL+')',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
           backgroundSize: 'cover'
         }}></div>
           
         <div id="page_info_titleid">
-            <h1>{productName}</h1>
-            <h2>by { productDetails.catalogDetails.PublisherName }</h2>
+
+            <div id="page_info_hero">
+              <h1>{productName}</h1>
+              <h2>by { productDetails.catalogDetails.PublisherName }</h2>
+            </div>
 
             <div id="page_info_titleid_sidebar">
               <Image src={ 'https:'+productDetails.catalogDetails.Image_Poster.URL } alt={productName} width={ 640/4 } height={ 960/4 } /><br />
