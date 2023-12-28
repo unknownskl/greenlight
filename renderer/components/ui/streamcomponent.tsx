@@ -219,6 +219,8 @@ function StreamComponent({
     };
   }, []);
 
+
+
   function toggleMic(){
     if(xPlayer.getChannelProcessor('chat').isPaused === true){
       xPlayer.getChannelProcessor('chat').startMic()
@@ -234,7 +236,7 @@ function StreamComponent({
     // onDisconnect()
 
     window.history.back()
-    xPlayer.reset()
+    // xPlayer.reset()
   }
 
   function endStream(){
@@ -243,7 +245,7 @@ function StreamComponent({
       onDisconnect()
       
       window.history.back()
-      xPlayer.reset()
+      // xPlayer.reset()
     }
   }
 
