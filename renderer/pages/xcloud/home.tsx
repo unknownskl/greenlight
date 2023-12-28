@@ -140,8 +140,10 @@ function xCloudLibrary() {
         <title>Greenlight - xCloud Library</title>
       </Head>
 
-      {(xcloudRecentTitles.length == 0) ? '' : <React.Fragment>
+      {(xcloudTitles.length == 0) ? '' : <React.Fragment>
+      {/* <React.Fragment> */}
         <h2 className="title">Recent games</h2><ViewportGrid maxHeight={ 140 }>{
+          (xcloudRecentTitles.length == 0) ? (<p>Loading...</p>) :
           xcloudRecentTitles.map((item, i) => {
             // console.log(item.catalogDetails)
             return (
@@ -153,7 +155,9 @@ function xCloudLibrary() {
                 ></GameTitle>
             )
           })
-        }</ViewportGrid></React.Fragment> }
+        }</ViewportGrid>
+      </React.Fragment>
+      }
 
       {(xcloudTitles.length == 0) ? <Card className='padbottom fullsize'>
 

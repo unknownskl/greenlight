@@ -29,6 +29,9 @@ function ViewportGrid({
             if(now-resizeLastUpdate > 250){
                 const element = document.getElementById('component_viewportgrid_'+randomId)
 
+                if(element === null || element.parentElement === null)
+                    return;
+
                 const parentHeight = element.parentElement.parentElement.offsetTop+element.parentElement.parentElement.clientHeight
                 const parentWidth = element.parentElement.parentElement.offsetLeft+element.parentElement.parentElement.clientWidth
                 let newElementHeight = (maxHeight < 0) ? (parentHeight-element.offsetTop) : maxHeight
@@ -53,7 +56,7 @@ function ViewportGrid({
         resizeEvent()
         const resizeInterval = setInterval(() => {
             resizeEvent()
-        }, 1000)
+        }, 250)
 
         return () => {
             // Unmount
@@ -107,7 +110,13 @@ function ViewportGrid({
       
         buttons.push((<Button onClick={ prevPage } disabled={page <= 0} className='btn-small' label="Previous page"></Button>))
         for(let i=1; i <= totalPages; i++){
-          buttons.push((<Button key={i} label={i.toString()} className={ page == (i-1) ? 'btn-small btn-primary': 'btn-small' } onClick={ () => { gotoPage(i) }}></Button>))
+          if(i == 1 || (i > (page-4) && i <= (page+5)) || i == totalPages){
+            buttons.push((<Button key={i} label={i.toString()} className={ page == (i-1) ? 'btn-small btn-primary': 'btn-small' } onClick={ () => { gotoPage(i) }}></Button>))
+          } else {
+            if(i == (page-4) || i == (page+6)){
+                buttons.push((<Button key={i} label='...' disabled={true} className={ 'btn-small btn-disabled' }></Button>))
+            }
+          }
         }
         buttons.push((<Button onClick={ nextPage } disabled={page >= totalPages-1} className='btn-small' label="Next page"></Button>))
     
@@ -139,7 +148,7 @@ function ViewportGrid({
                 justifyContent: 'space-around',
                 marginTop: 25,
                 // marginBottom: 25,
-                // overflow: 'hidden'
+                overflow: 'hidden'
             }}>
                 { React.Children.map(children, (child, index) => {
                     const offset = (page*showItems)
@@ -153,7 +162,7 @@ function ViewportGrid({
                         height: 155,
                         width: 145,
                         // padding: 5,
-                        justifyContent: 'center',
+                        // justifyContent: 'center',
                         // verticalAlign: 'middle'
                     }}>{ React.cloneElement(child) }</div> )
                 }) }
