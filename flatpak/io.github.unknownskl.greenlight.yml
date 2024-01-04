@@ -1,4 +1,4 @@
-app-id: dev.unknownskl.greenlight
+app-id: io.github.unknownskl.greenlight
 runtime: org.freedesktop.Platform
 runtime-version: '23.08'
 sdk: org.freedesktop.Sdk
@@ -6,8 +6,6 @@ base: org.electronjs.Electron2.BaseApp
 base-version: '23.08'
 sdk-extensions:
   - org.freedesktop.Sdk.Extension.node18
-platform-extensions:
-  - org.freedesktop.Platform.VAAPI.Intel
 command: run.sh
 separate-locales: false
 finish-args:
@@ -17,8 +15,6 @@ finish-args:
   - --share=network
   - --allow=bluetooth
   - --device=all
-  - --device=dri
-  - --allow=per-app-dev-shm
   - --filesystem=/run/udev:ro
 build-options:
   append-path: /usr/lib/sdk/node18/bin
@@ -34,40 +30,46 @@ modules:
         npm_config_offline: 'true'
         yarn_config_cache: /run/build/greenlight/flatpak-node/yarn-mirror
     build-commands:
-      - pwd
-      - ls -alF ../ ./
       - cp -a ../extralib -t /app/
       - yarn --offline
-      - yarn run flatpak-build --offline -- $ELECTRON_BUILDER_ARCH_ARGS --linux
+      - yarn run flatpak-build --offline -- --linux
+      # Add icon, metadata and desktop file
+      - install -Dm 644 flatpak/io.github.unknownskl.greenlight.png ${FLATPAK_DEST}/share/icons/hicolor/512x512/apps/${FLATPAK_ID}.png
+      - install -Dm 644 flatpak/io.github.unknownskl.greenlight.desktop ${FLATPAK_DEST}/share/applications/${FLATPAK_ID}.desktop
+      - install -Dm 644 flatpak/io.github.unknownskl.greenlight.metainfo.xml ${FLATPAK_DEST}/share/metainfo/${FLATPAK_ID}.appdata.xml
       # Bundle app and dependencies
       - cp -a dist/linux*unpacked /app/main
       # Install app wrapper
       - install -Dm755 -t /app/bin/ ../run.sh
-      - ls -la /app /app/bin /app/main
     subdir: main
     sources:
+      # Build from source
       - type: dir
         path: ..
         dest: main
-      # - type: dir
-      #   path: ./amd-patched-mesa/extralib
-      #   dest: extralib
+      # - type: git
+      #   url: https://github.com/unknownskl/greenlight
+      #   tag: v2.0.0-beta15
+      #   commit: 862b0e2502eeb9539126ba7a8d4aeb630a41b148
+      #   dest: main
       - type: git
         url: https://github.com/Originalimoc/amd-patched-mesa
         dest: extralib
         commit: "dd468982c84d77b1679a45f082af102b665dfd26"
       - yarn-sources.json
-      # Wrapper to launch the app
-      - type: file
-        path: yarnrc
+      - type: inline
         dest-filename: .yarnrc
+        contents: |
+          yarn-offline-mirror "/run/build/greenlight/flatpak-node/yarn-mirror"
+          yarn-offline-mirror-pruning true
+      # Wrapper to launch the app
       - type: script
         dest-filename: run.sh
         commands:
-          - ls -la /app/bin
-          - export LIBGL_DRIVERS_PATH=/app/extralib/dri:/usr/lib/x86_64-linux-gnu/dri/intel-vaapi-driver:/usr/lib/x86_64-linux-gnu/dri:${LIBGL_DRIVERS_PATH}
-          - export LIBVA_DRIVERS_PATH=/app/extralib/dri:/usr/lib/x86_64-linux-gnu/dri/intel-vaapi-driver:/usr/lib/x86_64-linux-gnu/dri:${LIBVA_DRIVERS_PATH}
+          - export LIBGL_DRIVERS_PATH=/app/extralib/dri:/usr/lib/x86_64-linux-gnu/dri/intel-vaapi-driver:/usr/lib/x86_64-linux-gnu/GL/default/lib/dri/:${LIBGL_DRIVERS_PATH}
+          - export LIBVA_DRIVERS_PATH=/app/extralib/dri:/usr/lib/x86_64-linux-gnu/dri/intel-vaapi-driver:/usr/lib/x86_64-linux-gnu/GL/default/lib/dri/:${LIBVA_DRIVERS_PATH}
           - export VK_ICD_FILENAMES=/app/extralib/icd.d/intel_icd.x86_64.json:/app/extralib/icd.d/radeon_icd.x86_64.json:/app/extralib/icd.d/virtio_icd.x86_64.json:/app/extralib/icd.d/intel_hasvk_icd.x86_64.json:/app/extralib/icd.d/lvp_icd.x86_64.json:${VK_ICD_FILENAMES}
           - export LD_LIBRARY_PATH=/app/extralib:${LD_LIBRARY_PATH}
           - echo runtime LD_LIBRARY_PATH = $LD_LIBRARY_PATH
+          - echo runtime ARCH = $(uname -m)-$(uname -s | tr '[:upper:]' '[:lower:]')
           - zypak-wrapper.sh /app/main/greenlight "$@"

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Greenlight
+Comment=Greenlight is an open-source client for xCloud and Xbox home streaming
+Icon=io.github.unknownskl.greenlight
+Exec=run.sh
+Terminal=false
+StartupWMClass=greenlight
+Categories=Network;Game;
+Keywords=Game;Streaming;Xbox;xCloud;Console;

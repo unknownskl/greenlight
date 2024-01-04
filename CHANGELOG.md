@@ -1,9 +1,16 @@
 # Changelog
 
-## v2.0.0 - 2023-xx-xx
+## v2.x.x - 2024-xx-xx
+- Fix vibration detection #1076 #813 (credits to @LostVector and @opencv4nodejs)
+
+## v2.0.1 - 2023-12-20
+- Bump version to align with Flathub Release
+
+## v2.0.0 - 2023-12-20
 - Add patch to remove region restriction on xCloud #850 (credits to @pccr10001)
 - Device info updated to stream true 1080p feed from xCloud (credits to @FatCache)
 - Flatpak manual build script and AMD VAAPI fix (credits to @Originalimoc)
+- Now also released on Flathub 🎉
 
 ## v2.0.0-beta15 - 2023-11-28
 - Updated xal-node library and removed Rust dependencies. Fixes #1000 #898 #899 #815
