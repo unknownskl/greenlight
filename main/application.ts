@@ -39,6 +39,8 @@ export default class Application {
         this._log = Debug('greenlight')
 
         ElectronApp.commandLine.appendSwitch('enable-features', 'VaapiVideoDecoder');
+        ElectronApp.commandLine.appendSwitch('disable-features', 'UseChromeOSDirectVideoDecoder');
+        ElectronApp.commandLine.appendSwitch('enable-gpu-rasterization');
 
         this.readStartupFlags()
         this.loadApplicationDefaults()
