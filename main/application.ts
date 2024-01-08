@@ -38,9 +38,12 @@ export default class Application {
         console.log(__filename+'[constructor()] Starting Greenlight v'+pkg.version)
         this._log = Debug('greenlight')
 
-        ElectronApp.commandLine.appendSwitch('enable-features', 'VaapiVideoDecoder');
+        ElectronApp.commandLine.appendSwitch('enable-features', 'VaapiIgnoreDriverChecks,VaapiVideoDecoder,PlatformHEVCDecoderSupport,CanvasOopRasterization');
         ElectronApp.commandLine.appendSwitch('disable-features', 'UseChromeOSDirectVideoDecoder');
         ElectronApp.commandLine.appendSwitch('enable-gpu-rasterization');
+        ElectronApp.commandLine.appendSwitch('enable-oop-rasterization');
+        ElectronApp.commandLine.appendSwitch('accelerated-video-decode');
+        ElectronApp.commandLine.appendSwitch('ozone-platform-hint', 'x11');
 
         this.readStartupFlags()
         this.loadApplicationDefaults()
