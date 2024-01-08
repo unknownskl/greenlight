@@ -108,7 +108,6 @@ export default class Application {
             this.log('electron', __filename+'[loadApplicationDefaults()] Electron has been fully loaded. Ready to open windows')
 
             this.openMainWindow()
-            this.openGPUWindow()
             this._authentication.startWebviewHooks()
         
             // Check authentication
@@ -174,6 +173,7 @@ export default class Application {
             
             if(this._isCi !== true){
                 this._mainWindow.webContents.openDevTools();
+                this.openGPUWindow();
             }
         }
     }
