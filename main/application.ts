@@ -108,6 +108,7 @@ export default class Application {
             this.log('electron', __filename+'[loadApplicationDefaults()] Electron has been fully loaded. Ready to open windows')
 
             this.openMainWindow()
+            this.openGPUWindow()
             this._authentication.startWebviewHooks()
         
             // Check authentication
@@ -175,6 +176,21 @@ export default class Application {
                 this._mainWindow.webContents.openDevTools();
             }
         }
+    }
+
+    _gpuWindow
+
+    openGPUWindow(){
+        this._gpuWindow = new BrowserWindow({
+            width: 800,
+            height: 600,
+        });
+
+        // Load chrome://gpu
+        this._gpuWindow.loadURL('chrome://gpu');
+
+        // Open DevTools
+        this._gpuWindow.webContents.openDevTools();
     }
 
     quit(){
