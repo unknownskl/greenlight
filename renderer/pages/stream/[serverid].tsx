@@ -70,6 +70,7 @@ function Stream() {
       } else if(event.state == 'closed') {
         // Client has been disconnected. Lets return to home.
         xPlayer.reset()
+        window.history.back()
       }
     }
   })

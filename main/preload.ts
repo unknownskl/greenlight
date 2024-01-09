@@ -19,8 +19,10 @@ export const Preload = {
                     
                     if(args.error === undefined)
                         resolve(args.data)
-                    else
+                    else {
+                        alert(args.error)
                         reject(args.error)
+                    }
                 }
             }
 

@@ -1,0 +1,81 @@
+div#page_info_background {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: #000000;
+    /* z-index: 10; */
+}
+
+div#page_info_hero {
+    vertical-align: middle;
+    padding-top: 20px;
+    padding-bottom: 30px;
+}
+
+div#page_info_titleid {
+    width: 100%;
+    position: relative;
+
+    padding-top: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+div#page_info_titleid h1 {
+    font-size: 24px;
+    font-weight: 400;
+    padding-top: 20px;
+}
+
+div#page_info_titleid h2 {
+    font-size: 14px;
+    font-weight: 400;
+    padding-top: 10px;
+    padding-bottom: 20px;
+    opacity: 0.7;
+}
+
+div#page_info_titleid_sidebar {
+    float: left;
+    width: 25%;
+}
+
+div#page_info_titleid_content {
+    float: right;
+    width: 65%;
+    margin-right: 10%;
+    box-sizing: border-box;
+}
+
+div#page_info_titleid_content h3 {
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 150%;
+    padding-bottom: 10px;
+}
+
+div#page_info_titleid_content p {
+    font-size: 14px;
+    line-height: 150%;
+    padding-bottom: 20px;
+    text-shadow: 0px 2px 2px rgba(0,0,0,0.5);
+}
+
+span.page_info_pill {
+    font-size: 14px;
+    background: #272727;
+    border: 1px solid rgba(255,255,255, 0.5);
+    border-radius: 10px;
+    display: inline-block;
+    padding-top: 4px;
+    height: 22px;
+    padding-left: 10px;
+    padding-right: 10px;
+    opacity: 0.7;
+    margin: 5px;
+}

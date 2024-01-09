@@ -38,7 +38,14 @@ export default class Application {
         console.log(__filename+'[constructor()] Starting Greenlight v'+pkg.version)
         this._log = Debug('greenlight')
 
-        ElectronApp.commandLine.appendSwitch('enable-features', 'VaapiVideoDecoder');
+        ElectronApp.commandLine.appendSwitch('enable-features', 'VaapiIgnoreDriverChecks,VaapiVideoDecoder,PlatformHEVCDecoderSupport,CanvasOopRasterization');
+        ElectronApp.commandLine.appendSwitch('disable-features', 'UseChromeOSDirectVideoDecoder');
+        ElectronApp.commandLine.appendSwitch('enable-gpu-rasterization');
+        ElectronApp.commandLine.appendSwitch('enable-oop-rasterization');
+        ElectronApp.commandLine.appendSwitch('accelerated-video-decode');
+        ElectronApp.commandLine.appendSwitch('ozone-platform-hint', 'x11');
+        ElectronApp.commandLine.appendSwitch('ignore-gpu-blocklist');
+        ElectronApp.commandLine.appendSwitch('enable-zero-copy');
 
         this.readStartupFlags()
         this.loadApplicationDefaults()
@@ -49,6 +56,8 @@ export default class Application {
         this._ipc = new Ipc(this)
         this._authentication = new Authentication(this)
         this._xboxWorker = new xboxWorker(this)
+
+        this._ipc.startUp()
     }
 
     log(namespace = 'application', ...args){
@@ -173,8 +182,24 @@ export default class Application {
             
             if(this._isCi !== true){
                 this._mainWindow.webContents.openDevTools();
+                this.openGPUWindow();
             }
         }
+    }
+
+    _gpuWindow
+
+    openGPUWindow(){
+        this._gpuWindow = new BrowserWindow({
+            width: 800,
+            height: 600,
+        });
+
+        // Load chrome://gpu
+        this._gpuWindow.loadURL('chrome://gpu');
+
+        // Open DevTools
+        this._gpuWindow.webContents.openDevTools();
     }
 
     quit(){

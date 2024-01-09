@@ -18,6 +18,7 @@ body {
     background: rgb(26, 27, 30);
     font-family: "Segoe UI",SegoeUI,"Helvetica Neue",Helvetica,Arial,sans-serif;
     color: #ffffff;
+    text-shadow: 0px 2px 2px rgba(0,0,0,0.5);
 }
 
 a {
@@ -40,12 +41,21 @@ a {
 @import 'components/ui/label.css';
 @import 'components/ui/streamcomponent.css';
 @import 'components/ui/progressbar.css';
+@import 'components/ui/viewportgrid.css';
+@import 'components/ui/breadcrumbbar.css';
+@import 'components/ui/game/title.css';
 
 @import 'components/sidebar/friends.css';
 @import 'components/sidebar/frienditem.css';
 
 @import 'components/achievement/row.css';
 @import 'components/achievement/gamerow.css';
+
+/*  
+ * Pages
+ */
+
+@import 'pages/xcloud/info/[titleid].css';
 
 
 div#app_body {
@@ -60,6 +70,7 @@ div#app_body {
 
 div#app_body_container{
     padding-top: 70px;
+    position: relative;
 }
 
 div#app_sidebar {
@@ -72,6 +83,27 @@ div#app_sidebar {
 
     backdrop-filter: blur(20px);
     background: rgba(0, 0, 0, 0.3);
+}
+
+h2.title {
+    font-weight: 400;
+    padding-top: 15px;
+    padding-left: 10px;
+    margin: 0px;
+    font-size: 20px;
+}
+
+input.h2-search {
+    background: #000000;
+    border-radius: 5px;
+    float: right;
+    padding: 10px;
+    display: block;
+    border: 0px;
+    outline: none;
+    color: #ffffff;
+    margin-right: 10px;
+    min-width: 200px;
 }
 
 /**

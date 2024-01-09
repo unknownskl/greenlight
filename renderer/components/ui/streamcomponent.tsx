@@ -246,6 +246,8 @@ function StreamComponent({
     };
   }, []);
 
+
+
   function toggleMic(){
     if(xPlayer.getChannelProcessor('chat').isPaused === true){
       xPlayer.getChannelProcessor('chat').startMic()
@@ -261,7 +263,7 @@ function StreamComponent({
     // onDisconnect()
 
     window.history.back()
-    xPlayer.reset()
+    // xPlayer.reset()
   }
 
   function endStream(){
@@ -270,7 +272,7 @@ function StreamComponent({
       onDisconnect()
       
       window.history.back()
-      xPlayer.reset()
+      // xPlayer.reset()
     }
   }
 
@@ -336,7 +338,7 @@ function StreamComponent({
               width: '25%'
             }}>
               <Button label={<span><i className="fa-solid fa-xmark"></i> End Stream</span>} className='btn-cancel' onClick={ () => { endStream() } }></Button> &nbsp;
-              <Button label={<span><i className="fa-solid fa-xmark"></i> Disconnect</span>} className='btn' onClick={ () => { streamDisconnect() } }></Button>
+              <Button label={<span><i className="fa-solid fa-xmark"></i></span>} className='btn' onClick={ () => { streamDisconnect() } }></Button>
             </div>
 
             <div style={{

@@ -37,6 +37,13 @@ export default class IpcStreaming extends IpcBase {
     }
 
     startStream(args:startStreamArgs){
+
+        if(args.type == 'home'){
+            this._application._ipc._channels.consoles._consolesLastUpdate = 0
+        } else {
+            this._application._ipc._channels.xCloud._recentTitlesLastUpdate = 0
+        }
+
         return this._streamManager.startStream(args.type, args.target)
     }
 

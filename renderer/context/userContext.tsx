@@ -39,7 +39,7 @@ export const UserProvider = ({ children }) => {
         controller_vibration: true,
         video_size: 'default',
         force_region_ip: '',
-	input_touch: false,
+	    input_touch: false,
         input_mousekeyboard: false,
         input_newgamepad: false,
     })

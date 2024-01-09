@@ -7,4 +7,14 @@ module.exports = {
 
     return config;
   },
+
+  images: {
+    unoptimized: true,
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'store-images.s-microsoft.com',
+      },
+    ],
+  }
 };

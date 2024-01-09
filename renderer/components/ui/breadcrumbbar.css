@@ -1,0 +1,44 @@
+#app_body_container .component_breadcrumbbar_push {
+  height: 32px;
+}
+
+#app_body_container .component_breadcrumbbar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0 0 0 0;
+    margin: 0 0 0 0;
+    height: 32px;
+    width: 70vw;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+    box-sizing: border-box;
+    overflow: hidden;
+    font-size: 14px;
+    color: #ffffff;
+    position: fixed;
+    z-index: 11;
+}
+
+#app_body_container .component_breadcrumbbar a {
+    color: #ffffff;
+    text-decoration: none;
+
+    margin-left: 10px;
+}
+
+#app_body_container .component_breadcrumbbar a:after {
+    content: ">";
+    margin-left: 10px;
+    margin-right: 0px;
+}
+
+#app_body_container .component_breadcrumbbar a:last-child:after {
+    content: "";
+}
+
+#app_body_container .component_breadcrumbbar a:first-child {
+  margin-left: 20px;
+  color: rgba(255, 255, 255, 0.6);
+}

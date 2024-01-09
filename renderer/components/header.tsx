@@ -22,7 +22,7 @@ function Header({
   ...props
 }: HeaderProps) {
 
-  console.log('level:', level)
+  // console.log('level:', level)
   const [headerLinks, setHeaderLinks] = React.useState([])
 
   function createLinks(level){

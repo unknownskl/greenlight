@@ -156,7 +156,11 @@ export default class xCloudApi {
     }
 
     getTitles() {
-        return this.get('/v1/titles')
+        return this.get('/v2/titles')
+    }
+
+    getRecentTitles() {
+        return this.get('/v2/titles/mru?mr=25')
     }
 
     stopStream(sessionId) {
