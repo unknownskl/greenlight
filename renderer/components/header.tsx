@@ -42,7 +42,7 @@ function Header({
       },{
         name: 'Settings',
         title: 'Change application settings',
-        url: '/settings'
+        url: '/settings/home'
       },{
         name: gamertag,
         title: 'View profile',
@@ -57,7 +57,7 @@ function Header({
       },{
         name: 'Settings',
         title: 'Change application settings',
-        url: '/settings'
+        url: '/settings/home'
       },{
         name: gamertag,
         title: 'View profile',

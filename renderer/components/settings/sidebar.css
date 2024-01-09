@@ -1,0 +1,54 @@
+div#component_settings_sidebar{
+    position: absolute;
+    top: 70px;
+    bottom: 0px;
+    left: 0px;
+    right: 30vw;
+}
+
+div#component_settings_sidebar_menu {
+    position: absolute;
+    width: 200px;
+    top: 0px;
+    left: 0px;
+    bottom: 0px;
+    background: rgba(0,0,0, 0.2);
+}
+
+div#component_settings_sidebar_menu ul {
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+}
+
+div#component_settings_sidebar_menu ul li {
+    border-bottom: 1px solid rgba(0,0,0, 0.2);
+    cursor: pointer;
+    font-size: 14px;
+}
+
+div#component_settings_sidebar_menu ul li a {
+    padding: 15px;
+    display: block;
+    color: rgba(255,255,255, 0.6);
+    text-decoration: none;
+}
+
+div#component_settings_sidebar_menu ul li.active a {
+    background: rgba(0,0,0, 0.2);
+}
+
+div#component_settings_sidebar_menu ul li:hover a {
+    background: rgba(0,128,0, 0.5);
+}
+
+
+div#component_settings_sidebar_content {
+    position: absolute;
+    top: 0px;
+    left: 200px;
+    right: 0px;
+    bottom: 0px;
+    padding-top: 20px;
+    overflow-y: auto;
+}

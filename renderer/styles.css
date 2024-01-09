@@ -51,11 +51,14 @@ a {
 @import 'components/achievement/row.css';
 @import 'components/achievement/gamerow.css';
 
+@import 'components/settings/sidebar.css';
+
 /*  
  * Pages
  */
 
 @import 'pages/xcloud/info/[titleid].css';
+@import 'pages/settings/home.css';
 
 
 div#app_body {
@@ -70,7 +73,7 @@ div#app_body {
 
 div#app_body_container{
     padding-top: 70px;
-    position: relative;
+    /* position: relative; */
 }
 
 div#app_sidebar {

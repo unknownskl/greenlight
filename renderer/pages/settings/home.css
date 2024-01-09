@@ -1,0 +1,69 @@
+div#component_settings_sidebar_content h1 {
+    padding-bottom: 20px;
+}
+
+div#component_settings_sidebar_content h2 {
+    /* padding: 20px; */
+}
+
+div#component_settings_sidebar_content p {
+    /* padding: 20px; */
+    padding-bottom: 20px;
+}
+
+div#component_settings_sidebar_content p a {
+    color: #ffffff;
+}
+
+div#component_settings_sidebar_content ul.kv-list {
+    list-style: none;
+    margin: 0px;
+    padding: 20px;
+    padding-top: 0px;
+    /* column-count: 2; */
+}
+
+div#component_settings_sidebar_content ul.kv-list li {
+    display: block;
+    box-sizing: border-box;
+    padding: 3px;
+    font-size: 14px;
+}
+
+div#component_settings_sidebar_content label {
+    font-weight: bold;
+    min-width: 250px;
+    display: inline-block;
+}
+
+div#component_settings_sidebar_content select {
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 5px;
+    padding: 10px;
+    display: inline-block;
+    border: 0px;
+    outline: none;
+    color: #ffffff;
+    margin-right: 10px;
+    min-width: 200px;
+}
+
+div#component_settings_sidebar_content input[type="range"] {
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 5px;
+    /* padding: 10px; */
+    display: inline-block;
+    border: 0px;
+    outline: none;
+    color: #ffffff;
+    margin-right: 10px;
+    min-width: 200px;
+}
+
+div#component_settings_sidebar_content input[type='checkbox'] {
+    position: relative;
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+    top: 3px;
+}

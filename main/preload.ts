@@ -1,4 +1,5 @@
-import { contextBridge, ipcRenderer } from 'electron';
+import { contextBridge, ipcRenderer, shell } from 'electron';
+import pkg from '../package.json';
 
 export const Preload = {
 
@@ -58,6 +59,14 @@ export const Preload = {
     removeListener(channel:string, listener){
         ipcRenderer.removeListener(channel, listener)
     },
+
+    openExternal(url:string){
+        shell.openExternal(url)
+    },
+
+    getVersion(url:string){
+        return pkg.version
+    }
 };
 
 contextBridge.exposeInMainWorld('Greenlight', Preload);

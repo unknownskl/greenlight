@@ -24,7 +24,7 @@ div#streamComponent.size_zoom video {
 }
 
 div#component_streamcomponent_debug {
-    z-index: 98;
+    z-index: 97;
 
     backdrop-filter: blur(20px);
     background: rgba(0, 0, 0, 0.3);
@@ -66,7 +66,7 @@ div#component_streamcomponent_debug.hidden {
 }
 
 div#component_streamcomponent_gamebar {
-    z-index: 97;
+    z-index: 98;
 
     backdrop-filter: blur(20px);
     background: rgba(0, 0, 0, 0.3);

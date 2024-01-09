@@ -9,7 +9,7 @@ div.component_card {
     border-radius: 20px;
 
     backdrop-filter: blur(20px);
-    background: rgba(0, 0, 0, 0.55);
+    background: rgba(0, 0, 0, 0.3);
     max-width: 100%;
 }
 

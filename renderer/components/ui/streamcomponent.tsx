@@ -337,16 +337,16 @@ function StreamComponent({
           <div style={{
               width: '25%'
             }}>
-              <Button label={<span><i className="fa-solid fa-xmark"></i> End Stream</span>} className='btn-cancel' onClick={ () => { endStream() } }></Button> &nbsp;
-              <Button label={<span><i className="fa-solid fa-xmark"></i></span>} className='btn' onClick={ () => { streamDisconnect() } }></Button>
+              <Button label={<span><i className="fa-solid fa-xmark"></i> End Stream</span>} title="End Stream" className='btn-cancel' onClick={ () => { endStream() } }></Button> &nbsp;
+              <Button label={<span><i className="fa-solid fa-xmark"></i></span>} title="Disconnect" className='btn' onClick={ () => { streamDisconnect() } }></Button>
             </div>
 
             <div style={{
               marginLeft: 'auto',
               marginRight: 'auto'
             }}>
-              <Button label={ <span><i className="fa-brands fa-xbox"></i> Menu</span> } onClick={ (e) => { e.target.blur(); onMenu(e) }}></Button> &nbsp;
-              <Button label={ (micStatus === false) ? <span><i className="fa-solid fa-microphone-slash"></i> Muted</span> : <span><i className="fa-solid fa-microphone"></i> Active</span> } className={ (micStatus === false) ? 'btn-cancel' : 'btn-primary' } onClick={ (e) => { e.target.blur(); toggleMic() }}></Button>
+              <Button label={ <span><i className="fa-brands fa-xbox"></i> Menu</span> } title="Open Xbox menu" onClick={ (e) => { e.target.blur(); onMenu(e) }}></Button> &nbsp;
+              <Button label={ (micStatus === false) ? <span><i className="fa-solid fa-microphone-slash"></i> Muted</span> : <span><i className="fa-solid fa-microphone"></i> Active</span> } title={ (micStatus === false) ? 'Enable mic' : 'Disable mic' } className={ (micStatus === false) ? 'btn-cancel' : 'btn-primary' } onClick={ (e) => { e.target.blur(); toggleMic() }}></Button>
             </div>
 
             <div style={{
@@ -354,7 +354,7 @@ function StreamComponent({
               width: '25%',
               textAlign: 'right'
             }}>
-              <Button label={ <i className="fa-solid fa-bug"></i> } onClick={ (e) => { e.target.blur(); toggleDebug() } }></Button>
+              <Button label={ <i className="fa-solid fa-bug"></i> } title="Debug" onClick={ (e) => { e.target.blur(); toggleDebug() } }></Button>
             </div>
           </div>
         </div>
@@ -366,8 +366,6 @@ function StreamComponent({
           <div id="component_streamcomponent_debug_webrtc_dropped"></div>
 
           <div id="component_streamcomponent_debug_text"></div>
-
-          {/* <Button label="Disconnect" onClick={ () => { streamDisconnect() } }></Button> */}
         </div>
       </div>
     </React.Fragment>

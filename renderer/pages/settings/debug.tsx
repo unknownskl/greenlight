@@ -1,0 +1,64 @@
+import React from 'react';
+import Head from 'next/head';
+import Link from 'next/link';
+
+import Ipc from '../../lib/ipc'
+
+import Card from '../../components/ui/card'
+import { useXcloud } from '../../context/userContext'
+import Button from '../../components/ui/button'
+import Loader from '../../components/ui/loader'
+import ViewportGrid from '../../components/ui/viewportgrid';
+import GameTitle from '../../components/ui/game/title';
+import BreadcrumbBar from '../../components/ui/breadcrumbbar';
+import TitleRow from '../../components/xcloud/titleRow';
+import SettingsSidebar from '../../components/settings/sidebar';
+
+function SettingsDebug() {
+  const [appDebug, setAppDebug] = React.useState([])
+
+  React.useEffect(() => {
+    if(appDebug.length === 0){
+      Ipc.send('app', 'debug').then((debug) => {
+        setAppDebug(debug)
+      })
+    }
+  })
+
+  return (
+    <React.Fragment>
+      <Head>
+        <title>Greenlight - Settings: Debug</title>
+      </Head>
+
+        <SettingsSidebar>
+            <div id="page_settings_debug_application">
+                {
+                    appDebug.map((item, index) => {
+                        return (
+                            <Card key={ item.name } title={ item.name }>
+                                <h1>{ item.name }</h1>
+                                <ul className="kv-list">
+                                    { item.data.map((dataItem, dataIndex) => {
+                                        return (
+                                            <li key={ item.name+'_'+dataIndex }>
+                                                <label>{dataItem.name}{ dataItem.name.length > 0 ? ':' : '' }</label>
+
+                                                {dataItem.value}
+                                            </li>
+                                        )
+                                    })}
+                                </ul>
+                            </Card>
+                        )
+                    })
+                }
+            </div>
+        </SettingsSidebar>
+      
+
+    </React.Fragment>
+  );
+};
+
+export default SettingsDebug;

@@ -1,5 +1,6 @@
 import IpcBase from './base'
 import { session } from 'electron'
+import electron from 'electron'
 
 interface setForceRegionIpArgs {
     ip:string
@@ -111,5 +112,46 @@ export default class IpcApp extends IpcBase {
 
             resolve(true)
         })
+    }
+
+    async debug(){
+        const returnValue = []
+
+        const gpuInfo = await electron.app.getGPUInfo("complete")
+
+        // Application Values
+        returnValue.push({
+            name: 'Application',
+            data: [
+                { name: 'Name', value: 'Greenlight' },
+                { name: 'Version', value: electron.app.getVersion() },
+                { name: 'GPU Info', value: gpuInfo.auxAttributes.glRenderer },
+            ]
+        })
+
+        // xCloud values
+        returnValue.push({
+            name: 'xCloud',
+            data: [
+                { name: 'Titles in cache', value: this._application._ipc._channels.xCloud._titles.length },
+                { name: 'Titles last update', value: this._application._ipc._channels.xCloud._titlesLastUpdate },
+                { name: 'Recent titles in cache', value: this._application._ipc._channels.xCloud._recentTitles.length },
+                { name: 'Recent titles last update', value: this._application._ipc._channels.xCloud._recentTitlesLastUpdate },
+                { name: '', value: ''},
+                { name: 'Titlemanager titles loaded', value: Object.keys(this._application._ipc._channels.xCloud._titleManager._xCloudTitles).length },
+
+            ]
+        })
+
+        // Streaming values
+        returnValue.push({
+            name: 'Streaming',
+            data: [
+                { name: 'Active sessions', value: Object.keys(this._application._ipc._channels.streaming._streamManager._sessions).length },
+
+            ]
+        })
+
+        return returnValue
     }
 }
