@@ -146,6 +146,7 @@ export default class Authentication {
             if(error){
                 const error_description = url.searchParams.get('error_description')
                 this._application.log('authentication', __filename+'[startWebviewHooks()] Received error from oauth:', error_description)
+                this._authWindow.close()
             }
 
             const code = url.searchParams.get('code')
@@ -161,15 +162,18 @@ export default class Authentication {
                     this._xalAuthenticator.do_sisu_authorization(this._authFlowTokens.sisu_session_id, res5.access_token, this._authFlowTokens.sisu_device_token.Token).then((res6:any) => {
                         this._application._store.set('auth.sisu_token', res6)
                         this._application.log('authentication', __filename+'[startWebviewHooks()] Retrieved sisu tokens:', res6)
+                        this._authWindow.close()
 
                         this.retrieveTokens(res5, res6)
 
                     }).catch((error6) => {
                         this._application.log('authentication', __filename+'[startWebviewHooks()] do_sisu_authorization error:', error6)
+                        this._authWindow.close()
                     })
             
                 }).catch((error5) => {
                     this._application.log('authentication', __filename+'[startWebviewHooks()] exchange_code_for_token error:', error5)
+                    this._authWindow.close()
                 })
             }
         })
