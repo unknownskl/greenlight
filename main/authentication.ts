@@ -58,7 +58,7 @@ export default class Authentication {
         this._application = application
 
         this.startSilentFlow()
-        this.startIpcEvents()
+        // this.startIpcEvents()
     }
 
     checkAuthentication(){
@@ -91,15 +91,11 @@ export default class Authentication {
 
             }).catch((error4) => {
                 this._application.log('authentication', __filename+'[startAuthflow()] do_sisu_authentication() error:', error4)
-                this._xalAuthenticator.close()
             })
             
         }).catch((error1) => {
             this._application.log('authentication', __filename+'[startAuthflow()] get_device_token() error:', error1)
-            this._xalAuthenticator.close()
         })
-
-        // this._xalAuthenticator.close()
 
         return false
     }
@@ -132,7 +128,6 @@ export default class Authentication {
 
         this._authWindow.on('close', () => {
             this._application.log('authentication', __filename+'[openAuthWindow()] Closed auth window')
-            this._xalAuthenticator.close()
         })
     }
 
@@ -151,7 +146,6 @@ export default class Authentication {
             if(error){
                 const error_description = url.searchParams.get('error_description')
                 this._application.log('authentication', __filename+'[startWebviewHooks()] Received error from oauth:', error_description)
-                this._authWindow.close()
             }
 
             const code = url.searchParams.get('code')
@@ -167,18 +161,15 @@ export default class Authentication {
                     this._xalAuthenticator.do_sisu_authorization(this._authFlowTokens.sisu_session_id, res5.access_token, this._authFlowTokens.sisu_device_token.Token).then((res6:any) => {
                         this._application._store.set('auth.sisu_token', res6)
                         this._application.log('authentication', __filename+'[startWebviewHooks()] Retrieved sisu tokens:', res6)
-                        this._authWindow.close()
 
                         this.retrieveTokens(res5, res6)
 
                     }).catch((error6) => {
                         this._application.log('authentication', __filename+'[startWebviewHooks()] do_sisu_authorization error:', error6)
-                        this._authWindow.close()
                     })
             
                 }).catch((error5) => {
                     this._application.log('authentication', __filename+'[startWebviewHooks()] exchange_code_for_token error:', error5)
-                    this._authWindow.close()
                 })
             }
         })
@@ -187,9 +178,7 @@ export default class Authentication {
     retrieveTokens(code_token, sisu_token){
         this._application.log('authentication', __filename+'[retrieveTokens()] Retrieving tokens...')
         // const xalAuth = xalAuthenticator = new XalLibrary.default.XalAuthenticator()
-        const xalAuth = this._xalAuthenticator
-
-        xalAuth.do_xsts_authorization(sisu_token.DeviceToken, sisu_token.TitleToken.Token, sisu_token.UserToken.Token, "http://gssv.xboxlive.com/").then((xsts_token:any) => {
+        this._xalAuthenticator.do_xsts_authorization(sisu_token.DeviceToken, sisu_token.TitleToken.Token, sisu_token.UserToken.Token, "http://gssv.xboxlive.com/").then((xsts_token:any) => {
             
             this._isAuthenticating = true
             this._application._ipc._channels.app.sendAuthState()
@@ -198,7 +187,7 @@ export default class Authentication {
                 // Supports xCloud
                 this._appLevel = 2
 
-                this.retrieveMSALTokens(code_token, sisu_token, xsts_token, xalAuth)
+                this.retrieveMSALTokens(code_token, sisu_token, xsts_token, this._xalAuthenticator)
             }).catch((error) => {
                 // Supports xHome only
                 this._appLevel = 1
@@ -206,11 +195,11 @@ export default class Authentication {
                 this.requestxCloudToken(xsts_token.Token, true).then((result) => {
                     this._appLevel = 2
 
-                    this.retrieveMSALTokens(code_token, sisu_token, xsts_token, xalAuth)
+                    this.retrieveMSALTokens(code_token, sisu_token, xsts_token, this._xalAuthenticator)
                 }).catch((error) => {
                     this._appLevel = 1
 
-                    this.retrieveMSALTokens(code_token, sisu_token, xsts_token, xalAuth)
+                    this.retrieveMSALTokens(code_token, sisu_token, xsts_token, this._xalAuthenticator)
                 })
             })
 
@@ -218,8 +207,6 @@ export default class Authentication {
             this._application.log('authentication', __filename+'[retrieveTokens()] do_xsts_authorization error returned. Probably tokens expired:')
             this._isAuthenticating = false
             this.startAuthflow()
-
-            xalAuth.close()
         })
     }
 
@@ -242,74 +229,10 @@ export default class Authentication {
             this._isAuthenticating = false
             this._application._events.emit('start', this._tokens)
 
-            xalAuth.close()
-
             this._application._ipc._channels.app.sendAuthState()
         }).catch((error) => {
             this._application.log('authentication', __filename+'[retrieveTokens()] Failed to retrieve tokens')
-            xalAuth.close()
         })
-    }
-
-    startIpcEvents(){
-        ipcMain.on('auth', (event, arg) => {
-            if(arg.type === 'init'){
-                const gamertag = this._application._store.get('user.gamertag')
-                const gamerpic = this._application._store.get('user.gamerpic')
-                const gamerscore = this._application._store.get('user.gamerscore')
-
-                // Check loading?
-                if(this._isAuthenticating === true){
-                    event.sender.send('app_loading', {})
-                }
-    
-                event.sender.send('auth', {
-                    loggedIn: gamertag ? this._isAuthenticated : false,
-    
-                    signedIn: gamertag ? true : false,
-                    gamertag: gamertag ? gamertag : '',
-                    gamerpic: gamerpic ? gamerpic : '',
-                    gamerscore: gamerscore ? gamerscore : '',
-                    level: this._appLevel,
-                })
-                
-            } else if(arg.type === 'get_user'){
-                const gamertag = this._application._store.get('user.gamertag')
-                const gamerpic = this._application._store.get('user.gamerpic')
-                const gamerscore = this._application._store.get('user.gamerscore')
-    
-                event.sender.send('auth', {
-                    type: 'user',
-                    gamertag: gamertag ? gamertag : '',
-                    gamerpic: gamerpic ? gamerpic : '',
-                    gamerscore: gamerscore ? gamerscore : '',
-                    level: this._appLevel,
-                })
-
-            } else if(arg.type === 'logout'){
-                this._application.log('authentication', __filename+'[startIpcEvents()] Received logout call')
-                session.defaultSession.clearStorageData().then(() => {
-                    this._application._store.delete('user')
-                    this._application._store.delete('auth')
-
-                    this._application.log('authentication', __filename+'[startIpcEvents()] Received restart request. Restarting application...')
-                    this._application.restart()
-    
-                }).catch((error) => {
-                    this._application.log('authentication', __filename+'[startIpcEvents()] Error: Failed to clear local storage!')
-                })
-
-            } else if(arg.type === 'quit'){
-                this._application.log('authentication', __filename+'[startIpcEvents()] Received quit request. Quitting application...')
-                this._application.quit()
-
-            } else if(arg.type == 'login') {
-                this.startAuthflow()
-            } else if(arg.type == 'restart'){
-                console.log('Restarting application...')
-                this._application.restart()
-            }
-        });
     }
 
     requestxHomeToken(streamingToken){

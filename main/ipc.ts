@@ -9,7 +9,7 @@ import { ipcMain } from 'electron'
 
 interface IpcChannels {
     streaming: IpcStreaming,
-    store: IpcStore,
+    // store: IpcStore,
     consoles: IpcConsoles,
     app: IpcApp,
     xCloud: IpcxCloud,
@@ -26,7 +26,7 @@ export default class Ipc {
 
         this._channels = {
             streaming: new IpcStreaming(this._application),
-            store: new IpcStore(this._application),
+            // store: new IpcStore(this._application),
             consoles: new IpcConsoles(this._application),
             app: new IpcApp(this._application),
             xCloud: new IpcxCloud(this._application),
