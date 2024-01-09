@@ -26,6 +26,10 @@ function StreamComponent({
   ...props
 }: StreamComponentProps) {
 
+  function performance_now_seconds() {
+    return performance.now() / 1000.0
+  }
+  
   let lastMovement = 0
   let gamebarElement = document.getElementById('component_streamcomponent_gamebar')
   let debugElement = document.getElementById('component_streamcomponent_debug')
@@ -34,8 +38,8 @@ function StreamComponent({
   const [micStatus, setMicStatus] = React.useState(false);
   const [waitingSeconds, setWaitingSeconds] = React.useState(0);
 
-  let jitterData = [new Float32Array([performance.now()]), new Float32Array([0.0])]
-  let droppedData = [new Float32Array([performance.now()]), new Float32Array([0.0]), new Float32Array([0.0])]
+  let jitterData = [new Float32Array([performance_now_seconds()]), new Float32Array([0.0])]
+  let droppedData = [new Float32Array([performance_now_seconds()]), new Float32Array([0.0]), new Float32Array([0.0])]
   let framesDroppedBaseline = 0
   let packetsDroppedBaseline = 0
   let frameCountDomUpdate = 0
@@ -69,10 +73,16 @@ function StreamComponent({
     // })
 
     let jitterUplot = new uPlot({
+      title: "Jitter (ms)",
       id: "component_streamcomponent_debug_webrtc_jitter",
       class: "debug-chart",
       width: 600,
-      height: 250,
+      height: 230,
+      scales: {
+        "x": {
+          time: false,
+        }
+      },
       series: [
         {},
         {
@@ -85,18 +95,28 @@ function StreamComponent({
         }
       ],
       axes: [
-        {},
         {
-          values: (u, vals, space) => vals.map(v => +v.toString() + " ms"),
-        }
+          values: (u, vals, space) => vals.map(v => +v),
+        },
+        {
+          size: 50,
+          stroke: "red",
+          values: (u, vals, space) => vals.map(v => (+v*1000.0).toFixed(1)),
+        },
       ]
     }, jitterData, document.getElementById('component_streamcomponent_debug_webrtc_jitter'));
     
     let droppedUplot = new uPlot({
+      title: "Packets lost / Frames dropped",
       id: "component_streamcomponent_debug_webrtc_dropped",
       class: "debug-chart",
       width: 600,
-      height: 250,
+      height: 230,
+      scales: {
+        "x": {
+          time: false,
+        }
+      },
       series: [
         {},
         {
@@ -117,12 +137,19 @@ function StreamComponent({
         }
       ],
       axes: [
-        {},
         {
-          values: (u, vals, space) => vals.map(v => +v.toFixed(0) + " dropped"),
+          values: (u, vals, space) => vals.map(v => +v),
+        },
+        {
+          size: 50,
+          stroke: "green",
+          values: (u, vals, space) => vals.map(v => +v.toFixed(0)),
           grid: {show: false},
         },
         {
+          side: 1,
+          stroke: "blue",
+          values: (u, vals, space) => vals.map(v => +v.toFixed(0)),
           grid: {show: false},
         },
       ]
@@ -142,10 +169,10 @@ function StreamComponent({
               droppedData = sliceData(droppedData, droppedData[0].length-1200, droppedData[0].length)
             }
 
-            jitterData[0] = new Float32Array([...Array.from(jitterData[0]), performance.now()])
+            jitterData[0] = new Float32Array([...Array.from(jitterData[0]), performance_now_seconds()])
             jitterData[1] = new Float32Array([...Array.from(jitterData[1]), report['jitter']])
 
-            droppedData[0] = new Float32Array([...Array.from(droppedData[0]), performance.now()])
+            droppedData[0] = new Float32Array([...Array.from(droppedData[0]), performance_now_seconds()])
             droppedData[1] = new Float32Array([...Array.from(droppedData[1]), report['packetsLost']-packetsDroppedBaseline])
             droppedData[2] = new Float32Array([...Array.from(droppedData[2]), report['framesDropped']-framesDroppedBaseline])
             packetsDroppedBaseline = report['packetsLost']
