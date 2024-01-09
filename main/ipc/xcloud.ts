@@ -18,6 +18,9 @@ export default class IpcxCloud extends IpcBase {
     _recentTitles = []
     _recentTitlesLastUpdate = 0
 
+    _newTitles = []
+    _newTitlesLastUpdate = 0
+
     constructor(application:Application){
         super(application)
 
@@ -85,7 +88,6 @@ export default class IpcxCloud extends IpcBase {
                     console.log('titles:', titles)
 
                     for(var title in titles.results){
-                        // console.log(titles[title])
                         if(titles.results[title].titleId)
                             returnTitles.push(titles.results[title].titleId)
                         else
@@ -102,6 +104,40 @@ export default class IpcxCloud extends IpcBase {
                 })
             } else {
                 resolve(this._titles)
+            }
+        })
+    }
+
+    getNewTitles(){
+        return new Promise((resolve, reject) => {
+            if(this._newTitlesLastUpdate < Date.now() - 3600*1000){
+                this._titleManager.getNewTitles().then((titles:any) => {
+
+                    const returnTitles = []
+
+                    for(var title in titles){
+                        if(titles[title].id !== undefined){
+                            const storeTitle = this._titleManager.findTitleByProductId(titles[title].id)
+                            
+                            if(storeTitle === undefined){
+                                this._application.log('Ipc:xCloud', 'Title not found in cache:', storeTitle, titles[title])
+                            } else {
+                                returnTitles.push(storeTitle.titleId)
+                            }
+                        } else {
+                            this._application.log('Ipc:xCloud', 'Title found without an id:', titles[title])
+                        }
+                    }
+                    
+                    this._newTitles = returnTitles
+                    this._newTitlesLastUpdate = Date.now()
+
+                    resolve(returnTitles)
+                }).catch((error) => {
+                    reject(error)
+                })
+            } else {
+                resolve(this._newTitles)
             }
         })
     }

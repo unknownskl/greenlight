@@ -71,6 +71,10 @@ export default class TitleManager {
         })
     }
 
+    getNewTitles(){
+        return this._http.get('catalog.gamepass.com', '/sigls/v2?id=f13cf6b4-57e6-4459-89df-6aec18cf0538&market=US&language=en-US')
+    }
+
     populateTitleInfo(titleInfo:titleInfoArgs[]){
         for(const product in titleInfo){
             const xCloudTitle = titleInfo[product].XCloudTitleId
@@ -96,6 +100,23 @@ export default class TitleManager {
                 return this._xCloudTitles[title]
             }
         }
+
+        // Perform a lookup?
+        this._application.log('TitleManager', 'Title not found in cache:', productId, 'Trying to get info from store...')
+        this._http.post('catalog.gamepass.com', '/v3/products?market=US&language=en-US&hydration=RemoteHighSapphire0', { // RemoteLowJade0
+            "Products": [productId]
+        }, {
+            'ms-cv': 0,
+            'calling-app-name': 'Xbox Cloud Gaming Web',
+            'calling-app-version': '21.0.0',
+
+        }).then((result:any) => {
+            this._application.log('TitleManager', 'Retrieved information from store:', result.Products)
+            this.populateTitleInfo(result.Products)
+
+        }).catch((error) => {
+            console.log('Error:', error)
+        })
 
         return undefined
     }

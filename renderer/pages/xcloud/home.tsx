@@ -16,6 +16,7 @@ import TitleRow from '../../components/xcloud/titleRow';
 function xCloudHome() {
   const { xcloudTitles, setXcloudTitles} = useXcloud()
   const [xcloudRecentTitles, setXcloudRecentTitles] = React.useState([])
+  const [xCloudNewTitles, setXcloudNewTitles] = React.useState([])
 
   React.useEffect(() => {
     if(xcloudTitles.length == 0){
@@ -28,6 +29,12 @@ function xCloudHome() {
     if(xcloudTitles.length > 0 && xcloudRecentTitles.length === 0){
       Ipc.send('xCloud', 'getRecentTitles').then((recentTitles) => {
         setXcloudRecentTitles(recentTitles)
+      })
+    }
+
+    if(xcloudTitles.length > 0 && xCloudNewTitles.length === 0){
+      Ipc.send('xCloud', 'getNewTitles').then((newTitles) => {
+        setXcloudNewTitles(newTitles)
       })
     }
   })
@@ -45,8 +52,8 @@ function xCloudHome() {
 
       <TitleRow titles={ xcloudRecentTitles }>Recent Games</TitleRow>
 
-        <TitleRow titles={ xcloudTitles }>
-          Library &nbsp;
+        <TitleRow titles={ xCloudNewTitles }>
+          Recently added &nbsp;
           <Link href="/xcloud/library"><Button label="View Library" className='btn-small'></Button></Link>
         </TitleRow>
         

@@ -28,7 +28,7 @@ function GameTitleDynamic({
 
 
     React.useEffect(() => {
-        if(titleData.titleId === undefined){
+        if(titleData !== undefined && titleData.titleId === undefined){
             Ipc.send('xCloud', 'getTitle', { titleId: titleId }).then((title) => {
                 setTitleData(title)
             })
