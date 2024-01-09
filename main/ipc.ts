@@ -2,6 +2,7 @@ import Application from './application'
 import IpcConsoles from './ipc/consoles'
 import IpcStore from './ipc/store'
 import IpcStreaming from './ipc/streaming'
+import IpcxCloud from './ipc/xcloud'
 import IpcApp from './ipc/app'
 
 import { ipcMain } from 'electron'
@@ -11,6 +12,7 @@ interface IpcChannels {
     store: IpcStore,
     consoles: IpcConsoles,
     app: IpcApp,
+    xCloud: IpcxCloud,
 }
 
 export default class Ipc {
@@ -27,12 +29,27 @@ export default class Ipc {
             store: new IpcStore(this._application),
             consoles: new IpcConsoles(this._application),
             app: new IpcApp(this._application),
+            xCloud: new IpcxCloud(this._application),
         }
 
         for(const channel in this._channels){
             ipcMain.on(channel, (event, args) => { this._channels[channel].onEvent(channel, event, args) })
         }
         
+    }
+
+    startUp(){
+        for(const channel in this._channels){
+            if(this._channels[channel].startUp)
+                this._channels[channel].startUp()
+        }
+    }
+
+    onUserLoaded(){
+        for(const channel in this._channels){
+            if(this._channels[channel].onUserLoaded)
+                this._channels[channel].onUserLoaded()
+        }
     }
 
     // sendIpc(name, value){

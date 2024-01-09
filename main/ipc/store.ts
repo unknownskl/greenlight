@@ -12,15 +12,20 @@ export default class IpcStore extends IpcBase {
         return new Promise((resolve, reject) => {
             
             this._application._events._xCloudApi.getTitles().then((titles:any) => {
-                this._titleManager.setCloudTitles(titles)
-                // console.log(this._titleManager)
+                this._titleManager.setCloudTitles(titles).then(() => {
+                    // console.log(this._titleManager)
 
-                const rettitles = []
-                for(const xcloudtitle in this._titleManager._xCloudTitles){
-                    rettitles.push(this._titleManager._xCloudTitles[xcloudtitle])
-                }
+                    const rettitles = []
+                    for(const xcloudtitle in this._titleManager._xCloudTitles){
+                        rettitles.push(this._titleManager._xCloudTitles[xcloudtitle])
+                    }
 
-                resolve(rettitles)
+                    resolve(rettitles)
+
+                }).catch((error) => {
+                    console.log('Error setting xCloud titles:', error)
+                    reject(error)
+                })
 
             }).catch((error) => {
                 console.log('Error fetching xCloud titles:', error)
@@ -37,7 +42,7 @@ export default class IpcStore extends IpcBase {
         })
     }
 
-    getRecentTitles(){
-        return this._titleManager.getRecentTitles()
-    }
+    // getRecentTitles(){
+    //     return this._titleManager.getRecentTitles()
+    // }
 }

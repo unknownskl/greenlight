@@ -63,6 +63,9 @@ export default class Events extends EventEmitter {
             }).catch((error) => {
                 console.log('events.ts: Error: Failed to retrieve current user profile (2):', error)
             })
+
+            this._application._ipc.onUserLoaded()
+
         })
     }
 

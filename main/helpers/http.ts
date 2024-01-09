@@ -85,7 +85,7 @@ export default class Http {
 
                 response.on('end', (data:any) => {
                     if(response.statusCode >= 200 && response.statusCode <= 299){
-                        this._application.log('HTTP', 'post('+url+') resolve:', response.statusCode, responseData)
+                        this._application.log('HTTP', 'post('+url+') resolve:', response.statusCode, responseData.substring(0, 100))
 
                         let returnData = responseData
                         try {

@@ -27,7 +27,7 @@ function xCloudInfo() {
 
   React.useEffect(() => {
     if(productDetails === undefined){
-        Ipc.send('store', 'getxCloudTitle', { titleId: router.query.titleid}).then((title) => {
+        Ipc.send('xCloud', 'getTitle', { titleId: router.query.titleid}).then((title) => {
             console.log(title)
 
             setProductDetails(title)

@@ -44,6 +44,8 @@ export default class Application {
         ElectronApp.commandLine.appendSwitch('enable-oop-rasterization');
         ElectronApp.commandLine.appendSwitch('accelerated-video-decode');
         ElectronApp.commandLine.appendSwitch('ozone-platform-hint', 'x11');
+        ElectronApp.commandLine.appendSwitch('ignore-gpu-blocklist');
+        ElectronApp.commandLine.appendSwitch('enable-zero-copy');
 
         this.readStartupFlags()
         this.loadApplicationDefaults()
@@ -54,6 +56,8 @@ export default class Application {
         this._ipc = new Ipc(this)
         this._authentication = new Authentication(this)
         this._xboxWorker = new xboxWorker(this)
+
+        this._ipc.startUp()
     }
 
     log(namespace = 'application', ...args){

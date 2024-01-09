@@ -8,6 +8,7 @@ import { useXcloud } from '../../context/userContext'
 import Loader from '../../components/ui/loader'
 import ViewportGrid from '../../components/ui/viewportgrid';
 import GameTitle from '../../components/ui/game/title';
+import GameTitleDynamic from '../../components/ui/game/titledynamic';
 import BreadcrumbBar from '../../components/ui/breadcrumbbar';
 
 
@@ -21,7 +22,7 @@ function xCloudLibrary() {
 
   React.useEffect(() => {
     if(xcloudTitles.length == 0){
-      Ipc.send('store', 'getxCloudTitles').then((titles) => {
+      Ipc.send('xCloud', 'getTitles').then((titles) => {
         setXcloudTitles(titles)
       })
     }
@@ -30,7 +31,7 @@ function xCloudLibrary() {
   function performFilter(titles){
     if(filter.name != ''){
       titles = titles.filter((item) => {
-        return item.catalogDetails.ProductTitle.toLowerCase().includes(filter.name.toLowerCase())
+        return item.toLowerCase().includes(filter.name.toLowerCase())
       })
     }
 
@@ -63,12 +64,10 @@ function xCloudLibrary() {
       <ViewportGrid drawPagination={true}>{
         (xcloudTitles.length == 0) ? (<p><Loader></Loader></p>) : performFilter(xcloudTitles).map((item, i) => {
           return (
-            <GameTitle
-              src={ 'https:'+item.catalogDetails.Image_Tile.URL }
-              name={ item.catalogDetails.ProductTitle}
-              titleId={ item.titleId }
-              key={ item.titleId }
-            ></GameTitle>
+            <GameTitleDynamic
+              titleId={ item }
+              key={ item }
+            ></GameTitleDynamic>
           )
         })
       }</ViewportGrid>
