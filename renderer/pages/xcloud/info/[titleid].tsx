@@ -40,7 +40,7 @@ function xCloudInfo() {
   return (
     <React.Fragment>
       <Head>
-        <title>Greenlight - xCloud Library</title>
+        <title>Greenlight - Viewing title information: { router.query.titleid }</title>
       </Head>
 
       <BreadcrumbBar>
