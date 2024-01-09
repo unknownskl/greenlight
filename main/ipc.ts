@@ -1,6 +1,5 @@
 import Application from './application'
 import IpcConsoles from './ipc/consoles'
-import IpcStore from './ipc/store'
 import IpcStreaming from './ipc/streaming'
 import IpcxCloud from './ipc/xcloud'
 import IpcApp from './ipc/app'
@@ -9,7 +8,6 @@ import { ipcMain } from 'electron'
 
 interface IpcChannels {
     streaming: IpcStreaming,
-    // store: IpcStore,
     consoles: IpcConsoles,
     app: IpcApp,
     xCloud: IpcxCloud,
@@ -26,7 +24,6 @@ export default class Ipc {
 
         this._channels = {
             streaming: new IpcStreaming(this._application),
-            // store: new IpcStore(this._application),
             consoles: new IpcConsoles(this._application),
             app: new IpcApp(this._application),
             xCloud: new IpcxCloud(this._application),
@@ -40,6 +37,8 @@ export default class Ipc {
 
     startUp(){
         for(const channel in this._channels){
+            this._application.log('Ipc', 'Starting IPC channel: ' + channel)
+
             if(this._channels[channel].startUp)
                 this._channels[channel].startUp()
         }
@@ -47,8 +46,10 @@ export default class Ipc {
 
     onUserLoaded(){
         for(const channel in this._channels){
-            if(this._channels[channel].onUserLoaded)
+            if(this._channels[channel].onUserLoaded){
+                this._application.log('Ipc', 'Loading startup data for IPC channel: ' + channel)
                 this._channels[channel].onUserLoaded()
+            }
         }
     }
 

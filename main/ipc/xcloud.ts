@@ -10,6 +10,8 @@ export default class IpcxCloud extends IpcBase {
 
     _titleManager:TitleManager
 
+    _titlesAreLoaded = false
+
     _titles = []
     _titlesLastUpdate = 0
 
@@ -22,12 +24,20 @@ export default class IpcxCloud extends IpcBase {
         this._titleManager = new TitleManager(application)
     }
 
+    startUp(){
+        this._application.log('Ipc:xCloud', 'Starting xCloud IPC Channel...')
+    }
+
     onUserLoaded(){
-        // @TODO: Refactor this code to perform batches and perform better caching
         this._application._events._xCloudApi.getTitles().then((titles:any) => {
             this._titleManager.setCloudTitles(titles).then(() => {
 
-                // Titles are loaded
+                this._titlesAreLoaded = true
+
+                // Uncomment to delay the process of loading data
+                // setTimeout(() => {
+                //     this._titlesAreLoaded = true
+                // }, 5000)
 
             }).catch((error) => {
                 this._application.log('Ipc:xCloud', 'Titlemanager is unable to load titles:', error)
@@ -69,7 +79,7 @@ export default class IpcxCloud extends IpcBase {
 
     getTitles(){
         return new Promise((resolve, reject) => {
-            if(this._recentTitlesLastUpdate < Date.now() - 60*1000){
+            if(this._recentTitlesLastUpdate < Date.now() - 3600*1000){
                 this._application._events._xCloudApi.getTitles().then((titles:any) => {
                     const returnTitles = []
                     console.log('titles:', titles)
@@ -98,33 +108,26 @@ export default class IpcxCloud extends IpcBase {
 
     getTitle(args:getTitleArgs){
         return new Promise((resolve, reject) => {
-            const title = this._titleManager.findTitle(args.titleId)
+            if(this._titlesAreLoaded === false){
 
-            resolve(title)
+                this.waitForTitle(resolve, args)
+            } else {
+                const title = this._titleManager.findTitle(args.titleId)
+
+                resolve(title)
+            }
         })
     }
 
-    // stopStream(args:stopStreamArgs){
-    //     return this._streamManager.stopStream(args.sessionId)
-    // }
+    waitForTitle(resolveCallback, args:getTitleArgs){
+        setTimeout(() => {
+            if(this._titlesAreLoaded === false){
+                this.waitForTitle(resolveCallback, args)
+            } else {
+                const title = this._titleManager.findTitle(args.titleId)
 
-    // sendSdp(args:sendSdpArgs){
-    //     return this._streamManager.sendSdp(args.sessionId, args.sdp)
-    // }
-
-    // sendChatSdp(args:sendSdpArgs){
-    //     return this._streamManager.sendChatSdp(args.sessionId, args.sdp)
-    // }
-
-    // sendIce(args:sendIceArgs){
-    //     return this._streamManager.sendIce(args.sessionId, args.ice)
-    // }
-
-    // sendKeepalive(args:sendKeepaliveArgs){
-    //     return this._streamManager.sendKeepalive(args.sessionId)
-    // }
-
-    // activeSessions(args:activeSessionsArgs){
-    //     return this._streamManager.getActiveSessions()
-    // }
+                resolveCallback(title)
+            }    
+        }, 200)
+    }
 }
