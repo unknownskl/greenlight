@@ -32,7 +32,7 @@ body:
           - **Greenlight version**: 2.0.1
       value: |
           - OS: 
-          - Node: 
+          - Device: 
           - Greenlight version: 
       render: markdown
     validations:
