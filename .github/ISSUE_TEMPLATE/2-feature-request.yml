@@ -2,28 +2,30 @@ name: Feature request
 description: Suggest an idea for this project
 title: "[FEATURE] "
 labels: ["Feature request"]
-
 body:
-  - type: markdown
+  - type: textarea
+    id: description
     attributes:
-      value: |
+      label: Describe the feature
+      description: |
         **Is your feature request related to a problem? Please describe.**
-        A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
-
-  - type: markdown
-    attributes:
       value: |
-        **Describe the solution you'd like**
-        A clear and concise description of what you want to happen.
+        A clear and concise description of what the feature should do. (example: I want to get a notification when a friend comes online)
 
-  - type: markdown
+  - type: textarea
+    id: usecase
     attributes:
+      label: Describe the use case
+      description: |
+        **Describe a use case for the feature**
       value: |
-        **Describe alternatives you've considered**
-        A clear and concise description of any alternative solutions or features you've considered.
+        A clear and concise description of when you want to use this. (example: I want to run the application in the background and get notified when a friend comes online)
 
-  - type: markdown
+  - type: textarea
+    id: other
     attributes:
-      value: |
-        **Additional context**
+      label: Additional information
+      description: |
+        **Additional information**
+      value: |        
         Add any other context or screenshots about the feature request here.
