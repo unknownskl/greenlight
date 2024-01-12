@@ -2,7 +2,6 @@ name: Other
 description: File a bug report
 title: ''
 labels: []
-
 body:
   - type: textarea
     id: description
