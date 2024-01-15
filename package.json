@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@playwright/test": "^1.40.1",
-    "axios": "^1.6.0",
+    "axios": "^1.6.5",
     "compare-versions": "^6.1.0",
     "debug": "^4.3.4",
     "electron-serve": "^1.2.0",
