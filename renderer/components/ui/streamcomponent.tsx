@@ -29,7 +29,7 @@ function StreamComponent({
   function performance_now_seconds() {
     return performance.now() / 1000.0
   }
-  
+
   let lastMovement = 0
   let gamebarElement = document.getElementById('component_streamcomponent_gamebar')
   let debugElement = document.getElementById('component_streamcomponent_debug')
@@ -105,7 +105,7 @@ function StreamComponent({
         },
       ]
     }, jitterData, document.getElementById('component_streamcomponent_debug_webrtc_jitter'));
-    
+
     let droppedUplot = new uPlot({
       title: "Packets lost / Frames dropped",
       id: "component_streamcomponent_debug_webrtc_dropped",
@@ -158,7 +158,7 @@ function StreamComponent({
     webRtcStatsInterval = setInterval(() => {
       xPlayer._webrtcClient.getStats().then((stats) => {
         let statsOutput = "";
-    
+
         stats.forEach((report) => {
           if (report.type === "inbound-rtp" && report.kind === "video") {
 
@@ -192,7 +192,7 @@ function StreamComponent({
             }
           }
         });
-    
+
         // document.querySelector('div#component_streamcomponent_debug_text').innerHTML = statsOutput;
       });
     }, 33);
@@ -230,7 +230,7 @@ function StreamComponent({
       }
     }
     window.addEventListener('keypress', keyboardPressEvent)
-  
+
     // cleanup this component
     return () => {
       window.removeEventListener('mousemove', mouseEvent)
@@ -270,7 +270,7 @@ function StreamComponent({
     if(confirm('Are you sure you want to end your stream?')){
       document.getElementById('streamComponentHolder').innerHTML = '';
       onDisconnect()
-      
+
       window.history.back()
       // xPlayer.reset()
     }
@@ -291,17 +291,18 @@ function StreamComponent({
   function drawWaitingTimes(seconds){
     if(seconds !== false){
       setWaitingSeconds(seconds)
-      const html = '<div>Estimated waiting time in queue: <span id="component_streamcomponent_waitingtimes_seconds">'+seconds+'</span> seconds</div>'
 
-      
+      const formattedWaitingTime = formatWaitingTime(seconds);
+      const html = '<div>Estimated waiting time in queue: <span id="component_streamcomponent_waitingtimes_seconds">'+formattedWaitingTime+'</span></div>'
+
       document.getElementById('component_streamcomponent_waitingtimes').innerHTML = html
 
       const secondsInterval = setInterval(() => {
         seconds--;
         setWaitingSeconds(seconds)
-        
+
         if(document.getElementById('component_streamcomponent_waitingtimes') !== null){
-          document.getElementById('component_streamcomponent_waitingtimes_seconds').innerText = seconds
+          document.getElementById('component_streamcomponent_waitingtimes_seconds').innerText = formatWaitingTime(seconds);
         } else {
           clearInterval(secondsInterval)
         }
@@ -311,6 +312,28 @@ function StreamComponent({
         }
       }, 1000)
     }
+  }
+
+  function formatWaitingTime(rawSeconds: number): string {
+    let formattedText = "";
+
+    const hours = Math.floor(rawSeconds / 3600);
+    const minutes = Math.floor((rawSeconds % 3600) / 60);
+    const seconds = (rawSeconds % 3600) % 60;
+
+    if (hours > 0) {
+      formattedText += hours + " hour(s), ";
+    }
+
+    if (minutes > 0) {
+      formattedText += minutes + " minute(s), ";
+    }
+
+    if (seconds > 0) {
+      formattedText += seconds + " second(s).";
+    }
+
+    return formattedText;
   }
 
   return (
