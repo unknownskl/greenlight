@@ -43,15 +43,19 @@ export default class IpcApp extends IpcBase {
 
     quit(){
         return new Promise((resolve, reject) => {
-            this._application.quit()
             resolve(true)
+            setTimeout(() => {
+                this._application.quit()
+            }, 100)
         })
     }
     
     restart(){
         return new Promise((resolve, reject) => {
-            this._application.restart()
             resolve(true)
+            setTimeout(() => {
+                this._application.restart()
+            }, 100)
         })
     }
 
@@ -125,7 +129,7 @@ export default class IpcApp extends IpcBase {
             data: [
                 { name: 'Name', value: 'Greenlight' },
                 { name: 'Version', value: electron.app.getVersion() },
-                { name: 'GPU Info', value: gpuInfo.auxAttributes.glRenderer },
+                { name: 'GPU Info', value: JSON.stringify(gpuInfo) },
             ]
         })
 

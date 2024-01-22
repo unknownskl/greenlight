@@ -22,10 +22,6 @@ export default class StreamManager {
     
     constructor(application){
         this._application = application
-
-        // setInterval(() => {
-
-        // }, 30*1000)
     }
 
     getApi(type):xCloudApi{
