@@ -154,8 +154,8 @@ export default class Application {
           }
 
         this._mainWindow = createWindow('main', {
-            width: 1000,
-            height: 600,
+            width: 1280,
+            height: 800,
             ...windowOptions,
         });
 
@@ -213,3 +213,8 @@ export default class Application {
 }
 
 new Application()
+
+process.on('unhandledRejection', (reason: string, p: Promise<any>) => {
+    console.log('Unhandled Rejection at:', p, 'reason:', reason);
+    alert('Unhandles rejection:'+ reason)
+});

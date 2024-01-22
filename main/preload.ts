@@ -21,11 +21,11 @@ export const Preload = {
                     if(args.error === undefined)
                         resolve(args.data)
                     else {
-                        if(args.error.status){
-                            alert('HTTP Status: ' + args.error.status + '\nPath:' + args.error.url + '\n' + args.error.body)
-                        } else {
-                            alert(args.error)
-                        }
+                        // if(args.error.status){
+                        //     alert('HTTP Status: ' + args.error.status + '\nPath:' + args.error.url + '\n' + args.error.body)
+                        // } else {
+                        //     alert(args.error)
+                        // }
                         reject(args.error)
                     }
                 }

@@ -17,6 +17,7 @@ function xCloudHome() {
   const { xcloudTitles, setXcloudTitles} = useXcloud()
   const [xcloudRecentTitles, setXcloudRecentTitles] = React.useState([])
   const [xCloudNewTitles, setXcloudNewTitles] = React.useState([])
+  const [xCloudNewTitlesLoaded, setXcloudNewTitlesLoaded] = React.useState(false)
 
   React.useEffect(() => {
     if(xcloudTitles.length == 0){
@@ -32,9 +33,13 @@ function xCloudHome() {
       })
     }
 
-    if(xcloudTitles.length > 0 && xCloudNewTitles.length === 0){
+    if(xcloudTitles.length > 0 && xCloudNewTitlesLoaded === false){
       Ipc.send('xCloud', 'getNewTitles').then((newTitles) => {
+        setXcloudNewTitlesLoaded(true)
         setXcloudNewTitles(newTitles)
+      }).catch((err) => {
+        console.log('Error loading titles:', err)
+        setXcloudNewTitlesLoaded(true)
       })
     }
   })

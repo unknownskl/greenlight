@@ -65,8 +65,19 @@ export default function MyApp({ Component, pageProps }) {
       }
     })
 
+    const errorHandler = function(event) {
+      console.error('Unhandled rejection (promise: ', event.promise, ', reason: ', event.reason, ').');
+      if(event.reason.status){
+          alert('HTTP Status: ' + event.reason.status + '\nPath:' + event.reason.url + '\n' + event.reason.body)
+      } else {
+          alert(event.reason)
+      }
+    }
+    window.addEventListener('unhandledrejection', errorHandler);
+
     // cleanup this component
     return () => {
+      window.removeEventListener('unhandledrejection', errorHandler)
       Ipc.removeListener('app', authState)
     };
   }, []);
