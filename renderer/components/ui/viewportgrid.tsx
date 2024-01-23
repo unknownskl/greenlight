@@ -17,8 +17,6 @@ function ViewportGrid({
     const randomId = Math.floor(Math.random()*1000)
     const [showItems, setShowItems] = React.useState(9999);
     const [page, setPage] = React.useState(0);
-    // const [clientWidth, setClientWidth] = React.useState(0);
-    // const [clientHeight, setClientHeight] = React.useState(0);
 
     React.useEffect(() => {
         // Mount
@@ -51,41 +49,23 @@ function ViewportGrid({
                 resizeLastUpdate = Date.now()
                 setShowItems(itemsShown)
             }
+
+            const totalPages = Math.ceil(Object.keys(children).length/showItems)
+            if(totalPages !== 0 && totalPages <= page){
+                console.log('Page is too high, resetting to: ', totalPages, page)
+                setPage(0)
+            }
         }
-        // window.addEventListener('resize', resizeEvent);
+
         resizeEvent()
         const resizeInterval = setInterval(() => {
             resizeEvent()
         }, 250)
 
         return () => {
-            // Unmount
-            // window.removeEventListener('resize', resizeEvent)
             clearInterval(resizeInterval)
         };
     })
-
-    // function calculateChildrenInViewport(element:HTMLElement){
-
-    //     let itemsInViewport = 0
-    //     for(const child in Object.keys(element.childNodes)){
-    //         const childNode = (element.childNodes[child] as HTMLElement)
-
-    //         const childOffset = childNode.offsetTop+childNode.clientHeight
-    //         console.log(childNode.offsetTop, childNode.clientHeight, element.clientHeight,element.offsetTop, childOffset-(element.clientHeight+element.offsetTop), childOffset-(element.clientHeight+element.offsetTop) < 0)
-            
-    //         // Loop over elements
-    //         if(childOffset-(element.clientHeight+element.offsetTop) < 0){
-    //             // Show element
-    //             // console.log(childOffset-element.clientHeight)
-    //             itemsInViewport++
-    //         } else {
-    //             // console.log(childOffset-element.clientHeight)
-    //         }
-    //     }
-
-    //     return itemsInViewport
-    // }
 
     function calculateChildrenInViewportCouldFit(element:HTMLElement){
 
@@ -108,7 +88,7 @@ function ViewportGrid({
         const buttons = []
         const totalPages = Math.ceil(Object.keys(children).length/showItems)
       
-        buttons.push((<Button onClick={ prevPage } disabled={page <= 0} className='btn-small' label="Previous page"></Button>))
+        buttons.push((<Button key="page_prev" onClick={ prevPage } disabled={page <= 0} className='btn-small' label="Previous page"></Button>))
         for(let i=1; i <= totalPages; i++){
           if(i == 1 || (i > (page-4) && i <= (page+5)) || i == totalPages){
             buttons.push((<Button key={i} label={i.toString()} className={ page == (i-1) ? 'btn-small btn-primary': 'btn-small' } onClick={ () => { gotoPage(i) }}></Button>))
@@ -118,7 +98,7 @@ function ViewportGrid({
             }
           }
         }
-        buttons.push((<Button onClick={ nextPage } disabled={page >= totalPages-1} className='btn-small' label="Next page"></Button>))
+        buttons.push((<Button key="page_next" onClick={ nextPage } disabled={page >= totalPages-1} className='btn-small' label="Next page"></Button>))
     
         return buttons
     }
@@ -140,7 +120,7 @@ function ViewportGrid({
 
     return (
         <React.Fragment>
-            <div id={ 'component_viewportgrid_'+randomId } style={{
+            <div id={ 'component_viewportgrid_'+randomId } key={ 'component_viewportgrid_'+randomId } style={{
                 display: 'flex',
                 flexDirection: 'row',
                 flexWrap: 'wrap',

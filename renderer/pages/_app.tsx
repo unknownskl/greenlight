@@ -15,10 +15,19 @@ import SidebarFriends from '../components/sidebar/friends'
 
 import { UserProvider } from '../context/userContext'
 
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  QueryClient,
+  QueryClientProvider,
+} from 'react-query'
+
 
 // This default export is required in a new `pages/_app.js` file.
 export default function MyApp({ Component, pageProps }) {
   const router = useRouter()
+  const queryClient = new QueryClient()
 
   const [loggedIn, setLoginState] = React.useState(false);
   const [prevUserState, setPrevUserState] = React.useState({
@@ -127,9 +136,11 @@ export default function MyApp({ Component, pageProps }) {
         width: '100vw',
         height: '100vh'
       }}>
-        <UserProvider>
-          {appBody}
-        </UserProvider>
+        <QueryClientProvider client={queryClient}>
+          <UserProvider>
+            {appBody}
+          </UserProvider>
+        </QueryClientProvider>
       </div>
     </React.Fragment>
   );

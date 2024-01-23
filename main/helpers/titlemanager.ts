@@ -17,6 +17,10 @@ interface titleInfoArgs {
     StoreId: string
 }
 
+interface FilterArgs {
+    name: string
+}
+
 export default class TitleManager {
 
     _application:Application
@@ -102,21 +106,21 @@ export default class TitleManager {
         }
 
         // Perform a lookup?
-        this._application.log('TitleManager', 'Title not found in cache:', productId, 'Trying to get info from store...')
-        this._http.post('catalog.gamepass.com', '/v3/products?market=US&language=en-US&hydration=RemoteHighSapphire0', { // RemoteLowJade0
-            "Products": [productId]
-        }, {
-            'ms-cv': 0,
-            'calling-app-name': 'Xbox Cloud Gaming Web',
-            'calling-app-version': '21.0.0',
+        // this._application.log('TitleManager', 'Title not found in cache:', productId, 'Trying to get info from store...')
+        // this._http.post('catalog.gamepass.com', '/v3/products?market=US&language=en-US&hydration=RemoteHighSapphire0', { // RemoteLowJade0
+        //     "Products": [productId]
+        // }, {
+        //     'ms-cv': 0,
+        //     'calling-app-name': 'Xbox Cloud Gaming Web',
+        //     'calling-app-version': '21.0.0',
 
-        }).then((result:any) => {
-            this._application.log('TitleManager', 'Retrieved information from store:', result.Products)
-            this.populateTitleInfo(result.Products)
+        // }).then((result:any) => {
+        //     this._application.log('TitleManager', 'Retrieved information from store:', result.Products)
+        //     this.populateTitleInfo(result.Products)
 
-        }).catch((error) => {
-            console.log('Error:', error)
-        })
+        // }).catch((error) => {
+        //     console.log('Error:', error)
+        // })
 
         return undefined
     }
@@ -127,6 +131,22 @@ export default class TitleManager {
         }
 
         return undefined
+    }
+
+    filterTitles(filter:FilterArgs){
+        const returnTitles = []
+
+        for(const title in this._xCloudTitles){
+            if(this._xCloudTitles[title].catalogDetails !== undefined){
+
+                if(this._xCloudTitles[title].catalogDetails.ProductTitle.toLowerCase().includes(filter.name.toLowerCase())){
+                    returnTitles.push(this._xCloudTitles[title].titleId)
+                }
+
+            }
+        }
+
+        return returnTitles
     }
 }
 

@@ -108,6 +108,14 @@ export default class IpcxCloud extends IpcBase {
         })
     }
 
+    filterTitles(filter){
+        return new Promise((resolve, reject) => {
+            const titles = this._titleManager.filterTitles(filter)
+
+            resolve(titles)
+        })
+    }
+
     getNewTitles(){
         return new Promise((resolve, reject) => {
             if(this._newTitlesLastUpdate < Date.now() - 3600*1000){

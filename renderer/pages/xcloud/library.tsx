@@ -2,40 +2,33 @@ import React from 'react';
 import Head from 'next/head';
 import Ipc from '../../lib/ipc'
 import Link from 'next/link';
-
-import Card from '../../components/ui/card'
-import { useXcloud } from '../../context/userContext'
 import Loader from '../../components/ui/loader'
 import ViewportGrid from '../../components/ui/viewportgrid';
-import GameTitle from '../../components/ui/game/title';
 import GameTitleDynamic from '../../components/ui/game/titledynamic';
 import BreadcrumbBar from '../../components/ui/breadcrumbbar';
+import { useQuery, QueryClient } from 'react-query'
 
 
 function xCloudLibrary() {
-  const { xcloudTitles, setXcloudTitles} = useXcloud()
   const [filter, setFilter] = React.useState({
     name: ''
   });
 
-  const resultsPerPage = 40
+  const xCloudTitles = useQuery('xCloudTitles', () => Ipc.send('xCloud', 'getTitles'), { staleTime: 300*1000 })
+  const xCloudSearch = useQuery(['xCloudSearch', filter], () => Ipc.send('xCloud', 'filterTitles', filter))
+  const queryClient = new QueryClient()
 
-  React.useEffect(() => {
-    if(xcloudTitles.length == 0){
-      Ipc.send('xCloud', 'getTitles').then((titles) => {
-        setXcloudTitles(titles)
-      })
-    }
-  })
+  function performFilter(){
+    console.log(filter)
 
-  function performFilter(titles){
-    if(filter.name != ''){
-      titles = titles.filter((item) => {
-        return item.toLowerCase().includes(filter.name.toLowerCase())
-      })
-    }
+    // if(filter.name !== ''){
+    //   // const xCloudSearch = useQuery('xCloudSearch', () => Ipc.send('xCloud', 'filterTitles', filter))
+      queryClient.invalidateQueries('xCloudSearch')
+      return (xCloudSearch.isFetched === true) ? xCloudSearch.data : xCloudTitles.data
+    // }
 
-    return titles
+    // return (xCloudSearch.isFetched === true) ? xCloudSearch.data : xCloudTitles.data
+    return xCloudTitles.data
   }
 
   return (
@@ -61,8 +54,8 @@ function xCloudLibrary() {
         }></input>
       </h2>
       
-      <ViewportGrid drawPagination={true}>{
-        (xcloudTitles.length == 0) ? (<p><Loader></Loader></p>) : performFilter(xcloudTitles).map((item, i) => {
+      <ViewportGrid key='library' drawPagination={true}>{
+        (xCloudTitles.isFetched !== true) ? (<Loader></Loader>) : performFilter().map((item, i) => {
           return (
             <GameTitleDynamic
               titleId={ item }

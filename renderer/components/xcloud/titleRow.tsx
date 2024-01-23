@@ -23,7 +23,7 @@ function TitleRow({
             <h2 className="title">{ children }</h2>
             
             <ViewportGrid maxHeight={ 140 }>{
-                (titles.length == 0) ? (<p><Loader></Loader></p>) :
+                (titles.length == 0) ? (<Loader></Loader>) :
                   titles.map((item, i) => {
                     return (
                         <GameTitleDynamic
