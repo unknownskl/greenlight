@@ -50,14 +50,12 @@ function Stream() {
 
         // Start keepalive loop
         keepaliveInterval = setInterval(() => {
-          // ipcRenderer.send(((router.query.serverid as string).substr(0, 6) == 'xcloud') ? 'xcloud' : 'stream', {
-          //   type: 'keepalive'
-          // })
-
           Ipc.send('streaming', 'sendKeepalive', {
             sessionId: sessionId
           }).then((result) => {
             console.log('StartStream keepalive:', result)
+          }).catch((error) => {
+            console.error('Failed to send keepalive. Error details:\n'+JSON.stringify(error))
           })
         }, 30000) // Send every 30 seconds
 
