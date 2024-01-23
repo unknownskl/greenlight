@@ -1,7 +1,10 @@
 # Changelog
 
-## v2.x.x - 2024-xx-xx
+## v2.1.0 - 2024-01-xx
 - Fix vibration detection #1076 #813 (credits to @LostVector and @opencv4nodejs)
+- Revamped the xCloud UI. New overview page with recent played titles and new added games.
+- Set default resolution to 1280*800 to fix several scaling issues on Steamdeck
+- Experimental support for second controller (Uses same user profile, so multiplayer in some games does not work correctly) #916
 
 ## v2.0.1 - 2023-12-20
 - Bump version to align with Flathub Release

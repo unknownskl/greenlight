@@ -260,10 +260,9 @@ function StreamComponent({
 
   function streamDisconnect(){
     document.getElementById('streamComponentHolder').innerHTML = '';
-    // onDisconnect()
 
-    window.history.back()
-    // xPlayer.reset()
+    // window.history.back()
+    xPlayer.reset()
   }
 
   function endStream(){
