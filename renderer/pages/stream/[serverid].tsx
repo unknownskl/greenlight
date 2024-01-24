@@ -9,7 +9,6 @@ import { useSettings } from '../../context/userContext'
 import StreamComponent from '../../components/ui/streamcomponent'
 import Ipc from '../../lib/ipc';
 
-
 function Stream() {
   const router = useRouter()
   const { settings, setSettings} = useSettings()
@@ -96,6 +95,8 @@ function Stream() {
     if((ipc_channel === 'xcloud') ? settings.xcloud_bitrate : settings.xhome_bitrate > 0){
       xPlayer.setVideoBitrate((ipc_channel === 'xcloud') ? settings.xcloud_bitrate : settings.xhome_bitrate)
     }
+
+    xPlayer.setCodecPreferences('video/H264', { profiles: ['4d'] }) // 4d = high, 42e = mid, 420 = low
     
     Ipc.send('streaming', 'startStream', {
       type: streamType,
