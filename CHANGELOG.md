@@ -1,6 +1,6 @@
 # Changelog
 
-## v2.1.0 - 2024-01-xx
+## v2.1.0 - 2024-01-26
 - Fix vibration detection #1076 #813 (credits to @LostVector and @opencv4nodejs)
 - Revamped the xCloud UI. New overview page with recent played titles and new added games.
 - Set default resolution to 1280*800 to fix several scaling issues on Steamdeck
