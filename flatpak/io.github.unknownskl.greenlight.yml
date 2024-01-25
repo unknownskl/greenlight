@@ -31,6 +31,9 @@ modules:
         yarn_config_cache: /run/build/greenlight/flatpak-node/yarn-mirror
     build-commands:
       - cp -a ../extralib/extralib -t /app/
+      - gunzip /app/extralib/libLLVM-16.0.6.so.gz
+      - cp -a ../extralib/reduceSoFiles.sh -t /app/extralib
+      - pushd /app/extralib && ln -s libLLVM-16.0.6.so libLLVM-16.so && chmod +x reduceSoFiles.sh && ./reduceSoFiles.sh && popd
       - yarn --offline
       - yarn run flatpak-build --offline -- --linux
       # Add icon, metadata and desktop file
