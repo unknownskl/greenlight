@@ -66,7 +66,8 @@ function Stream() {
 
       } else if(event.state == 'closed') {
         // Client has been disconnected. Lets return to home.
-        xPlayer.reset()
+        // xPlayer.close()
+        console.log('Client has been disconnected. Returning to prev page.')
         window.history.back()
       }
     }
@@ -96,7 +97,7 @@ function Stream() {
       xPlayer.setVideoBitrate((ipc_channel === 'xcloud') ? settings.xcloud_bitrate : settings.xhome_bitrate)
     }
 
-    xPlayer.setCodecPreferences('video/H264', { profiles: ['4d'] }) // 4d = high, 42e = mid, 420 = low
+    xPlayer.setCodecPreferences('video/H264', { profiles: settings.video_profiles || [] }) // 4d = high, 42e = mid, 420 = low
     
     Ipc.send('streaming', 'startStream', {
       type: streamType,

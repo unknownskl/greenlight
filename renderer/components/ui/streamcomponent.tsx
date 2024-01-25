@@ -261,8 +261,7 @@ function StreamComponent({
   function streamDisconnect(){
     document.getElementById('streamComponentHolder').innerHTML = '';
 
-    // window.history.back()
-    xPlayer.reset()
+    xPlayer.close()
   }
 
   function endStream(){
@@ -270,8 +269,7 @@ function StreamComponent({
       document.getElementById('streamComponentHolder').innerHTML = '';
       onDisconnect()
       
-      window.history.back()
-      // xPlayer.reset()
+      xPlayer.close()
     }
   }
 

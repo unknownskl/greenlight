@@ -1,20 +1,16 @@
 import React, { useContext, useEffect, useState } from 'react'
 
-export const UserContext = React.createContext({
-    consoles: [],
-    setConsoles: (consoles) => null,
-})
-export const useUser = () => useContext(UserContext)
+// export const UserContext = React.createContext({
+//     consoles: [],
+//     setConsoles: (consoles) => null,
+// })
+// export const useUser = () => useContext(UserContext)
 
-
-
-export const XcloudContext = React.createContext({
-    xcloudTitles: [],
-    setXcloudTitles: (titles) => null,
-})
-export const useXcloud = () => useContext(XcloudContext)
-
-
+// export const XcloudContext = React.createContext({
+//     xcloudTitles: [],
+//     setXcloudTitles: (titles) => null,
+// })
+// export const useXcloud = () => useContext(XcloudContext)
 
 export const SettingsContext = React.createContext({
     settings: undefined,
@@ -22,13 +18,11 @@ export const SettingsContext = React.createContext({
 })
 export const useSettings = () => useContext(SettingsContext)
 
-export const AchievementsContext = React.createContext({
-    achievements: undefined,
-    setAchievements: (settings) => null,
-})
-export const useAchievements = () => useContext(AchievementsContext)
-
-
+// export const AchievementsContext = React.createContext({
+//     achievements: undefined,
+//     setAchievements: (settings) => null,
+// })
+// export const useAchievements = () => useContext(AchievementsContext)
 
 export const UserProvider = ({ children }) => {
     const [consoles, setConsoles] = useState([])
@@ -36,6 +30,7 @@ export const UserProvider = ({ children }) => {
     const [settings, setSettings] = useState({
         xhome_bitrate: 0,
         xcloud_bitrate: 0,
+        video_profiles: [],
         controller_vibration: true,
         video_size: 'default',
         force_region_ip: '',
@@ -52,21 +47,31 @@ export const UserProvider = ({ children }) => {
         return newSettings
     }
 
+    // Check for missing keys and update if needed.
+
+
     useEffect(() => {
-        const settings = localStorage.getItem("settings")
-        console.log('Loading settings from localStorage', settings)
-        if (settings) {
-            setSettings(JSON.parse(settings))
+        const localSettings = localStorage.getItem('settings')
+        const mergedSettings = { ...settings, ...JSON.parse(localSettings) }
+        console.log('Loading settings from localStorage', mergedSettings)
+        if (localSettings) {
+            setSettings(mergedSettings)
 	    }
     }, [])
 
-    return <UserContext.Provider value={{ consoles, setConsoles }}>
-        <XcloudContext.Provider value={{ xcloudTitles, setXcloudTitles }}>
-            <SettingsContext.Provider value={{ settings, setSettings: setSettingsAndSaveToLocalStorage }}>
-                <AchievementsContext.Provider value={{ achievements, setAchievements }}>
-                    {children}
-                </AchievementsContext.Provider>
-            </SettingsContext.Provider>
-        </XcloudContext.Provider>
-    </UserContext.Provider>
+    // return <UserContext.Provider value={{ consoles, setConsoles }}>
+    //     <XcloudContext.Provider value={{ xcloudTitles, setXcloudTitles }}>
+    //         <SettingsContext.Provider value={{ settings, setSettings: setSettingsAndSaveToLocalStorage }}>
+    //             <AchievementsContext.Provider value={{ achievements, setAchievements }}>
+    //                 {children}
+    //             </AchievementsContext.Provider>
+    //         </SettingsContext.Provider>
+    //     </XcloudContext.Provider>
+    // </UserContext.Provider>
+
+    return <SettingsContext.Provider value={{ settings, setSettings: setSettingsAndSaveToLocalStorage }}>
+        {/* <AchievementsContext.Provider value={{ achievements, setAchievements }}> */}
+            {children}
+        {/* </AchievementsContext.Provider> */}
+    </SettingsContext.Provider>
 }
