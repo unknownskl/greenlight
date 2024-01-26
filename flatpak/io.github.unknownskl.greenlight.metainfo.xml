@@ -22,20 +22,26 @@
   <releases>
     <release version="2.1.0" date="2024-01-25">
      <description>
-        <li>- Fix vibration detection #1076 #813 (credits to @LostVector and @opencv4nodejs)</li>
-        <li>- Revamped the xCloud UI. New overview page with recent played titles and new added games.</li>
-        <li>- Set default resolution to 1280*800 to fix several scaling issues on Steamdeck</li>
-        <li>- Experimental support for second controller (Uses same user profile, so multiplayer in some games does not work correctly) #916</li>
+        <ul>
+          <li>- Fix vibration detection #1076 #813 (credits to @LostVector and @opencv4nodejs)</li>
+          <li>- Revamped the xCloud UI. New overview page with recent played titles and new added games.</li>
+          <li>- Set default resolution to 1280*800 to fix several scaling issues on Steamdeck</li>
+          <li>- Experimental support for second controller (Uses same user profile, so multiplayer in some games does not work correctly) #916</li>
+        </ul>
      </description>
     </release>
     <release version="2.0.1" date="2023-12-20">
      <description>
-        <li>Align internal release version with version released on Github</li>
+        <ul>
+          <li>Align internal release version with version released on Github</li>
+        </ul>
      </description>
     </release>
     <release version="2.0.0" date="2023-12-14">
      <description>
-        <li>First full release</li>
+        <ul>
+          <li>First full release</li>
+        </ul>
      </description>
     </release>
   </releases>
