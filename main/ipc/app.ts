@@ -15,7 +15,7 @@ export default class IpcApp extends IpcBase {
 
             resolve(user)
 
-            this.sendAuthState()
+            // this.sendAuthState()
         })
     }
 
@@ -32,6 +32,16 @@ export default class IpcApp extends IpcBase {
             gamerscore: gamerscore ? gamerscore : '',
             level: this._application._authentication._appLevel,
         }
+    }
+
+    getAuthState(){
+        return new Promise((resolve, reject) => {
+            resolve({
+                isAuthenticating: this._application._authentication._isAuthenticating,
+                isAuthenticated: this._application._authentication._isAuthenticated,
+                user: this.getUserState()
+            })
+        })
     }
 
     login(){

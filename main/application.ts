@@ -6,6 +6,7 @@ import { createWindow, xboxWorker, updater } from './helpers';
 import Events from './events'
 import Authentication from './authentication'
 import Ipc from './ipc'
+import WebUI from './webui'
 
 import pkg from '../package.json'
 
@@ -31,6 +32,7 @@ export default class Application {
     private _mainWindow
     public _events:Events
     public _ipc:Ipc
+    public _webUI:WebUI
     public _authentication:Authentication
     public _xboxWorker:xboxWorker
 
@@ -58,6 +60,10 @@ export default class Application {
         this._xboxWorker = new xboxWorker(this)
 
         this._ipc.startUp()
+        
+        this._webUI = new WebUI(this)
+        this._webUI.startServer(3001)
+
     }
 
     log(namespace = 'application', ...args){

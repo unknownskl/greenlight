@@ -52,27 +52,54 @@ export default function MyApp({ Component, pageProps }) {
       })
     })
 
-    const authState = Ipc.onAction('app', 'authState', (event, args) => {
-      console.log('Received AuthState:', args)
+    // const authState = Ipc.onAction('app', 'authState', (event, args) => {
+    //   console.log('Received AuthState:', args)
       
-      if(args.isAuthenticating === true){
-        setIsLoading(true)
-        setPrevUserState({ ...prevUserState, ...args.user})
+    //   if(args.isAuthenticating === true){
+    //     setIsLoading(true)
+    //     setPrevUserState({ ...prevUserState, ...args.user})
 
-      } else if(args.isAuthenticated === true){
-        if(loggedIn === false){
-          Ipc.send('app', 'onUiShown').then((result) => {
-            if(result.autoStream !== '')
-              setTimeout(() => {
-                router.push('stream/'+result.autoStream)
-              }, 1000)
-          })
-        }
+    //   } else if(args.isAuthenticated === true){
+    //     if(loggedIn === false){
+    //       Ipc.send('app', 'onUiShown').then((result) => {
+    //         if(result.autoStream !== '')
+    //           setTimeout(() => {
+    //             router.push('stream/'+result.autoStream)
+    //           }, 1000)
+    //       })
+    //     }
         
-        setLoginState(true)
-        setPrevUserState({ ...prevUserState, ...args.user})
-      }
-    })
+    //     setLoginState(true)
+    //     setPrevUserState({ ...prevUserState, ...args.user})
+    //   }
+    // })
+
+    const authInterval = setInterval(() => {
+      console.log('Requesting AuthState...')
+      Ipc.send('app', 'getAuthState').then((args) => {
+        console.log('Received AuthState:', args)
+        
+        if(args.isAuthenticating === true){
+          setIsLoading(true)
+          setPrevUserState({ ...prevUserState, ...args.user})
+
+        } else if(args.isAuthenticated === true){
+          clearInterval(authInterval)
+
+          if(loggedIn === false){
+            Ipc.send('app', 'onUiShown').then((result) => {
+              if(result.autoStream !== '')
+                setTimeout(() => {
+                  router.push('stream/'+result.autoStream)
+                }, 1000)
+            })
+          }
+          
+          setLoginState(true)
+          setPrevUserState({ ...prevUserState, ...args.user})
+        }
+      })
+    }, 500)
 
     const errorHandler = function(event) {
       console.error('Unhandled rejection (promise: ', event.promise, ', reason: ', event.reason, ').');
@@ -87,7 +114,11 @@ export default function MyApp({ Component, pageProps }) {
     // cleanup this component
     return () => {
       window.removeEventListener('unhandledrejection', errorHandler)
-      Ipc.removeListener('app', authState)
+
+      if(authInterval)
+        clearInterval(authInterval)
+
+      // Ipc.removeListener('app', authState)
     };
   }, []);
 

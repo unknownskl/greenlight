@@ -35,6 +35,7 @@ export default class IpcxCloud extends IpcBase {
         this._application._events._xCloudApi.getTitles().then((titles:any) => {
             this._titleManager.setCloudTitles(titles).then(() => {
 
+                this._application.log('Ipc:xCloud', 'Titlemanager has loaded all titles.')
                 this._titlesAreLoaded = true
 
                 // Uncomment to delay the process of loading data
@@ -166,6 +167,7 @@ export default class IpcxCloud extends IpcBase {
     waitForTitle(resolveCallback, args:getTitleArgs){
         setTimeout(() => {
             if(this._titlesAreLoaded === false){
+                this._application.log('Ipc:xCloud', 'Titles not loaded yet. Queueing title:', args.titleId, this._titlesAreLoaded, this._titleManager._xCloudTitles)
                 this.waitForTitle(resolveCallback, args)
             } else {
                 const title = this._titleManager.findTitle(args.titleId)
