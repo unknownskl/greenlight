@@ -191,7 +191,7 @@ export default class Authentication {
                 // Supports xCloud
                 this._appLevel = 2
 
-                this.retrieveMSALTokens(code_token, sisu_token, xsts_token, this._xalAuthenticator)
+                this.retrieveMSALTokens(code_token, sisu_token, xsts_token)
             }).catch((error) => {
                 // Supports xHome only
                 this._appLevel = 1
@@ -199,11 +199,11 @@ export default class Authentication {
                 this.requestxCloudToken(xsts_token.Token, true).then((result) => {
                     this._appLevel = 2
 
-                    this.retrieveMSALTokens(code_token, sisu_token, xsts_token, this._xalAuthenticator)
+                    this.retrieveMSALTokens(code_token, sisu_token, xsts_token)
                 }).catch((error) => {
                     this._appLevel = 1
 
-                    this.retrieveMSALTokens(code_token, sisu_token, xsts_token, this._xalAuthenticator)
+                    this.retrieveMSALTokens(code_token, sisu_token, xsts_token)
                 })
             })
 
@@ -214,7 +214,9 @@ export default class Authentication {
         })
     }
 
-    retrieveMSALTokens(code_token, sisu_token, xsts_token, xalAuth){
+    retrieveMSALTokenCount = 0
+
+    retrieveMSALTokens(code_token, sisu_token, xsts_token){
         const xalAuthenticator = this._xalAuthenticator
         Promise.all([
             xalAuthenticator.exchange_refresh_token_for_xcloud_transfer_token(code_token.refresh_token),
@@ -235,7 +237,14 @@ export default class Authentication {
 
             this._application._ipc._channels.app.sendAuthState()
         }).catch((error) => {
-            this._application.log('authentication', __filename+'[retrieveTokens()] Failed to retrieve tokens')
+            this._application.log('authentication', __filename+'[retrieveTokens()] Failed to retrieve tokens, try again...')
+            this.retrieveMSALTokenCount++
+            if(this.retrieveMSALTokenCount < 3){
+                this.retrieveMSALTokens(code_token, sisu_token, xsts_token)
+            } else {
+                dialog.showMessageBox({ message: 'Failed to retrieve tokens after 3 attempts. \n Detailed error message: '+error.error})
+                this._isAuthenticating = false
+            }
         })
     }
 
