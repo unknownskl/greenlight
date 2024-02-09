@@ -23,7 +23,7 @@ export default class Application {
         fullscreen: false,
         autoStream: '',
     }
-    private _isProduction:boolean = (process.env.NODE_ENV === 'production')
+    public _isProduction:boolean = (process.env.NODE_ENV === 'production')
     private _isCi:boolean = (process.env.CI !== undefined)
     private _isMac:boolean = (process.platform === 'darwin')
     private _isWindows:boolean = (process.platform === 'win32')

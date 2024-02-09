@@ -22,6 +22,9 @@ interface sendKeepaliveArgs {
 interface stopStreamArgs {
     sessionId: string
 }
+interface getPlayerStateArgs {
+    sessionId: string
+}
 
 interface activeSessionsArgs {
 }
@@ -65,6 +68,12 @@ export default class IpcStreaming extends IpcBase {
 
     sendKeepalive(args:sendKeepaliveArgs){
         return this._streamManager.sendKeepalive(args.sessionId)
+    }
+
+    getPlayerState(args:getPlayerStateArgs){
+        return new Promise((resolve, reject) => {
+            resolve(this._streamManager.getSession(args.sessionId))
+        })
     }
 
     activeSessions(args:activeSessionsArgs){

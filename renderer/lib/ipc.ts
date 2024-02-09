@@ -1,4 +1,4 @@
-import { version } from '../../package.json'
+import pkg from '../../package.json'
 import WebsocketIPC from './websocket'
 
 export default {
@@ -74,11 +74,15 @@ export default {
             },
 
             getVersion(){
-                return version+' (WebUI)'
+                return pkg.version+' (WebUI)'
             },
 
             openExternal(url:string){
                 window.open(url, '_blank')
+            },
+
+            isWebUI(){
+                return true
             }
         }
     }

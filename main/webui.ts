@@ -61,16 +61,18 @@ export default class WebUI {
             });
         });
 
+        if(this._application._isProduction){
+            this._express.use(express.static(path.join(__dirname, "../app/")))
 
-        // this._express.use(express.static(path.join(__dirname, "../app/")))
+            this._express.get('*', (req, res) => {
+                // res.send('Hello World!')
+                res.sendFile(path.join(__dirname, "../app/", "home.html"));
+            })
+        } else {
+            const expressPort = process.argv[2] || 3000;
+            this._express.use(expressProxy('localhost', { port: 8888}));
+        }
 
-        // this._express.get('*', (req, res) => {
-        //     // res.send('Hello World!')
-        //     res.sendFile(path.join(__dirname, "../app/", "home.html"));
-        // })
-
-        const expressPort = process.argv[2] || 3000;
-        this._express.use(expressProxy('localhost', { port: 8888}));
 
         this._express.listen(port, () => {
             this._application.log('webui', 'Webserver running on port:', port)

@@ -70,6 +70,10 @@ export const Preload = {
 
     getVersion(url:string){
         return pkg.version
+    },
+
+    isWebUI(){
+        return false
     }
 };
 
