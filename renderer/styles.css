@@ -25,6 +25,10 @@ a {
     text-decoration: none;
 }
 
+p {
+    vertical-align: middle;
+}
+
 @import '@fortawesome/fontawesome-free/css/fontawesome.min.css';
 @import '@fortawesome/fontawesome-free/css/brands.min.css';
 @import '@fortawesome/fontawesome-free/css/solid.min.css';
@@ -97,9 +101,12 @@ h2.title {
 }
 
 input.h2-search {
+    float: right;
+}
+
+input.text {
     background: #000000;
     border-radius: 5px;
-    float: right;
     padding: 10px;
     display: block;
     border: 0px;

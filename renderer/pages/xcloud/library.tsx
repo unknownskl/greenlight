@@ -45,7 +45,7 @@ function xCloudLibrary() {
       <h2 className="title">
         Library
 
-        <input type="text" className="h2-search" placeholder="Search" onChange={
+        <input type="text" className="text h2-search" placeholder="Search" onChange={
           (e) => {
             setFilter({
               name: e.target.value

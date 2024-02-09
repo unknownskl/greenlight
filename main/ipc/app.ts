@@ -1,9 +1,25 @@
 import IpcBase from './base'
 import { session } from 'electron'
 import electron from 'electron'
+import { defaultSettings } from '../../renderer/context/userContext.defaults'
 
 interface setForceRegionIpArgs {
     ip:string
+}
+
+interface setSettingsArgs {
+    xhome_bitrate: number,
+    xcloud_bitrate: number,
+    video_profiles: Array<string>
+    controller_vibration: boolean,
+    video_size: string,
+    force_region_ip: string,
+    input_touch: boolean,
+    input_mousekeyboard: boolean,
+    input_newgamepad: boolean,
+    webui_enabled: boolean,
+    webui_autostart: boolean,
+    webui_port: number,
 }
 
 export default class IpcApp extends IpcBase {
@@ -111,6 +127,49 @@ export default class IpcApp extends IpcBase {
             this._application._authentication.startSilentFlow();
 
             resolve(true)
+        })
+    }
+
+    setSettings(args:setSettingsArgs){
+        return new Promise((resolve, reject) => {
+            // Check for changes which we need to take action on
+            // const settings = this._application._store.get('settings', defaultSettings) as Object
+            // const prevSettings = {...defaultSettings, ...settings}
+            const newSettings = {...defaultSettings, ...args}
+
+            // Perform save
+            this._application._store.set('settings', newSettings)
+            resolve(newSettings)
+        })
+    }
+
+    getSettings(args){
+        return new Promise((resolve, reject) => {
+            const settings = this._application._store.get('settings', defaultSettings) as Object;
+            resolve({...defaultSettings, ...settings})
+        })
+    }
+
+    getWebUIStatus(args){
+        return new Promise((resolve, reject) => {
+            resolve((this._application._webUI._express ? true : false))
+        })
+    }
+
+    startWebUI(args){
+        return new Promise((resolve, reject) => {
+            const rawSettings = this._application._store.get('settings', defaultSettings) as Object;
+            const settings = {...defaultSettings, ...rawSettings}
+            this._application._webUI.startServer(settings.webui_port)
+            resolve(true)
+        })
+    }
+
+
+    stopWebUI(args){
+        return new Promise((resolve, reject) => {
+            this._application._webUI.stopServer()
+            resolve(false)
         })
     }
 

@@ -60,10 +60,7 @@ export default class Application {
         this._xboxWorker = new xboxWorker(this)
 
         this._ipc.startUp()
-        
         this._webUI = new WebUI(this)
-        this._webUI.startServer(3001)
-
     }
 
     log(namespace = 'application', ...args){

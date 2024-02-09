@@ -48,7 +48,7 @@ export default {
     },
 
     websocketFallbackApi(){
-        const websocket = new WebsocketIPC('ws://127.0.0.1:3001/ipc')
+        const websocket = new WebsocketIPC('ws://'+window.location.hostname+':'+window.location.port+'/ipc')
 
         console.log('Injecting Greenlight Websocker IPC')
 
