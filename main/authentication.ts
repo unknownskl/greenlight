@@ -181,11 +181,9 @@ export default class Authentication {
 
     retrieveTokens(code_token, sisu_token){
         this._application.log('authentication', __filename+'[retrieveTokens()] Retrieving tokens...')
-        // const xalAuth = xalAuthenticator = new XalLibrary.default.XalAuthenticator()
         this._xalAuthenticator.do_xsts_authorization(sisu_token.DeviceToken, sisu_token.TitleToken.Token, sisu_token.UserToken.Token, "http://gssv.xboxlive.com/").then((xsts_token:any) => {
             
             this._isAuthenticating = true
-            this._application._ipc._channels.app.sendAuthState()
             
             this.requestxCloudToken(xsts_token.Token).then((result) => {
                 // Supports xCloud
@@ -235,7 +233,6 @@ export default class Authentication {
             this._isAuthenticating = false
             this._application._events.emit('start', this._tokens)
 
-            this._application._ipc._channels.app.sendAuthState()
         }).catch((error) => {
             this._application.log('authentication', __filename+'[retrieveTokens()] Failed to retrieve tokens, try again...')
             this.retrieveMSALTokenCount++

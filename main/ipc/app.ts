@@ -86,23 +86,9 @@ export default class IpcApp extends IpcBase {
         })
     }
 
-    sendAuthState(){
-        this.send('app', {
-            id: 0,
-            action: 'authState',
-            data: {
-                isAuthenticating: this._application._authentication._isAuthenticating,
-                isAuthenticated: this._application._authentication._isAuthenticated,
-                user: this.getUserState()
-            }
-        })
-    }
-
-    sendOnlineFriends(onlineFriends){
-        this.send('app', {
-            id: 0,
-            action: 'onlineFriends',
-            data: onlineFriends
+    getOnlineFriends(){
+        return new Promise((resolve, reject) => {
+            resolve(this._application._xboxWorker._onlineFriends)
         })
     }
 

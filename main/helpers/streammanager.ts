@@ -1,5 +1,6 @@
 import Application from '../application'
 import xCloudApi, { playResult } from './xcloudapi'
+import Ipc from '../ipc'
 
 interface streamSession {
     id: string
@@ -163,11 +164,18 @@ export default class StreamManager {
 
                 if(result.state === 'Provisioned'){
                     // Do rest of handshake...
+                    // Session module needed?
                     this._application._ipc._channels.streaming.send('streaming', {
                         action: 'startStreamResult',
                         id: 0,
                         data: this.getSession(sessionId)
                     })
+
+                    // this._application._webUI._ipc._channels.streaming.send('streaming', {
+                    //     action: 'startStreamResult',
+                    //     id: 0,
+                    //     data: this.getSession(sessionId)
+                    // })
 
                 } else if(result.state === 'Provisioning'){
                     // Lets loop again

@@ -15,17 +15,16 @@ function SidebarFriends({
 
   React.useEffect(() => {
 
-    // ipcRenderer.on('xbox_friends', (event, friends) => {
-    //   setOnlineFriends(friends)
-    // })
-
-    const ipcListener = Ipc.onAction('app', 'onlineFriends', (event, onlineFriends) => {
-      setOnlineFriends(onlineFriends)
-    })
+    const updateFriends = () => {
+      Ipc.send('app', 'getOnlineFriends').then((onlineFriends) => {
+        setOnlineFriends(onlineFriends)
+      })
+    }
+    updateFriends()
+    const friendsInterval = setInterval(updateFriends, 1000*15)
 
     return () => {
-      // ipcRenderer.removeAllListeners('stream');
-      Ipc.removeListener('app', ipcListener)
+      clearInterval(friendsInterval)
     };
   }, []);
   

@@ -52,28 +52,6 @@ export default function MyApp({ Component, pageProps }) {
       })
     })
 
-    // const authState = Ipc.onAction('app', 'authState', (event, args) => {
-    //   console.log('Received AuthState:', args)
-      
-    //   if(args.isAuthenticating === true){
-    //     setIsLoading(true)
-    //     setPrevUserState({ ...prevUserState, ...args.user})
-
-    //   } else if(args.isAuthenticated === true){
-    //     if(loggedIn === false){
-    //       Ipc.send('app', 'onUiShown').then((result) => {
-    //         if(result.autoStream !== '')
-    //           setTimeout(() => {
-    //             router.push('stream/'+result.autoStream)
-    //           }, 1000)
-    //       })
-    //     }
-        
-    //     setLoginState(true)
-    //     setPrevUserState({ ...prevUserState, ...args.user})
-    //   }
-    // })
-
     const authInterval = setInterval(() => {
       console.log('Requesting AuthState...')
       Ipc.send('app', 'getAuthState').then((args) => {
@@ -117,8 +95,6 @@ export default function MyApp({ Component, pageProps }) {
 
       if(authInterval)
         clearInterval(authInterval)
-
-      // Ipc.removeListener('app', authState)
     };
   }, []);
 
