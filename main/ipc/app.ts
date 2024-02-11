@@ -162,8 +162,6 @@ export default class IpcApp extends IpcBase {
         return new Promise((resolve, reject) => {
             
             this.getSettings().then((settings) => {
-                settings.app_lowresolution
-
                 if(settings.app_lowresolution === false){
                     this._application._mainWindow.setSize(960, 600)
                     settings.app_lowresolution = true
