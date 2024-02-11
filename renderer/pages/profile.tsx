@@ -14,7 +14,7 @@ import AchievementGameRow from '../components/achievement/gamerow'
 function Profile() {
   // const {achievements, setAchievements} = useAchievements()
   const [page, setPage] = React.useState(0);
-  let loadingAchievements = []
+  const loadingAchievements = []
   const resultsPerPage = 10
 
   React.useEffect(() => {

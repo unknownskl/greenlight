@@ -75,7 +75,7 @@ function Header({
   }
 
   function drawMenu() {
-    let linksHtml = []
+    const linksHtml = []
 
     for(const link in headerLinks){
       linksHtml.push(<li key={ link }>
