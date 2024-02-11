@@ -29,7 +29,7 @@ export default class Application {
     private _isWindows:boolean = (process.platform === 'win32')
     private _isQuitting:boolean = false
 
-    private _mainWindow
+    public _mainWindow
     public _events:Events
     public _ipc:Ipc
     public _webUI:WebUI

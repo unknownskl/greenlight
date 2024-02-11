@@ -8,6 +8,7 @@ export const defaultSettings = {
     input_touch: false,
     input_mousekeyboard: false,
     input_newgamepad: false,
+    app_lowresolution: false,
 
     // WebUI
     webui_autostart: false,

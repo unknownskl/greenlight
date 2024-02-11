@@ -7,21 +7,6 @@ interface setForceRegionIpArgs {
     ip:string
 }
 
-interface setSettingsArgs {
-    xhome_bitrate: number,
-    xcloud_bitrate: number,
-    video_profiles: Array<string>
-    controller_vibration: boolean,
-    video_size: string,
-    force_region_ip: string,
-    input_touch: boolean,
-    input_mousekeyboard: boolean,
-    input_newgamepad: boolean,
-    webui_enabled: boolean,
-    webui_autostart: boolean,
-    webui_port: number,
-}
-
 export default class IpcApp extends IpcBase {
     // _streamingSessions:any = {}
 
@@ -130,7 +115,7 @@ export default class IpcApp extends IpcBase {
         })
     }
 
-    setSettings(args:setSettingsArgs){
+    setSettings(args:(typeof defaultSettings)){
         return new Promise((resolve, reject) => {
             // Check for changes which we need to take action on
             // const settings = this._application._store.get('settings', defaultSettings) as Object
@@ -143,14 +128,14 @@ export default class IpcApp extends IpcBase {
         })
     }
 
-    getSettings(args){
-        return new Promise((resolve, reject) => {
+    getSettings(){
+        return new Promise<typeof defaultSettings>((resolve, reject) => {
             const settings = this._application._store.get('settings', defaultSettings) as Object;
             resolve({...defaultSettings, ...settings})
         })
     }
 
-    getWebUIStatus(args){
+    getWebUIStatus(){
         return new Promise((resolve, reject) => {
             resolve((this._application._webUI._express ? true : false))
         })
@@ -170,6 +155,32 @@ export default class IpcApp extends IpcBase {
         return new Promise((resolve, reject) => {
             this._application._webUI.stopServer()
             resolve(false)
+        })
+    }
+
+    setLowResolution(){
+        return new Promise((resolve, reject) => {
+            
+            this.getSettings().then((settings) => {
+                settings.app_lowresolution
+
+                if(settings.app_lowresolution === false){
+                    this._application._mainWindow.setSize(960, 600)
+                    settings.app_lowresolution = true
+
+                } else {
+                    this._application._mainWindow.setSize(1280, 800)
+                    settings.app_lowresolution = false
+                }
+
+                this.setSettings(settings)
+            })
+
+
+            // if(this._application._mainWindow.height !)
+            // this._application._mainWindow.setSize(960, 600)
+             
+            resolve(true)
         })
     }
 
