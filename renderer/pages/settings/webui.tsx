@@ -1,12 +1,10 @@
-import React from 'react';
-import Head from 'next/head';
-
-import SettingsSidebar from '../../components/settings/sidebar';
-import Card from '../../components/ui/card';
-
-import { useSettings } from '../../context/userContext'
-import Button from '../../components/ui/button';
+import React from 'react'
+import Head from 'next/head'
+import SettingsSidebar from '../../components/settings/sidebar'
+import Card from '../../components/ui/card'
+import Button from '../../components/ui/button'
 import Ipc from '../../lib/ipc'
+import { useSettings } from '../../context/userContext'
 
 
 function SettingsWebUI() {

@@ -15,7 +15,6 @@ export default (windowName: string, options: BrowserWindowConstructorOptions): B
     height: options.height,
   };
   let state = {};
-  let win;
 
   const restore = () => store.get(key, defaultSize);
 
@@ -84,7 +83,7 @@ export default (windowName: string, options: BrowserWindowConstructorOptions): B
     },
     autoHideMenuBar: true,
   };
-  win = new BrowserWindow(browserOptions);
+  const win = new BrowserWindow(browserOptions);
 
   win.on('close', saveState);
 

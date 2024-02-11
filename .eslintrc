@@ -5,16 +5,16 @@
       "@typescript-eslint"
     ],
     "extends": [
-      "plugin:@next/next/recommended"
+      "plugin:@next/next/recommended",
       // "eslint:recommended"
-      // "plugin:@typescript-eslint/eslint-recommended",
+      "plugin:@typescript-eslint/eslint-recommended"
       // "plugin:@typescript-eslint/recommended"
-    ]
-    // "rules": {
-    //   "quotes": ["warn", "single"],
+    ],
+    "rules": {
+      // "quotes": ["warn", "single"],
     //   "indent": ["warn", 4, { "SwitchCase": 1 }],
-    //   "semi": ["error", "never"],
-    //   "comma-dangle": ["warn", "always-multiline"],
+      // "semi": ["error", "never"],
+      // "comma-dangle": ["warn", "always-multiline"],
     //   "dot-notation": "off",
     //   "eqeqeq": "warn",
     //   "curly": ["warn", "all"],
@@ -31,5 +31,5 @@
     //   "@typescript-eslint/explicit-module-boundary-types": "off",
     //   "@typescript-eslint/no-explicit-any": "off",
     //   "@typescript-eslint/member-delimiter-style": ["warn"]
-    // }
+    }
   }

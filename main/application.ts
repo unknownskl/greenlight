@@ -41,13 +41,13 @@ export default class Application {
         this._log = Debug('greenlight')
 
         ElectronApp.commandLine.appendSwitch('enable-features', 'VaapiIgnoreDriverChecks,VaapiVideoDecoder,PlatformHEVCDecoderSupport,CanvasOopRasterization');
-        ElectronApp.commandLine.appendSwitch('disable-features', 'UseChromeOSDirectVideoDecoder');
+        // ElectronApp.commandLine.appendSwitch('disable-features', 'UseChromeOSDirectVideoDecoder');
         ElectronApp.commandLine.appendSwitch('enable-gpu-rasterization');
         ElectronApp.commandLine.appendSwitch('enable-oop-rasterization');
         ElectronApp.commandLine.appendSwitch('accelerated-video-decode');
         ElectronApp.commandLine.appendSwitch('ozone-platform-hint', 'x11');
         ElectronApp.commandLine.appendSwitch('ignore-gpu-blocklist');
-        ElectronApp.commandLine.appendSwitch('enable-zero-copy');
+        // ElectronApp.commandLine.appendSwitch('enable-zero-copy');
 
         this.readStartupFlags()
         this.loadApplicationDefaults()
@@ -85,7 +85,7 @@ export default class Application {
             }
 
             if(process.argv[arg].includes('--connect=')){
-                let key = process.argv[arg].substring(10)
+                const key = process.argv[arg].substring(10)
 
                 this.log('application',__filename+'[readStartupFlags()] --connect switch found. Setting autoStream to', key)
                 this._startupFlags.autoStream = key
@@ -98,6 +98,7 @@ export default class Application {
     loadApplicationDefaults(){
         if(this._isProduction === true && this._isCi === false) {
             serve({ directory: 'app' });
+
         } else if(this._isCi === true) {
             const random = Math.random()*100
             ElectronApp.setPath('userData', `${ElectronApp.getPath('userData')} (${random})`);
@@ -107,6 +108,7 @@ export default class Application {
 
             serve({ directory: 'app' });
         } else {
+            
             ElectronApp.setPath('userData', `${ElectronApp.getPath('userData')} (development)`);
         }
 

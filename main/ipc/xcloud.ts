@@ -60,7 +60,7 @@ export default class IpcxCloud extends IpcBase {
                 this._application._events._xCloudApi.getRecentTitles().then((titles:any) => {
                     const returnTitles = []
     
-                    for(var title in titles.results){
+                    for(const title in titles.results){
                         if(titles.results[title].titleId)
                             returnTitles.push(titles.results[title].titleId)
                         else
@@ -88,7 +88,7 @@ export default class IpcxCloud extends IpcBase {
                     const returnTitles = []
                     console.log('titles:', titles)
 
-                    for(var title in titles.results){
+                    for(const title in titles.results){
                         if(titles.results[title].titleId)
                             returnTitles.push(titles.results[title].titleId)
                         else
@@ -124,7 +124,7 @@ export default class IpcxCloud extends IpcBase {
 
                     const returnTitles = []
 
-                    for(var title in titles){
+                    for(const title in titles){
                         if(titles[title].id !== undefined){
                             const storeTitle = this._titleManager.findTitleByProductId(titles[title].id)
                             

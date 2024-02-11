@@ -297,7 +297,7 @@ export default class Authentication {
             }
 
             let headers_ip = {};
-            let fri = this._application._store.get('force_region_ip' ,'')
+            const fri = this._application._store.get('force_region_ip' ,'')
             console.log(fri, 'loaded from store')
             if (fri !== '') {
                 headers_ip = {
