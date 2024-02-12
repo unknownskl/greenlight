@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test'
 import { _electron as electron } from 'playwright'
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
 
-import authHelper from './lib/auth'
+// import authHelper from './lib/auth'
 
 let appWindow
 let electronApp

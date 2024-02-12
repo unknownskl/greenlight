@@ -1,4 +1,3 @@
-import https from 'https'
 import xboxWebApi from 'xbox-webapi'
 
 export default class xCloudBrowser {
@@ -24,8 +23,7 @@ export default class xCloudBrowser {
         
         return new Promise((resolve, reject) => {
 
-            this.resolveTitles().then((titles) => {
-
+            this.resolveTitles().then(() => {
                 console.log('resolveTitles has been resolved. Sending back data now')
                 resolve(this.filterTitles({}))
 
@@ -60,7 +58,7 @@ export default class xCloudBrowser {
                     for(const title in this._titles){
                         if(this._titles[title].details.productId.toLowerCase() === result.Products[product].ProductId.toLowerCase()){
                             result.Products[product]['xcloudInfo'] = this._titles[title]
-                            break;
+                            break
                         }
                     }
 
@@ -71,7 +69,7 @@ export default class xCloudBrowser {
                     resolve(true)
 
                 } else {
-                    this.resolveTitles().then((result) => {
+                    this.resolveTitles().then(() => {
                         resolve(true)
                     }).catch((error) => {
                         console.log(error)
@@ -86,12 +84,12 @@ export default class xCloudBrowser {
         })
     }
 
-    filterTitles(filters){
+    filterTitles(){
         const products = []
 
         for(const product in this._resolvedTitles){
             products.push({
-                ...this._resolvedTitles[product]
+                ...this._resolvedTitles[product],
             })
         }
 

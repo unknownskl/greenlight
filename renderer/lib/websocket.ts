@@ -11,7 +11,7 @@ export default class WebsocketIPC {
 
     send(channel, action, data){
         return new Promise((resolve, reject) => {
-            if(this._websocket.readyState == 0){
+            if(this._websocket.readyState === 0){
                 // Still connecting
                 setTimeout(() => {
                     this.send(channel, action, data).then((event) => {
@@ -27,7 +27,7 @@ export default class WebsocketIPC {
                     channel: channel,
                     id: actionId,
                     action: action,
-                    data: data
+                    data: data,
                 }))
 
                 const listener = this.onAction(channel, action, (event, args) => {

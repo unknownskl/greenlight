@@ -3,22 +3,22 @@ import HTTP from './http'
 import Store from 'electron-store'
 
 interface titleInfoArgs {
-    ProductTitle: string,
-    PublisherName: string,
-    XCloudTitleId: string,
-    Image_Tile: any,
-    Image_Poster: any,
-    Streamability: any,
-    Categories: any,
-    LocalizedCategories: any,
-    XCloudOfferings: any,
-    XboxTitleId: string,
-    ChildXboxTitleIds: any,
-    StoreId: string
+    ProductTitle: string;
+    PublisherName: string;
+    XCloudTitleId: string;
+    Image_Tile: any;
+    Image_Poster: any;
+    Streamability: any;
+    Categories: any;
+    LocalizedCategories: any;
+    XCloudOfferings: any;
+    XboxTitleId: string;
+    ChildXboxTitleIds: any;
+    StoreId: string;
 }
 
 interface FilterArgs {
-    name: string
+    name: string;
 }
 
 export default class TitleManager {
@@ -52,7 +52,7 @@ export default class TitleManager {
 
             if(this._productIdQueue.length > 0){
                 this._http.post('catalog.gamepass.com', '/v3/products?market=US&language=en-US&hydration=RemoteHighSapphire0', { // RemoteLowJade0
-                    "Products": this._productIdQueue
+                    'Products': this._productIdQueue,
                 }, {
                     'ms-cv': 0,
                     'calling-app-name': 'Xbox Cloud Gaming Web',
@@ -151,20 +151,20 @@ export default class TitleManager {
 }
 
 interface TitleDetails {
-    titleId:string
+    titleId:string;
     details: {
-        productId:string,
-        xboxTitleId:number,
-        hasEntitlement:boolean,
-        supportsInAppPurchases:boolean,
-        supportedTabs: any,
-        supportedInputTypes: any,
-        programs: any,
-        userPrograms: any,
-        userSubscriptions: any,
-        isFreeInStore: boolean
-        maxGameplayTimeInSeconds: number
-    }
+        productId:string;
+        xboxTitleId:number;
+        hasEntitlement:boolean;
+        supportsInAppPurchases:boolean;
+        supportedTabs: any;
+        supportedInputTypes: any;
+        programs: any;
+        userPrograms: any;
+        userSubscriptions: any;
+        isFreeInStore: boolean;
+        maxGameplayTimeInSeconds: number;
+    };
 }
 
 export class Title {

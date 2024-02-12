@@ -1,16 +1,16 @@
-import { contextBridge, ipcRenderer, shell } from 'electron';
-import pkg from '../package.json';
+import { contextBridge, ipcRenderer, shell } from 'electron'
+import pkg from '../package.json'
 
 export const Preload = {
 
     send(channel:string, action:string, data = {}){
         return new Promise((resolve, reject) => {
-            const requestId = Math.round(Math.random()*1000);
+            const requestId = Math.round(Math.random()*1000)
 
             ipcRenderer.send(channel, {
                 id: requestId,
                 action: action,
-                data: data
+                data: data,
             })
 
             // Wait for event back..
@@ -68,13 +68,13 @@ export const Preload = {
         shell.openExternal(url)
     },
 
-    getVersion(url:string){
+    getVersion(){
         return pkg.version
     },
 
     isWebUI(){
         return false
-    }
-};
+    },
+}
 
-contextBridge.exposeInMainWorld('Greenlight', Preload);
+contextBridge.exposeInMainWorld('Greenlight', Preload)

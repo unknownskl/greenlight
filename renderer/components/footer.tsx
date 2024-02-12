@@ -1,5 +1,6 @@
-import React from 'react';
-import Link from 'next/link';
+import React from 'react'
+import Link from 'next/link'
+import Image from 'next/image'
 
 import Button from './ui/button'
 
@@ -10,7 +11,7 @@ interface HeaderProps {
 
 function Footer({
   hidden = true,
-  connected,
+  connected = false,
   ...props
 }: HeaderProps) {
 
@@ -30,11 +31,11 @@ function Footer({
   
   return (
     <React.Fragment>
-        <div id="component_footer" className={hidden === true ? 'disabled' : connected === true ? 'connected' : 'disconnected'}>
+        {/* <div id="component_footer" className={hidden === true ? 'disabled' : connected === true ? 'connected' : 'disconnected'}>
           <p className='status'>{getStatus()}</p>
 
           <div className='current_app'>
-            <img className='current_app_logo' src={getCurrentApp().media_logo}></img>
+            <Image className='current_app_logo' src={getCurrentApp().media_logo} alt="Media"></Image>
 
             <p className='current_app_name'>{getCurrentApp().name}</p>
 
@@ -44,7 +45,7 @@ function Footer({
               <Button className="btn-grey" label="Start stream" />
             </div>
           </div>
-        </div>
+        </div> */}
     </React.Fragment>
   );
 };

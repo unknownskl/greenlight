@@ -1,4 +1,3 @@
-import Application from '../application'
 import IpcBase from './base'
 
 export default class IpcConsoles extends IpcBase {

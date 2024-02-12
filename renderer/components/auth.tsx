@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { ipcRenderer } from 'electron';
 import Ipc from '../lib/ipc'
+import Image from 'next/image'
 
 import Card from '../components/ui/card'
 import Button from './ui/button';
@@ -49,7 +50,7 @@ function Auth({
               <Card>
                 {signedIn === true ? (<div className="component_auth_profile_container">
                   <div className="component_auth_profile_gamerpic">
-                    <img src={ gamerpic } className="component_auth_profile_gamerpic_img" />
+                    <Image src={ gamerpic } className="component_auth_profile_gamerpic_img" alt={ gamertag } width='96' height='96'></Image>
                   </div>
 
                   <div className="component_auth_profile_userdetails">

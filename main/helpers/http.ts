@@ -18,20 +18,21 @@ export default class Http {
                 path: url,
                 method: method,
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 },
             }, (response:any) => {
                 response.on('data', (data:any) => {
                     responseData += data
-                });
+                })
 
-                response.on('end', (data:any) => {
+                response.on('end', () => {
                     if(response.statusCode >= 200 && response.statusCode <= 299){
                         this._application.log('HTTP', 'get('+url+', '+method+') resolve:', response.statusCode)
                         let returnData = responseData
                         try {
                             returnData = JSON.parse(responseData)
                         } catch(error){
+                            // Data is not JSON..
                         }
 
                         if(response.statusCode === 204){
@@ -45,7 +46,7 @@ export default class Http {
                                 })
                             }, 750)
                         } else {
-                          resolve(returnData)
+                            resolve(returnData)
                         }
                     } else {
                         this._application.log('HTTP', 'get('+url+') reject:', response.statusCode)
@@ -55,13 +56,13 @@ export default class Http {
                             body: responseData,
                         })
                     }
-                });
+                })
             })
 
             req.on('error', (error) => {
                 reject(error)
-            });
-            req.end();
+            })
+            req.end()
         })
     }
 
@@ -81,9 +82,9 @@ export default class Http {
 
                 response.on('data', (data:any) => {
                     responseData += data
-                });
+                })
 
-                response.on('end', (data:any) => {
+                response.on('end', () => {
                     if(response.statusCode >= 200 && response.statusCode <= 299){
                         this._application.log('HTTP', 'post('+url+') resolve:', response.statusCode, responseData.substring(0, 100))
 
@@ -91,6 +92,7 @@ export default class Http {
                         try {
                             returnData = JSON.parse(responseData)
                         } catch(error){
+                            // Data is not JSON..
                         }
                         
                         resolve(returnData)
@@ -102,16 +104,16 @@ export default class Http {
                             body: responseData,
                         })
                     }
-                });
+                })
             })
 
             req.on('error', (error) => {
                 reject(error)
-            });
+            })
 
             req.write(JSON.stringify(postData))
 
-            req.end();
+            req.end()
         })
     }
 

@@ -1,4 +1,4 @@
-import { app as ElectronApp, dialog, ipcMain, session } from 'electron'
+import { dialog, session } from 'electron'
 import { createWindow } from './helpers'
 import Application from './application'
 import https from 'https'
@@ -6,9 +6,9 @@ import https from 'https'
 import Xal from 'xal-node'
 
 interface authFlowTokens {
-    sisu_local_code_verifier
-    sisu_session_id
-    sisu_device_token
+    sisu_local_code_verifier;
+    sisu_session_id;
+    sisu_device_token;
 }
 
 export default class Authentication {
@@ -48,10 +48,10 @@ export default class Authentication {
             id_token: false,
             client_info: false,
             expires: false,
-        }
+        },
     }
-    _appLevel = 0
 
+    _appLevel = 0
 
     constructor(application:Application){
         this._xalAuthenticator = new Xal.XalAuthenticator()
@@ -120,10 +120,10 @@ export default class Authentication {
         const authWindow = createWindow('auth', {
             width: 500,
             height: 600,
-            title: 'Authentication'
-        });
+            title: 'Authentication',
+        })
         
-        authWindow.loadURL(url);
+        authWindow.loadURL(url)
         this._authWindow = authWindow
 
         this._authWindow.on('close', () => {
@@ -136,8 +136,8 @@ export default class Authentication {
         session.defaultSession.webRequest.onBeforeRedirect({
             urls: [
                 'https://login.live.com/oauth20_authorize.srf?*',
-                'https://login.live.com/ppsecure/post.srf?*'
-            ]
+                'https://login.live.com/ppsecure/post.srf?*',
+            ],
         }, (details) => {
             this._application.log('authentication', __filename+'[startWebviewHooks()] Got response:', details.redirectURL)
             const url = new URL(details.redirectURL)
@@ -181,31 +181,31 @@ export default class Authentication {
 
     retrieveTokens(code_token, sisu_token){
         this._application.log('authentication', __filename+'[retrieveTokens()] Retrieving tokens...')
-        this._xalAuthenticator.do_xsts_authorization(sisu_token.DeviceToken, sisu_token.TitleToken.Token, sisu_token.UserToken.Token, "http://gssv.xboxlive.com/").then((xsts_token:any) => {
+        this._xalAuthenticator.do_xsts_authorization(sisu_token.DeviceToken, sisu_token.TitleToken.Token, sisu_token.UserToken.Token, 'http://gssv.xboxlive.com/').then((xsts_token:any) => {
             
             this._isAuthenticating = true
             
-            this.requestxCloudToken(xsts_token.Token).then((result) => {
+            this.requestxCloudToken(xsts_token.Token).then(() => {
                 // Supports xCloud
                 this._appLevel = 2
 
                 this.retrieveMSALTokens(code_token, sisu_token, xsts_token)
-            }).catch((error) => {
+            }).catch(() => {
                 // Supports xHome only
                 this._appLevel = 1
 
-                this.requestxCloudToken(xsts_token.Token, true).then((result) => {
+                this.requestxCloudToken(xsts_token.Token, true).then(() => {
                     this._appLevel = 2
 
                     this.retrieveMSALTokens(code_token, sisu_token, xsts_token)
-                }).catch((error) => {
+                }).catch(() => {
                     this._appLevel = 1
 
                     this.retrieveMSALTokens(code_token, sisu_token, xsts_token)
                 })
             })
 
-        }).catch((error7) => {
+        }).catch(() => {
             this._application.log('authentication', __filename+'[retrieveTokens()] do_xsts_authorization error returned. Probably tokens expired:')
             this._isAuthenticating = false
             this.startAuthflow()
@@ -218,8 +218,8 @@ export default class Authentication {
         const xalAuthenticator = this._xalAuthenticator
         Promise.all([
             xalAuthenticator.exchange_refresh_token_for_xcloud_transfer_token(code_token.refresh_token),
-            xalAuthenticator.do_xsts_authorization(sisu_token.DeviceToken, sisu_token.TitleToken.Token, sisu_token.UserToken.Token, "http://xboxlive.com"),
-            this.requestxHomeToken(xsts_token.Token)
+            xalAuthenticator.do_xsts_authorization(sisu_token.DeviceToken, sisu_token.TitleToken.Token, sisu_token.UserToken.Token, 'http://xboxlive.com'),
+            this.requestxHomeToken(xsts_token.Token),
         ]).then((values) => {
             this._tokens.msal.token = values[0].lpt
 
@@ -251,8 +251,8 @@ export default class Authentication {
 
             // Get xHomeStreaming Token
             const data = JSON.stringify({
-                "token": streamingToken,
-                "offeringId": "xhome"
+                'token': streamingToken,
+                'offeringId': 'xhome',
             })
         
             const options = {
@@ -286,8 +286,8 @@ export default class Authentication {
 
             // Get xHomeStreaming Token
             const data = JSON.stringify({
-                "token": streamingToken,
-                "offeringId": (f2p === true) ? "xgpuwebf2p" : "xgpuweb"
+                'token': streamingToken,
+                'offeringId': (f2p === true) ? 'xgpuwebf2p' : 'xgpuweb',
             })
         
             const options = {
@@ -296,16 +296,16 @@ export default class Authentication {
                 path: '/v2/login/user',
             }
 
-            let headers_ip = {};
-            const fri = this._application._store.get('force_region_ip' ,'')
+            let headers_ip = {}
+            const fri = this._application._store.get('force_region_ip', '')
             console.log(fri, 'loaded from store')
             if (fri !== '') {
                 headers_ip = {
-                    "X-Forwarded-For": fri,
-                };
-                console.log("IP spoofed as ", fri)
+                    'X-Forwarded-For': fri,
+                }
+                console.log('IP spoofed as ', fri)
             } else {
-                console.log("IP not spoofed")
+                console.log('IP not spoofed')
             }
 
             this.request(options, data, headers_ip).then((response:any) => {
@@ -321,7 +321,7 @@ export default class Authentication {
                     }
                 }
 
-            this._application.log('authentication', __filename+'[requestxCloudToken()] Retrieved xCloud streaming tokens')
+                this._application.log('authentication', __filename+'[requestxCloudToken()] Retrieved xCloud streaming tokens')
 
                 resolve(response)
             }).catch((error) => {
@@ -345,7 +345,7 @@ export default class Authentication {
                     'x-gssv-client': 'XboxComBrowser',
                     ...headers,
                 },
-                ...options
+                ...options,
             }
             const req = https.request(reqOptions, (res) => {
                 let responseData = ''
@@ -355,7 +355,7 @@ export default class Authentication {
                 })
         
                 res.on('close', () => {
-                    if(res.statusCode == 200){
+                    if(res.statusCode === 200){
                         const response = JSON.parse(responseData.toString())
         
                         resolve(response)
@@ -363,7 +363,7 @@ export default class Authentication {
                         this._application.log('authentication', __filename+'[request()] Request error ['+res.statusCode+']', responseData.toString())
                         reject({
                             status: res.statusCode,
-                            body: responseData.toString()
+                            body: responseData.toString(),
                         })
                     }
                 })
@@ -371,7 +371,7 @@ export default class Authentication {
             
             req.on('error', (error) => {
                 reject({
-                    error: error
+                    error: error,
                 })
             })
 

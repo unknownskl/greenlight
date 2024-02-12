@@ -3,7 +3,7 @@ export default {
 
     },
 
-    performAuthentication: async (window) => {
+    performAuthentication: async () => {
         
-    }
+    },
 }

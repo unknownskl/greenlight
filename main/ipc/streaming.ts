@@ -3,30 +3,27 @@ import Application from '../application'
 import StreamManager from '../helpers/streammanager'
 
 interface startStreamArgs {
-    type: string
-    target: string
+    type: string;
+    target: string;
 }
 
 interface sendSdpArgs {
-    sessionId: string,
-    sdp: any
+    sessionId: string;
+    sdp: any;
 }
 
 interface sendIceArgs {
-    sessionId: string,
-    ice: any
+    sessionId: string;
+    ice: any;
 }
 interface sendKeepaliveArgs {
-    sessionId: string
+    sessionId: string;
 }
 interface stopStreamArgs {
-    sessionId: string
+    sessionId: string;
 }
 interface getPlayerStateArgs {
-    sessionId: string
-}
-
-interface activeSessionsArgs {
+    sessionId: string;
 }
 
 export default class IpcStreaming extends IpcBase {
@@ -41,7 +38,7 @@ export default class IpcStreaming extends IpcBase {
 
     startStream(args:startStreamArgs){
 
-        if(args.type == 'home'){
+        if(args.type === 'home'){
             this._application._ipc._channels.consoles._consolesLastUpdate = 0
         } else {
             this._application._ipc._channels.xCloud._recentTitlesLastUpdate = 0
@@ -71,12 +68,12 @@ export default class IpcStreaming extends IpcBase {
     }
 
     getPlayerState(args:getPlayerStateArgs){
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             resolve(this._streamManager.getSession(args.sessionId))
         })
     }
 
-    activeSessions(args:activeSessionsArgs){
+    activeSessions(){
         return this._streamManager.getActiveSessions()
     }
 

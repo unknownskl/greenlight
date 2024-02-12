@@ -1,4 +1,4 @@
-import { PlaywrightTestConfig } from '@playwright/test';
+import { PlaywrightTestConfig } from '@playwright/test'
 
 const config: PlaywrightTestConfig = {
     testDir: 'tests/',
@@ -16,6 +16,6 @@ const config: PlaywrightTestConfig = {
         reuseExistingServer: !process.env.CI,
         timeout: 60000,
     },
-};
+}
 
-export default config;
+export default config

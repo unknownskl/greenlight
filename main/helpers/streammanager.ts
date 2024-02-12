@@ -1,19 +1,18 @@
 import Application from '../application'
 import xCloudApi, { playResult } from './xcloudapi'
-import Ipc from '../ipc'
 
 interface streamSession {
-    id: string
-    target: string,
-    path: string
-    type: string|'home'|'cloud'
-    state?: string
-    waitingTimes?: any
-    playerState: string|'pending'|'started'|'queued'|'failed'
+    id: string;
+    target: string;
+    path: string;
+    type: string|'home'|'cloud';
+    state?: string;
+    waitingTimes?: any;
+    playerState: string|'pending'|'started'|'queued'|'failed';
     errorDetails?: {
-        code,
-        message
-    }
+        code;
+        message;
+    };
 }
 
 export default class StreamManager {
@@ -51,7 +50,7 @@ export default class StreamManager {
                     target: target,
                     path: playResult.sessionPath,
                     type: type,
-                    playerState: 'pending'
+                    playerState: 'pending',
                 }
                 this._sessions[sessionId] = streamSession
                 this.monitorSession(sessionId)
@@ -66,9 +65,9 @@ export default class StreamManager {
     stopStream(sessionId){
         return new Promise((resolve, reject) => {
             const session = this.getSession(sessionId)
-            if(session == undefined){
+            if(session === undefined){
                 reject('Session not found: '+sessionId)
-                return;
+                return
             }
 
             this.getApi(session.type).stopStream(sessionId).then((result) => {
@@ -86,9 +85,9 @@ export default class StreamManager {
     sendSdp(sessionId:string, sdp:any){
         return new Promise((resolve, reject) => {
             const session = this.getSession(sessionId)
-            if(session == undefined){
+            if(session === undefined){
                 reject('Session not found: '+sessionId)
-                return;
+                return
             }
 
             this.getApi(session.type).sendSdp(sessionId, sdp).then((result) => {
@@ -103,9 +102,9 @@ export default class StreamManager {
     sendChatSdp(sessionId:string, sdp:any){
         return new Promise((resolve, reject) => {
             const session = this.getSession(sessionId)
-            if(session == undefined){
+            if(session === undefined){
                 reject('Session not found: '+sessionId)
-                return;
+                return
             }
 
             this.getApi(session.type).sendChatSdp(sessionId, sdp).then((result) => {
@@ -120,9 +119,9 @@ export default class StreamManager {
     sendIce(sessionId:string, ice:any){
         return new Promise((resolve, reject) => {
             const session = this.getSession(sessionId)
-            if(session == undefined){
+            if(session === undefined){
                 reject('Session not found: '+sessionId)
-                return;
+                return
             }
 
             this.getApi(session.type).sendIce(sessionId, ice).then((result) => {
@@ -137,9 +136,9 @@ export default class StreamManager {
     sendKeepalive(sessionId:string){
         return new Promise((resolve, reject) => {
             const session = this.getSession(sessionId)
-            if(session == undefined){
+            if(session === undefined){
                 reject('Session not found: '+sessionId)
-                return;
+                return
             }
 
             this.getApi(session.type).sendKeepalive(sessionId).then((result) => {
@@ -155,9 +154,9 @@ export default class StreamManager {
             this._application.log('StreamManager', 'monitorSession('+sessionId+') checking state')
 
             const session = this.getSession(sessionId)
-            if(session == undefined){
-            this._application.log('StreamManager', 'monitorSession('+sessionId+') session not found')
-                return;
+            if(session === undefined){
+                this._application.log('StreamManager', 'monitorSession('+sessionId+') session not found')
+                return
             }
             this.getApi(this.getSession(sessionId).type).getStreamState(sessionId).then((result:any) => {
                 console.log('Streammanager - state:', result)
@@ -174,7 +173,7 @@ export default class StreamManager {
                 } else if(result.state === 'ReadyToConnect'){
                     // Do MSAL Auth
                     // @TODO: Refresh token if expired?
-                    this.getApi(this.getSession(sessionId).type).sendMSALAuth(sessionId, this._application._authentication._tokens.msal.token).then((result) => {
+                    this.getApi(this.getSession(sessionId).type).sendMSALAuth(sessionId, this._application._authentication._tokens.msal.token).then(() => {
                         this.monitorSession(sessionId)
 
                     }).catch((error) => {

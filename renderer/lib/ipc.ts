@@ -83,8 +83,8 @@ export default {
 
             isWebUI(){
                 return true
-            }
+            },
         }
-    }
+    },
 }
 

@@ -3,7 +3,7 @@ import Application from '../application'
 import TitleManager from '../helpers/titlemanager'
 
 interface getTitleArgs {
-    titleId: string
+    titleId: string;
 }
 
 export default class IpcxCloud extends IpcBase {
@@ -100,9 +100,9 @@ export default class IpcxCloud extends IpcBase {
 
                     resolve(returnTitles)
                 })
-                .catch((error) => {
-                    reject(error)
-                })
+                    .catch((error) => {
+                        reject(error)
+                    })
             } else {
                 resolve(this._titles)
             }
@@ -110,7 +110,7 @@ export default class IpcxCloud extends IpcBase {
     }
 
     filterTitles(filter){
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             const titles = this._titleManager.filterTitles(filter)
 
             resolve(titles)
@@ -152,7 +152,7 @@ export default class IpcxCloud extends IpcBase {
     }
 
     getTitle(args:getTitleArgs){
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             if(this._titlesAreLoaded === false){
 
                 this.waitForTitle(resolve, args)

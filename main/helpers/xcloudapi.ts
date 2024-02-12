@@ -3,23 +3,23 @@ import Application from '../application'
 import { Address6 } from 'ip-address'
 
 export interface playResult {
-    sessionPath:string,
-    sessionId?:string,
-    state?:string,
+    sessionPath:string;
+    sessionId?:string;
+    state?:string;
 }
 
 export interface playResult {
-    sessionPath:string,
-    sessionId?:string,
-    state?:string,
+    sessionPath:string;
+    sessionId?:string;
+    state?:string;
 }
 
 export interface exchangeResult {
-    exchangeResponse:string,
+    exchangeResponse:string;
     errorDetails: {
-        code: any
-        message: any
-    }
+        code: any;
+        message: any;
+    };
 }
 
 export default class xCloudApi {
@@ -53,20 +53,21 @@ export default class xCloudApi {
                 method: method,
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': 'Bearer '+this._token
+                    'Authorization': 'Bearer '+this._token,
                 },
             }, (response:any) => {
                 response.on('data', (data:any) => {
                     responseData += data
-                });
+                })
 
-                response.on('end', (data:any) => {
+                response.on('end', () => {
                     if(response.statusCode >= 200 && response.statusCode <= 299){
                         this._application.log('xCloudApi', 'get('+url+', '+method+') resolve:', response.statusCode)
                         let returnData = responseData
                         try {
                             returnData = JSON.parse(responseData)
                         } catch(error){
+                            // Data is not JSON..
                         }
 
                         if(response.statusCode === 204){
@@ -80,7 +81,7 @@ export default class xCloudApi {
                                 })
                             }, 750)
                         } else {
-                          resolve(returnData)
+                            resolve(returnData)
                         }
                     } else {
                         this._application.log('xCloudApi', 'get('+url+') reject:', response.statusCode)
@@ -90,13 +91,13 @@ export default class xCloudApi {
                             body: responseData,
                         })
                     }
-                });
+                })
             })
 
             req.on('error', (error) => {
                 reject(error)
-            });
-            req.end();
+            })
+            req.end()
         })
     }
 
@@ -117,9 +118,9 @@ export default class xCloudApi {
 
                 response.on('data', (data:any) => {
                     responseData += data
-                });
+                })
 
-                response.on('end', (data:any) => {
+                response.on('end', () => {
                     if(response.statusCode >= 200 && response.statusCode <= 299){
                         this._application.log('xCloudApi', 'post('+url+') resolve:', response.statusCode, responseData)
 
@@ -127,6 +128,7 @@ export default class xCloudApi {
                         try {
                             returnData = JSON.parse(responseData)
                         } catch(error){
+                            // Data is not JSON..
                         }
                         
                         resolve(returnData)
@@ -138,16 +140,16 @@ export default class xCloudApi {
                             body: responseData,
                         })
                     }
-                });
+                })
             })
 
             req.on('error', (error) => {
                 reject(error)
-            });
+            })
 
             req.write(JSON.stringify(postData))
 
-            req.end();
+            req.end()
         })
     }
 
@@ -169,38 +171,38 @@ export default class xCloudApi {
 
     startStream(target:string){
         const deviceInfo = JSON.stringify({
-            "appInfo": {
-                "env": {
-                    "clientAppId": "Microsoft.GamingApp",
-                    "clientAppType": "native",
-                    "clientAppVersion": "2203.1001.4.0",
-                    "clientSdkVersion": "8.5.2",
-                    "httpEnvironment": "prod",
-                    "sdkInstallId": ""
-                }
+            'appInfo': {
+                'env': {
+                    'clientAppId': 'Microsoft.GamingApp',
+                    'clientAppType': 'native',
+                    'clientAppVersion': '2203.1001.4.0',
+                    'clientSdkVersion': '8.5.2',
+                    'httpEnvironment': 'prod',
+                    'sdkInstallId': '',
+                },
             },
-            "dev": {
-                "hw": {
-                    "make": "Microsoft",
-                    "model": "Surface Pro",
-                    "sdktype": "native"
+            'dev': {
+                'hw': {
+                    'make': 'Microsoft',
+                    'model': 'Surface Pro',
+                    'sdktype': 'native',
                 },
-                "os": {
-                    "name": "Windows 11",
-                    "ver": "22631.2715",
-                    "platform": "desktop"
+                'os': {
+                    'name': 'Windows 11',
+                    'ver': '22631.2715',
+                    'platform': 'desktop',
                 },
-                "displayInfo": {
-                    "dimensions": {
-                        "widthInPixels": 1920,
-                        "heightInPixels": 1080
+                'displayInfo': {
+                    'dimensions': {
+                        'widthInPixels': 1920,
+                        'heightInPixels': 1080,
                     },
-                    "pixelDensity": {
-                        "dpiX": 1,
-                        "dpiY": 1
-                    }
-                }
-            }
+                    'pixelDensity': {
+                        'dpiX': 1,
+                        'dpiY': 1,
+                    },
+                },
+            },
         })
 
         const postData = {
@@ -215,10 +217,10 @@ export default class xCloudApi {
                 'useIceConnection': false,
                 'timezoneOffsetMinutes': 120,
                 'sdkType': 'web',
-                'osName': 'windows'
+                'osName': 'windows',
             },
             'serverId': (this._type === 'home') ? target : '',
-            'fallbackRegionNames': []
+            'fallbackRegionNames': [],
         }
 
         return this.post('/v5/sessions/'+this._type+'/play', postData, {
@@ -234,39 +236,39 @@ export default class xCloudApi {
     sendSdp(sessionId:string, sdp: string){
         return new Promise((resolve, reject) => {
             const postData = {
-                "messageType":"offer",
-                "sdp": sdp,
-                "configuration":{
-                    "chatConfiguration":{
-                      "bytesPerSample":2,
-                      "expectedClipDurationMs":20,
-                      "format":{
-                         "codec":"opus",
-                         "container":"webm"
-                      },
-                      "numChannels":1,
-                      "sampleFrequencyHz":24000
-                   },
-                   "chat":{
-                      "minVersion":1,
-                      "maxVersion":1
-                   },
-                   "control":{
-                      "minVersion":1,
-                      "maxVersion":3
-                   },
-                   "input":{
-                      "minVersion":1,
-                      "maxVersion":8
-                   },
-                   "message":{
-                      "minVersion":1,
-                      "maxVersion":1
-                   },
-                }
+                'messageType':'offer',
+                'sdp': sdp,
+                'configuration':{
+                    'chatConfiguration':{
+                        'bytesPerSample':2,
+                        'expectedClipDurationMs':20,
+                        'format':{
+                            'codec':'opus',
+                            'container':'webm',
+                        },
+                        'numChannels':1,
+                        'sampleFrequencyHz':24000,
+                    },
+                    'chat':{
+                        'minVersion':1,
+                        'maxVersion':1,
+                    },
+                    'control':{
+                        'minVersion':1,
+                        'maxVersion':3,
+                    },
+                    'input':{
+                        'minVersion':1,
+                        'maxVersion':8,
+                    },
+                    'message':{
+                        'minVersion':1,
+                        'maxVersion':1,
+                    },
+                },
             }
 
-            this.post('/v5/sessions/'+this._type+'/'+sessionId+'/sdp', postData).then((result) => {
+            this.post('/v5/sessions/'+this._type+'/'+sessionId+'/sdp', postData).then(() => {
 
                 this.get('/v5/sessions/'+this._type+'/'+sessionId+'/sdp').then((sdpResult:exchangeResult) => {
                     const exchangeSdp = JSON.parse(sdpResult.exchangeResponse)
@@ -286,14 +288,14 @@ export default class xCloudApi {
     sendChatSdp(sessionId:string, sdp: string){
         return new Promise((resolve, reject) => {
             const postData = {
-                "messageType":"offer",
-                "sdp": sdp,
-                "configuration":{
+                'messageType':'offer',
+                'sdp': sdp,
+                'configuration':{
                     'isMediaStreamsChatRenegotiation': true,
-                }
+                },
             }
 
-            this.post('/v5/sessions/'+this._type+'/'+sessionId+'/sdp', postData).then((result) => {
+            this.post('/v5/sessions/'+this._type+'/'+sessionId+'/sdp', postData).then(() => {
 
                 this.get('/v5/sessions/'+this._type+'/'+sessionId+'/sdp').then((sdpResult:exchangeResult) => {
                     const exchangeSdp = JSON.parse(sdpResult.exchangeResponse)
@@ -313,11 +315,11 @@ export default class xCloudApi {
     sendIce(sessionId:string, ice:any){
         return new Promise((resolve, reject) => {
             const postData = {
-                "messageType": "iceCandidate",
-                "candidate": ice
+                'messageType': 'iceCandidate',
+                'candidate': ice,
             }
 
-            this.post('/v5/sessions/'+this._type+'/'+sessionId+'/ice', postData).then((result) => {
+            this.post('/v5/sessions/'+this._type+'/'+sessionId+'/ice', postData).then(() => {
 
                 this.get('/v5/sessions/'+this._type+'/'+sessionId+'/ice').then((iceResult:exchangeResult) => {
                     const exchangeIce = JSON.parse(iceResult.exchangeResponse)
@@ -336,13 +338,13 @@ export default class xCloudApi {
                                 candidate: 'a=candidate:10 1 UDP 1 '+teredo.client4+' 9002 typ host ',
                                 messageType: 'iceCandidate',
                                 sdpMLineIndex: '0',
-                                sdpMid: '0'
+                                sdpMid: '0',
                             })
                             computedCandidates.push({
                                 candidate: 'a=candidate:11 1 UDP 1 '+teredo.client4+' '+teredo.udpPort+' typ host ',
                                 messageType: 'iceCandidate',
                                 sdpMLineIndex: '0',
-                                sdpMid: '0'
+                                sdpMid: '0',
                             })
                         }
 
@@ -363,7 +365,7 @@ export default class xCloudApi {
 
     sendMSALAuth(sessionId:string, userToken:string){
         return this.post('/v5/sessions/'+this._type+'/'+sessionId+'/connect', {
-            "userToken": userToken
+            'userToken': userToken,
         })
     }
 

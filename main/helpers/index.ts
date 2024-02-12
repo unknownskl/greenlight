@@ -5,9 +5,9 @@ import xboxWorker from './xboxWorker'
 import { setUpdateNotification as updater } from './updater'
 
 export {
-  createWindow,
-  xCloudApi,
-  xCloudBrowser,
-  xboxWorker,
-  updater,
-};
+    createWindow,
+    xCloudApi,
+    xCloudBrowser,
+    xboxWorker,
+    updater,
+}

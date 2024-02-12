@@ -1,5 +1,4 @@
 import Application from '../application'
-import { Notification } from 'electron'
 
 export default class xboxWorker {
 
@@ -11,12 +10,14 @@ export default class xboxWorker {
     constructor(application){
         this._application = application
 
-        this._application._events.on('loaded', (userinfo) => {
+        this._application._events.on('loaded', () => {
             // We can assume we are authenticted now
             // console.log('xboxWorker has been loaded!')
             // new Notification({ title: 'User logged in', body: 'Welcome back, '+userinfo.gamertag }).show()
 
-            setInterval(() => { this.intervalFriends() }, 30 * 1000) // Api is limited to 30 requests per 300 seconds. (300/30 = 10 sec)
+            setInterval(() => {
+                this.intervalFriends() 
+            }, 30 * 1000) // Api is limited to 30 requests per 300 seconds. (300/30 = 10 sec)
             this.intervalFriends()
         })
     }

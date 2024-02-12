@@ -1,8 +1,8 @@
-import { app as ElectronApp, BrowserWindow, ipcMain, session, protocol } from 'electron';
+import { app as ElectronApp, BrowserWindow } from 'electron'
 import serve from 'electron-serve'
 import Store from 'electron-store'
 import Debug from 'debug'
-import { createWindow, xboxWorker, updater } from './helpers';
+import { createWindow, xboxWorker, updater } from './helpers'
 import Events from './events'
 import Authentication from './authentication'
 import Ipc from './ipc'
@@ -11,8 +11,8 @@ import WebUI from './webui'
 import pkg from '../package.json'
 
 interface startupFlags {
-    fullscreen:boolean
-    autoStream:string
+    fullscreen:boolean;
+    autoStream:string;
 }
 
 export default class Application {
@@ -23,6 +23,7 @@ export default class Application {
         fullscreen: false,
         autoStream: '',
     }
+
     public _isProduction:boolean = (process.env.NODE_ENV === 'production')
     private _isCi:boolean = (process.env.CI !== undefined)
     private _isMac:boolean = (process.platform === 'darwin')
@@ -40,13 +41,13 @@ export default class Application {
         console.log(__filename+'[constructor()] Starting Greenlight v'+pkg.version)
         this._log = Debug('greenlight')
 
-        ElectronApp.commandLine.appendSwitch('enable-features', 'VaapiIgnoreDriverChecks,VaapiVideoDecoder,PlatformHEVCDecoderSupport,CanvasOopRasterization');
+        ElectronApp.commandLine.appendSwitch('enable-features', 'VaapiIgnoreDriverChecks,VaapiVideoDecoder,PlatformHEVCDecoderSupport,CanvasOopRasterization')
         // ElectronApp.commandLine.appendSwitch('disable-features', 'UseChromeOSDirectVideoDecoder');
-        ElectronApp.commandLine.appendSwitch('enable-gpu-rasterization');
-        ElectronApp.commandLine.appendSwitch('enable-oop-rasterization');
-        ElectronApp.commandLine.appendSwitch('accelerated-video-decode');
-        ElectronApp.commandLine.appendSwitch('ozone-platform-hint', 'x11');
-        ElectronApp.commandLine.appendSwitch('ignore-gpu-blocklist');
+        ElectronApp.commandLine.appendSwitch('enable-gpu-rasterization')
+        ElectronApp.commandLine.appendSwitch('enable-oop-rasterization')
+        ElectronApp.commandLine.appendSwitch('accelerated-video-decode')
+        ElectronApp.commandLine.appendSwitch('ozone-platform-hint', 'x11')
+        ElectronApp.commandLine.appendSwitch('ignore-gpu-blocklist')
         // ElectronApp.commandLine.appendSwitch('enable-zero-copy');
 
         this.readStartupFlags()
@@ -76,40 +77,40 @@ export default class Application {
     }
 
     readStartupFlags(){
-        this.log('application',__filename+'[readStartupFlags()] Program args detected:', process.argv)
+        this.log('application', __filename+'[readStartupFlags()] Program args detected:', process.argv)
 
         for(const arg in process.argv){
             if(process.argv[arg].includes('--fullscreen')){
-                this.log('application',__filename+'[readStartupFlags()] --fullscreen switch found. Setting fullscreen to true')
+                this.log('application', __filename+'[readStartupFlags()] --fullscreen switch found. Setting fullscreen to true')
                 this._startupFlags.fullscreen = true
             }
 
             if(process.argv[arg].includes('--connect=')){
                 const key = process.argv[arg].substring(10)
 
-                this.log('application',__filename+'[readStartupFlags()] --connect switch found. Setting autoStream to', key)
+                this.log('application', __filename+'[readStartupFlags()] --connect switch found. Setting autoStream to', key)
                 this._startupFlags.autoStream = key
             }
         }
 
-        this.log('application',__filename+'[readStartupFlags()] End result of startupFlags:', this._startupFlags)
+        this.log('application', __filename+'[readStartupFlags()] End result of startupFlags:', this._startupFlags)
     }
 
     loadApplicationDefaults(){
         if(this._isProduction === true && this._isCi === false) {
-            serve({ directory: 'app' });
+            serve({ directory: 'app' })
 
         } else if(this._isCi === true) {
             const random = Math.random()*100
-            ElectronApp.setPath('userData', `${ElectronApp.getPath('userData')} (${random})`);
-            ElectronApp.setPath('sessionData', `${ElectronApp.getPath('userData')} (${random})`);
+            ElectronApp.setPath('userData', `${ElectronApp.getPath('userData')} (${random})`)
+            ElectronApp.setPath('sessionData', `${ElectronApp.getPath('userData')} (${random})`)
             this._store.delete('user')
             this._store.delete('auth')
 
-            serve({ directory: 'app' });
+            serve({ directory: 'app' })
         } else {
             
-            ElectronApp.setPath('userData', `${ElectronApp.getPath('userData')} (development)`);
+            ElectronApp.setPath('userData', `${ElectronApp.getPath('userData')} (development)`)
         }
 
         ElectronApp.whenReady().then(() => {
@@ -139,11 +140,13 @@ export default class Application {
 
             } else {
                 this.log('electron', __filename+'[loadApplicationDefaults()] Electron detected that all windows are closed. Quitting app...')
-                ElectronApp.quit();
+                ElectronApp.quit()
             }
-        });
+        })
 
-        ElectronApp.on('activate', () => { (this._mainWindow !== undefined) ? this._mainWindow.show() : this.openMainWindow() })
+        ElectronApp.on('activate', () => {
+            (this._mainWindow !== undefined) ? this._mainWindow.show() : this.openMainWindow() 
+        })
         ElectronApp.on('before-quit', () => this._isQuitting = true)
     }
 
@@ -152,19 +155,19 @@ export default class Application {
 
         const windowOptions:any = {
             title: 'Greenlight',
-            backgroundColor: 'rgb(26, 27, 30)'
+            backgroundColor: 'rgb(26, 27, 30)',
         }
         if(this._startupFlags.fullscreen === true){
             windowOptions.fullscreen = true
-          }
+        }
 
         this._mainWindow = createWindow('main', {
             width: 1280,
             height: 800,
             ...windowOptions,
-        });
+        })
 
-        this._mainWindow.on('show', (event) => {
+        this._mainWindow.on('show', () => {
             this.log('electron', __filename+'[openMainWindow()] Showing Main window.')
         })
 
@@ -180,14 +183,14 @@ export default class Application {
         })
 
         if (this._isProduction === true && this._isCi === false) {
-            this._mainWindow.loadURL('app://./home.html');
+            this._mainWindow.loadURL('app://./home.html')
         } else {
-            const port = process.argv[2] || 3000;
-            this._mainWindow.loadURL(`http://localhost:${port}/home`);
+            const port = process.argv[2] || 3000
+            this._mainWindow.loadURL(`http://localhost:${port}/home`)
             
             if(this._isCi !== true){
-                this._mainWindow.webContents.openDevTools();
-                this.openGPUWindow();
+                this._mainWindow.webContents.openDevTools()
+                this.openGPUWindow()
             }
         }
     }
@@ -198,13 +201,13 @@ export default class Application {
         this._gpuWindow = new BrowserWindow({
             width: 800,
             height: 600,
-        });
+        })
 
         // Load chrome://gpu
-        this._gpuWindow.loadURL('chrome://gpu');
+        this._gpuWindow.loadURL('chrome://gpu')
 
         // Open DevTools
-        this._gpuWindow.webContents.openDevTools();
+        this._gpuWindow.webContents.openDevTools()
     }
 
     quit(){

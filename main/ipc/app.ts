@@ -1,22 +1,19 @@
 import IpcBase from './base'
 import { session } from 'electron'
 import electron from 'electron'
-import { defaultSettings } from '../../renderer/context/userContext.defaults'
 
 interface setForceRegionIpArgs {
-    ip:string
+    ip:string;
 }
 
 export default class IpcApp extends IpcBase {
     // _streamingSessions:any = {}
 
     loadCachedUser(){
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             const user = this.getUserState()
 
             resolve(user)
-
-            // this.sendAuthState()
         })
     }
 
@@ -36,24 +33,24 @@ export default class IpcApp extends IpcBase {
     }
 
     getAuthState(){
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             resolve({
                 isAuthenticating: this._application._authentication._isAuthenticating,
                 isAuthenticated: this._application._authentication._isAuthenticated,
-                user: this.getUserState()
+                user: this.getUserState(),
             })
         })
     }
 
     login(){
-        return new Promise((resolve, reject) => {
+        return new Promise<boolean>((resolve) => {
             this._application._authentication.startAuthflow()
             resolve(true)
         })
     }
 
     quit(){
-        return new Promise((resolve, reject) => {
+        return new Promise<boolean>((resolve) => {
             resolve(true)
             setTimeout(() => {
                 this._application.quit()
@@ -62,7 +59,7 @@ export default class IpcApp extends IpcBase {
     }
     
     restart(){
-        return new Promise((resolve, reject) => {
+        return new Promise<boolean>((resolve) => {
             resolve(true)
             setTimeout(() => {
                 this._application.restart()
@@ -71,7 +68,7 @@ export default class IpcApp extends IpcBase {
     }
 
     clearData(){
-        return new Promise((resolve, reject) => {
+        return new Promise<boolean>((resolve, reject) => {
             session.defaultSession.clearStorageData().then(() => {
                 this._application._store.delete('user')
                 this._application._store.delete('auth')
@@ -88,28 +85,28 @@ export default class IpcApp extends IpcBase {
     }
 
     getOnlineFriends(){
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             resolve(this._application._xboxWorker._onlineFriends)
         })
     }
 
     onUiShown(){
 
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             resolve({
-                autoStream: this._application.getStartupFlags().autoStream
+                autoStream: this._application.getStartupFlags().autoStream,
             })
             this._application.getStartupFlags().autoStream = ''
         }) 
     }
 
     setForceRegionIp(args:setForceRegionIpArgs){
-        return new Promise((resolve, reject) => {
-            console.log("IPC received force region IP data and write to store:", args.ip)
-            this._application._store.set('force_region_ip', args.ip);
+        return new Promise<boolean>((resolve) => {
+            console.log('IPC received force region IP data and write to store:', args.ip)
+            this._application._store.set('force_region_ip', args.ip)
 
             // Rerun silent flow to retrieve new tokens
-            this._application._authentication.startSilentFlow();
+            this._application._authentication.startSilentFlow()
 
             resolve(true)
         })
@@ -118,7 +115,7 @@ export default class IpcApp extends IpcBase {
     async debug(){
         const returnValue = []
 
-        const gpuInfo = await electron.app.getGPUInfo("complete")
+        const gpuInfo = await electron.app.getGPUInfo('complete')
 
         // Application Values
         returnValue.push({
@@ -127,7 +124,7 @@ export default class IpcApp extends IpcBase {
                 { name: 'Name', value: 'Greenlight' },
                 { name: 'Version', value: electron.app.getVersion() },
                 { name: 'GPU Info', value: gpuInfo.auxAttributes.glRenderer },
-            ]
+            ],
         })
 
         // xCloud values
@@ -141,7 +138,7 @@ export default class IpcApp extends IpcBase {
                 { name: '', value: ''},
                 { name: 'Titlemanager titles loaded', value: Object.keys(this._application._ipc._channels.xCloud._titleManager._xCloudTitles).length },
 
-            ]
+            ],
         })
 
         // Streaming values
@@ -150,7 +147,7 @@ export default class IpcApp extends IpcBase {
             data: [
                 { name: 'Active sessions', value: Object.keys(this._application._ipc._channels.streaming._streamManager._sessions).length },
 
-            ]
+            ],
         })
 
         return returnValue

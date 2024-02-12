@@ -32,7 +32,7 @@ export default class WebUI {
     startServer(port:number = 3000){
         this._application.log('webui', 'Starting webserver...')
         this._express = express()
-        this._ws = expressWS(this._express);
+        this._ws = expressWS(this._express)
         this._ipc = this._application._ipc
 
         this._application._events.on('start', () => {
@@ -45,11 +45,11 @@ export default class WebUI {
             res.redirect('/home')
         })
 
-        this._express.ws('/ipc', (ws, req) => {
+        this._express.ws('/ipc', (ws) => {
 
             // Websocket ipc hack
             for(const channel in this._ipc._channels){
-                const orgSendFunc = this._ipc._channels[channel].send
+
                 this._ipc._channels[channel].send = (channel, args) => {
                     console.log('HOOKED IPC:', channel, args)
                     ws.send(JSON.stringify({
@@ -58,7 +58,7 @@ export default class WebUI {
                         action: args.action,
                         data: args.data,
                     }))
-                    // orgSendFunc(channel, args)
+                    
                     this._application._mainWindow.webContents.send(channel, {
                         action: args.action,
                         id: args.id,
@@ -75,23 +75,22 @@ export default class WebUI {
                 this._application._webUI._ipc._channels[ipcData.channel].onEvent(ipcData.channel, undefined, {
                     action: ipcData.action,
                     id: ipcData.id || 0,
-                    data: ipcData.data
+                    data: ipcData.data,
                 })
 
                 // ws.send(msg);
-            });
-        });
+            })
+        })
 
         if(this._application._isProduction){
-            this._express.use(express.static(path.join(__dirname, "../app/")))
+            this._express.use(express.static(path.join(__dirname, '../app/')))
 
             this._express.get('*', (req, res) => {
                 // res.send('Hello World!')
-                res.sendFile(path.join(__dirname, "../app/", "home.html"));
+                res.sendFile(path.join(__dirname, '../app/', 'home.html'))
             })
         } else {
-            const expressPort = process.argv[2] || 3000;
-            this._express.use(expressProxy('localhost', { port: 8888}));
+            this._express.use(expressProxy('localhost', { port: 8888}))
         }
 
 

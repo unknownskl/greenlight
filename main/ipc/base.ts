@@ -1,10 +1,10 @@
 import Application from '../application'
 
 interface EventArgs {
-    action: string,
-    id: number,
-    data: any,
-    error?: any
+    action: string;
+    id: number;
+    data: any;
+    error?: any;
 }
 
 export default class IpcBase {
