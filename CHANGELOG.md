@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.2.0 - 2024-02-xx
+- Added a WebUI option to make Greenlight available over the network. Enables usage of Greenlight on devices with a chromium based webbrowser.
+- Adding human readable waiting time when queued for a xCloud stream (credits to @NiccoMaganeli)
+- Added a low resolution mode for the Steam Deck to set a lower resolution then 720p for using FSR #1133
+- Updated icons #1127 (credits to @el2zay, and thanks for @jxhug for the suggestion)
+
 ## v2.1.1 - 2024-01-29
 - Fixed controller input not working on default settings #1118 #1117
 - Fixed keyboard mapping on certain keyboard layouts #878
