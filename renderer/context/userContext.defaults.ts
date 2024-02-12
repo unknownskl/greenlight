@@ -10,6 +10,9 @@ export const defaultSettings = {
     input_newgamepad: false,
     app_lowresolution: false,
 
+    video_enabled: true,
+    audio_enabled: true,
+
     // WebUI
     webui_autostart: false,
     webui_port: 9003,

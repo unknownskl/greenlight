@@ -13,12 +13,12 @@ function SettingsWebUI() {
 
   React.useEffect(() => {
     const webuiStatusInterval = setInterval(() => {
-      Ipc.send('app', 'getWebUIStatus').then((status) => {
+      Ipc.send('settings', 'getWebUIStatus').then((status) => {
         setWebuiRunning(status)
       })
     }, 1000)
 
-    Ipc.send('app', 'getWebUIStatus').then((status) => {
+    Ipc.send('settings', 'getWebUIStatus').then((status) => {
       setWebuiRunning(status)
     })
 
@@ -28,7 +28,7 @@ function SettingsWebUI() {
   })
 
   function setWebUIEnabled(){
-    Ipc.send('app', (webuiRunning) ? 'stopWebUI' : 'startWebUI').then((status) => {
+    Ipc.send('settings', (webuiRunning) ? 'stopWebUI' : 'startWebUI').then((status) => {
       setWebuiRunning(status)
     })
   }
@@ -61,7 +61,6 @@ function SettingsWebUI() {
               <p>
                 <label>Enable WebUI</label>
                 <label style={{ minWidth: 0 }}>
-                    {/* <input type='checkbox' onChange={ setWebUIEnabled } checked={(settings.webui_enabled || settings.webui_autostart) ? true : false} disabled={settings.webui_autostart} />&nbsp; ({ settings.webui_enabled ? 'Enabled' : 'Disabled'}) */}
                     <Button onClick={ () => setWebUIEnabled() } disabled={ window.Greenlight.isWebUI() } className={ ((webuiRunning) ? 'btn-primary' : 'btn-cancel') + ' btn-small' } label={ webuiRunning ? 'Stop Web UI' : 'Start Web UI' }></Button>
                 </label>
               </p>

@@ -3,7 +3,7 @@ import Ipc from '../lib/ipc'
 import { defaultSettings } from './userContext.defaults'
 
 export const SettingsContext = React.createContext({
-    settings: undefined,
+    settings: defaultSettings,
     setSettings: (settings) => null,
 })
 export const useSettings = () => useContext(SettingsContext)
@@ -13,10 +13,7 @@ export const UserProvider = ({ children }) => {
 
     function setSettingsAndSaveToLocalStorage(newSettings: any) {
         setSettings(newSettings)
-        Ipc.send('app', 'setSettings', newSettings)
-
-        // console.log('Saving settings to localStorage', newSettings)
-        // localStorage.setItem("settings", JSON.stringify(newSettings))
+        Ipc.send('settings', 'setSettings', newSettings)
 
         return newSettings
     }
@@ -28,17 +25,17 @@ export const UserProvider = ({ children }) => {
             // We have a local settings item. Lets migrate to backend.
             console.log('Settings found in localStorage. migrating to backend:', localSettings)
             const migSetting = JSON.parse(localSettings)
-            Ipc.send('app', 'setSettings', migSetting).then(() => {
+            Ipc.send('settings', 'setSettings', migSetting).then(() => {
                 console.log('Settings migrated. Removing from localStorage and loading from backend')
                 localStorage.removeItem('settings')
-                Ipc.send('app', 'getSettings').then((settings) => {
+                Ipc.send('settings', 'getSettings').then((settings) => {
                     setSettings(settings)
                 }).catch((error) => {
                     console.log('Failed to migrate settings. Error:', error)
                 })
             })
         } else {
-            Ipc.send('app', 'getSettings').then((settings) => {
+            Ipc.send('settings', 'getSettings').then((settings) => {
                 setSettings(settings)
             })
         }

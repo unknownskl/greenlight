@@ -47,6 +47,16 @@ function Stream() {
         connStatus.innerText = 'Client has been connected!'
         document.getElementById('component_streamcomponent_loader').className = 'hidden'
 
+        // Set audio / Video settings
+        // @TODO: Implement api's in xbox-xcloud-player
+        if(settings.audio_enabled === false){
+          xPlayer._audioComponent._audioRender.muted = true
+        }
+
+        if(settings.video_enabled === false){
+          xPlayer._videoComponent._videoRender.style.opacity = 0
+        }
+
         // Start keepalive loop
         keepaliveInterval = setInterval(() => {
           Ipc.send('streaming', 'sendKeepalive', {
