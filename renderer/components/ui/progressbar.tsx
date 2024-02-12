@@ -1,5 +1,5 @@
-import React from 'react';
-import Link from 'next/link';
+import React from 'react'
+import Link from 'next/link'
 
 interface ButtonProps {
 //   label: string;
@@ -9,21 +9,21 @@ interface ButtonProps {
 }
 
 function ProgressBar({
-  value,
-  children,
-  onClick,
-  ...props
+    value,
+    children,
+    onClick,
+    ...props
 }: ButtonProps) {
 
-  return (
-    <React.Fragment>
-        <div className='component_progressbar'>
-            <div className='component_progressbar_filler' style={{ width: value }}>
-                { children }
+    return (
+        <React.Fragment>
+            <div className='component_progressbar'>
+                <div className='component_progressbar_filler' style={{ width: value }}>
+                    { children }
+                </div>
             </div>
-        </div>
-    </React.Fragment>
-  );
-};
+        </React.Fragment>
+    )
+}
 
-export default ProgressBar;
+export default ProgressBar

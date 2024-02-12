@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 // import { ipcRenderer } from 'electron';
 import Ipc from '../../lib/ipc'
 import SidebarFriendItem from './frienditem'
@@ -8,37 +8,37 @@ interface SidebarFriendsProps {
 }
 
 function SidebarFriends({
-  // friends = [],
-  ...props
+    // friends = [],
+    ...props
 }: SidebarFriendsProps) {
-  const [onlineFriends, setOnlineFriends] = React.useState([])
+    const [onlineFriends, setOnlineFriends] = React.useState([])
 
-  React.useEffect(() => {
+    React.useEffect(() => {
 
-    const updateFriends = () => {
-      Ipc.send('app', 'getOnlineFriends').then((onlineFriends) => {
-        setOnlineFriends(onlineFriends)
-      })
-    }
-    updateFriends()
-    const friendsInterval = setInterval(updateFriends, 1000*15)
+        const updateFriends = () => {
+            Ipc.send('app', 'getOnlineFriends').then((onlineFriends) => {
+                setOnlineFriends(onlineFriends)
+            })
+        }
+        updateFriends()
+        const friendsInterval = setInterval(updateFriends, 1000*15)
 
-    return () => {
-      clearInterval(friendsInterval)
-    };
-  }, []);
+        return () => {
+            clearInterval(friendsInterval)
+        }
+    }, [])
   
-  return (
-    <React.Fragment>
-      <div id="components_sidebarfriends" key="components_sidebarfriends">
-        {(onlineFriends.length > 0) ? onlineFriends.map((item:any, i) => {               
-           return (
-            <SidebarFriendItem key={ item.xuid } userinfo={ item }></SidebarFriendItem>
-           ) 
-        }) : <div className='components_sidebarfrienditem'><div className='components_sidebarfrienditem_userdetails'><p>All your friends are offline</p></div></div> }
-      </div>
-    </React.Fragment>
-  );
-};
+    return (
+        <React.Fragment>
+            <div id="components_sidebarfriends" key="components_sidebarfriends">
+                {(onlineFriends.length > 0) ? onlineFriends.map((item:any, i) => {               
+                    return (
+                        <SidebarFriendItem key={ item.xuid } userinfo={ item }></SidebarFriendItem>
+                    ) 
+                }) : <div className='components_sidebarfrienditem'><div className='components_sidebarfrienditem_userdetails'><p>All your friends are offline</p></div></div> }
+            </div>
+        </React.Fragment>
+    )
+}
 
-export default SidebarFriends;
+export default SidebarFriends

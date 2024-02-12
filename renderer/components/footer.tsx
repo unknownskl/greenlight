@@ -10,28 +10,28 @@ interface HeaderProps {
 }
 
 function Footer({
-  hidden = true,
-  connected = false,
-  ...props
+    hidden = true,
+    connected = false,
+    ...props
 }: HeaderProps) {
 
-  function getStatus(){
-    if(connected === true){
-      return 'Connected to: XX000000000000'
-    } else {
-      return 'Not connected'
+    function getStatus(){
+        if(connected === true){
+            return 'Connected to: XX000000000000'
+        } else {
+            return 'Not connected'
+        }
     }
-  }
-  function getCurrentApp(){
-    return {
-      name: 'Subnautica',
-      media_logo: 'https://store-images.s-microsoft.com/image/apps.19794.63409341877910445.4fd452e1-c3ee-4448-a0f8-ac6eb6bdaabf.8fe60020-9cc9-42c9-af2a-bf7b08cb5e13'
+    function getCurrentApp(){
+        return {
+            name: 'Subnautica',
+            media_logo: 'https://store-images.s-microsoft.com/image/apps.19794.63409341877910445.4fd452e1-c3ee-4448-a0f8-ac6eb6bdaabf.8fe60020-9cc9-42c9-af2a-bf7b08cb5e13',
+        }
     }
-  }
   
-  return (
-    <React.Fragment>
-        {/* <div id="component_footer" className={hidden === true ? 'disabled' : connected === true ? 'connected' : 'disconnected'}>
+    return (
+        <React.Fragment>
+            {/* <div id="component_footer" className={hidden === true ? 'disabled' : connected === true ? 'connected' : 'disconnected'}>
           <p className='status'>{getStatus()}</p>
 
           <div className='current_app'>
@@ -46,8 +46,8 @@ function Footer({
             </div>
           </div>
         </div> */}
-    </React.Fragment>
-  );
-};
+        </React.Fragment>
+    )
+}
 
-export default Footer;
+export default Footer

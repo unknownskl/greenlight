@@ -1,23 +1,23 @@
-import React from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import Ipc from '../../../lib/ipc';
-import Loader from '../loader';
+import React from 'react'
+import Link from 'next/link'
+import Image from 'next/image'
+import Ipc from '../../../lib/ipc'
+import Loader from '../loader'
 import { useQuery } from 'react-query'
 
 interface GameTitleProps {
-    titleId: string
+    titleId: string;
     // children;
 }
 
 interface titleDataState {
-    titleId?: string
+    titleId?: string;
     catalogDetails?: {
-        ProductTitle: string
+        ProductTitle: string;
         Image_Tile: {
-            URL: string
-        }
-    }
+            URL: string;
+        };
+    };
 }
 
 function GameTitleDynamic({
@@ -57,16 +57,16 @@ function GameTitleDynamic({
                         src={ 'https:'+titleData.data.catalogDetails.Image_Tile.URL }
                         alt={ titleData.data.catalogDetails.ProductTitle }
                         width='280' height='280' style={{
-                        width: 140,
-                        height: 140,
-                        borderRadius: '4px',
-                    }} ></Image>
+                            width: 140,
+                            height: 140,
+                            borderRadius: '4px',
+                        }} ></Image>
 
                     <div className='component_gametitle_title'><p>{ titleData.data.catalogDetails.ProductTitle }</p></div>
                 </Link> : <Loader></Loader> }
             </div>
         </React.Fragment>
-    );
-};
+    )
+}
 
-export default GameTitleDynamic;
+export default GameTitleDynamic

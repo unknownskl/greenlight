@@ -1,7 +1,7 @@
-import React from 'react';
+import React from 'react'
 import { ipcRenderer } from 'electron'
-import Head from 'next/head';
-import Link from 'next/link';
+import Head from 'next/head'
+import Link from 'next/link'
 
 import Header from '../components/header'
 import Card from '../components/ui/card'
@@ -10,7 +10,7 @@ import { useSettings } from '../context/userContext'
 
 
 function Debug() {
-  const { settings, setSettings} = useSettings()
+    const { settings, setSettings} = useSettings()
 
     // const [message, setMessage] = React.useState('no ipc message');
 
@@ -24,20 +24,20 @@ function Debug() {
     // };
     
     React.useEffect(() => {
-      // setSettings({
-      //   ...settings,
-      //   streamingMode: true,
-      // })
+        // setSettings({
+        //   ...settings,
+        //   streamingMode: true,
+        // })
 
-      // console.log('debug settings:', settings)
+        // console.log('debug settings:', settings)
 
-      // ipcRenderer.send('stream', {
-      //   type: 'start_stream',
-      //   data: {
-      //     type: 'home',
-      //     serverId: 'F4000EEB7F3EF52A'
-      //   }
-      // })
+        // ipcRenderer.send('stream', {
+        //   type: 'start_stream',
+        //   data: {
+        //     type: 'home',
+        //     serverId: 'F4000EEB7F3EF52A'
+        //   }
+        // })
 
         // ipcRenderer.on('ping-pong', (event, data) => {
         //     setMessage(data);
@@ -47,28 +47,28 @@ function Debug() {
         // return () => {
         //     ipcRenderer.removeAllListeners('ping-pong');
         // };
-    }, []);
+    }, [])
 
-  return (
-    <React.Fragment>
-      <Head>
-        <title>Greenlight - Debug</title>
-      </Head>
+    return (
+        <React.Fragment>
+            <Head>
+                <title>Greenlight - Debug</title>
+            </Head>
 
-      <div style={{
-        paddingTop: '20px'
-      }}>
+            <div style={{
+                paddingTop: '20px',
+            }}>
 
-        <Card className='padbottom'>
-          <h1>Debug</h1>
+                <Card className='padbottom'>
+                    <h1>Debug</h1>
 
-          <pre>{JSON.stringify(JSON.parse(JSON.stringify(settings)), null, 2)  }</pre>
-        </Card>
+                    <pre>{JSON.stringify(JSON.parse(JSON.stringify(settings)), null, 2) }</pre>
+                </Card>
 
-      </div>
+            </div>
 
-    </React.Fragment>
-  );
-};
+        </React.Fragment>
+    )
+}
 
-export default Debug;
+export default Debug

@@ -1,10 +1,10 @@
-import React from 'react';
-import Link from 'next/link';
-import Button from './button';
+import React from 'react'
+import Link from 'next/link'
+import Button from './button'
 
 interface ViewportGridProps {
-    drawPagination?:boolean
-    maxHeight?:number
+    drawPagination?:boolean;
+    maxHeight?:number;
     children;
 }
 
@@ -15,8 +15,8 @@ function ViewportGrid({
     ...props
 }: ViewportGridProps) {
     const randomId = Math.floor(Math.random()*1000)
-    const [showItems, setShowItems] = React.useState(9999);
-    const [page, setPage] = React.useState(0);
+    const [showItems, setShowItems] = React.useState(9999)
+    const [page, setPage] = React.useState(0)
 
     React.useEffect(() => {
         // Mount
@@ -28,7 +28,7 @@ function ViewportGrid({
                 const element = document.getElementById('component_viewportgrid_'+randomId)
 
                 if(element === null || element.parentElement === null)
-                    return;
+                    return
 
                 const parentHeight = element.parentElement.parentElement.offsetTop+element.parentElement.parentElement.clientHeight
                 const parentWidth = element.parentElement.parentElement.offsetLeft+element.parentElement.parentElement.clientWidth
@@ -64,7 +64,7 @@ function ViewportGrid({
 
         return () => {
             clearInterval(resizeInterval)
-        };
+        }
     })
 
     function calculateChildrenInViewportCouldFit(element:HTMLElement){
@@ -90,13 +90,15 @@ function ViewportGrid({
       
         buttons.push((<Button key="page_prev" onClick={ prevPage } disabled={page <= 0} className='btn-small' label="Previous page"></Button>))
         for(let i=1; i <= totalPages; i++){
-          if(i == 1 || (i > (page-4) && i <= (page+5)) || i == totalPages){
-            buttons.push((<Button key={i} label={i.toString()} className={ page == (i-1) ? 'btn-small btn-primary': 'btn-small' } onClick={ () => { gotoPage(i) }}></Button>))
-          } else {
-            if(i == (page-4) || i == (page+6)){
-                buttons.push((<Button key={i} label='...' disabled={true} className={ 'btn-small btn-disabled' }></Button>))
+            if(i == 1 || (i > (page-4) && i <= (page+5)) || i == totalPages){
+                buttons.push((<Button key={i} label={i.toString()} className={ page == (i-1) ? 'btn-small btn-primary': 'btn-small' } onClick={ () => {
+                    gotoPage(i) 
+                }}></Button>))
+            } else {
+                if(i == (page-4) || i == (page+6)){
+                    buttons.push((<Button key={i} label='...' disabled={true} className={ 'btn-small btn-disabled' }></Button>))
+                }
             }
-          }
         }
         buttons.push((<Button key="page_next" onClick={ nextPage } disabled={page >= totalPages-1} className='btn-small' label="Next page"></Button>))
     
@@ -106,17 +108,17 @@ function ViewportGrid({
     function nextPage(){
         setPage(page+1)
         window.scrollTo({ top: 0 })
-      }
+    }
     
-      function prevPage(){
+    function prevPage(){
         setPage(page-1)
         window.scrollTo({ top: 0 })
-      }
+    }
     
-      function gotoPage(page){
+    function gotoPage(page){
         setPage(parseInt(page)-1)
         window.scrollTo({ top: 0 })
-      }
+    }
 
     return (
         <React.Fragment>
@@ -129,7 +131,7 @@ function ViewportGrid({
                 marginTop: 25,
                 // marginBottom: 25,
                 overflow: 'hidden',
-                height: (maxHeight < 0) ? 'auto' : maxHeight
+                height: (maxHeight < 0) ? 'auto' : maxHeight,
             }}>
                 { React.Children.map(children, (child, index) => {
                     const offset = (page*showItems)
@@ -139,7 +141,7 @@ function ViewportGrid({
                         return 
                     }
 
-                    return ( <div id={ "title_"+index } style={{
+                    return ( <div id={ 'title_'+index } style={{
                         height: 155,
                         width: 145,
                         // padding: 5,
@@ -152,7 +154,7 @@ function ViewportGrid({
                 { drawPageButtons() }
             </div> : '' }
         </React.Fragment>
-    );
-};
+    )
+}
 
-export default ViewportGrid;
+export default ViewportGrid

@@ -9,7 +9,7 @@ export const SettingsContext = React.createContext({
 export const useSettings = () => useContext(SettingsContext)
 
 export const UserProvider = ({ children }) => {
-    const [settings, setSettings] = useState(defaultSettings);
+    const [settings, setSettings] = useState(defaultSettings)
 
     function setSettingsAndSaveToLocalStorage(newSettings: any) {
         setSettings(newSettings)

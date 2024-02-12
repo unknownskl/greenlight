@@ -1,11 +1,11 @@
-import React from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
+import React from 'react'
+import Link from 'next/link'
+import Image from 'next/image'
 
 interface GameTitleProps {
-    name: string
-    src: string
-    titleId: string
+    name: string;
+    src: string;
+    titleId: string;
     // children;
 }
 
@@ -23,7 +23,7 @@ function GameTitle({
 
         return () => {
             // Unmount
-        };
+        }
     })
 
     return (
@@ -45,7 +45,7 @@ function GameTitle({
                 </Link>
             </div>
         </React.Fragment>
-    );
-};
+    )
+}
 
-export default GameTitle;
+export default GameTitle

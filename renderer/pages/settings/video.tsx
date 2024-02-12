@@ -9,91 +9,93 @@ import { useSettings } from '../../context/userContext'
 function SettingsVideo() {
     const { settings, setSettings} = useSettings()
 
-  React.useEffect(() => {
+    React.useEffect(() => {
     //
-  })
-
-  function setVideoSize(e){
-    setSettings({
-      ...settings,
-      video_size: e
     })
-  }
 
-  function forceLowResolution(e){
-    Ipc.send('settings', 'setLowResolution').then(() => {
-      console.log('Resizing main window...')
-      setSettings({
-        ...settings,
-        app_lowresolution: (!settings.app_lowresolution)
-      })
-    })
-  }
+    function setVideoSize(e){
+        setSettings({
+            ...settings,
+            video_size: e,
+        })
+    }
 
-  function setAudioEnabled(e){
-    setSettings({
-      ...settings,
-      audio_enabled: (!settings.audio_enabled)
-    })
-  }
+    function forceLowResolution(){
+        Ipc.send('settings', 'setLowResolution').then(() => {
+            console.log('Resizing main window...')
+            setSettings({
+                ...settings,
+                app_lowresolution: (!settings.app_lowresolution),
+            })
+        })
+    }
 
-  function setVideoEnabled(e){
-    setSettings({
-      ...settings,
-      video_enabled: (!settings.video_enabled)
-    })
-  }
+    function setAudioEnabled(){
+        setSettings({
+            ...settings,
+            audio_enabled: (!settings.audio_enabled),
+        })
+    }
 
-  return (
-    <React.Fragment>
-      <Head>
-        <title>Greenlight - Settings: Video & Audio</title>
-      </Head>
+    function setVideoEnabled(){
+        setSettings({
+            ...settings,
+            video_enabled: (!settings.video_enabled),
+        })
+    }
 
-      <SettingsSidebar>
-          <Card>
-              <h1>Video</h1>
+    return (
+        <React.Fragment>
+            <Head>
+                <title>Greenlight - Settings: Video & Audio</title>
+            </Head>
 
-              <p>
-                <label>Disable video</label>
-                <label style={{ minWidth: 0 }}>
-                    <input type='checkbox' onChange={ setVideoEnabled } checked={!settings.video_enabled} />&nbsp; ({ !settings.video_enabled ? 'Enabled' : 'Disabled'})
-                </label>
-              </p>
+            <SettingsSidebar>
+                <Card>
+                    <h1>Video</h1>
 
-              <p>
-                <label>Video aspect size</label>
-                <select value={ settings.video_size } onChange={(e) => {setVideoSize(e.target.value)}}>
-                    <option value='default'>Default</option>
-                    <option value='stretch'>Stretch</option>
-                    <option value='zoom'>Zoom</option>
-                </select>
-              </p>
+                    <p>
+                        <label>Disable video</label>
+                        <label style={{ minWidth: 0 }}>
+                            <input type='checkbox' onChange={ setVideoEnabled } checked={!settings.video_enabled} />&nbsp; ({ !settings.video_enabled ? 'Enabled' : 'Disabled'})
+                        </label>
+                    </p>
 
-              <p>
-                <label>Force low resolution video</label>
-                <label style={{ minWidth: 0 }}>
-                    <input type='checkbox' onChange={ forceLowResolution } checked={settings.app_lowresolution} />&nbsp; ({ settings.app_lowresolution ? 'Enabled' : 'Disabled'})
-                </label><br />
-                <small>(This option is useful on the Steam Deck and enables the application to render in a low resolution so FSR can be enabled.)</small>
-              </p>
-          </Card>
+                    <p>
+                        <label>Video aspect size</label>
+                        <select value={ settings.video_size } onChange={(e) => {
+                            setVideoSize(e.target.value)
+                        }}>
+                            <option value='default'>Default</option>
+                            <option value='stretch'>Stretch</option>
+                            <option value='zoom'>Zoom</option>
+                        </select>
+                    </p>
 
-          <Card>
-              <h1>Audio</h1>
+                    <p>
+                        <label>Force low resolution video</label>
+                        <label style={{ minWidth: 0 }}>
+                            <input type='checkbox' onChange={ forceLowResolution } checked={settings.app_lowresolution} />&nbsp; ({ settings.app_lowresolution ? 'Enabled' : 'Disabled'})
+                        </label><br />
+                        <small>(This option is useful on the Steam Deck and enables the application to render in a low resolution so FSR can be enabled.)</small>
+                    </p>
+                </Card>
 
-              <p>
-                <label>Disable audio</label>
-                <label style={{ minWidth: 0 }}>
-                    <input type='checkbox' onChange={ setAudioEnabled } checked={!settings.audio_enabled} />&nbsp; ({ !settings.audio_enabled ? 'Enabled' : 'Disabled'})
-                </label>
-              </p>
-          </Card>
-      </SettingsSidebar>
+                <Card>
+                    <h1>Audio</h1>
+
+                    <p>
+                        <label>Disable audio</label>
+                        <label style={{ minWidth: 0 }}>
+                            <input type='checkbox' onChange={ setAudioEnabled } checked={!settings.audio_enabled} />&nbsp; ({ !settings.audio_enabled ? 'Enabled' : 'Disabled'})
+                        </label>
+                    </p>
+                </Card>
+            </SettingsSidebar>
       
 
-    </React.Fragment>
-  );
-};
+        </React.Fragment>
+    )
+}
 
-export default SettingsVideo;
+export default SettingsVideo

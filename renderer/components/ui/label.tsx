@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 
 interface LabelProps {
   className?: string;
@@ -7,20 +7,20 @@ interface LabelProps {
 
 function Label({
     className,
-  children,
-  ...props
+    children,
+    ...props
 }: LabelProps) {
 
-  className = className ? 'component_label '+className : 'component_label'
+    className = className ? 'component_label '+className : 'component_label'
 
 
-  return (
-    <React.Fragment>
-      <span className={className}>
-        { children }
-      </span>
-    </React.Fragment>
-  );
-};
+    return (
+        <React.Fragment>
+            <span className={className}>
+                { children }
+            </span>
+        </React.Fragment>
+    )
+}
 
-export default Label;
+export default Label
