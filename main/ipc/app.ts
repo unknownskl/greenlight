@@ -163,7 +163,7 @@ export default class IpcApp extends IpcBase {
             
             this.getSettings().then((settings) => {
                 if(settings.app_lowresolution === false){
-                    this._application._mainWindow.setSize(960, 600)
+                    this._application._mainWindow.setSize(985, 615)
                     settings.app_lowresolution = true
 
                 } else {

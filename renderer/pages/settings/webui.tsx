@@ -42,10 +42,10 @@ function SettingsWebUI() {
 
   function setWebUIPort(e){
     console.log('change port:', e.target.value)
-    // setSettings({
-    //   ...settings,
-    //   webui_port: e
-    // })
+    setSettings({
+      ...settings,
+      webui_port: e.target.value
+    })
   }
 
   return (
