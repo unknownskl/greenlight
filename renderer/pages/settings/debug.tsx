@@ -5,13 +5,6 @@ import Link from 'next/link';
 import Ipc from '../../lib/ipc'
 
 import Card from '../../components/ui/card'
-import { useXcloud } from '../../context/userContext'
-import Button from '../../components/ui/button'
-import Loader from '../../components/ui/loader'
-import ViewportGrid from '../../components/ui/viewportgrid';
-import GameTitle from '../../components/ui/game/title';
-import BreadcrumbBar from '../../components/ui/breadcrumbbar';
-import TitleRow from '../../components/xcloud/titleRow';
 import SettingsSidebar from '../../components/settings/sidebar';
 
 function SettingsDebug() {

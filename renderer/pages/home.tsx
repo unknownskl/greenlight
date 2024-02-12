@@ -1,29 +1,16 @@
 import React from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
-import { ipcRenderer } from 'electron'
 import Ipc from '../lib/ipc'
+import { useQuery } from 'react-query'
 
-import Header from '../components/header'
 import Button from '../components/ui/button'
 import Card from '../components/ui/card'
-
-// import { UserProvider } from '../context/userContext'
-import { useUser } from '../context/userContext'
 import Label from '../components/ui/label';
+import Loader from '../components/ui/loader';
 
 function Home() {
-  const { consoles, setConsoles} = useUser()
-
-  React.useEffect(() => {
-    Ipc.send('consoles', 'get').then((consoles) => {
-      setConsoles(consoles)
-    })
-
-    // return () => {
-    //   // ipcRenderer.removeAllListeners('stream');
-    // };
-  }, []);
+  const consoles = useQuery('consoles', () => Ipc.send('consoles', 'get'), { staleTime: 60*1000 })
   
   return (
     <React.Fragment>
@@ -38,7 +25,8 @@ function Home() {
         alignItems: 'stretch',
         paddingTop: '20px'
       }}>
-        {consoles.length > 0 ? consoles.map((item, i) => {               
+        { (consoles.isLoading === true) ? <Loader></Loader> :
+          (consoles.isFetched === true && consoles.data.length > 0) ? consoles.data.map((item, i) => {               
            return (
             <Card className='padbottom' key={i}>
               <h1>{item.name}</h1>
@@ -73,8 +61,8 @@ function Home() {
               {/* <p>Name: {item.name}</p>
               <p>ID: {item.id}</p>
               <p>State: {item.powerState}</p>
-              <p>Type: {item.consoleType}</p> */}
-              {/* <p>Assistant: {item.digitalAssistantRemoteControlEnabled ? 'Enabled' : 'Disabled'}</p>
+              <p>Type: {item.consoleType}</p>
+              <p>Assistant: {item.digitalAssistantRemoteControlEnabled ? 'Enabled' : 'Disabled'}</p>
               <p>Remote: {item.remoteManagementEnabled ? 'Enabled' : 'Disabled'}</p>
               <p>Streaming: {item.consoleStreamingEnabled ? 'Enabled' : 'Disabled'}</p><br /> */}
 
@@ -85,7 +73,7 @@ function Home() {
               </div>
             </Card>
            ) 
-        }) : <Card className='padbottom' key='noconsoles'>No consoles found on account. If you do have an Xbox console then make sure that remote playing is enabled and is visible in the official Xbox App.</Card>
+        }) : <Card className='padbottom' key='noconsoles'>No consoles found on your account. If you do have an Xbox console then make sure that remote playing is enabled and is visible in the official Xbox App.</Card>
         }
       </div>
 

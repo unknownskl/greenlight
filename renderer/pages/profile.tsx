@@ -9,12 +9,12 @@ import Card from '../components/ui/card'
 import Loader from '../components/ui/loader'
 import AchievementGameRow from '../components/achievement/gamerow'
 
-import { useAchievements } from '../context/userContext'
+// import { useAchievements } from '../context/userContext'
 
 function Profile() {
-  const {achievements, setAchievements} = useAchievements()
+  // const {achievements, setAchievements} = useAchievements()
   const [page, setPage] = React.useState(0);
-  let loadingAchievements = []
+  const loadingAchievements = []
   const resultsPerPage = 10
 
   React.useEffect(() => {
@@ -77,18 +77,18 @@ function Profile() {
     window.scrollTo({ top: 0 })
   }
 
-  function drawPageButtons(){
-    const buttons = []
-    const totalPages = Math.ceil(filterAchievements(achievements).length/resultsPerPage)
+  // function drawPageButtons(){
+  //   const buttons = []
+  //   const totalPages = Math.ceil(filterAchievements(achievements).length/resultsPerPage)
   
-    buttons.push((<Button onClick={ prevPage } disabled={page <= 0} label="Previous page"></Button>))
-    for(let i=1; i <= totalPages; i++){
-      buttons.push((<Button key={i} label={i.toString()} className={ page == (i-1) ? 'btn-primary': '' } onClick={ () => { gotoPage(i) }}></Button>))
-    }
-    buttons.push((<Button onClick={ nextPage } disabled={page >= totalPages-1} label="Next page"></Button>))
+  //   buttons.push((<Button onClick={ prevPage } disabled={page <= 0} label="Previous page"></Button>))
+  //   for(let i=1; i <= totalPages; i++){
+  //     buttons.push((<Button key={i} label={i.toString()} className={ page == (i-1) ? 'btn-primary': '' } onClick={ () => { gotoPage(i) }}></Button>))
+  //   }
+  //   buttons.push((<Button onClick={ nextPage } disabled={page >= totalPages-1} label="Next page"></Button>))
 
-    return buttons
-  }
+  //   return buttons
+  // }
 
   return (
     <React.Fragment>

@@ -20,14 +20,40 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="2.0.1" date="2023-12-20"/>
+    <release version="2.1.1" date="2024-01-29">
      <description>
-        <li>Align internal release version with version released on Github</li>
+        <ul>
+          <li>Fixed controller input not working on default settings #1118 #1117</li>
+          <li>Fixed keyboard mapping on certain keyboard layouts #878</li>
+          <li>Fixed N button mapping when using the new Gamepad driver in settings</li>
+        </ul>
      </description>
-    <release version="2.0.0" date="2023-12-14"/>
+    </release>
+    <release version="2.1.0" date="2024-01-25">
      <description>
-        <li>First full release</li>
+        <ul>
+          <li>Fix vibration detection #1076 #813 (credits to @LostVector and @opencv4nodejs)</li>
+          <li>Revamped the xCloud UI. New overview page with recent played titles and new added games.</li>
+          <li>Set default resolution to 1280*800 to fix several scaling issues on Steamdeck</li>
+          <li>Experimental support for second controller (Uses same user profile, so multiplayer in some games does not work correctly) #916</li>
+          <li>Fix webrtc plots in debug window (credits to @LostVector)</li>
+        </ul>
      </description>
+    </release>
+    <release version="2.0.1" date="2023-12-20">
+     <description>
+        <ul>
+          <li>Align internal release version with version released on Github</li>
+        </ul>
+     </description>
+    </release>
+    <release version="2.0.0" date="2023-12-14">
+     <description>
+        <ul>
+          <li>First full release</li>
+        </ul>
+     </description>
+    </release>
   </releases>
   <content_rating type="oars-1.1"/>
 </component>

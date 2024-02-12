@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import React from 'react';
 import Button from '../ui/button';
+import Image from 'next/image';
 
 interface SidebarFriendItemProps {
   userinfo;
@@ -31,7 +32,7 @@ function SidebarFriendItem({
           <div className="components_sidebarfrienditem_gamerpic" style={ {
             borderColor: '#' + userinfo.preferredColor.primaryColor
           }}>
-            <img className='components_sidebarfrienditem_gamerpic_img' loading='lazy' src={userinfo.displayPicRaw} />
+            <Image alt="Gamerpic" className='components_sidebarfrienditem_gamerpic_img' width='45' height='45' loading='lazy' src={userinfo.displayPicRaw.replace('&mode=Padding', '')} />
           </div>
           
           <div className='components_sidebarfrienditem_userdetails'>

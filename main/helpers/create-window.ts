@@ -8,14 +8,13 @@ import path from 'node:path'
 
 export default (windowName: string, options: BrowserWindowConstructorOptions): BrowserWindow => {
   const key = 'window-state';
-  const name = `window-state-${windowName}`;
+  const name = `window-state-v2-${windowName}`;
   const store = new Store({ name });
   const defaultSize = {
     width: options.width,
     height: options.height,
   };
   let state = {};
-  let win;
 
   const restore = () => store.get(key, defaultSize);
 
@@ -84,7 +83,7 @@ export default (windowName: string, options: BrowserWindowConstructorOptions): B
     },
     autoHideMenuBar: true,
   };
-  win = new BrowserWindow(browserOptions);
+  const win = new BrowserWindow(browserOptions);
 
   win.on('close', saveState);
 

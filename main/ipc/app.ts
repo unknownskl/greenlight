@@ -1,6 +1,7 @@
 import IpcBase from './base'
 import { session } from 'electron'
 import electron from 'electron'
+import { defaultSettings } from '../../renderer/context/userContext.defaults'
 
 interface setForceRegionIpArgs {
     ip:string
@@ -15,7 +16,7 @@ export default class IpcApp extends IpcBase {
 
             resolve(user)
 
-            this.sendAuthState()
+            // this.sendAuthState()
         })
     }
 
@@ -34,6 +35,16 @@ export default class IpcApp extends IpcBase {
         }
     }
 
+    getAuthState(){
+        return new Promise((resolve, reject) => {
+            resolve({
+                isAuthenticating: this._application._authentication._isAuthenticating,
+                isAuthenticated: this._application._authentication._isAuthenticated,
+                user: this.getUserState()
+            })
+        })
+    }
+
     login(){
         return new Promise((resolve, reject) => {
             this._application._authentication.startAuthflow()
@@ -43,15 +54,19 @@ export default class IpcApp extends IpcBase {
 
     quit(){
         return new Promise((resolve, reject) => {
-            this._application.quit()
             resolve(true)
+            setTimeout(() => {
+                this._application.quit()
+            }, 100)
         })
     }
     
     restart(){
         return new Promise((resolve, reject) => {
-            this._application.restart()
             resolve(true)
+            setTimeout(() => {
+                this._application.restart()
+            }, 100)
         })
     }
 
@@ -72,23 +87,9 @@ export default class IpcApp extends IpcBase {
         })
     }
 
-    sendAuthState(){
-        this.send('app', {
-            id: 0,
-            action: 'authState',
-            data: {
-                isAuthenticating: this._application._authentication._isAuthenticating,
-                isAuthenticated: this._application._authentication._isAuthenticated,
-                user: this.getUserState()
-            }
-        })
-    }
-
-    sendOnlineFriends(onlineFriends){
-        this.send('app', {
-            id: 0,
-            action: 'onlineFriends',
-            data: onlineFriends
+    getOnlineFriends(){
+        return new Promise((resolve, reject) => {
+            resolve(this._application._xboxWorker._onlineFriends)
         })
     }
 
@@ -110,6 +111,73 @@ export default class IpcApp extends IpcBase {
             // Rerun silent flow to retrieve new tokens
             this._application._authentication.startSilentFlow();
 
+            resolve(true)
+        })
+    }
+
+    setSettings(args:(typeof defaultSettings)){
+        return new Promise((resolve, reject) => {
+            // Check for changes which we need to take action on
+            // const settings = this._application._store.get('settings', defaultSettings) as Object
+            // const prevSettings = {...defaultSettings, ...settings}
+            const newSettings = {...defaultSettings, ...args}
+
+            // Perform save
+            this._application._store.set('settings', newSettings)
+            resolve(newSettings)
+        })
+    }
+
+    getSettings(){
+        return new Promise<typeof defaultSettings>((resolve, reject) => {
+            const settings = this._application._store.get('settings', defaultSettings) as Object;
+            resolve({...defaultSettings, ...settings})
+        })
+    }
+
+    getWebUIStatus(){
+        return new Promise((resolve, reject) => {
+            resolve((this._application._webUI._express ? true : false))
+        })
+    }
+
+    startWebUI(args){
+        return new Promise((resolve, reject) => {
+            const rawSettings = this._application._store.get('settings', defaultSettings) as Object;
+            const settings = {...defaultSettings, ...rawSettings}
+            this._application._webUI.startServer(settings.webui_port)
+            resolve(true)
+        })
+    }
+
+
+    stopWebUI(args){
+        return new Promise((resolve, reject) => {
+            this._application._webUI.stopServer()
+            resolve(false)
+        })
+    }
+
+    setLowResolution(){
+        return new Promise((resolve, reject) => {
+            
+            this.getSettings().then((settings) => {
+                if(settings.app_lowresolution === false){
+                    this._application._mainWindow.setSize(960, 600)
+                    settings.app_lowresolution = true
+
+                } else {
+                    this._application._mainWindow.setSize(1280, 800)
+                    settings.app_lowresolution = false
+                }
+
+                this.setSettings(settings)
+            })
+
+
+            // if(this._application._mainWindow.height !)
+            // this._application._mainWindow.setSize(960, 600)
+             
             resolve(true)
         })
     }

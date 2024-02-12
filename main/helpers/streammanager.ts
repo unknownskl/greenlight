@@ -1,5 +1,6 @@
 import Application from '../application'
 import xCloudApi, { playResult } from './xcloudapi'
+import Ipc from '../ipc'
 
 interface streamSession {
     id: string
@@ -8,6 +9,7 @@ interface streamSession {
     type: string|'home'|'cloud'
     state?: string
     waitingTimes?: any
+    playerState: string|'pending'|'started'|'queued'|'failed'
     errorDetails?: {
         code,
         message
@@ -22,10 +24,6 @@ export default class StreamManager {
     
     constructor(application){
         this._application = application
-
-        // setInterval(() => {
-
-        // }, 30*1000)
     }
 
     getApi(type):xCloudApi{
@@ -53,6 +51,7 @@ export default class StreamManager {
                     target: target,
                     path: playResult.sessionPath,
                     type: type,
+                    playerState: 'pending'
                 }
                 this._sessions[sessionId] = streamSession
                 this.monitorSession(sessionId)
@@ -166,12 +165,7 @@ export default class StreamManager {
                 this.getSession(sessionId).state = result.state
 
                 if(result.state === 'Provisioned'){
-                    // Do rest of handshake...
-                    this._application._ipc._channels.streaming.send('streaming', {
-                        action: 'startStreamResult',
-                        id: 0,
-                        data: this.getSession(sessionId)
-                    })
+                    this.getSession(sessionId).playerState = 'started'
 
                 } else if(result.state === 'Provisioning'){
                     // Lets loop again
@@ -179,6 +173,7 @@ export default class StreamManager {
 
                 } else if(result.state === 'ReadyToConnect'){
                     // Do MSAL Auth
+                    // @TODO: Refresh token if expired?
                     this.getApi(this.getSession(sessionId).type).sendMSALAuth(sessionId, this._application._authentication._tokens.msal.token).then((result) => {
                         this.monitorSession(sessionId)
 
@@ -192,12 +187,8 @@ export default class StreamManager {
                     if(this.getSession(sessionId).waitingTimes === undefined){
                         this.getApi(this.getSession(sessionId).type).getWaitingTimes(this.getSession(sessionId).target).then((waitingTimes) => {
                             this.getSession(sessionId).waitingTimes = waitingTimes
+                            this.getSession(sessionId).playerState = 'queued'
 
-                            this._application._ipc._channels.streaming.send('streaming', {
-                                action: 'onQueue',
-                                id: 0,
-                                data: waitingTimes
-                            })
                         })
                     }
                     
@@ -205,11 +196,7 @@ export default class StreamManager {
 
                 } else if(result.state === 'Failed'){
                     this.getSession(sessionId).errorDetails = result.errorDetails
-                    this._application._ipc._channels.streaming.send('streaming', {
-                        action: 'startStreamResult',
-                        id: 0,
-                        data: this.getSession(sessionId)
-                    })
+                    this.getSession(sessionId).playerState = 'failed'
 
                 } else {
                     

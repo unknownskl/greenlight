@@ -6,6 +6,7 @@ import { createWindow, xboxWorker, updater } from './helpers';
 import Events from './events'
 import Authentication from './authentication'
 import Ipc from './ipc'
+import WebUI from './webui'
 
 import pkg from '../package.json'
 
@@ -22,15 +23,16 @@ export default class Application {
         fullscreen: false,
         autoStream: '',
     }
-    private _isProduction:boolean = (process.env.NODE_ENV === 'production')
+    public _isProduction:boolean = (process.env.NODE_ENV === 'production')
     private _isCi:boolean = (process.env.CI !== undefined)
     private _isMac:boolean = (process.platform === 'darwin')
     private _isWindows:boolean = (process.platform === 'win32')
     private _isQuitting:boolean = false
 
-    private _mainWindow
+    public _mainWindow
     public _events:Events
     public _ipc:Ipc
+    public _webUI:WebUI
     public _authentication:Authentication
     public _xboxWorker:xboxWorker
 
@@ -39,13 +41,13 @@ export default class Application {
         this._log = Debug('greenlight')
 
         ElectronApp.commandLine.appendSwitch('enable-features', 'VaapiIgnoreDriverChecks,VaapiVideoDecoder,PlatformHEVCDecoderSupport,CanvasOopRasterization');
-        ElectronApp.commandLine.appendSwitch('disable-features', 'UseChromeOSDirectVideoDecoder');
+        // ElectronApp.commandLine.appendSwitch('disable-features', 'UseChromeOSDirectVideoDecoder');
         ElectronApp.commandLine.appendSwitch('enable-gpu-rasterization');
         ElectronApp.commandLine.appendSwitch('enable-oop-rasterization');
         ElectronApp.commandLine.appendSwitch('accelerated-video-decode');
         ElectronApp.commandLine.appendSwitch('ozone-platform-hint', 'x11');
         ElectronApp.commandLine.appendSwitch('ignore-gpu-blocklist');
-        ElectronApp.commandLine.appendSwitch('enable-zero-copy');
+        // ElectronApp.commandLine.appendSwitch('enable-zero-copy');
 
         this.readStartupFlags()
         this.loadApplicationDefaults()
@@ -58,6 +60,7 @@ export default class Application {
         this._xboxWorker = new xboxWorker(this)
 
         this._ipc.startUp()
+        this._webUI = new WebUI(this)
     }
 
     log(namespace = 'application', ...args){
@@ -82,7 +85,7 @@ export default class Application {
             }
 
             if(process.argv[arg].includes('--connect=')){
-                let key = process.argv[arg].substring(10)
+                const key = process.argv[arg].substring(10)
 
                 this.log('application',__filename+'[readStartupFlags()] --connect switch found. Setting autoStream to', key)
                 this._startupFlags.autoStream = key
@@ -95,6 +98,7 @@ export default class Application {
     loadApplicationDefaults(){
         if(this._isProduction === true && this._isCi === false) {
             serve({ directory: 'app' });
+
         } else if(this._isCi === true) {
             const random = Math.random()*100
             ElectronApp.setPath('userData', `${ElectronApp.getPath('userData')} (${random})`);
@@ -104,6 +108,7 @@ export default class Application {
 
             serve({ directory: 'app' });
         } else {
+            
             ElectronApp.setPath('userData', `${ElectronApp.getPath('userData')} (development)`);
         }
 
@@ -154,8 +159,8 @@ export default class Application {
           }
 
         this._mainWindow = createWindow('main', {
-            width: 1000,
-            height: 600,
+            width: 1280,
+            height: 800,
             ...windowOptions,
         });
 

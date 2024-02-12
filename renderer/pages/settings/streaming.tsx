@@ -31,6 +31,16 @@ function SettingsStreaming() {
     })
   }
 
+  function setVideoProfile(profile){
+    console.log('Set video profile to:', profile)
+    setSettings({
+      ...settings,
+      video_profiles: (profile != '') ? [profile] : []
+    })
+  }
+
+  // video_profiles ([])
+
   function setForceRegionIp(e){
     setSettings({
       ...settings,
@@ -50,7 +60,7 @@ function SettingsStreaming() {
 
       <SettingsSidebar>
           <Card>
-              <h1>Bitrate settings</h1>
+              <h1>Stream settings</h1>
 
               <p>
                 xHome and xCloud does not support more then 20mbps by default. This setting does not override this limit.
@@ -66,6 +76,17 @@ function SettingsStreaming() {
                 <input type="range" min="0" max="40960" step="1024" value={settings.xhome_bitrate} onChange={ setxHomeBitrate } />
                 ({ settings.xhome_bitrate == 0 ? 'Unlimited / Off' : Math.floor(settings.xhome_bitrate / 1024) + " mbps" })
               </p>
+
+              <p>
+                <label>Set H264 Profile </label>
+                <select value={ (settings.video_profiles.length > 0) ? settings.video_profiles[0] : '' } onChange={ (e) => setVideoProfile(e.target.value) }>
+                    <option value="">Auto-Negotiate</option>
+                    <option value="4d">High</option>
+                    <option value="42e">Medium</option>
+                    <option value="420">Low</option>
+                </select>
+              </p>
+
           </Card>
 
           <Card>

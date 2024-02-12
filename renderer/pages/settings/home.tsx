@@ -59,7 +59,7 @@ function SettingsHome() {
                 <p>
                   Gamerscore: { user.gamerscore }
                 </p>
-                <Button label="Logout" className='btn' onClick={ () => { logout() } }></Button>
+                <Button label="Logout" className='btn' disabled={(window.Greenlight.isWebUI() === false) ? false : true } onClick={ () => { logout() } }></Button>
               </div>
 
               <br style={{ clear: 'both' }} />

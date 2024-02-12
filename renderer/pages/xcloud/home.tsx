@@ -1,43 +1,16 @@
 import React from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
-
 import Ipc from '../../lib/ipc'
-
-import Card from '../../components/ui/card'
-import { useXcloud } from '../../context/userContext'
 import Button from '../../components/ui/button'
-import Loader from '../../components/ui/loader'
-import ViewportGrid from '../../components/ui/viewportgrid';
-import GameTitle from '../../components/ui/game/title';
 import BreadcrumbBar from '../../components/ui/breadcrumbbar';
 import TitleRow from '../../components/xcloud/titleRow';
+import { useQuery } from 'react-query'
 
 function xCloudHome() {
-  const { xcloudTitles, setXcloudTitles} = useXcloud()
-  const [xcloudRecentTitles, setXcloudRecentTitles] = React.useState([])
-  const [xCloudNewTitles, setXcloudNewTitles] = React.useState([])
-
-  React.useEffect(() => {
-    if(xcloudTitles.length == 0){
-      Ipc.send('xCloud', 'getTitles').then((titles) => {
-        setXcloudTitles(titles)
-      })
-    }
-
-    // console.log(xcloudTitles.length, xcloudRecentTitles.length)
-    if(xcloudTitles.length > 0 && xcloudRecentTitles.length === 0){
-      Ipc.send('xCloud', 'getRecentTitles').then((recentTitles) => {
-        setXcloudRecentTitles(recentTitles)
-      })
-    }
-
-    if(xcloudTitles.length > 0 && xCloudNewTitles.length === 0){
-      Ipc.send('xCloud', 'getNewTitles').then((newTitles) => {
-        setXcloudNewTitles(newTitles)
-      })
-    }
-  })
+  const xCloudTitles = useQuery('xCloudTitles', () => Ipc.send('xCloud', 'getTitles'), { staleTime: 300*1000 })
+  const xCloudNewTitles = useQuery('xCloudNewTitles', () => Ipc.send('xCloud', 'getNewTitles'), { staleTime: 60*1000 })
+  const xCloudRecentTitles = useQuery('xCloudRecentTitles', () => Ipc.send('xCloud', 'getRecentTitles'), { staleTime: 10*1000 })
 
   return (
     <React.Fragment>
@@ -50,9 +23,9 @@ function xCloudHome() {
         {/* <Link href="/xcloud/library">Library</Link> */}
       </BreadcrumbBar>
 
-      <TitleRow titles={ xcloudRecentTitles }>Recent Games</TitleRow>
+      <TitleRow titles={ (xCloudRecentTitles.isFetched) ? xCloudRecentTitles.data : [] }>Recent Games</TitleRow>
 
-        <TitleRow titles={ xCloudNewTitles }>
+        <TitleRow titles={ (xCloudNewTitles.isFetched) ? xCloudNewTitles.data : [] }>
           Recently added &nbsp;
           <Link href="/xcloud/library"><Button label="View Library" className='btn-small'></Button></Link>
         </TitleRow>

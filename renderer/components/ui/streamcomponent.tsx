@@ -7,8 +7,6 @@ import uPlot from 'uplot'
 // import { ipcRenderer } from 'electron'
 import Ipc from '../../lib/ipc'
 
-
-
 interface StreamComponentProps {
   hidden?: boolean;
   onDisconnect?: () => void;
@@ -46,7 +44,7 @@ function StreamComponent({
 
 
   function sliceData(data, start, end) {
-    let d = [];
+    const d = [];
 
     for (let i = 0; i < data.length; i++)
       d.push(data[i].slice(start, end));
@@ -72,7 +70,7 @@ function StreamComponent({
     //   }
     // })
 
-    let jitterUplot = new uPlot({
+    const jitterUplot = new uPlot({
       title: "Jitter (ms)",
       id: "component_streamcomponent_debug_webrtc_jitter",
       class: "debug-chart",
@@ -106,7 +104,7 @@ function StreamComponent({
       ]
     }, jitterData, document.getElementById('component_streamcomponent_debug_webrtc_jitter'));
 
-    let droppedUplot = new uPlot({
+    const droppedUplot = new uPlot({
       title: "Packets lost / Frames dropped",
       id: "component_streamcomponent_debug_webrtc_dropped",
       class: "debug-chart",
@@ -260,19 +258,15 @@ function StreamComponent({
 
   function streamDisconnect(){
     document.getElementById('streamComponentHolder').innerHTML = '';
-    // onDisconnect()
 
-    window.history.back()
-    // xPlayer.reset()
+    xPlayer.close()
   }
 
   function endStream(){
     if(confirm('Are you sure you want to end your stream?')){
       document.getElementById('streamComponentHolder').innerHTML = '';
       onDisconnect()
-
-      window.history.back()
-      // xPlayer.reset()
+      xPlayer.close()
     }
   }
 

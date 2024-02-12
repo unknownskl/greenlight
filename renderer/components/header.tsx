@@ -75,7 +75,7 @@ function Header({
   }
 
   function drawMenu() {
-    let linksHtml = []
+    const linksHtml = []
 
     for(const link in headerLinks){
       linksHtml.push(<li key={ link }>
@@ -89,6 +89,9 @@ function Header({
   }
 
   function confirmQuit() {
+    if(window.Greenlight.isWebUI() === true)
+      return;
+    
     if(confirm('Are you sure you want to quit?')){
       Ipc.send('app', 'quit')
     }

@@ -42,8 +42,8 @@ export default class xCloudBrowser {
             // - First batch the products into lists of 30
             // - Merge results and return to client once done.
 
-            let ids = []
-            let batchTitles = this._titles.slice(this._currentBatch*30, (this._currentBatch*30)+30)
+            const ids = []
+            const batchTitles = this._titles.slice(this._currentBatch*30, (this._currentBatch*30)+30)
             for(const title in batchTitles){
                 ids.push(batchTitles[title].details.productId)
             }

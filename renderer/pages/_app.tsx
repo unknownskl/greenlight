@@ -15,10 +15,19 @@ import SidebarFriends from '../components/sidebar/friends'
 
 import { UserProvider } from '../context/userContext'
 
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  QueryClient,
+  QueryClientProvider,
+} from 'react-query'
+
 
 // This default export is required in a new `pages/_app.js` file.
 export default function MyApp({ Component, pageProps }) {
   const router = useRouter()
+  const queryClient = new QueryClient()
 
   const [loggedIn, setLoginState] = React.useState(false);
   const [prevUserState, setPrevUserState] = React.useState({
@@ -43,31 +52,49 @@ export default function MyApp({ Component, pageProps }) {
       })
     })
 
-    const authState = Ipc.onAction('app', 'authState', (event, args) => {
-      console.log('Received AuthState:', args)
-      
-      if(args.isAuthenticating === true){
-        setIsLoading(true)
-        setPrevUserState({ ...prevUserState, ...args.user})
-
-      } else if(args.isAuthenticated === true){
-        if(loggedIn === false){
-          Ipc.send('app', 'onUiShown').then((result) => {
-            if(result.autoStream !== '')
-              setTimeout(() => {
-                router.push('stream/'+result.autoStream)
-              }, 1000)
-          })
-        }
+    const authInterval = setInterval(() => {
+      console.log('Requesting AuthState...')
+      Ipc.send('app', 'getAuthState').then((args) => {
+        console.log('Received AuthState:', args)
         
-        setLoginState(true)
-        setPrevUserState({ ...prevUserState, ...args.user})
+        if(args.isAuthenticating === true){
+          setIsLoading(true)
+          setPrevUserState({ ...prevUserState, ...args.user})
+
+        } else if(args.isAuthenticated === true){
+          clearInterval(authInterval)
+
+          if(loggedIn === false){
+            Ipc.send('app', 'onUiShown').then((result) => {
+              if(result.autoStream !== '')
+                setTimeout(() => {
+                  router.push('stream/'+result.autoStream)
+                }, 1000)
+            })
+          }
+          
+          setLoginState(true)
+          setPrevUserState({ ...prevUserState, ...args.user})
+        }
+      })
+    }, 500)
+
+    const errorHandler = function(event) {
+      console.error('Unhandled rejection (promise: ', event.promise, ', reason: ', event.reason, ').');
+      if(event.reason.status){
+          alert('HTTP Status: ' + event.reason.status + '\nPath:' + event.reason.url + '\n' + event.reason.body)
+      } else {
+          alert(event.reason)
       }
-    })
+    }
+    window.addEventListener('unhandledrejection', errorHandler);
 
     // cleanup this component
     return () => {
-      Ipc.removeListener('app', authState)
+      window.removeEventListener('unhandledrejection', errorHandler)
+
+      if(authInterval)
+        clearInterval(authInterval)
     };
   }, []);
 
@@ -116,9 +143,11 @@ export default function MyApp({ Component, pageProps }) {
         width: '100vw',
         height: '100vh'
       }}>
-        <UserProvider>
-          {appBody}
-        </UserProvider>
+        <QueryClientProvider client={queryClient}>
+          <UserProvider>
+            {appBody}
+          </UserProvider>
+        </QueryClientProvider>
       </div>
     </React.Fragment>
   );

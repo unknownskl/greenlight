@@ -35,6 +35,7 @@ export default class IpcxCloud extends IpcBase {
         this._application._events._xCloudApi.getTitles().then((titles:any) => {
             this._titleManager.setCloudTitles(titles).then(() => {
 
+                this._application.log('Ipc:xCloud', 'Titlemanager has loaded all titles.')
                 this._titlesAreLoaded = true
 
                 // Uncomment to delay the process of loading data
@@ -59,7 +60,7 @@ export default class IpcxCloud extends IpcBase {
                 this._application._events._xCloudApi.getRecentTitles().then((titles:any) => {
                     const returnTitles = []
     
-                    for(var title in titles.results){
+                    for(const title in titles.results){
                         if(titles.results[title].titleId)
                             returnTitles.push(titles.results[title].titleId)
                         else
@@ -87,7 +88,7 @@ export default class IpcxCloud extends IpcBase {
                     const returnTitles = []
                     console.log('titles:', titles)
 
-                    for(var title in titles.results){
+                    for(const title in titles.results){
                         if(titles.results[title].titleId)
                             returnTitles.push(titles.results[title].titleId)
                         else
@@ -108,6 +109,14 @@ export default class IpcxCloud extends IpcBase {
         })
     }
 
+    filterTitles(filter){
+        return new Promise((resolve, reject) => {
+            const titles = this._titleManager.filterTitles(filter)
+
+            resolve(titles)
+        })
+    }
+
     getNewTitles(){
         return new Promise((resolve, reject) => {
             if(this._newTitlesLastUpdate < Date.now() - 3600*1000){
@@ -115,7 +124,7 @@ export default class IpcxCloud extends IpcBase {
 
                     const returnTitles = []
 
-                    for(var title in titles){
+                    for(const title in titles){
                         if(titles[title].id !== undefined){
                             const storeTitle = this._titleManager.findTitleByProductId(titles[title].id)
                             
@@ -158,6 +167,7 @@ export default class IpcxCloud extends IpcBase {
     waitForTitle(resolveCallback, args:getTitleArgs){
         setTimeout(() => {
             if(this._titlesAreLoaded === false){
+                this._application.log('Ipc:xCloud', 'Titles not loaded yet. Queueing title:', args.titleId, this._titlesAreLoaded, this._titleManager._xCloudTitles)
                 this.waitForTitle(resolveCallback, args)
             } else {
                 const title = this._titleManager.findTitle(args.titleId)

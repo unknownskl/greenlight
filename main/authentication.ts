@@ -181,17 +181,15 @@ export default class Authentication {
 
     retrieveTokens(code_token, sisu_token){
         this._application.log('authentication', __filename+'[retrieveTokens()] Retrieving tokens...')
-        // const xalAuth = xalAuthenticator = new XalLibrary.default.XalAuthenticator()
         this._xalAuthenticator.do_xsts_authorization(sisu_token.DeviceToken, sisu_token.TitleToken.Token, sisu_token.UserToken.Token, "http://gssv.xboxlive.com/").then((xsts_token:any) => {
             
             this._isAuthenticating = true
-            this._application._ipc._channels.app.sendAuthState()
             
             this.requestxCloudToken(xsts_token.Token).then((result) => {
                 // Supports xCloud
                 this._appLevel = 2
 
-                this.retrieveMSALTokens(code_token, sisu_token, xsts_token, this._xalAuthenticator)
+                this.retrieveMSALTokens(code_token, sisu_token, xsts_token)
             }).catch((error) => {
                 // Supports xHome only
                 this._appLevel = 1
@@ -199,11 +197,11 @@ export default class Authentication {
                 this.requestxCloudToken(xsts_token.Token, true).then((result) => {
                     this._appLevel = 2
 
-                    this.retrieveMSALTokens(code_token, sisu_token, xsts_token, this._xalAuthenticator)
+                    this.retrieveMSALTokens(code_token, sisu_token, xsts_token)
                 }).catch((error) => {
                     this._appLevel = 1
 
-                    this.retrieveMSALTokens(code_token, sisu_token, xsts_token, this._xalAuthenticator)
+                    this.retrieveMSALTokens(code_token, sisu_token, xsts_token)
                 })
             })
 
@@ -214,7 +212,9 @@ export default class Authentication {
         })
     }
 
-    retrieveMSALTokens(code_token, sisu_token, xsts_token, xalAuth){
+    retrieveMSALTokenCount = 0
+
+    retrieveMSALTokens(code_token, sisu_token, xsts_token){
         const xalAuthenticator = this._xalAuthenticator
         Promise.all([
             xalAuthenticator.exchange_refresh_token_for_xcloud_transfer_token(code_token.refresh_token),
@@ -233,9 +233,15 @@ export default class Authentication {
             this._isAuthenticating = false
             this._application._events.emit('start', this._tokens)
 
-            this._application._ipc._channels.app.sendAuthState()
         }).catch((error) => {
-            this._application.log('authentication', __filename+'[retrieveTokens()] Failed to retrieve tokens')
+            this._application.log('authentication', __filename+'[retrieveTokens()] Failed to retrieve tokens, try again...')
+            this.retrieveMSALTokenCount++
+            if(this.retrieveMSALTokenCount < 3){
+                this.retrieveMSALTokens(code_token, sisu_token, xsts_token)
+            } else {
+                dialog.showMessageBox({ message: 'Failed to retrieve tokens after 3 attempts. \n Detailed error message: '+error.error})
+                this._isAuthenticating = false
+            }
         })
     }
 
@@ -291,7 +297,7 @@ export default class Authentication {
             }
 
             let headers_ip = {};
-            let fri = this._application._store.get('force_region_ip' ,'')
+            const fri = this._application._store.get('force_region_ip' ,'')
             console.log(fri, 'loaded from store')
             if (fri !== '') {
                 headers_ip = {

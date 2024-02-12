@@ -52,8 +52,4 @@ export default class Ipc {
             }
         }
     }
-
-    // sendIpc(name, value){
-    //     this._application._mainWindow.webContents.send(name, value)
-    // }
 }

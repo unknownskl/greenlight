@@ -9,7 +9,6 @@ import { useSettings } from '../../context/userContext'
 import StreamComponent from '../../components/ui/streamcomponent'
 import Ipc from '../../lib/ipc';
 
-
 function Stream() {
   const router = useRouter()
   const { settings, setSettings} = useSettings()
@@ -50,14 +49,12 @@ function Stream() {
 
         // Start keepalive loop
         keepaliveInterval = setInterval(() => {
-          // ipcRenderer.send(((router.query.serverid as string).substr(0, 6) == 'xcloud') ? 'xcloud' : 'stream', {
-          //   type: 'keepalive'
-          // })
-
           Ipc.send('streaming', 'sendKeepalive', {
             sessionId: sessionId
           }).then((result) => {
             console.log('StartStream keepalive:', result)
+          }).catch((error) => {
+            console.error('Failed to send keepalive. Error details:\n'+JSON.stringify(error))
           })
         }, 30000) // Send every 30 seconds
 
@@ -69,7 +66,8 @@ function Stream() {
 
       } else if(event.state == 'closed') {
         // Client has been disconnected. Lets return to home.
-        xPlayer.reset()
+        // xPlayer.close()
+        console.log('Client has been disconnected. Returning to prev page.')
         window.history.back()
       }
     }
@@ -78,6 +76,7 @@ function Stream() {
   React.useEffect(() => {
     document.getElementById('streamComponentHolder').innerHTML = '<div id="streamComponent" class="size_'+settings.video_size+'"></div>'
 
+    // Detect stream type and title / server id
     let streamType = 'home'
     let ipc_channel = 'stream'
     let serverId = router.query.serverid
@@ -87,71 +86,90 @@ function Stream() {
       serverId = (router.query.serverid as string).substr(7)
     }
 
-    // ipcRenderer.send(ipc_channel, {
-    //   type: 'start_stream',
-    //   data: {
-    //     type: 'home',
-    //     serverId: serverId
-    //   }
-    // })
-
+    // Set bitrates & video codec profiles
     if((ipc_channel === 'xcloud') ? settings.xcloud_bitrate : settings.xhome_bitrate > 0){
       xPlayer.setVideoBitrate((ipc_channel === 'xcloud') ? settings.xcloud_bitrate : settings.xhome_bitrate)
     }
+    xPlayer.setCodecPreferences('video/H264', { profiles: settings.video_profiles || [] }) // 4d = high, 42e = mid, 420 = low
     
+    // Send the start stream command
     Ipc.send('streaming', 'startStream', {
       type: streamType,
       target: serverId,
     }).then((result:string) => {
       console.log('StartStream session:', result)
       sessionId = result
+
+      const streamStateInterval = setInterval(() => {
+        Ipc.send('streaming', 'getPlayerState', {
+          sessionId: sessionId
+        }).then((session:any) => {
+
+          console.log('Player state:', session)
+
+
+          switch(session.playerState){
+            case 'pending':
+              // Waiting for console to start
+              break;
+            case 'started':
+              clearInterval(streamStateInterval)
+              // Console is ready
+              xPlayer.createOffer().then((offer:any) => {
+                Ipc.send('streaming', 'sendSdp', {
+                  sessionId: session.id,
+                  sdp: offer.sdp
+                }).then((sdpResult:any) => {
+                  xPlayer.setRemoteOffer(sdpResult.sdp)
+      
+                  // Gather candidates
+                  const iceCandidates = xPlayer.getIceCandidates()
+                  const candidates = []
+                  for(const candidate in iceCandidates){
+                    candidates.push({
+                      candidate: iceCandidates[candidate].candidate,
+                      sdpMLineIndex: iceCandidates[candidate].sdpMLineIndex,
+                      sdpMid: iceCandidates[candidate].sdpMid,
+                    })
+                  }
+      
+                  Ipc.send('streaming', 'sendIce', {
+                    sessionId: session.id,
+                    ice: candidates
+                  }).then((iceResult:any) => {
+                    console.log(iceResult)
+                    xPlayer.setIceCandidates(iceResult)
+
+                    // All done. Waiting for the connection to appear
+      
+                  }).catch((error) => {
+                    console.log('ICE Exchange error:', error)
+                    alert('ICE Exchange error:'+ JSON.stringify(error))
+                  })
+      
+                }).catch((error) => {
+                  console.log('SDP Exchange error:', error)
+                  alert('SDP Exchange error:'+ JSON.stringify(error))
+                })
+              })
+              break;
+            case 'failed':
+              // Error
+              alert('Stream error result: '+session.state+'\nDetails: ['+session.errorDetails.code+'] '+session.errorDetails.message)
+              break;
+            case 'queued':
+              // Waiting in queue
+              // @TODO: Show queue position
+              break;
+          }
+
+        }).catch((error) => {
+          alert('Failed to get player state. Error details:\n'+JSON.stringify(error))
+        })
+      }, 1000)
+
     }).catch((error) => {
       alert('Failed to start new stream. Error details:\n'+JSON.stringify(error))
-    })
-
-    const ipcListener = Ipc.onAction('streaming', 'startStreamResult', (event, args) => {
-      if(args.state != 'Provisioned'){
-        // Error?
-        alert('Stream error result: '+args.state+'\nDetails: ['+args.errorDetails.code+'] '+args.errorDetails.message)
-
-      } else {
-        // Stream is ready
-        xPlayer.createOffer().then((offer:any) => {
-          Ipc.send('streaming', 'sendSdp', {
-            sessionId: args.id,
-            sdp: offer.sdp
-          }).then((sdpResult:any) => {
-            // Set SDP
-            xPlayer.setRemoteOffer(sdpResult.sdp)
-
-            const iceCandidates = xPlayer.getIceCandidates()
-            const candidates = []
-            for(const candidate in iceCandidates){
-              candidates.push({
-                candidate: iceCandidates[candidate].candidate,
-                sdpMLineIndex: iceCandidates[candidate].sdpMLineIndex,
-                sdpMid: iceCandidates[candidate].sdpMid,
-              })
-            }
-
-            Ipc.send('streaming', 'sendIce', {
-              sessionId: args.id,
-              ice: candidates
-            }).then((iceResult:any) => {
-              console.log(iceResult)
-              xPlayer.setIceCandidates(iceResult)
-
-            }).catch((error) => {
-              console.log('ICE Exchange error:', error)
-              alert('ICE Exchange error:'+ JSON.stringify(error))
-            })
-
-          }).catch((error) => {
-            console.log('SDP Exchange error:', error)
-            alert('SDP Exchange error:'+ JSON.stringify(error))
-          })
-        })
-      }
     })
 
 
@@ -211,7 +229,6 @@ function Stream() {
 
     // Modal window
     return () => {
-      Ipc.removeListener('streaming', ipcListener)
       // ipcRenderer.removeAllListeners(ipc_channel);
       // window.removeEventListener('keydown', keyboardDownEvent)
       // xPlayer.reset()
