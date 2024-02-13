@@ -8,12 +8,6 @@ export interface playResult {
     state?:string;
 }
 
-export interface playResult {
-    sessionPath:string;
-    sessionId?:string;
-    state?:string;
-}
-
 export interface exchangeResult {
     exchangeResponse:string;
     errorDetails: {

@@ -3,10 +3,12 @@ import serve from 'electron-serve'
 import Store from 'electron-store'
 import Debug from 'debug'
 import { createWindow, xboxWorker, updater } from './helpers'
-import Events from './events'
 import Authentication from './authentication'
 import Ipc from './ipc'
 import WebUI from './webui'
+
+import xboxWebApi from 'xbox-webapi'
+import xCloudApi from './helpers/xcloudapi'
 
 import pkg from '../package.json'
 
@@ -31,11 +33,9 @@ export default class Application {
     private _isQuitting:boolean = false
 
     public _mainWindow
-    public _events:Events
     public _ipc:Ipc
     public _webUI:WebUI
     public _authentication:Authentication
-    public _xboxWorker:xboxWorker
 
     constructor(){
         console.log(__filename+'[constructor()] Starting Greenlight v'+pkg.version)
@@ -55,10 +55,8 @@ export default class Application {
 
         // ElectronApp.removeAsDefaultProtocolClient('ms-xal-public-beta-000000004c20a908')
         
-        this._events = new Events(this)
         this._ipc = new Ipc(this)
         this._authentication = new Authentication(this)
-        this._xboxWorker = new xboxWorker(this)
 
         this._ipc.startUp()
         this._webUI = new WebUI(this)
@@ -148,6 +146,29 @@ export default class Application {
             (this._mainWindow !== undefined) ? this._mainWindow.show() : this.openMainWindow() 
         })
         ElectronApp.on('before-quit', () => this._isQuitting = true)
+    }
+
+    _webApi:xboxWebApi
+    _xHomeApi:xCloudApi
+    _xCloudApi:xCloudApi
+    _xboxWorker:xboxWorker
+
+    authenticationCompleted(){
+        console.log('Authentication is done. Lets setup the Backend classes...')
+        const tokens = this._authentication._tokens
+
+        // Create Web API (smartglass)
+        this._webApi = new xboxWebApi({
+            userToken: tokens.web.token,
+            uhs: tokens.web.uhs,
+        })
+
+        this._xboxWorker = new xboxWorker(this)
+        this._xHomeApi = new xCloudApi(this, 'uks.gssv-play-prodxhome.xboxlive.com', tokens.gamestreaming.token, 'home')
+        this._xCloudApi = new xCloudApi(this, tokens.xcloud.host, tokens.xcloud.token, 'cloud')
+
+        // Let IPC know we are ready
+        this._ipc.onUserLoaded()
     }
 
     openMainWindow(){

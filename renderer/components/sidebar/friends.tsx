@@ -12,7 +12,9 @@ function SidebarFriends() {
                 setOnlineFriends(onlineFriends)
             })
         }
-        updateFriends()
+        setTimeout(() => { updateFriends() }, 1000)
+        setTimeout(() => { updateFriends() }, 2000)
+        setTimeout(() => { updateFriends() }, 3000)
         const friendsInterval = setInterval(updateFriends, 1000*15)
 
         return () => {

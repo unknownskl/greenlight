@@ -60,7 +60,8 @@ function SettingsWebUI() {
                     <p>
                         <label>Enable WebUI</label>
                         <label style={{ minWidth: 0 }}>
-                            <Button onClick={ () => setWebUIEnabled() } disabled={ window.Greenlight.isWebUI() } className={ ((webuiRunning) ? 'btn-primary' : 'btn-cancel') + ' btn-small' } label={ webuiRunning ? 'Stop Web UI' : 'Start Web UI' }></Button>
+                            <Button onClick={ () => setWebUIEnabled() } disabled={ window.Greenlight.isWebUI() } className={ ((webuiRunning) ? 'btn-primary' : 'btn-cancel') + ' btn-small' } label={ webuiRunning ? 'Stop Web UI' : 'Start Web UI' }></Button> &nbsp;
+                            <Button onClick={ () => window.Greenlight.openExternal('http://127.0.0.1:'+settings.webui_port) } className={ 'btn-small' } label={ 'Open Web UI' }></Button>
                         </label>
                     </p>
 

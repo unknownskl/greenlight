@@ -32,7 +32,7 @@ export default class IpcxCloud extends IpcBase {
     }
 
     onUserLoaded(){
-        this._application._events._xCloudApi.getTitles().then((titles:any) => {
+        this._application._xCloudApi.getTitles().then((titles:any) => {
             this._titleManager.setCloudTitles(titles).then(() => {
 
                 this._application.log('Ipc:xCloud', 'Titlemanager has loaded all titles.')
@@ -57,7 +57,7 @@ export default class IpcxCloud extends IpcBase {
     getRecentTitles(){
         return new Promise((resolve, reject) => {
             if(this._recentTitlesLastUpdate < Date.now() - 60*1000){
-                this._application._events._xCloudApi.getRecentTitles().then((titles:any) => {
+                this._application._xCloudApi.getRecentTitles().then((titles:any) => {
                     const returnTitles = []
     
                     for(const title in titles.results){
@@ -84,7 +84,7 @@ export default class IpcxCloud extends IpcBase {
     getTitles(){
         return new Promise((resolve, reject) => {
             if(this._recentTitlesLastUpdate < Date.now() - 3600*1000){
-                this._application._events._xCloudApi.getTitles().then((titles:any) => {
+                this._application._xCloudApi.getTitles().then((titles:any) => {
                     const returnTitles = []
                     console.log('titles:', titles)
 

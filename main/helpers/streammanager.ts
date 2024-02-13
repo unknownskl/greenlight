@@ -27,9 +27,9 @@ export default class StreamManager {
 
     getApi(type):xCloudApi{
         if(type === 'home'){
-            return this._application._events._xHomeApi
+            return this._application._xHomeApi
         } else {
-            return this._application._events._xCloudApi
+            return this._application._xCloudApi
         }
     }
 
@@ -40,7 +40,7 @@ export default class StreamManager {
     startStream(type:string|'home'|'cloud', target){
         return new Promise((resolve, reject) => {
             this.getApi(type).startStream(target).then((playResult:playResult) => {
-            // this._application._events._xCloudApi.startStream(type, target).then((playResult) => {
+            // this._application._xCloudApi.startStream(type, target).then((playResult) => {
                 console.log('Streammanager - startStream:', playResult)
 
                 const sessionId = playResult.sessionPath.split('/')[3]

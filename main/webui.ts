@@ -35,9 +35,9 @@ export default class WebUI {
         this._ws = expressWS(this._express)
         this._ipc = this._application._ipc
 
-        this._application._events.on('start', () => {
-            this._ipc.onUserLoaded()
-        })
+        // this._application._events.on('start', () => {
+        //     this._ipc.onUserLoaded()
+        // })
 
         this._express.get('/', (req, res) => {
             // res.send('Hello World!')

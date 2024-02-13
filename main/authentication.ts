@@ -28,17 +28,17 @@ export default class Authentication {
             expires: false,
         },
         gamestreaming: {
-            token: false,
+            token: '',
             market: false,
             regions: [],
             settings: false,
             expires: false,
         },
         xcloud: {
-            token: false,
+            token: '',
             market: false,
             regions: [],
-            host: false,
+            host: '',
             settings: false,
             expires: false,
         },
@@ -231,7 +231,7 @@ export default class Authentication {
             this._application.log('authentication', __filename+'[retrieveTokens()] Authentication successful:', this._tokens)
             this._isAuthenticated = true
             this._isAuthenticating = false
-            this._application._events.emit('start', this._tokens)
+            this._application.authenticationCompleted()
 
         }).catch((error) => {
             this._application.log('authentication', __filename+'[retrieveTokens()] Failed to retrieve tokens, try again...')
