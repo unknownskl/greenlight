@@ -1,16 +1,8 @@
 import React from 'react'
-// import { ipcRenderer } from 'electron';
 import Ipc from '../../lib/ipc'
 import SidebarFriendItem from './frienditem'
 
-interface SidebarFriendsProps {
-  // friends:[];
-}
-
-function SidebarFriends({
-    // friends = [],
-    ...props
-}: SidebarFriendsProps) {
+function SidebarFriends() {
     const [onlineFriends, setOnlineFriends] = React.useState([])
 
     React.useEffect(() => {
@@ -31,7 +23,7 @@ function SidebarFriends({
     return (
         <React.Fragment>
             <div id="components_sidebarfriends" key="components_sidebarfriends">
-                {(onlineFriends.length > 0) ? onlineFriends.map((item:any, i) => {               
+                {(onlineFriends.length > 0) ? onlineFriends.map((item:any) => {               
                     return (
                         <SidebarFriendItem key={ item.xuid } userinfo={ item }></SidebarFriendItem>
                     ) 

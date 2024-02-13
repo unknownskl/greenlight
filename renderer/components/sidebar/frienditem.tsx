@@ -1,6 +1,4 @@
-import Link from 'next/link'
 import React from 'react'
-import Button from '../ui/button'
 import Image from 'next/image'
 
 interface SidebarFriendItemProps {
@@ -9,9 +7,7 @@ interface SidebarFriendItemProps {
 
 function SidebarFriendItem({
     userinfo,
-    ...props
 }: SidebarFriendItemProps) {
-    // console.log(userinfo)
 
     function drawPresence(){
 

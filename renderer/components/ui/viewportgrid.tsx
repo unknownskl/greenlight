@@ -1,5 +1,4 @@
 import React from 'react'
-import Link from 'next/link'
 import Button from './button'
 
 interface ViewportGridProps {
@@ -12,7 +11,6 @@ function ViewportGrid({
     drawPagination = false,
     maxHeight = -1,
     children,
-    ...props
 }: ViewportGridProps) {
     const randomId = Math.floor(Math.random()*1000)
     const [showItems, setShowItems] = React.useState(9999)
@@ -31,7 +29,7 @@ function ViewportGrid({
                     return
 
                 const parentHeight = element.parentElement.parentElement.offsetTop+element.parentElement.parentElement.clientHeight
-                const parentWidth = element.parentElement.parentElement.offsetLeft+element.parentElement.parentElement.clientWidth
+                // const parentWidth = element.parentElement.parentElement.offsetLeft+element.parentElement.parentElement.clientWidth
                 let newElementHeight = (maxHeight < 0) ? (parentHeight-element.offsetTop) : maxHeight
 
                 if(drawPagination === true){
@@ -90,12 +88,12 @@ function ViewportGrid({
       
         buttons.push((<Button key="page_prev" onClick={ prevPage } disabled={page <= 0} className='btn-small' label="Previous page"></Button>))
         for(let i=1; i <= totalPages; i++){
-            if(i == 1 || (i > (page-4) && i <= (page+5)) || i == totalPages){
-                buttons.push((<Button key={i} label={i.toString()} className={ page == (i-1) ? 'btn-small btn-primary': 'btn-small' } onClick={ () => {
+            if(i === 1 || (i > (page-4) && i <= (page+5)) || i === totalPages){
+                buttons.push((<Button key={i} label={i.toString()} className={ page === (i-1) ? 'btn-small btn-primary': 'btn-small' } onClick={ () => {
                     gotoPage(i) 
                 }}></Button>))
             } else {
-                if(i == (page-4) || i == (page+6)){
+                if(i === (page-4) || i === (page+6)){
                     buttons.push((<Button key={i} label='...' disabled={true} className={ 'btn-small btn-disabled' }></Button>))
                 }
             }

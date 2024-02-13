@@ -8,7 +8,6 @@ interface LabelProps {
 function Label({
     className,
     children,
-    ...props
 }: LabelProps) {
 
     className = className ? 'component_label '+className : 'component_label'

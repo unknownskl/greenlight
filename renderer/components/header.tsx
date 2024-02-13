@@ -8,18 +8,12 @@ interface HeaderProps {
   hidden?: boolean;
   gamertag: string;
   level: number;
-  /**
-   * Optional click handler
-   */
-  onClick?: () => void;
 }
 
 function Header({
     hidden = false,
     gamertag,
     level = 0,
-    // links,
-    ...props
 }: HeaderProps) {
 
     // console.log('level:', level)

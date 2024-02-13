@@ -4,22 +4,18 @@ import xPlayer from 'xbox-xcloud-player'
 import Loader from './loader'
 import Card from './card'
 import uPlot from 'uplot'
-// import { ipcRenderer } from 'electron'
 import Ipc from '../../lib/ipc'
 
 interface StreamComponentProps {
   onDisconnect?: () => void;
   onMenu?: () => void;
   xPlayer: xPlayer;
-  sessionId: string;
 }
 
 function StreamComponent({
     onDisconnect,
     onMenu,
     xPlayer,
-    sessionId,
-    ...props
 }: StreamComponentProps) {
 
     function performance_now_seconds() {
@@ -32,7 +28,7 @@ function StreamComponent({
     let webRtcStatsInterval
 
     const [micStatus, setMicStatus] = React.useState(false)
-    const [waitingSeconds, setWaitingSeconds] = React.useState(0)
+    const [waitingSeconds, setWaitingSeconds] = React.useState(0) // eslint-disable-line no-unused-vars
 
     let jitterData = [new Float32Array([performance_now_seconds()]), new Float32Array([0.0])]
     let droppedData = [new Float32Array([performance_now_seconds()]), new Float32Array([0.0]), new Float32Array([0.0])]
@@ -92,12 +88,12 @@ function StreamComponent({
             ],
             axes: [
                 {
-                    values: (u, vals, space) => vals.map(v => +v),
+                    values: (u, vals) => vals.map(v => +v),
                 },
                 {
                     size: 50,
                     stroke: 'red',
-                    values: (u, vals, space) => vals.map(v => (+v*1000.0).toFixed(1)),
+                    values: (u, vals) => vals.map(v => (+v*1000.0).toFixed(1)),
                 },
             ],
         }, jitterData, document.getElementById('component_streamcomponent_debug_webrtc_jitter'))
@@ -134,18 +130,18 @@ function StreamComponent({
             ],
             axes: [
                 {
-                    values: (u, vals, space) => vals.map(v => +v),
+                    values: (u, vals) => vals.map(v => +v),
                 },
                 {
                     size: 50,
                     stroke: 'green',
-                    values: (u, vals, space) => vals.map(v => +v.toFixed(0)),
+                    values: (u, vals) => vals.map(v => +v.toFixed(0)),
                     grid: {show: false},
                 },
                 {
                     side: 1,
                     stroke: 'blue',
-                    values: (u, vals, space) => vals.map(v => +v.toFixed(0)),
+                    values: (u, vals) => vals.map(v => +v.toFixed(0)),
                     grid: {show: false},
                 },
             ],
@@ -194,7 +190,7 @@ function StreamComponent({
         }, 33)
 
         // Gamebar menu mouse events
-        const mouseEvent = (e) => {
+        const mouseEvent = () => {
             lastMovement = Date.now()
         }
         window.addEventListener('mousemove', mouseEvent)

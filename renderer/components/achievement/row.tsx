@@ -54,7 +54,7 @@ function AchievementRow({
         <React.Fragment>
             <div className='components_achievement_row'>
                 <div>
-                    <img className='components_achievement_row_icon' src={ achievement.mediaAssets[0].url} />
+                    {/* <img className='components_achievement_row_icon' src={ achievement.mediaAssets[0].url} /> */}
                 </div>
 
                 <div>

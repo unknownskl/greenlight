@@ -10,18 +10,18 @@ import Ipc from '../../lib/ipc'
 
 function Stream() {
     const router = useRouter()
-    const { settings} = useSettings()
-    // const [sessionId, setSessionId] = React.useState('')
+    const { settings } = useSettings()
+
     let sessionId = ''
+    let streamStateInterval
+    let keepaliveInterval
+
     const [xPlayer] = React.useState(new xCloudPlayer('streamComponent', {
         ui_systemui: [],
         input_touch: settings.input_touch || false,
         input_mousekeyboard: settings.input_mousekeyboard || false,
         input_legacykeyboard: (settings.input_newgamepad) ? false : true,
     }))
-
-    // let rerenderTimeout
-    let keepaliveInterval
 
     xPlayer.setControllerRumble(settings.controller_vibration)
     xPlayer.setSdpHandler((client, offer) => {
@@ -109,21 +109,21 @@ function Stream() {
             console.log('StartStream session:', result)
             sessionId = result
 
-            const streamStateInterval = setInterval(() => {
+            streamStateInterval = setInterval(() => {
                 Ipc.send('streaming', 'getPlayerState', {
                     sessionId: sessionId,
                 }).then((session:any) => {
-
                     console.log('Player state:', session)
-
 
                     switch(session.playerState){
                         case 'pending':
                             // Waiting for console to start
                             break
+
                         case 'started':
-                            clearInterval(streamStateInterval)
                             // Console is ready
+                            clearInterval(streamStateInterval)
+                            
                             xPlayer.createOffer().then((offer:any) => {
                                 Ipc.send('streaming', 'sendSdp', {
                                     sessionId: session.id,
@@ -162,10 +162,22 @@ function Stream() {
                                 })
                             })
                             break
+
                         case 'failed':
                             // Error
-                            alert('Stream error result: '+session.state+'\nDetails: ['+session.errorDetails.code+'] '+session.errorDetails.message)
+                            clearInterval(streamStateInterval)
+
+                            if(session.errorDetails.code === 'WNSError' && session.errorDetails.message.includes('WaitingForServerToRegister')){
+                                // Detected the "WaitingForServerToRegister" error. This means the console is not connected to the xbox servers
+                                alert('Unable to start stream session on console. The console is not connected to the Xbox servers. This ocasionally happens then there is an update or when the user is not signed in to the console. Please hard reboot your console and try again.\n\n'+'Stream error result: '+session.state+'\nDetails: ['+session.errorDetails.code+'] '+session.errorDetails.message)
+                            } else {
+                                alert('Stream error result: '+session.state+'\nDetails: ['+session.errorDetails.code+'] '+session.errorDetails.message)
+                            }
+                            console.log('Full stream error:', session.errorDetails)
+                            onDisconnect()
+                            xPlayer.close()
                             break
+
                         case 'queued':
                             // Waiting in queue
                             // @TODO: Show queue position
@@ -181,69 +193,15 @@ function Stream() {
             alert('Failed to start new stream. Error details:\n'+JSON.stringify(error))
         })
 
-
-
-
-    
-
-        // ipcRenderer.on(ipc_channel, (event, args) => {
-        //   if(args.type === 'error') {
-        //     alert((args.data !== undefined) ? args.message+': '+JSON.stringify(args.data) : args.message)
-
-        //   } else if(args.type === 'start_stream'){
-        //     if(args.data.state === 'Provisioned'){
-        //       xPlayer.createOffer().then((offer:any) => {
-        //         // console.log('sdp:', setMediaBitrates(offer.sdp, (ipc_channel === 'home') ? settings.xhome_bitrate || 4096 : settings.xcloud_bitrate || 2048))
-
-        //         ipcRenderer.send(ipc_channel, {
-        //           type: 'start_stream_sdp',
-        //           data: {
-        //             sdp: offer.sdp
-        //             // sdp: (ipc_channel === 'home') ? setMediaBitrates(offer.sdp, settings.xhome_bitrate || 4096) : offer.sdp
-        //           }
-        //         })
-        //       })
-        //     } else {
-        //       alert('Console state is '+args.data.state+', expected Provisioned.\n'+args.data.errorDetails.message)
-        //     }
-        //   } else if(args.type === 'start_stream_sdp'){
-        //     if(args.data.status === 'success'){
-        //       xPlayer.setRemoteOffer(args.data.sdp)
-
-        //       const ice_candidates = xPlayer.getIceCandidates()
-        //       const candidates = []
-        //       for(const candidate in ice_candidates){
-        //         candidates.push({
-        //           candidate: ice_candidates[candidate].candidate,
-        //           sdpMLineIndex: ice_candidates[candidate].sdpMLineIndex,
-        //           sdpMid: ice_candidates[candidate].sdpMid,
-        //         })
-        //       }
-
-        //       ipcRenderer.send(ipc_channel, {
-        //         type: 'start_stream_ice',
-        //         data: {
-        //           ice: candidates
-        //         }
-        //       })
-        //     } else {
-        //       alert('SDP Answer state is '+args.data.status+', expected success')
-        //     }
-        //   } else if(args.type === 'start_stream_ice'){
-        //     xPlayer.setIceCandidates(args.data)
-        //   } else {
-        //     console.log('Unknown event:', args)
-        //   }
-        // })
-
         // Modal window
         return () => {
-            // ipcRenderer.removeAllListeners(ipc_channel);
-            // window.removeEventListener('keydown', keyboardDownEvent)
-            // xPlayer.reset()
-
+            xPlayer.close()
             if(keepaliveInterval){
                 clearInterval(keepaliveInterval) 
+            }
+
+            if(streamStateInterval){
+                clearInterval(streamStateInterval) 
             }
         }
     })
@@ -259,6 +217,10 @@ function Stream() {
         }).then((result) => {
             console.log('Stream stopped:', result)
         })
+
+        if(streamStateInterval){
+            clearInterval(streamStateInterval)
+        }
     }
 
     return (

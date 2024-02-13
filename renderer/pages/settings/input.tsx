@@ -12,6 +12,7 @@ function SettingsInput() {
     const [ controllerPing, setControllerPing] = React.useState(0)
 
     React.useEffect(() => {
+        console.log('Last controller check:', controllerPing)
         const controllerInterval = setInterval(() => {
             setControllerPing(Date.now())
         }, 1000)

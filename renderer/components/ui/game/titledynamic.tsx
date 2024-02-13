@@ -7,7 +7,6 @@ import { useQuery } from 'react-query'
 
 interface GameTitleProps {
     titleId: string;
-    // children;
 }
 
 interface titleDataState {
@@ -22,27 +21,8 @@ interface titleDataState {
 
 function GameTitleDynamic({
     titleId,
-    ...props
 }: GameTitleProps) {
-    const titleData = useQuery('titledynamic_titleId_'+titleId, () => Ipc.send('xCloud', 'getTitle', { titleId: titleId }), { staleTime: 300*1000 })
-
-    // // const [clientHeight, setClientHeight] = React.useState(0);
-    // const [titleData, setTitleData] = React.useState<titleDataState>({})
-
-
-    // React.useEffect(() => {
-    //     if(titleData !== undefined && titleData.titleId === undefined){
-    //         Ipc.send('xCloud', 'getTitle', { titleId: titleId }).then((title) => {
-    //             setTitleData(title)
-    //         })
-    //     }
-
-    //     return () => {
-    //         // Unmount
-    //     };
-    // })
-
-    // console.log(titleData)
+    const titleData = useQuery<titleDataState>('titledynamic_titleId_'+titleId, () => Ipc.send('xCloud', 'getTitle', { titleId: titleId }), { staleTime: 300*1000 })
 
     return (
         <React.Fragment>

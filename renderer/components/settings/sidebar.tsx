@@ -8,11 +8,8 @@ interface SettingsSidebarProps {
 
 function SettingsSidebar({
     children,
-    ...props
 }: SettingsSidebarProps) {
     const router = useRouter()
-
-    // console.log(router.pathname, router.pathname.includes('settings/home'))
 
     return (
         <React.Fragment>

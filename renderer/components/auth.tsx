@@ -1,6 +1,4 @@
 import React from 'react'
-import Link from 'next/link'
-import { ipcRenderer } from 'electron'
 import Ipc from '../lib/ipc'
 import Image from 'next/image'
 
@@ -22,7 +20,6 @@ function Auth({
     gamerpic,
     gamerscore,
     isLoading = false,
-    ...props
 }: AuthProps) {
 
     function startAuthFlow(){

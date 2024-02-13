@@ -1,20 +1,16 @@
 import React from 'react'
 import ViewportGrid from '../ui/viewportgrid'
-import GameTitle from '../ui/game/title'
 import GameTitleDynamic from '../ui/game/titledynamic'
 import Loader from '../ui/loader'
 
 interface Props {
   children;
   titles;
-  onClick?: () => void;
 }
 
 function TitleRow({
     children,
     titles,
-    onClick,
-    ...props
 }: Props) {
 
     return (
@@ -23,8 +19,8 @@ function TitleRow({
                 <h2 className="title">{ children }</h2>
             
                 <ViewportGrid maxHeight={ 140 }>{
-                    (titles.length == 0) ? (<Loader></Loader>) :
-                        titles.map((item, i) => {
+                    (titles.length === 0) ? (<Loader></Loader>) :
+                        titles.map((item) => {
                             return (
                                 <GameTitleDynamic
                                     titleId={ item }

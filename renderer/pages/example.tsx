@@ -2,8 +2,6 @@ import React from 'react'
 import Head from 'next/head'
 import Link from 'next/link'
 
-import Header from '../components/header'
-
 function Home() {
     return (
         <React.Fragment>
@@ -21,7 +19,6 @@ function Home() {
                         <a>Go to logs</a>
                     </Link>
                 </p>
-                <img src="/images/logo.png" />
             </div>
         </React.Fragment>
     )

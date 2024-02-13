@@ -1,18 +1,13 @@
 import React from 'react'
-import Link from 'next/link'
 
 interface ButtonProps {
-//   label: string;
   value?: number;
   children;
-  onClick?: () => void;
 }
 
 function ProgressBar({
     value,
     children,
-    onClick,
-    ...props
 }: ButtonProps) {
 
     return (

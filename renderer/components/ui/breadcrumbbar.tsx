@@ -1,15 +1,11 @@
 import React from 'react'
-import Link from 'next/link'
 
 interface BreadcrumbBarProps {
   children;
-  onClick?: () => void;
 }
 
 function BreadcrumbBar({
     children,
-    onClick,
-    ...props
 }: BreadcrumbBarProps) {
 
     return (

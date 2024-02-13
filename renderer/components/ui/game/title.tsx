@@ -6,15 +6,12 @@ interface GameTitleProps {
     name: string;
     src: string;
     titleId: string;
-    // children;
 }
 
 function GameTitle({
     name,
     src,
     titleId,
-    // children,
-    ...props
 }: GameTitleProps) {
     // const [clientHeight, setClientHeight] = React.useState(0);
 

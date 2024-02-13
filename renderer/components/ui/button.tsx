@@ -1,5 +1,4 @@
 import React from 'react'
-import Link from 'next/link'
 
 interface ButtonProps {
   label: string | any;
@@ -7,7 +6,7 @@ interface ButtonProps {
   title?: string;
   disabled?: boolean;
   className?: string;
-  onClick?: (e) => void;
+  onClick?: () => void;
 }
 
 function Button({
@@ -17,7 +16,6 @@ function Button({
     disabled,
     className,
     onClick,
-    ...props
 }: ButtonProps) {
   
     if(label === undefined)

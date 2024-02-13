@@ -2,12 +2,8 @@ import '../styles.css'
 
 import React from 'react'
 import Head from 'next/head'
-// import { ipcRenderer } from 'electron'
 import Ipc from '../lib/ipc'
-// import Router from 'next/router'
 import { useRouter } from 'next/navigation'
-
-
 import Header from '../components/header'
 import Footer from '../components/footer'
 import Auth from '../components/auth'
@@ -16,9 +12,6 @@ import SidebarFriends from '../components/sidebar/friends'
 import { UserProvider } from '../context/userContext'
 
 import {
-    useQuery,
-    useMutation,
-    useQueryClient,
     QueryClient,
     QueryClientProvider,
 } from 'react-query'
@@ -38,7 +31,7 @@ export default function MyApp({ Component, pageProps }) {
         level: '',
     })
     // const [headerLinks, setHeaderLinks] = React.useState([])
-    const [streamingMode, setStreamingMode] = React.useState(false)
+    // const [streamingMode, setStreamingMode] = React.useState(false)
     const [isLoading, setIsLoading] = React.useState(false)
 
     React.useEffect(() => {
@@ -98,15 +91,15 @@ export default function MyApp({ Component, pageProps }) {
         }
     }, [])
 
-    function isStreaming(){
-        return streamingMode
-    }
+    // function isStreaming(){
+    //     return streamingMode
+    // }
 
     let appBody
-    if(loggedIn && prevUserState.gamertag != ''){
+    if(loggedIn && prevUserState.gamertag !== ''){
         appBody = (
             <React.Fragment>
-                <Header gamertag={ prevUserState.gamertag } hidden={ isStreaming() } level={ parseInt(prevUserState.level) } />
+                <Header gamertag={ prevUserState.gamertag } level={ parseInt(prevUserState.level) } />
 
                 <div id="app_body">
                     <div id="app_body_container">
@@ -115,7 +108,7 @@ export default function MyApp({ Component, pageProps }) {
                 </div>
 
                 <div id="app_sidebar" style={{
-                    display: isStreaming() ? 'none' : 'block',
+                    display: 'block',
                 }}>
                     <SidebarFriends></SidebarFriends>
                 </div>
