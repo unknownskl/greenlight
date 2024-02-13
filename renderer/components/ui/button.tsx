@@ -6,7 +6,7 @@ interface ButtonProps {
   title?: string;
   disabled?: boolean;
   className?: string;
-  onClick?: () => void;
+  onClick?: (e) => void; // eslint-disable-line no-unused-vars
 }
 
 function Button({

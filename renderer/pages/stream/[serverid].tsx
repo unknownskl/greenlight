@@ -206,8 +206,8 @@ function Stream() {
         }
     })
 
-    function gamepadSend(){
-        console.log('Pressed nexus...')
+    function gamepadSend(button){
+        console.log('Pressed button:', button)
         xPlayer.getChannelProcessor('input').pressButton(0, 'Nexus')
     }
 
@@ -233,7 +233,7 @@ function Stream() {
                 onDisconnect() 
             }} onMenu={ () => {
                 gamepadSend('nexus') 
-            } } xPlayer={ xPlayer } sessionId={ sessionId }></StreamComponent>
+            } } xPlayer={ xPlayer }></StreamComponent>
         </React.Fragment>
     )
 }

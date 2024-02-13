@@ -26,7 +26,7 @@ function SettingsDebug() {
                     {
                         appDebug.map((item) => {
                             return (
-                                <Card key={ item.name } title={ item.name }>
+                                <Card key={ item.name }>
                                     <h1>{ item.name }</h1>
                                     <ul className="kv-list">
                                         { item.data.map((dataItem, dataIndex) => {

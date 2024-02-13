@@ -363,7 +363,7 @@ function StreamComponent({
                             marginRight: 'auto',
                         }}>
                             <Button label={ <span><i className="fa-brands fa-xbox"></i> Menu</span> } title="Open Xbox menu" onClick={ (e) => {
-                                e.target.blur(); onMenu(e) 
+                                e.target.blur(); onMenu() 
                             }}></Button> &nbsp;
                             <Button label={ (micStatus === false) ? <span><i className="fa-solid fa-microphone-slash"></i> Muted</span> : <span><i className="fa-solid fa-microphone"></i> Active</span> } title={ (micStatus === false) ? 'Enable mic' : 'Disable mic' } className={ (micStatus === false) ? 'btn-cancel' : 'btn-primary' } onClick={ (e) => {
                                 e.target.blur(); toggleMic() 
