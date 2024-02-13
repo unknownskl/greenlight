@@ -28,7 +28,7 @@ function StreamComponent({
     let webRtcStatsInterval
 
     const [micStatus, setMicStatus] = React.useState(false)
-    const [waitingSeconds, setWaitingSeconds] = React.useState(0) // eslint-disable-line no-unused-vars
+    const [waitingSeconds, setWaitingSeconds] = React.useState(0) // eslint-disable-line @typescript-eslint/no-unused-vars
 
     let jitterData = [new Float32Array([performance_now_seconds()]), new Float32Array([0.0])]
     let droppedData = [new Float32Array([performance_now_seconds()]), new Float32Array([0.0]), new Float32Array([0.0])]

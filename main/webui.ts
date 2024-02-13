@@ -17,7 +17,7 @@ export default class WebUI {
         this._application = application
         this._application.log('webui', 'Loaded WebUI Plugin')
 
-        const rawSettings = this._application._store.get('settings', defaultSettings) as Object
+        const rawSettings = this._application._store.get('settings', defaultSettings) as object
         const settings = {...defaultSettings, ...rawSettings}
 
         this._application.log('webui', 'Settings:', settings, rawSettings)

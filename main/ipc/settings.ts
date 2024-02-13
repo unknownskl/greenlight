@@ -18,7 +18,7 @@ export default class IpcSettings extends IpcBase {
 
     getSettings(){
         return new Promise<typeof defaultSettings>((resolve) => {
-            const settings = this._application._store.get('settings', defaultSettings) as Object
+            const settings = this._application._store.get('settings', defaultSettings) as object
             resolve({...defaultSettings, ...settings})
         })
     }
@@ -31,7 +31,7 @@ export default class IpcSettings extends IpcBase {
 
     startWebUI(){
         return new Promise((resolve) => {
-            const rawSettings = this._application._store.get('settings', defaultSettings) as Object
+            const rawSettings = this._application._store.get('settings', defaultSettings) as object
             const settings = {...defaultSettings, ...rawSettings}
             this._application._webUI.startServer(settings.webui_port)
             resolve(true)

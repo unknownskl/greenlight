@@ -4,7 +4,7 @@ import { defaultSettings } from './userContext.defaults'
 
 export const SettingsContext = React.createContext({
     settings: defaultSettings,
-    setSettings: (settings) => null, // eslint-disable-line no-unused-vars
+    setSettings: (settings) => null, // eslint-disable-line @typescript-eslint/no-unused-vars
 })
 export const useSettings = () => useContext(SettingsContext)
 
