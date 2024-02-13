@@ -5,6 +5,7 @@
 - Adding human readable waiting time when queued for a xCloud stream (credits to @NiccoMaganeli)
 - Added a low resolution mode for the Steam Deck to set a lower resolution then 720p for using FSR #1133
 - Updated icons #1127 (credits to @el2zay, and thanks for @jxhug for the suggestion)
+- Added toggles to mute audio / hide video to use in a controller-only setup (credits to @thirty7four2)
 
 ## v2.1.1 - 2024-01-29
 - Fixed controller input not working on default settings #1118 #1117
