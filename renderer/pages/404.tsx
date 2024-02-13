@@ -1,7 +1,7 @@
 import React from 'react'
 import Head from 'next/head'
 
-function Error() {
+function Error404Page() {
     return (
         <React.Fragment>
             <Head>
@@ -13,4 +13,4 @@ function Error() {
     )
 }
 
-export default Error
+export default Error404Page
