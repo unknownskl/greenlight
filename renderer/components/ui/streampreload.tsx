@@ -1,0 +1,102 @@
+import React from 'react'
+import Loader from './loader'
+import Card from './card'
+
+interface StreamPreloadProps {
+  waitingTime?: number;
+}
+
+function StreamPreload({
+    waitingTime = 0,
+}: StreamPreloadProps) {
+    const [waitingSeconds, setWaitingSeconds] = React.useState(-1) // eslint-disable-line @typescript-eslint/no-unused-vars
+    // console.log('outeffect', waitingTime, waitingSeconds)
+
+    if(waitingSeconds < 0 && waitingTime > 0){
+        // console.log('setWaitingSeconds', waitingTime)
+        setWaitingSeconds(waitingTime)
+        
+    } else if(waitingSeconds > 0){
+        // console.log('drawWaitingTimes', waitingSeconds)
+        drawWaitingTimes(waitingSeconds)
+    }
+
+    React.useEffect(() => {
+
+        return () => {
+            
+        }
+    }, [])
+
+    function drawWaitingTimes(seconds){
+        const formattedWaitingTime = formatWaitingTime(seconds)
+        const html = '<div>Estimated waiting time in queue: <span id="component_streamcomponent_waitingtimes_seconds">'+formattedWaitingTime+'</span></div>'
+
+        document.getElementById('component_streamcomponent_waitingtimes').innerHTML = html
+
+        const secondsInterval = setInterval(() => {
+            seconds--
+            setWaitingSeconds(seconds)
+
+            if(document.getElementById('component_streamcomponent_waitingtimes_seconds') !== null){
+                document.getElementById('component_streamcomponent_waitingtimes_seconds').innerText = formatWaitingTime(seconds)
+            } else {
+                clearInterval(secondsInterval)
+            }
+
+            if(seconds === 0){
+                clearInterval(secondsInterval)
+            }
+        }, 1000)
+    }
+
+    function formatWaitingTime(rawSeconds: number): string {
+        let formattedText = ''
+
+        const hours = Math.floor(rawSeconds / 3600)
+        const minutes = Math.floor((rawSeconds % 3600) / 60)
+        const seconds = (rawSeconds % 3600) % 60
+
+        if (hours > 0) {
+            formattedText += hours + ' hour(s), '
+        }
+
+        if (minutes > 0) {
+            formattedText += minutes + ' minute(s), '
+        }
+
+        if (seconds >= 0) {
+            formattedText += seconds + ' second(s).'
+        }
+
+        if(seconds === 0){
+            formattedText += '\nIts taking a little longer.. Your stream may start soon.'
+        }
+
+        return formattedText
+    }
+
+    return (
+        <React.Fragment>
+            <div>
+                <div id="streamComponentHolder">
+                </div>
+
+                <div id="component_streamcomponent_loader">
+                    <Card className='padbottom'>
+                        <h1>Loading...</h1>
+
+                        <Loader></Loader>
+
+                        <p>We are getting your stream ready...</p>
+                        <p id="component_streamcomponent_connectionstatus"></p>
+
+                        <p id="component_streamcomponent_waitingtimes"></p>
+                    </Card>
+                </div>
+            </div>
+        </React.Fragment>
+    )
+}
+
+export default StreamPreload

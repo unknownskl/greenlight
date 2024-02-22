@@ -6,111 +6,160 @@ import xCloudPlayer from 'xbox-xcloud-player'
 
 import { useSettings } from '../../context/userContext'
 import StreamComponent from '../../components/ui/streamcomponent'
+import StreamPreload from '../../components/ui/streampreload'
 import Ipc from '../../lib/ipc'
 
 function Stream() {
     const router = useRouter()
     const { settings } = useSettings()
 
-    let sessionId = ''
     let streamStateInterval
     let keepaliveInterval
 
-    const [xPlayer] = React.useState(new xCloudPlayer('streamComponent', {
-        ui_systemui: [],
-        input_touch: settings.input_touch || false,
-        input_mousekeyboard: settings.input_mousekeyboard || false,
-        input_legacykeyboard: (settings.input_newgamepad) ? false : true,
-    }))
+    const [xPlayer, setxPlayer] = React.useState(undefined)
+    const [sessionId, setSessionId] = React.useState('')
+    const [queueTime, setQueueTime] = React.useState(0)
 
-    xPlayer.setControllerRumble(settings.controller_vibration)
-    xPlayer.setSdpHandler((client, offer) => {
-        Ipc.send('streaming', 'sendChatSdp', {
-            sessionId: sessionId,
-            sdp: offer.sdp,
-        }).then((sdpResponse) => {
-            xPlayer.setRemoteOffer(sdpResponse.sdp)
-
-        }).catch((error) => {
-            console.log('ChatSDP Exchange error:', error)
-            alert('ChatSDP Exchange error:'+ JSON.stringify(error))
-        })
-    })
-
-    xPlayer.getEventBus().on('connectionstate', (event) => {
-        console.log('connectionstate changed:', event)
-
-        const connStatus = document.getElementById('component_streamcomponent_connectionstatus')
-        if(connStatus !== null){
-            if(event.state === 'connected'){
-                connStatus.innerText = 'Client has been connected!'
-                document.getElementById('component_streamcomponent_loader').className = 'hidden'
-
-                // Set audio / Video settings
-                // @TODO: Implement api's in xbox-xcloud-player
-                if(settings.audio_enabled === false){
-                    xPlayer._audioComponent._audioRender.muted = true
-                }
-
-                if(settings.video_enabled === false){
-                    xPlayer._videoComponent._videoRender.style.opacity = 0
-                }
-
-                // Start keepalive loop
-                keepaliveInterval = setInterval(() => {
-                    Ipc.send('streaming', 'sendKeepalive', {
-                        sessionId: sessionId,
-                    }).then((result) => {
-                        console.log('StartStream keepalive:', result)
-                    }).catch((error) => {
-                        console.error('Failed to send keepalive. Error details:\n'+JSON.stringify(error))
-                    })
-                }, 30000) // Send every 30 seconds
-
-            } else if(event.state === 'new'){
-                connStatus.innerText = 'Starting connection...'
-
-            } else if(event.state === 'connecting'){
-                connStatus.innerText = 'Connecting to console...'
-
-            } else if(event.state === 'closed') {
-                // Client has been disconnected. Lets return to home.
-                // xPlayer.close()
-                console.log('Client has been disconnected. Returning to prev page.')
-                window.history.back()
-            }
-        }
-    })
+    // setxPlayer(new xCloudPlayer('streamComponent', {
+    //     ui_systemui: [],
+    //     input_touch: settings.input_touch || false,
+    //     input_mousekeyboard: settings.input_mousekeyboard || false,
+    //     input_legacykeyboard: (settings.input_newgamepad) ? false : true,
+    // }))
 
     React.useEffect(() => {
-        document.getElementById('streamComponentHolder').innerHTML = '<div id="streamComponent" class="size_'+settings.video_size+'"></div>'
-
         // Detect stream type and title / server id
         let streamType = 'home'
-        let ipc_channel = 'stream'
         let serverId = router.query.serverid
         if((router.query.serverid as string).substr(0, 6) === 'xcloud'){
             streamType = 'cloud'
-            ipc_channel = 'xcloud'
             serverId = (router.query.serverid as string).substr(7)
         }
 
-        // Set bitrates & video codec profiles
-        if((ipc_channel === 'xcloud') ? settings.xcloud_bitrate : settings.xhome_bitrate > 0){
-            xPlayer.setVideoBitrate((ipc_channel === 'xcloud') ? settings.xcloud_bitrate : settings.xhome_bitrate)
-        }
+        if(xPlayer !== undefined){
+            document.getElementById('streamComponentHolder').innerHTML = '<div id="streamComponent" class="size_'+settings.video_size+'"></div>'
+            xPlayer.bind()
 
-        if(settings.video_profiles.length > 0){
-            xPlayer.setCodecPreferences('video/H264', { profiles: settings.video_profiles || [] }) // 4d = high, 42e = mid, 420 = low
-        }
+            // Set bitrates & video codec profiles
+            if((streamType === 'cloud') ? settings.xcloud_bitrate : settings.xhome_bitrate > 0){
+                xPlayer.setVideoBitrate((streamType === 'cloud') ? settings.xcloud_bitrate : settings.xhome_bitrate)
+            }
+
+            if(settings.video_profiles.length > 0){
+                xPlayer.setCodecPreferences('video/H264', { profiles: settings.video_profiles || [] }) // 4d = high, 42e = mid, 420 = low
+            }
+
+            // Stream is ready so we start the player
+            xPlayer.setControllerRumble(settings.controller_vibration)
+            xPlayer.setSdpHandler((client, offer) => {
+                Ipc.send('streaming', 'sendChatSdp', {
+                    sessionId: sessionId,
+                    sdp: offer.sdp,
+                }).then((sdpResponse) => {
+                    xPlayer.setRemoteOffer(sdpResponse.sdp)
     
-        // Send the start stream command
-        Ipc.send('streaming', 'startStream', {
-            type: streamType,
-            target: serverId,
-        }).then((result:string) => {
-            console.log('StartStream session:', result)
-            sessionId = result
+                }).catch((error) => {
+                    console.log('ChatSDP Exchange error:', error)
+                    alert('ChatSDP Exchange error:'+ JSON.stringify(error))
+                })
+            })
+
+            xPlayer.createOffer().then((offer:any) => {
+                Ipc.send('streaming', 'sendSdp', {
+                    sessionId: sessionId,
+                    sdp: offer.sdp,
+                }).then((sdpResult:any) => {
+                    xPlayer.setRemoteOffer(sdpResult.sdp)
+
+                    // Gather candidates
+                    const iceCandidates = xPlayer.getIceCandidates()
+                    const candidates = []
+                    for(const candidate in iceCandidates){
+                        candidates.push({
+                            candidate: iceCandidates[candidate].candidate,
+                            sdpMLineIndex: iceCandidates[candidate].sdpMLineIndex,
+                            sdpMid: iceCandidates[candidate].sdpMid,
+                        })
+                    }
+
+                    Ipc.send('streaming', 'sendIce', {
+                        sessionId: sessionId,
+                        ice: candidates,
+                    }).then((iceResult:any) => {
+                        console.log(iceResult)
+                        xPlayer.setIceCandidates(iceResult)
+
+                        // All done. Waiting for the connection to appear
+
+                    }).catch((error) => {
+                        console.log('ICE Exchange error:', error)
+                        alert('ICE Exchange error:'+ JSON.stringify(error))
+                    })
+
+                }).catch((error) => {
+                    console.log('SDP Exchange error:', error)
+                    alert('SDP Exchange error:'+ JSON.stringify(error))
+                })
+            })
+    
+            xPlayer.getEventBus().on('connectionstate', (event) => {
+                console.log('connectionstate changed:', event)
+    
+                const connStatus = document.getElementById('component_streamcomponent_connectionstatus')
+                if(connStatus !== null){
+                    if(event.state === 'connected'){
+                        connStatus.innerText = 'Client has been connected!'
+                        document.getElementById('component_streamcomponent_loader').className = 'hidden'
+    
+                        // Set audio / Video settings
+                        // @TODO: Implement api's in xbox-xcloud-player
+                        if(settings.audio_enabled === false){
+                            xPlayer._audioComponent._audioRender.muted = true
+                        }
+    
+                        if(settings.video_enabled === false){
+                            xPlayer._videoComponent._videoRender.style.opacity = 0
+                        }
+    
+                        // Start keepalive loop
+                        keepaliveInterval = setInterval(() => {
+                            Ipc.send('streaming', 'sendKeepalive', {
+                                sessionId: sessionId,
+                            }).then((result) => {
+                                console.log('StartStream keepalive:', result)
+                            }).catch((error) => {
+                                console.error('Failed to send keepalive. Error details:\n'+JSON.stringify(error))
+                            })
+                        }, 30000) // Send every 30 seconds
+    
+                    } else if(event.state === 'new'){
+                        connStatus.innerText = 'Starting connection...'
+    
+                    } else if(event.state === 'connecting'){
+                        connStatus.innerText = 'Connecting to console...'
+    
+                    } else if(event.state === 'closed') {
+                        // Client has been disconnected. Lets return to home.
+                        // xPlayer.close()
+                        console.log('Client has been disconnected. Returning to prev page.')
+                        window.history.back()
+                    }
+                }
+            })
+        } else if(sessionId === '') {
+            // Stream is not ready yet, lets start it...
+
+            Ipc.send('streaming', 'startStream', {
+                type: streamType,
+                target: serverId,
+            }).then((result:string) => {
+                console.log('StartStream session:', result)
+                setSessionId(result)
+    
+            }).catch((error) => {
+                alert('Failed to start new stream. Error details:\n'+JSON.stringify(error))
+            })
+        } else {
 
             streamStateInterval = setInterval(() => {
                 Ipc.send('streaming', 'getPlayerState', {
@@ -127,43 +176,13 @@ function Stream() {
                             // Console is ready
                             clearInterval(streamStateInterval)
                             
-                            xPlayer.createOffer().then((offer:any) => {
-                                Ipc.send('streaming', 'sendSdp', {
-                                    sessionId: session.id,
-                                    sdp: offer.sdp,
-                                }).then((sdpResult:any) => {
-                                    xPlayer.setRemoteOffer(sdpResult.sdp)
-      
-                                    // Gather candidates
-                                    const iceCandidates = xPlayer.getIceCandidates()
-                                    const candidates = []
-                                    for(const candidate in iceCandidates){
-                                        candidates.push({
-                                            candidate: iceCandidates[candidate].candidate,
-                                            sdpMLineIndex: iceCandidates[candidate].sdpMLineIndex,
-                                            sdpMid: iceCandidates[candidate].sdpMid,
-                                        })
-                                    }
-      
-                                    Ipc.send('streaming', 'sendIce', {
-                                        sessionId: session.id,
-                                        ice: candidates,
-                                    }).then((iceResult:any) => {
-                                        console.log(iceResult)
-                                        xPlayer.setIceCandidates(iceResult)
-
-                                        // All done. Waiting for the connection to appear
-      
-                                    }).catch((error) => {
-                                        console.log('ICE Exchange error:', error)
-                                        alert('ICE Exchange error:'+ JSON.stringify(error))
-                                    })
-      
-                                }).catch((error) => {
-                                    console.log('SDP Exchange error:', error)
-                                    alert('SDP Exchange error:'+ JSON.stringify(error))
-                                })
-                            })
+                            // Start xPlayer interface
+                            setxPlayer(new xCloudPlayer('streamComponent', {
+                                ui_systemui: [],
+                                input_touch: settings.input_touch || false,
+                                input_mousekeyboard: settings.input_mousekeyboard || false,
+                                input_legacykeyboard: (settings.input_newgamepad) ? false : true,
+                            }))
                             break
 
                         case 'failed':
@@ -184,6 +203,12 @@ function Stream() {
                         case 'queued':
                             // Waiting in queue
                             // @TODO: Show queue position
+                            if(queueTime === 0){
+                                setQueueTime(session.waitingTimes.estimatedTotalWaitTimeInSeconds)
+                                console.log('Setting queue to:', session.waitingTimes.estimatedTotalWaitTimeInSeconds)
+
+                                
+                            }
                             break
                     }
 
@@ -191,14 +216,14 @@ function Stream() {
                     alert('Failed to get player state. Error details:\n'+JSON.stringify(error))
                 })
             }, 1000)
-
-        }).catch((error) => {
-            alert('Failed to start new stream. Error details:\n'+JSON.stringify(error))
-        })
+        }
 
         // Modal window
         return () => {
-            xPlayer.close()
+            if(xPlayer !== undefined){
+                xPlayer.close()
+            }
+
             if(keepaliveInterval){
                 clearInterval(keepaliveInterval) 
             }
@@ -232,11 +257,11 @@ function Stream() {
                 <title>Greenlight - Streaming {router.query.serverid}</title>
             </Head>
 
-            <StreamComponent onDisconnect={ () => {
+            { (xPlayer !== undefined) ? <StreamComponent onDisconnect={ () => {
                 onDisconnect() 
             }} onMenu={ () => {
                 gamepadSend('nexus') 
-            } } xPlayer={ xPlayer }></StreamComponent>
+            } } xPlayer={ xPlayer }></StreamComponent> : (queueTime > 0) ?<StreamPreload waitingTime={ queueTime }></StreamPreload> : <StreamPreload></StreamPreload> }
         </React.Fragment>
     )
 }

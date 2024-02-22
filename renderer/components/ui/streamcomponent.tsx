@@ -148,45 +148,47 @@ function StreamComponent({
         }, droppedData, document.getElementById('component_streamcomponent_debug_webrtc_dropped'))
 
         webRtcStatsInterval = setInterval(() => {
-            xPlayer._webrtcClient.getStats().then((stats) => {
-                let statsOutput = ''
+            if(xPlayer._webrtcClient !== undefined){
+                xPlayer._webrtcClient.getStats().then((stats) => {
+                    let statsOutput = ''
 
-                stats.forEach((report) => {
-                    if (report.type === 'inbound-rtp' && report.kind === 'video') {
+                    stats.forEach((report) => {
+                        if (report.type === 'inbound-rtp' && report.kind === 'video') {
 
-                        if(jitterData[0].length > 1200){
-                            jitterData = sliceData(jitterData, jitterData[0].length-1200, jitterData[0].length)
+                            if(jitterData[0].length > 1200){
+                                jitterData = sliceData(jitterData, jitterData[0].length-1200, jitterData[0].length)
+                            }
+                            if(droppedData[0].length > 1200){
+                                droppedData = sliceData(droppedData, droppedData[0].length-1200, droppedData[0].length)
+                            }
+
+                            jitterData[0] = new Float32Array([...Array.from(jitterData[0]), performance_now_seconds()])
+                            jitterData[1] = new Float32Array([...Array.from(jitterData[1]), report['jitter']])
+
+                            droppedData[0] = new Float32Array([...Array.from(droppedData[0]), performance_now_seconds()])
+                            droppedData[1] = new Float32Array([...Array.from(droppedData[1]), report['packetsLost']-packetsDroppedBaseline])
+                            droppedData[2] = new Float32Array([...Array.from(droppedData[2]), report['framesDropped']-framesDroppedBaseline])
+                            packetsDroppedBaseline = report['packetsLost']
+                            framesDroppedBaseline = report['framesDropped']
+
+                            jitterUplot.setData(jitterData)
+                            droppedUplot.setData(droppedData)
+
+                            if(frameCountDomUpdate >= 15){
+                                Object.keys(report).forEach((statName) => {
+                                    statsOutput += `<strong>${statName}:</strong> ${report[statName]}<br>\n`
+                                })
+                                document.querySelector('div#component_streamcomponent_debug_text').innerHTML = statsOutput
+                                frameCountDomUpdate = 0
+                            } else {
+                                frameCountDomUpdate++
+                            }
                         }
-                        if(droppedData[0].length > 1200){
-                            droppedData = sliceData(droppedData, droppedData[0].length-1200, droppedData[0].length)
-                        }
+                    })
 
-                        jitterData[0] = new Float32Array([...Array.from(jitterData[0]), performance_now_seconds()])
-                        jitterData[1] = new Float32Array([...Array.from(jitterData[1]), report['jitter']])
-
-                        droppedData[0] = new Float32Array([...Array.from(droppedData[0]), performance_now_seconds()])
-                        droppedData[1] = new Float32Array([...Array.from(droppedData[1]), report['packetsLost']-packetsDroppedBaseline])
-                        droppedData[2] = new Float32Array([...Array.from(droppedData[2]), report['framesDropped']-framesDroppedBaseline])
-                        packetsDroppedBaseline = report['packetsLost']
-                        framesDroppedBaseline = report['framesDropped']
-
-                        jitterUplot.setData(jitterData)
-                        droppedUplot.setData(droppedData)
-
-                        if(frameCountDomUpdate >= 15){
-                            Object.keys(report).forEach((statName) => {
-                                statsOutput += `<strong>${statName}:</strong> ${report[statName]}<br>\n`
-                            })
-                            document.querySelector('div#component_streamcomponent_debug_text').innerHTML = statsOutput
-                            frameCountDomUpdate = 0
-                        } else {
-                            frameCountDomUpdate++
-                        }
-                    }
+                    // document.querySelector('div#component_streamcomponent_debug_text').innerHTML = statsOutput;
                 })
-
-                // document.querySelector('div#component_streamcomponent_debug_text').innerHTML = statsOutput;
-            })
+            }
         }, 33)
 
         // Gamebar menu mouse events
