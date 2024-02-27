@@ -86,7 +86,7 @@ function SettingsInput() {
                         <label style={{ minWidth: 0 }}>
                             <input type='checkbox' onChange={ setLegacyInput } checked={settings.input_newgamepad} />&nbsp; ({ settings.input_newgamepad ? 'Enabled' : 'Disabled'})
                         </label><br />
-                        <small>(Enable this if you want to use the Keyboard & Mouse input to avoid double input. The default keybaord controls will be disabled.)</small>
+                        <small>(Enable this if you want to use the Keyboard & Mouse input to avoid double input. The default keyboard controls will be disabled.)</small>
                     </p>
                 </Card>
 
