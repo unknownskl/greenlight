@@ -1,12 +1,15 @@
 import React from 'react'
 import Loader from './loader'
 import Card from './card'
+import Button from './button'
 
 interface StreamPreloadProps {
+  onDisconnect?: () => void;
   waitingTime?: number;
 }
 
 function StreamPreload({
+    onDisconnect,
     waitingTime = 0,
 }: StreamPreloadProps) {
     const [waitingSeconds, setWaitingSeconds] = React.useState(-1) // eslint-disable-line @typescript-eslint/no-unused-vars
@@ -50,6 +53,17 @@ function StreamPreload({
         }, 1000)
     }
 
+    function streamDisconnect(){
+        window.history.back()
+    }
+
+    function endStream(){
+        if(confirm('Are you sure you want to end your stream?')){
+            onDisconnect()
+            window.history.back()
+        }
+    }
+
     function formatWaitingTime(rawSeconds: number): string {
         let formattedText = ''
 
@@ -79,7 +93,7 @@ function StreamPreload({
     return (
         <React.Fragment>
             <div>
-                <div id="streamComponentHolder">
+                <div id="streamComponent">
                 </div>
 
                 <div id="component_streamcomponent_loader">
@@ -93,6 +107,21 @@ function StreamPreload({
 
                         <p id="component_streamcomponent_waitingtimes"></p>
                     </Card>
+                </div>
+
+                <div id="component_streamcomponent_gamebar">
+                    <div id="component_streamcomponent_gamebar_menu">
+                        <div style={{
+                            width: '25%',
+                        }}>
+                            <Button label={<span><i className="fa-solid fa-xmark"></i> End Stream</span>} title="End Stream" className='btn-cancel' onClick={ () => {
+                                endStream() 
+                            } }></Button> &nbsp;
+                            <Button label={<span><i className="fa-solid fa-xmark"></i></span>} title="Disconnect" className='btn' onClick={ () => {
+                                streamDisconnect() 
+                            } }></Button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </React.Fragment>

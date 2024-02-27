@@ -261,7 +261,11 @@ function Stream() {
                 onDisconnect() 
             }} onMenu={ () => {
                 gamepadSend('nexus') 
-            } } xPlayer={ xPlayer }></StreamComponent> : (queueTime > 0) ?<StreamPreload waitingTime={ queueTime }></StreamPreload> : <StreamPreload></StreamPreload> }
+            } } xPlayer={ xPlayer }></StreamComponent> : (queueTime > 0) ?<StreamPreload onDisconnect={ () => {
+                onDisconnect() 
+            }} waitingTime={ queueTime }></StreamPreload> : <StreamPreload onDisconnect={ () => {
+                onDisconnect() 
+            }}></StreamPreload> }
         </React.Fragment>
     )
 }

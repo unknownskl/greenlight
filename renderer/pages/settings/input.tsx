@@ -86,7 +86,7 @@ function SettingsInput() {
                         <label style={{ minWidth: 0 }}>
                             <input type='checkbox' onChange={ setLegacyInput } checked={settings.input_newgamepad} />&nbsp; ({ settings.input_newgamepad ? 'Enabled' : 'Disabled'})
                         </label><br />
-                        <small>(Enable this if you want to use the Keyboard & Mouse input to avoid double input)</small>
+                        <small>(Enable this if you want to use the Keyboard & Mouse input to avoid double input. The default keybaord controls will be disabled.)</small>
                     </p>
                 </Card>
 
@@ -94,7 +94,7 @@ function SettingsInput() {
                     <h1>Controllers detected</h1>
 
                     <p>
-                If you have a gamepad connected but it is not showing up, try to press a button on the controller to detect it.
+                        If you have a gamepad connected but it is not showing up, try to press a button on the controller to detect it.
                     </p>
 
                     <div>
