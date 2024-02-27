@@ -1,4 +1,4 @@
-import { app as ElectronApp, BrowserWindow } from 'electron'
+import { app as ElectronApp, BrowserWindow, systemPreferences } from 'electron'
 import serve from 'electron-serve'
 import Store from 'electron-store'
 import Debug from 'debug'
@@ -169,6 +169,21 @@ export default class Application {
 
         // Let IPC know we are ready
         this._ipc.onUserLoaded()
+
+        // Check for app permissions
+        try {
+            const micPermission = systemPreferences.getMediaAccessStatus('microphone')
+            // console.log('Mic permission:', micPermission)
+            if(micPermission !== 'granted'){
+                systemPreferences.askForMediaAccess('microphone').then((status) => {
+                    console.log('Mic permission granted:', status)
+                }).catch((error) => {
+                    console.log('Mic permission denied:', error)
+                })
+            }
+        } catch (error) {
+            console.log('Mic permission error:', error)
+        }
     }
 
     openMainWindow(){
