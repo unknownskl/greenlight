@@ -207,7 +207,7 @@ export default class xCloudApi {
                 'nanoVersion': 'V3;WebrtcTransport.dll',
                 'enableTextToSpeech': false,
                 'highContrast': 0,
-                'locale': 'en-US',
+                'locale': this._application._store.get('preferred_game_language', 'en-US'),
                 'useIceConnection': false,
                 'timezoneOffsetMinutes': 120,
                 'sdkType': 'web',
