@@ -34,7 +34,7 @@
     "ip-address": "^9.0.5",
     "playwright": "^1.40.0",
     "react-query": "^3.39.3",
-    "uplot": "^1.6.27",
+    "uplot": "^1.6.30",
     "xal-node": "^0.2.0",
     "xbox-webapi": "^1.4.1",
     "xbox-xcloud-player": "^0.2.10",
