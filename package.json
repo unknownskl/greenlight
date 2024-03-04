@@ -27,7 +27,7 @@
     "debug": "^4.3.4",
     "electron-serve": "^1.3.0",
     "electron-store": "^8.0.1",
-    "express": "^4.18.2",
+    "express": "^4.18.3",
     "express-http-proxy": "^2.0.0",
     "express-ws": "^5.0.2",
     "github-url-to-object": "^4.0.6",
