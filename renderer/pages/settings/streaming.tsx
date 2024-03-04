@@ -48,7 +48,7 @@ function SettingsStreaming() {
         })
 
         Ipc.send('app', 'setPreferredGameLanguage', { language: e }).then((res) => {
-            console.log('Set preferred game\'s language to:', e)
+            console.log('Set preferred game\'s language:', res)
         })
     }
 
