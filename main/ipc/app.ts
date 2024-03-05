@@ -7,7 +7,7 @@ interface setForceRegionIpArgs {
 }
 
 interface setPreferredGameLanguageArgs {
-    language:string
+    language:string;
 }
 
 export default class IpcApp extends IpcBase {
@@ -117,9 +117,9 @@ export default class IpcApp extends IpcBase {
     }
 
     setPreferredGameLanguage(args:setPreferredGameLanguageArgs){
-        return new Promise((resolve, reject) => {
-            console.log("IPC received preferred game\'s language and write to store:", args.language)
-            this._application._store.set('preferred_game_language', args.language);
+        return new Promise((resolve) => {
+            console.log('IPC received preferred game\'s language and write to store:', args.language)
+            this._application._store.set('preferred_game_language', args.language)
 
             resolve(true)
         })

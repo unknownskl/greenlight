@@ -117,8 +117,7 @@ function SettingsStreaming() {
                     </p>
                     <p>
                         <label>Preferred game's language:</label>
-                        <select value={settings.preferred_game_language || ''}
-                                onChange={(e) => setPreferredGameLanguage(e.target.value)}>
+                        <select value={settings.preferred_game_language || ''} onChange={(e) => setPreferredGameLanguage(e.target.value)}>
                             <option value="ar-SA">Arabic (Saudi Arabia)</option>
                             <option value="cs-CZ">Czech</option>
                             <option value="da-DK">Danish</option>
