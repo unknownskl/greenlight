@@ -41,6 +41,17 @@ function SettingsStreaming() {
 
     // video_profiles ([])
 
+    function setPreferredGameLanguage(e){
+        setSettings({
+            ...settings,
+            preferred_game_language: e,
+        })
+
+        Ipc.send('app', 'setPreferredGameLanguage', { language: e }).then((res) => {
+            console.log('Set preferred game\'s language:', res)
+        })
+    }
+
     function setForceRegionIp(e){
         setSettings({
             ...settings,
@@ -102,6 +113,39 @@ function SettingsStreaming() {
                             <option value="122.1.0.154">Japan</option>
                             <option value="203.253.64.1">Korea</option>
                             <option value="4.2.2.2">United States</option>
+                        </select>
+                    </p>
+                    <p>
+                        <label>Preferred game's language:</label>
+                        <select value={settings.preferred_game_language || ''}
+                                onChange={(e) => setPreferredGameLanguage(e.target.value)}>
+                            <option value="ar-SA">Arabic (Saudi Arabia)</option>
+                            <option value="cs-CZ">Czech</option>
+                            <option value="da-DK">Danish</option>
+                            <option value="de-DE">German</option>
+                            <option value="el-GR">Greek</option>
+                            <option value="en-GB">English (United Kingdom)</option>
+                            <option value="en-US">English (United States)</option>
+                            <option value="es-ES">Spanish (Spain)</option>
+                            <option value="es-MX">Spanish (Mexico)</option>
+                            <option value="fi-FI">Swedish</option>
+                            <option value="fr-FR">French</option>
+                            <option value="he-IL">Hebrew</option>
+                            <option value="hu-HU">Hungarian</option>
+                            <option value="it-IT">Italian</option>
+                            <option value="ja-JP">Japanese</option>
+                            <option value="ko-KR">Korean</option>
+                            <option value="nb-NO">Norwegian</option>
+                            <option value="nl-NL">Dutch</option>
+                            <option value="pl-PL">Polish</option>
+                            <option value="pt-BR">Portuguese (Brazil)</option>
+                            <option value="pt-PT">Portuguese (Portugal)</option>
+                            <option value="ru-RU">Russian</option>
+                            <option value="sk-SK">Slovak</option>
+                            <option value="sv-SE">Swedish</option>
+                            <option value="tr-TR">Turkish</option>
+                            <option value="zh-CN">Chinese (PRC)</option>
+                            <option value="zh-TW">Chinese (Taiwan)</option>
                         </select>
                     </p>
                 </Card>

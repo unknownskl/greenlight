@@ -6,6 +6,10 @@ interface setForceRegionIpArgs {
     ip:string;
 }
 
+interface setPreferredGameLanguageArgs {
+    language:string
+}
+
 export default class IpcApp extends IpcBase {
     // _streamingSessions:any = {}
 
@@ -107,6 +111,15 @@ export default class IpcApp extends IpcBase {
 
             // Rerun silent flow to retrieve new tokens
             this._application._authentication.startSilentFlow()
+
+            resolve(true)
+        })
+    }
+
+    setPreferredGameLanguage(args:setPreferredGameLanguageArgs){
+        return new Promise((resolve, reject) => {
+            console.log("IPC received preferred game\'s language and write to store:", args.language)
+            this._application._store.set('preferred_game_language', args.language);
 
             resolve(true)
         })
