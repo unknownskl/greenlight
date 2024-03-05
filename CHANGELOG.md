@@ -7,6 +7,7 @@
 - Updated icons #1127 (credits to @el2zay, and thanks for @jxhug for the suggestion)
 - Added toggles to mute audio / hide video to use in a controller-only setup (credits to @thirty7four2)
 - Added permission prompt for microphone access after authentication to prevent mass spamming for access #1069 #365
+- Added option to set language of the stream in the streaming settings #1166 #1119 #692 #319 (credits to @andy-kru)
 
 ## v2.1.1 - 2024-01-29
 - Fixed controller input not working on default settings #1118 #1117
