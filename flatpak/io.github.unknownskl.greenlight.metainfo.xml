@@ -20,15 +20,12 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="2.2.0" date="2024-02-29">
+    <release version="2.2.0" date="2024-03-05">
      <description>
         <ul>
-          <li>Added a WebUI option to make Greenlight available over the network. Enables usage of Greenlight on devices with a chromium based webbrowser. #673</li>
-          <li>Adding human readable waiting time when queued for a xCloud stream (credits to @NiccoMaganeli)</li>
-          <li>Added a low resolution mode for the Steam Deck to set a lower resolution then 720p for using FSR #1133</li>
-          <li>Updated icons #1127 (credits to @el2zay, and thanks for @jxhug for the suggestion)</li>
-          <li>Added toggles to mute audio / hide video to use in a controller-only setup (credits to @thirty7four2)</li>
-          <li>Added permission prompt for microphone access after authentication to prevent mass spamming for access #1069 #365</li>
+          <li>Added a WebUI function to make Greenlight available on devices with the chromium browser.</li>
+          <li>Added toggles for muting audio and hiding the video</li>
+          <li>Other improvements</li>
         </ul>
      </description>
     </release>
