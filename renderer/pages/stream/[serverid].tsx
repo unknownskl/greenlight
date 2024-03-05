@@ -1,7 +1,6 @@
 import React from 'react'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-// import { ipcRenderer } from 'electron'
 import xCloudPlayer from 'xbox-xcloud-player'
 
 import { useSettings } from '../../context/userContext'
@@ -19,13 +18,6 @@ function Stream() {
     const [xPlayer, setxPlayer] = React.useState(undefined)
     const [sessionId, setSessionId] = React.useState('')
     const [queueTime, setQueueTime] = React.useState(0)
-
-    // setxPlayer(new xCloudPlayer('streamComponent', {
-    //     ui_systemui: [],
-    //     input_touch: settings.input_touch || false,
-    //     input_mousekeyboard: settings.input_mousekeyboard || false,
-    //     input_legacykeyboard: (settings.input_newgamepad) ? false : true,
-    // }))
 
     React.useEffect(() => {
         // Detect stream type and title / server id
@@ -89,7 +81,7 @@ function Stream() {
                         console.log(iceResult)
                         xPlayer.setIceCandidates(iceResult)
 
-                        // All done. Waiting for the connection to appear
+                        // All done. Waiting for the event 'connectionstate' to be triggered
 
                     }).catch((error) => {
                         console.log('ICE Exchange error:', error)

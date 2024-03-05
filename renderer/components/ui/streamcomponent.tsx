@@ -23,7 +23,7 @@ function StreamComponent({
     }
 
     let lastMovement = 0
-    let gamebarElement = document.getElementById('component_streamcomponent_gamebar')
+    // let gamebarElement = document.getElementById('component_streamcomponent_gamebar')
     let debugElement = document.getElementById('component_streamcomponent_debug')
     let webRtcStatsInterval
 
@@ -199,8 +199,8 @@ function StreamComponent({
         window.addEventListener('mousedown', mouseEvent)
 
         const mouseInterval = setInterval(() => {
+            const gamebarElement = document.getElementById('component_streamcomponent_gamebar')
             if(gamebarElement === null){
-                gamebarElement = document.getElementById('component_streamcomponent_gamebar')
                 return
             }
 
@@ -208,6 +208,7 @@ function StreamComponent({
                 if(! gamebarElement.className.includes('hidden')){
                     gamebarElement.className = 'hidden'
                 }
+
             } else {
                 if(gamebarElement.className.includes('hidden')){
                     gamebarElement.className = ''
