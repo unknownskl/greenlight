@@ -1,5 +1,8 @@
 # Changelog
 
+## v2.2.1 - 2024-03-11
+- Fixed authentication on a fresh installation. #1168
+
 ## v2.2.0 - 2024-03-05
 - Added a WebUI option to make Greenlight available over the network. Enables usage of Greenlight on devices with a chromium based webbrowser. #673
 - Adding human readable waiting time when queued for a xCloud stream (credits to @NiccoMaganeli)
