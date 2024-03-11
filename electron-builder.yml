@@ -1,6 +1,6 @@
 appId: com.unknownskl.greenlight
 productName: Greenlight
-copyright: Copyright © 2021-2022 UnknownSKL
+copyright: Copyright © 2021-2024 UnknownSKL
 
 directories:
   output: dist
@@ -55,10 +55,10 @@ linux:
     - "deb"
     # - "pacman"
 
-flatpak:
-  runtime: org.freedesktop.Platform
-  runtimeVersion: 21.08
+# flatpak:
+#   runtime: org.freedesktop.Platform
+#   runtimeVersion: 21.08
 
-  sdk: org.freedesktop.Sdk
-  base: org.electronjs.Electron2.BaseApp
-  baseVersion: 21.08
+#   sdk: org.freedesktop.Sdk
+#   base: org.electronjs.Electron2.BaseApp
+#   baseVersion: 21.08

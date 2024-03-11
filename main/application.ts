@@ -1,4 +1,4 @@
-import { app as ElectronApp, BrowserWindow, systemPreferences } from 'electron'
+import { app as ElectronApp, BrowserWindow, systemPreferences, dialog } from 'electron'
 import serve from 'electron-serve'
 import Store from 'electron-store'
 import Debug from 'debug'
@@ -163,6 +163,30 @@ export default class Application {
             uhs: tokens.web.uhs,
         })
 
+        this._webApi.getProvider('profile').get('/users/me/profile/settings?settings=GameDisplayName,GameDisplayPicRaw,Gamerscore,Gamertag').then((result) => {
+            if(result.profileUsers.length > 0) {
+                for(const setting in result.profileUsers[0].settings){
+
+                    if(result.profileUsers[0].settings[setting].id == 'Gamertag'){
+                        this._store.set('user.gamertag', result.profileUsers[0].settings[setting].value)
+
+                    } else if(result.profileUsers[0].settings[setting].id == 'GameDisplayPicRaw'){
+                        this._store.set('user.gamerpic', result.profileUsers[0].settings[setting].value)
+
+                    } else if(result.profileUsers[0].settings[setting].id == 'Gamerscore'){
+                        this._store.set('user.gamerscore', result.profileUsers[0].settings[setting].value)
+                    }
+                }
+            }
+    
+        }).catch(function(error){
+            console.log('events.ts: Error: Failed to retrieve current user (1):', error)
+            dialog.showMessageBox({
+                message: 'Error: Failed to retrieve current user (1):'+ JSON.stringify(error),
+                type: 'error'
+            })
+        })
+
         this._xboxWorker = new xboxWorker(this)
         this._xHomeApi = new xCloudApi(this, 'uks.gssv-play-prodxhome.xboxlive.com', tokens.gamestreaming.token, 'home')
         this._xCloudApi = new xCloudApi(this, tokens.xcloud.host, tokens.xcloud.token, 'cloud')
@@ -171,19 +195,19 @@ export default class Application {
         this._ipc.onUserLoaded()
 
         // Check for app permissions
-        try {
-            const micPermission = systemPreferences.getMediaAccessStatus('microphone')
-            // console.log('Mic permission:', micPermission)
-            if(micPermission !== 'granted'){
-                systemPreferences.askForMediaAccess('microphone').then((status) => {
-                    console.log('Mic permission granted:', status)
-                }).catch((error) => {
-                    console.log('Mic permission denied:', error)
-                })
-            }
-        } catch (error) {
-            console.log('Mic permission error:', error)
-        }
+        // try {
+        //     const micPermission = systemPreferences.getMediaAccessStatus('microphone')
+        //     // console.log('Mic permission:', micPermission)
+        //     if(micPermission !== 'granted'){
+        //         systemPreferences.askForMediaAccess('microphone').then((status) => {
+        //             console.log('Mic permission granted:', status)
+        //         }).catch((error) => {
+        //             console.log('Mic permission denied:', error)
+        //         })
+        //     }
+        // } catch (error) {
+        //     console.log('Mic permission error:', error)
+        // }
     }
 
     openMainWindow(){

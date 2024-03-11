@@ -54,7 +54,7 @@ export default function MyApp({ Component, pageProps }) {
                     setIsLoading(true)
                     setPrevUserState({ ...prevUserState, ...args.user})
 
-                } else if(args.isAuthenticated === true){
+                } else if(args.isAuthenticated === true && args.user.signedIn === true){
                     clearInterval(authInterval)
 
                     if(loggedIn === false){
