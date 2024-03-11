@@ -1,4 +1,4 @@
-import { app as ElectronApp, BrowserWindow, systemPreferences, dialog } from 'electron'
+import { app as ElectronApp, BrowserWindow, dialog } from 'electron'
 import serve from 'electron-serve'
 import Store from 'electron-store'
 import Debug from 'debug'
@@ -167,23 +167,23 @@ export default class Application {
             if(result.profileUsers.length > 0) {
                 for(const setting in result.profileUsers[0].settings){
 
-                    if(result.profileUsers[0].settings[setting].id == 'Gamertag'){
+                    if(result.profileUsers[0].settings[setting].id === 'Gamertag'){
                         this._store.set('user.gamertag', result.profileUsers[0].settings[setting].value)
 
-                    } else if(result.profileUsers[0].settings[setting].id == 'GameDisplayPicRaw'){
+                    } else if(result.profileUsers[0].settings[setting].id === 'GameDisplayPicRaw'){
                         this._store.set('user.gamerpic', result.profileUsers[0].settings[setting].value)
 
-                    } else if(result.profileUsers[0].settings[setting].id == 'Gamerscore'){
+                    } else if(result.profileUsers[0].settings[setting].id === 'Gamerscore'){
                         this._store.set('user.gamerscore', result.profileUsers[0].settings[setting].value)
                     }
                 }
             }
     
-        }).catch(function(error){
+        }).catch((error) =>{
             console.log('events.ts: Error: Failed to retrieve current user (1):', error)
             dialog.showMessageBox({
                 message: 'Error: Failed to retrieve current user (1):'+ JSON.stringify(error),
-                type: 'error'
+                type: 'error',
             })
         })
 
