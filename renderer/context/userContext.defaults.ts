@@ -8,6 +8,7 @@ export const defaultSettings = {
     force_region_ip: '',
     input_touch: false,
     input_mousekeyboard: false,
+    input_mousekeyboard_config: undefined,
     input_newgamepad: false,
     app_lowresolution: false,
 
