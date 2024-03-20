@@ -157,7 +157,7 @@ jobs:
           cache-key: flatpak-builder-${{ github.sha }}
 
       - name: Release flatpak
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/v')
         with:
           files: greenlight.flatpak
