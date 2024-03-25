@@ -114,6 +114,11 @@ input.text {
     color: #ffffff;
     margin-right: 10px;
     min-width: 200px;
+    border: 2px solid #000000;
+}
+
+input.text:focus {
+    border: 2px solid green;
 }
 
 /**
