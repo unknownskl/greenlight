@@ -5,30 +5,28 @@ import SettingsSidebar from '../../components/settings/sidebar'
 import Card from '../../components/ui/card'
 
 import { useSettings } from '../../context/userContext'
-import { MouseKeyboardConfig } from 'xbox-xcloud-player/dist/Driver/Keyboard'
 
-function getUniqueButtons(keyMapping) {
-    const buttons = []
-    for(const button in keyMapping) {
-        // k = actualButton,  v = gamepadButton
-        buttons.push(keyMapping[button])
-    }
-    const uniqueButtons = buttons.filter((v, i, a) => a.indexOf(v) === i)
-    return uniqueButtons
-}
+// function getUniqueButtons(keyMapping) {
+//     const buttons = []
+//     for(const button in keyMapping) {
+//         // k = actualButton,  v = gamepadButton
+//         buttons.push(keyMapping[button])
+//     }
+//     const uniqueButtons = buttons.filter((v, i, a) => a.indexOf(v) === i)
+//     return uniqueButtons
+// }
 
 function invert(obj) {
-    var new_obj = {};
-    for (var prop in obj) {
-        if(obj.hasOwnProperty(prop)) {
-            new_obj[obj[prop]] = prop;
-        }
+    const new_obj = {}
+    for (const prop in obj) {
+        // if(obj.hasOwnProperty(prop)) {
+        new_obj[obj[prop]] = prop
+        // }
     }
-    return new_obj;
+    return new_obj
 }
 
 function KeySettings({keyConfigs, setKeyConfig}) {
-    // const mappableButtons = getUniqueButtons(MouseKeyboardConfig.default()._keymapping)
     const mappableButtons = ['DPadUp', 'DPadDown', 'DPadLeft', 'DPadRight', 'A', 'B', 'X', 'Y', 'View', 'Menu', 'Nexus', 'LeftShoulder', 'RightShoulder', 'LeftTrigger', 'RightTrigger', 'LeftThumb', 'RightThumb']
     console.log('KEYS:', keyConfigs, mappableButtons)
     keyConfigs = invert(keyConfigs)
@@ -36,42 +34,42 @@ function KeySettings({keyConfigs, setKeyConfig}) {
         {
             mappableButtons.map(
                 (btn:string) => {
-                    let fullBtnText = '';
+                    let fullBtnText = ''
 
                     switch(btn){
                         case 'DPadUp':
                             fullBtnText = 'DPad Up'
-                            break;
+                            break
                         case 'DPadDown':
                             fullBtnText = 'DPad Down'
-                            break;
+                            break
                         case 'DPadLeft':
                             fullBtnText = 'DPad Left'
-                            break;
+                            break
                         case 'DPadRight':
                             fullBtnText = 'DPad Right'
-                            break;
+                            break
                         case 'LeftShoulder':
                             fullBtnText = 'Left Shoulder'
-                            break;
+                            break
                         case 'RightShoulder':
                             fullBtnText = 'Right Shoulder'
-                            break;
+                            break
                         case 'LeftTrigger':
                             fullBtnText = 'Left Trigger'
-                            break;
+                            break
                         case 'RightTrigger':
                             fullBtnText = 'Right Trigger'
-                            break;
+                            break
                         case 'LeftThumb':
                             fullBtnText = 'Left Thumbstick'
-                            break;
+                            break
                         case 'RightThumb':
                             fullBtnText = 'Right Thumbstick'
-                            break;
+                            break
                         default:
                             fullBtnText = btn
-                            break;
+                            break
                     }
 
                     return <p key={btn}>

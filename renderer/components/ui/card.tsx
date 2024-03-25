@@ -2,7 +2,7 @@ import React from 'react'
 
 interface ButtonProps {
   className?: string;
-  hidden?: boolean
+  hidden?: boolean;
   children;
 }
 
