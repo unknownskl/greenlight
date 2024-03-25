@@ -2,11 +2,13 @@ import React from 'react'
 
 interface ButtonProps {
   className?: string;
+  hidden?: boolean
   children;
 }
 
 function Card({
     className,
+    hidden = false,
     children,
 }: ButtonProps) {
 
@@ -14,9 +16,9 @@ function Card({
 
     return (
         <React.Fragment>
-            <div className={ className }>
+            { hidden === true ? '' : <div className={ className }>
                 { children }
-            </div>
+            </div> }
         </React.Fragment>
     )
 }

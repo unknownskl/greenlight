@@ -5,56 +5,82 @@ import SettingsSidebar from '../../components/settings/sidebar'
 import Card from '../../components/ui/card'
 
 import { useSettings } from '../../context/userContext'
-import {InputFrame} from 'xbox-xcloud-player/dist/Channel/Input'
+import { MouseKeyboardConfig } from 'xbox-xcloud-player/dist/Driver/Keyboard'
 
-const emptyInputFrame = () => ({
-    GamepadIndex: 0,
-    Nexus: 0,
-    Menu: 0,
-    View: 0,
-    A: 0,
-    B: 0,
-    X: 0,
-    Y: 0,
-    DPadUp: 0,
-    DPadDown: 0,
-    DPadLeft: 0,
-    DPadRight: 0,
-    LeftShoulder: 0,
-    RightShoulder: 0,
-    LeftThumb: 0,
-    RightThumb: 0,
-
-    LeftThumbXAxis: 0.0,
-    LeftThumbYAxis: 0.0,
-    RightThumbXAxis: 0.0,
-    RightThumbYAxis: 0.0,
-    LeftTrigger: 0.0,
-    RightTrigger: 0.0,
-}) as InputFrame
-
-function invert(dict) {
-    const inv = {}
-    for(const [k, v] of Object.entries(dict)) {
-        inv[v.toString()] = k
+function getUniqueButtons(keyMapping) {
+    const buttons = []
+    for(const button in keyMapping) {
+        // k = actualButton,  v = gamepadButton
+        buttons.push(keyMapping[button])
     }
-    return inv
+    const uniqueButtons = buttons.filter((v, i, a) => a.indexOf(v) === i)
+    return uniqueButtons
+}
+
+function invert(obj) {
+    var new_obj = {};
+    for (var prop in obj) {
+        if(obj.hasOwnProperty(prop)) {
+            new_obj[obj[prop]] = prop;
+        }
+    }
+    return new_obj;
 }
 
 function KeySettings({keyConfigs, setKeyConfig}) {
-    const keys = Object.keys(emptyInputFrame())
+    // const mappableButtons = getUniqueButtons(MouseKeyboardConfig.default()._keymapping)
+    const mappableButtons = ['DPadUp', 'DPadDown', 'DPadLeft', 'DPadRight', 'A', 'B', 'X', 'Y', 'View', 'Menu', 'Nexus', 'LeftShoulder', 'RightShoulder', 'LeftTrigger', 'RightTrigger', 'LeftThumb', 'RightThumb']
+    console.log('KEYS:', keyConfigs, mappableButtons)
     keyConfigs = invert(keyConfigs)
     return <p>
         {
-            keys.map(
-                (btn: keyof InputFrame) =>(
-                    <p key={btn}>
-                        <label>{btn}</label>
+            mappableButtons.map(
+                (btn:string) => {
+                    let fullBtnText = '';
+
+                    switch(btn){
+                        case 'DPadUp':
+                            fullBtnText = 'DPad Up'
+                            break;
+                        case 'DPadDown':
+                            fullBtnText = 'DPad Down'
+                            break;
+                        case 'DPadLeft':
+                            fullBtnText = 'DPad Left'
+                            break;
+                        case 'DPadRight':
+                            fullBtnText = 'DPad Right'
+                            break;
+                        case 'LeftShoulder':
+                            fullBtnText = 'Left Shoulder'
+                            break;
+                        case 'RightShoulder':
+                            fullBtnText = 'Right Shoulder'
+                            break;
+                        case 'LeftTrigger':
+                            fullBtnText = 'Left Trigger'
+                            break;
+                        case 'RightTrigger':
+                            fullBtnText = 'Right Trigger'
+                            break;
+                        case 'LeftThumb':
+                            fullBtnText = 'Left Thumbstick'
+                            break;
+                        case 'RightThumb':
+                            fullBtnText = 'Right Thumbstick'
+                            break;
+                        default:
+                            fullBtnText = btn
+                            break;
+                    }
+
+                    return <p key={btn}>
+                        <label>{fullBtnText}</label>
                         <label style={{minWidth: 0}}>
-                            <input type='text' className='text' onKeyUp={(e) => setKeyConfig(btn, e.key)} value={keyConfigs[btn] ?? 'None'}/>
+                            <input type='text' className='text' onKeyUp={(e) => setKeyConfig(btn, e)} value={keyConfigs[btn] ?? 'None'}/>
                         </label>
                     </p>
-                )
+                }
             )
         }
     </p>
@@ -105,10 +131,10 @@ function SettingsInput() {
         })
     }
 
-    function setKeyConfig(button: keyof InputFrame, keymap: string) {
+    function setKeyConfig(button:string, event) {
         let ckeys = controllerKeys
         if(ckeys === undefined) {
-            ckeys = {}
+            ckeys = {} as any
         }
 
 
@@ -116,10 +142,12 @@ function SettingsInput() {
             if(ckeys[ckeysKey] === button) delete ckeys[ckeysKey]
         }
 
-        if (keymap !== 'Backspace')
-            ckeys[keymap] = button
+        if (event.key !== 'Backspace')
+            ckeys[event.key] = button
 
         setControllerKeys(ckeys)
+
+        event.target.blur()
 
         setSettings({
             ...settings,
@@ -155,19 +183,16 @@ function SettingsInput() {
                         <label>Enable Mouse & Keyboard</label>
                         <label style={{ minWidth: 0 }}>
                             <input type='checkbox' onChange={ setMKBInput } checked={settings.input_mousekeyboard} />&nbsp; ({ settings.input_mousekeyboard ? 'Enabled' : 'Disabled'})
-                        </label>
+                        </label> <br />
+                        { (!settings.input_newgamepad && settings.input_mousekeyboard) ? <small style={{ color: 'orange' }}>Using the Mouse & Keyboard driver together with the Gamepad keyboard mappings will cause conflicts</small> : '' }
                     </p>
 
-                    {
-                        settings.input_mousekeyboard ? <KeySettings keyConfigs={controllerKeys} setKeyConfig={setKeyConfig}></KeySettings> : <></>
-                    }
-
                     <p>
-                        <label>Enable new Gamepad driver</label>
+                        <label>Enable Keyboard to Gamepad</label>
                         <label style={{ minWidth: 0 }}>
-                            <input type='checkbox' onChange={ setLegacyInput } checked={settings.input_newgamepad} />&nbsp; ({ settings.input_newgamepad ? 'Enabled' : 'Disabled'})
+                            <input type='checkbox' onChange={ setLegacyInput } checked={!settings.input_newgamepad} />&nbsp; ({ !settings.input_newgamepad ? 'Enabled' : 'Disabled'})
                         </label><br />
-                        <small>(Enable this if you want to use the Keyboard & Mouse input to avoid double input. The default keyboard controls will be disabled.)</small>
+                        <small>(Disabling this feature will disable the keyboard to gamepad mapping and only allows controls from the gamepad.)</small>
                     </p>
                 </Card>
 
@@ -194,6 +219,15 @@ function SettingsInput() {
                             })
                         }
                     </div>
+                </Card>
+
+                <Card hidden={ settings.input_newgamepad }>
+                    <h1>Keyboard mappings</h1>
+                    <p>
+                        {
+                            <KeySettings keyConfigs={controllerKeys} setKeyConfig={setKeyConfig} />
+                        }
+                    </p>
                 </Card>
             </SettingsSidebar>
       
