@@ -49,7 +49,7 @@
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^6.21.0",
     "babel-loader": "^9.1.3",
-    "electron": "30",
+    "electron": "31",
     "electron-builder": "^24.13.3",
     "eslint": "^8.57.0",
     "next": "^13.5.6",
