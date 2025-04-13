@@ -4099,10 +4099,10 @@ electron-publish@26.0.11:
     lazy-val "^1.0.5"
     mime "^2.5.2"
 
-electron-serve@^1.3.0:
-  version "1.3.0"
-  resolved "https://registry.npmjs.org/electron-serve/-/electron-serve-1.3.0.tgz"
-  integrity sha512-OEC/48ZBJxR6XNSZtCl4cKPyQ1lvsu8yp8GdCplMWwGS1eEyMcEmzML5BRs/io/RLDnpgyf+7rSL+X6ICifRIg==
+electron-serve@^2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/electron-serve/-/electron-serve-2.1.1.tgz#69a59fbdaf3e11250a53bad73e8c4f4931315717"
+  integrity sha512-SJdA7bfZuPODK9BkXTZ8EPsQlzg6yNSA0H6811DQvqzyDhPP8icIACA0bIA9aWeT+gmDB7V4eMg/wZhR+ijk6w==
 
 electron-store@^8.1.0:
   version "8.2.0"
