@@ -5079,18 +5079,18 @@ fumadocs-mdx@^11.5.8:
     unist-util-visit "^5.0.0"
     zod "^3.24.2"
 
-fumadocs-typescript@^3.1.0:
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/fumadocs-typescript/-/fumadocs-typescript-3.1.0.tgz#bcbc66fdb2a695f60d975212379e2e01988a0c53"
-  integrity sha512-H8zEMUrQfM8dqUBGhMepAjXi5hRbSKSK5565ObXXzQI7kFHnLH5Jc1MFBa6LXyaatZIv7B7ozWdVm7XaUHDtiA==
+fumadocs-typescript@^4.0.2:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/fumadocs-typescript/-/fumadocs-typescript-4.0.2.tgz#3620308c3d4fcd23c48eb667e9fa5aafa8ed75d0"
+  integrity sha512-R+jLdGHkdecNF6haUsH5iMRr3t+g582t3l5lYyUIiZRDGhwMZSjLP8s/izGrBos76s/ZnMVlxEhhkty+cK3x+w==
   dependencies:
     estree-util-value-to-estree "^3.3.2"
     fast-glob "^3.3.3"
-    hast-util-to-estree "^3.1.2"
-    hast-util-to-jsx-runtime "^2.3.5"
+    hast-util-to-estree "^3.1.3"
+    hast-util-to-jsx-runtime "^2.3.6"
     remark "^15.0.1"
-    remark-rehype "^11.1.1"
-    shiki "^3.1.0"
+    remark-rehype "^11.1.2"
+    shiki "^3.2.1"
     ts-morph "^25.0.1"
     unist-util-visit "^5.0.0"
 
@@ -5409,7 +5409,7 @@ hasown@^2.0.2:
   dependencies:
     function-bind "^1.1.2"
 
-hast-util-to-estree@^3.0.0, hast-util-to-estree@^3.1.2, hast-util-to-estree@^3.1.3:
+hast-util-to-estree@^3.0.0, hast-util-to-estree@^3.1.3:
   version "3.1.3"
   resolved "https://registry.yarnpkg.com/hast-util-to-estree/-/hast-util-to-estree-3.1.3.tgz#e654c1c9374645135695cc0ab9f70b8fcaf733d7"
   integrity sha512-48+B/rJWAp0jamNbAAf9M7Uf//UVqAoMmgXhBdxTDJLGKY+LRnZ99qcG+Qjl5HfMpYNzS5v4EAwVEF34LeAj7w==
@@ -5448,7 +5448,7 @@ hast-util-to-html@^9.0.5:
     stringify-entities "^4.0.0"
     zwitch "^2.0.4"
 
-hast-util-to-jsx-runtime@^2.0.0, hast-util-to-jsx-runtime@^2.3.5, hast-util-to-jsx-runtime@^2.3.6:
+hast-util-to-jsx-runtime@^2.0.0, hast-util-to-jsx-runtime@^2.3.6:
   version "2.3.6"
   resolved "https://registry.yarnpkg.com/hast-util-to-jsx-runtime/-/hast-util-to-jsx-runtime-2.3.6.tgz#ff31897aae59f62232e21594eac7ef6b63333e98"
   integrity sha512-zl6s8LwNyo1P9uw+XJGvZtdFF1GdAkOg8ujOw+4Pyb76874fLps4ueHXDhXWdk6YHQ6OgUtinliG7RsYvCbbBg==
@@ -8074,7 +8074,7 @@ remark-parse@^11.0.0:
     micromark-util-types "^2.0.0"
     unified "^11.0.0"
 
-remark-rehype@^11.0.0, remark-rehype@^11.1.1:
+remark-rehype@^11.0.0, remark-rehype@^11.1.2:
   version "11.1.2"
   resolved "https://registry.yarnpkg.com/remark-rehype/-/remark-rehype-11.1.2.tgz#2addaadda80ca9bd9aa0da763e74d16327683b37"
   integrity sha512-Dh7l57ianaEoIpzbp0PC9UKAdCSVklD8E5Rpw7ETfbTl3FqcOOgq5q2LVDhgGCkaBv7p24JXikPdvhhmHvKMsw==
@@ -8449,7 +8449,7 @@ shebang-regex@^3.0.0:
   resolved "https://registry.npmjs.org/shebang-regex/-/shebang-regex-3.0.0.tgz"
   integrity sha512-7++dFhtcx3353uBaq8DDR4NuxBetBzC7ZQOhmTQInHEd6bSrXdiEyzCvG07Z44UYdLShWUyXt5M/yhz8ekcb1A==
 
-shiki@3.2.2, shiki@^3.1.0, shiki@^3.2.1:
+shiki@3.2.2, shiki@^3.2.1:
   version "3.2.2"
   resolved "https://registry.yarnpkg.com/shiki/-/shiki-3.2.2.tgz#aa231cc84efcf4f2a875de604aa7a45efe446fd2"
   integrity sha512-0qWBkM2t/0NXPRcVgtLhtHv6Ak3Q5yI4K/ggMqcgLRKm4+pCs3namgZlhlat/7u2CuqNtlShNs9lENOG6n7UaQ==
