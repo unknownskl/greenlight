@@ -50,7 +50,7 @@
     "@types/react": "^18.2.47",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "babel-loader": "^10.0.0",
-    "electron": "35.1.5",
+    "electron": "35.2.1",
     "electron-builder": "^26.0.12",
     "eslint": "^9",
     "next": "^15.1.5",

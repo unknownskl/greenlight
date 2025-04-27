@@ -31,7 +31,7 @@
     "@electron/fuses": "^1.8.0",
     "@greenlight/server": "^0.1.0",
     "@trpc/server": "^11.1.0",
-    "electron": "^35.1.5",
+    "electron": "^35.2.1",
     "electron-trpc": "^0.7.1",
     "mime": "^4.0.7",
     "ts-loader": "^9.5.2",
