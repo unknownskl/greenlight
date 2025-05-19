@@ -62,6 +62,6 @@
     "prettier": "3.3.3",
     "typescript": "5.6.3",
     "vite": "^5.2.0",
-    "vite-tsconfig-paths": "^4.3.2"
+    "vite-tsconfig-paths": "^5.1.4"
   }
 }
