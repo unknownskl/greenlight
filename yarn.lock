@@ -5133,10 +5133,10 @@ fumadocs-core@15.7.13, fumadocs-core@^15.3.3:
     shiki "^3.12.2"
     unist-util-visit "^5.0.0"
 
-fumadocs-mdx@^11.6.4:
-  version "11.10.1"
-  resolved "https://registry.yarnpkg.com/fumadocs-mdx/-/fumadocs-mdx-11.10.1.tgz#f6b00b01d19f4ea86e3c1393ef48d56727f4417a"
-  integrity sha512-WoEzzzoKncXl7PM++GRxEplAb73y3A4ow+QdTYybhVtoYXgJzvTzkLc5OIlNQm72Dv+OxSAx7uk11zTTOX9YMQ==
+fumadocs-mdx@^12.0.0:
+  version "12.0.0"
+  resolved "https://registry.yarnpkg.com/fumadocs-mdx/-/fumadocs-mdx-12.0.0.tgz#879c293a3fc1843036e78a2c90f87545246ee09b"
+  integrity sha512-NZG7sbN6jP+I4xW9/mgWJXkTFjgtxwgSUs50fov8HRMjkJ0jy5kheBjOkd4bdU9MDAGdl/1wlYfXJx2NHyovlg==
   dependencies:
     "@mdx-js/mdx" "^3.1.1"
     "@standard-schema/spec" "^1.0.0"
@@ -5145,6 +5145,7 @@ fumadocs-mdx@^11.6.4:
     estree-util-value-to-estree "^3.4.0"
     js-yaml "^4.1.0"
     lru-cache "^11.2.1"
+    mdast-util-to-markdown "^2.1.2"
     picocolors "^1.1.1"
     remark-mdx "^3.1.1"
     remark-parse "^11.0.0"
@@ -6634,7 +6635,7 @@ mdast-util-to-hast@^13.0.0:
     unist-util-visit "^5.0.0"
     vfile "^6.0.0"
 
-mdast-util-to-markdown@^2.0.0:
+mdast-util-to-markdown@^2.0.0, mdast-util-to-markdown@^2.1.2:
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/mdast-util-to-markdown/-/mdast-util-to-markdown-2.1.2.tgz#f910ffe60897f04bb4b7e7ee434486f76288361b"
   integrity sha512-xj68wMTvGXVOKonmog6LwyJKrYXZPvlwabaryTjLh9LuvovB/KAH+kvi8Gjj+7rJjsFi23nkUxRQv1KqSroMqA==
