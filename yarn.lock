@@ -5283,10 +5283,10 @@ fsevents@~2.3.3:
   resolved "https://registry.yarnpkg.com/fsevents/-/fsevents-2.3.3.tgz#cac6407785d03675a2a5e1a5305c697b347d90d6"
   integrity sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==
 
-fumadocs-core@15.8.1, fumadocs-core@^15.8.1:
-  version "15.8.1"
-  resolved "https://registry.yarnpkg.com/fumadocs-core/-/fumadocs-core-15.8.1.tgz#6413e31ff24b1332f7e52a25b97e1a507f8ef223"
-  integrity sha512-3NBM2U3QlnDr4AwfDCLFaNjRGOj52g3geHSnwC9hU2en34xROe7/I8FI1eLkX68ppGnhSQYm/rIuMAPzvepnsg==
+fumadocs-core@15.8.2, fumadocs-core@^15.8.2:
+  version "15.8.2"
+  resolved "https://registry.yarnpkg.com/fumadocs-core/-/fumadocs-core-15.8.2.tgz#8a2a508ed3ab20c97e3cbc137563bbfd5813b57a"
+  integrity sha512-8x6nwL9gQyfU94VrX3xOIRb3avG9txEJXd0/XdldxHeH6uIAtSGnZ6YV1LksJfEsSIUL+DRxrxRfvL0rbwBP1g==
   dependencies:
     "@formatjs/intl-localematcher" "^0.6.1"
     "@orama/orama" "^3.1.14"
@@ -5298,6 +5298,7 @@ fumadocs-core@15.8.1, fumadocs-core@^15.8.1:
     image-size "^2.0.2"
     negotiator "^1.0.0"
     npm-to-yarn "^3.0.1"
+    path-to-regexp "^8.3.0"
     react-remove-scroll "^2.7.1"
     remark "^15.0.0"
     remark-gfm "^4.0.1"
@@ -5328,10 +5329,10 @@ fumadocs-mdx@^12.0.1:
     unist-util-visit "^5.0.0"
     zod "^4.1.11"
 
-fumadocs-typescript@^4.0.9:
-  version "4.0.9"
-  resolved "https://registry.yarnpkg.com/fumadocs-typescript/-/fumadocs-typescript-4.0.9.tgz#7d0c7fcb4ccde5f367585812224618d5a3fcbe0a"
-  integrity sha512-PeAKsO0d2PbvM78cNDRlrB+K5m+QJato5hoFmxeSK/idoFWl8xAISTOnwikHT3hyIAW5jwYTlZvsP2eSFbF5sg==
+fumadocs-typescript@^4.0.10:
+  version "4.0.10"
+  resolved "https://registry.yarnpkg.com/fumadocs-typescript/-/fumadocs-typescript-4.0.10.tgz#99d944ede8a61dbf1f8a304125efb943e71467de"
+  integrity sha512-+B5FWDqOE1KbAGUHF658pnqSqwbnMGwyr/2G9WpH077LKqC/taienSLIsOhyFw2Q2KlBFD0lH6nam8xCGq+sqg==
   dependencies:
     estree-util-value-to-estree "^3.4.0"
     hast-util-to-estree "^3.1.3"
@@ -5342,10 +5343,10 @@ fumadocs-typescript@^4.0.9:
     ts-morph "^27.0.0"
     unist-util-visit "^5.0.0"
 
-fumadocs-ui@^15.8.1:
-  version "15.8.1"
-  resolved "https://registry.yarnpkg.com/fumadocs-ui/-/fumadocs-ui-15.8.1.tgz#14f628679d58290b00f1d3038f131d72c7f557a7"
-  integrity sha512-GFJoKiDPTPefXtfwr4cheeprtAF+rHILeyovta3cODPsurSRvSfxqbGVN8YRDUh1ja9GpExSQFgUFwp1+7qVtQ==
+fumadocs-ui@^15.8.2:
+  version "15.8.2"
+  resolved "https://registry.yarnpkg.com/fumadocs-ui/-/fumadocs-ui-15.8.2.tgz#5a1bb9e45a60e74e0f30c072dd48c3b80a310d58"
+  integrity sha512-GLMm0a83mVQ2ubQLHbYQ/BcIRKEkA3cMXuVgKK4F/eB6duD6kLPwahoSb0mijwH3UrpJT+zfpKxPlK3JHXXW1A==
   dependencies:
     "@radix-ui/react-accordion" "^1.2.12"
     "@radix-ui/react-collapsible" "^1.1.12"
@@ -5358,7 +5359,7 @@ fumadocs-ui@^15.8.1:
     "@radix-ui/react-slot" "^1.2.3"
     "@radix-ui/react-tabs" "^1.1.13"
     class-variance-authority "^0.7.1"
-    fumadocs-core "15.8.1"
+    fumadocs-core "15.8.2"
     lodash.merge "^4.6.2"
     next-themes "^0.4.6"
     postcss-selector-parser "^7.1.0"
@@ -7938,6 +7939,11 @@ path-to-regexp@0.1.12:
   version "0.1.12"
   resolved "https://registry.yarnpkg.com/path-to-regexp/-/path-to-regexp-0.1.12.tgz#d5e1a12e478a976d432ef3c58d534b9923164bb7"
   integrity sha512-RA1GjUVMnvYFxuqovrEqZoxxW5NUZqbwKtYz/Tt7nXerk0LbLblQmrsgdeOxV5SFHf0UDggjS/bSeOZwt1pmEQ==
+
+path-to-regexp@^8.3.0:
+  version "8.3.0"
+  resolved "https://registry.yarnpkg.com/path-to-regexp/-/path-to-regexp-8.3.0.tgz#aa818a6981f99321003a08987d3cec9c3474cd1f"
+  integrity sha512-7jdwVIRtsP8MYpdXSwOS0YdD0Du+qOoF/AEPIt88PcCFrZCzx41oxku1jD88hZBwbNUIEfpqvuhjFaMAqMTWnA==
 
 path-type@^4.0.0:
   version "4.0.0"
