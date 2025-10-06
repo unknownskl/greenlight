@@ -3024,6 +3024,11 @@ ajv@^8.0.0, ajv@^8.6.3, ajv@^8.9.0:
     json-schema-traverse "^1.0.0"
     require-from-string "^2.0.2"
 
+ansi-colors@^4.1.1:
+  version "4.1.3"
+  resolved "https://registry.yarnpkg.com/ansi-colors/-/ansi-colors-4.1.3.tgz#37611340eb2243e70cc604cad35d63270d48781b"
+  integrity sha512-/6w/C21Pm1A7aZitlI5Ni/2J6FFQN8i1Cvz3kHABAAbw93v/NlvKdVOqz7CCWz/3iv/JplRSEEZ83XION15ovw==
+
 ansi-escapes@^4.3.0, ansi-escapes@^4.3.2:
   version "4.3.2"
   resolved "https://registry.yarnpkg.com/ansi-escapes/-/ansi-escapes-4.3.2.tgz#6b2291d1db7d98b6521d5f1efa42d0f3a9feb65e"
@@ -4297,6 +4302,17 @@ electron-builder@^26.0.12:
     simple-update-notifier "2.0.0"
     yargs "^17.6.2"
 
+electron-mocha@^13.1.0:
+  version "13.1.0"
+  resolved "https://registry.yarnpkg.com/electron-mocha/-/electron-mocha-13.1.0.tgz#e885d34d716c3dd07de9daf16008ae82e16bcac9"
+  integrity sha512-n/PxV2Jv3mGiqFwoYWvzsjBxNXzuLqkfgxeJtjrrLpuYN/9VaJP98FUsd4GRKFFerD3Q1KihqNCaLXXEER2j1A==
+  dependencies:
+    ansi-colors "^4.1.1"
+    electron-window "^0.8.0"
+    mocha "^11.0.1"
+    which "^5.0.0"
+    yargs "^17.7.2"
+
 electron-publish@26.0.11:
   version "26.0.11"
   resolved "https://registry.yarnpkg.com/electron-publish/-/electron-publish-26.0.11.tgz#92c9329a101af2836d9d228c82966eca1eee9a7b"
@@ -4334,10 +4350,26 @@ electron-to-chromium@^1.5.227:
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.5.229.tgz#ce32e345990b031ae5fec4d99e98188b90ba3731"
   integrity sha512-cwhDcZKGcT/rEthLRJ9eBlMDkh1sorgsuk+6dpsehV0g9CABsIqBxU4rLRjG+d/U6pYU1s37A4lSKrVc5lSQYg==
 
+electron-window@^0.8.0:
+  version "0.8.1"
+  resolved "https://registry.yarnpkg.com/electron-window/-/electron-window-0.8.1.tgz#16ca187eb4870b0679274fc8299c5960e6ab2c5e"
+  integrity sha512-W1i9LfnZJozk3MXE8VgsL2E5wOUHSgyCvcg1H2vQQjj+gqhO9lVudgY3z3SF7LJAmi+0vy3CJkbMqsynWB49EA==
+  dependencies:
+    is-electron-renderer "^2.0.0"
+
 electron@38.2.0:
   version "38.2.0"
   resolved "https://registry.yarnpkg.com/electron/-/electron-38.2.0.tgz#fc6bb321923320cc76aa036c7677642ab0239d70"
   integrity sha512-Cw5Mb+N5NxsG0Hc1qr8I65Kt5APRrbgTtEEn3zTod30UNJRnAE1xbGk/1NOaDn3ODzI/MYn6BzT9T9zreP7xWA==
+  dependencies:
+    "@electron/get" "^2.0.0"
+    "@types/node" "^22.7.7"
+    extract-zip "^2.0.1"
+
+electron@^38.2.1:
+  version "38.2.1"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-38.2.1.tgz#c018fa527253ecbe10ac04ea61aeec4d2b7baf62"
+  integrity sha512-P4pE2RpRg3kM8IeOK+heg6iAxR5wcXnNHrbVchn7M3GBnYAhjfJRkROusdOro5PlKzdtfKjesbbqaG4MqQXccg==
   dependencies:
     "@electron/get" "^2.0.0"
     "@types/node" "^22.7.7"
@@ -6038,6 +6070,11 @@ is-docker@^2.0.0:
   resolved "https://registry.yarnpkg.com/is-docker/-/is-docker-2.2.1.tgz#33eeabe23cfe86f14bde4408a02c0cfb853acdaa"
   integrity sha512-F+i2BKsFrH66iaUFc0woD8sLy8getkwTwtOBjvs56Cx4CgJDeKQeqfz8wAYiSb8JOprWhHH5p77PbmYCvvUuXQ==
 
+is-electron-renderer@^2.0.0:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/is-electron-renderer/-/is-electron-renderer-2.0.1.tgz#a469d056f975697c58c98c6023eb0aa79af895a2"
+  integrity sha512-pRlQnpaCFhDVPtkXkP+g9Ybv/CjbiQDjnKFQTEjpBfDKeV6dRDBczuFRDpM6DVfk2EjpMS8t5kwE5jPnqYl3zA==
+
 is-extglob@^2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/is-extglob/-/is-extglob-2.1.1.tgz#a88c02535791f02ed37c76a1b9ea9773c833f8c2"
@@ -6244,6 +6281,11 @@ isexe@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/isexe/-/isexe-2.0.0.tgz#e8fbf374dc556ff8947a10dcb0572d633f2cfa10"
   integrity sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==
+
+isexe@^3.1.1:
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/isexe/-/isexe-3.1.1.tgz#4a407e2bd78ddfb14bea0c27c6f7072dde775f0d"
+  integrity sha512-LpB/54B+/2J5hqQ7imZHfdU31OlgQqx7ZicVlkm9kzg9/w8GKLEcFfJl/t7DCEDueOyBAD6zCCwTO6Fzs0NoEQ==
 
 isobject@^3.0.1:
   version "3.0.1"
@@ -7445,7 +7487,7 @@ mkdirp@^3.0.1:
   resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-3.0.1.tgz#e44e4c5607fb279c168241713cc6e0fea9adcb50"
   integrity sha512-+NsyUUAZDmo6YVHzL/stxSu3t9YS1iljliy3BSDrXJ/dkn1KYdmtZODGGjLcc9XLgVVpH4KshHB8XmZgMhaBXg==
 
-mocha@^11.1.0:
+mocha@^11.0.1, mocha@^11.1.0:
   version "11.7.4"
   resolved "https://registry.yarnpkg.com/mocha/-/mocha-11.7.4.tgz#f161b17aeccb0762484b33bdb3f7ab9410ba5c82"
   integrity sha512-1jYAaY8x0kAZ0XszLWu14pzsf4KV740Gld4HXkhNTXwcHx4AUEDkPzgEHg9CM5dVcW+zv036tjpsEbLraPJj4w==
@@ -9927,6 +9969,13 @@ which@^2.0.1, which@^2.0.2:
   integrity sha512-BLI3Tl1TW3Pvl70l3yq3Y64i+awpwXqsGBYWkkqMtnbXgrMD+yj7rhW0kuEDxzJaYXGjEW5ogapKNMEKNMjibA==
   dependencies:
     isexe "^2.0.0"
+
+which@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/which/-/which-5.0.0.tgz#d93f2d93f79834d4363c7d0c23e00d07c466c8d6"
+  integrity sha512-JEdGzHwwkrbWoGOlIHqQ5gtprKGOenpDHpxE9zVR1bWbOtYRyPPHMe9FaP6x61CmNaTThSkb0DAJte5jD+DmzQ==
+  dependencies:
+    isexe "^3.1.1"
 
 widest-line@^3.1.0:
   version "3.1.0"

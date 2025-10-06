@@ -1,0 +1,27 @@
+{
+  "name": "@greenlight/authentication",
+  "version": "0.1.0",
+  "dependencies": {
+    "xal-node": "^1.1.2"
+  },
+  "license": "MIT",
+  "main": "dist/index.js",
+  "scripts": {
+    "start": "yarn build && electron dist/example/run.js",
+    "build": "tsc --build",
+    "clean": "rm -rf dist/",
+    "test": "yarn build && electron-mocha tests/**.ts tests/**/*.ts"
+  },
+  "devDependencies": {
+    "@types/chai": "^5.2.2",
+    "@types/debug": "^4.1.12",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^22.14.1",
+    "chai": "^5.2.0",
+    "electron": "^38.2.1",
+    "electron-mocha": "^13.1.0",
+    "mocha": "^11.1.0",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.3"
+  }
+}

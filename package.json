@@ -11,11 +11,13 @@
     "desktop": "yarn workspace greenlight-desktop",
     "docs": "yarn workspace @greenlight/docs",
     "logger": "yarn workspace @greenlight/logger",
+    "authentication": "yarn workspace @greenlight/authentication",
     "platform": "yarn workspace @greenlight/platform",
     "test": "yarn logger test"
   },
   "workspaces": [
     "packages/logger",
+    "packages/authentication",
     "packages/platform",
     "packages/desktop",
     "packages/docs"

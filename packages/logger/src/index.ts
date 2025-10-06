@@ -35,7 +35,7 @@ export default class Logger {
         return logLine
     }
 
-    warning(...args:any[]) {
+    warn(...args:any[]) {
         args = this.logEncoder(...args)
         const logLine = this._sink.addLog('\x1b[33m'+"[WARNING]"+'\x1b[0m '+args.join(" "))
         if(this._enableStdout === true) {
