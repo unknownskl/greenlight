@@ -1,3 +1,4 @@
+import Stream from 'xbox-xcloud-player/dist/lib/stream';
 import Application from '../application'
 import xCloudApi, { playResult } from './xcloudapi'
 
@@ -39,16 +40,17 @@ export default class StreamManager {
 
     startStream(type:string|'home'|'cloud', target){
         return new Promise((resolve, reject) => {
-            this.getApi(type).startStream(target).then((playResult:playResult) => {
+            this.getApi(type).startStream(target).then((playResult:Stream) => {
             // this._application._xCloudApi.startStream(type, target).then((playResult) => {
                 console.log('Streammanager - startStream:', playResult)
 
-                const sessionId = playResult.sessionPath.split('/')[3]
+                const sessionId = playResult.getSessionId()
+                const sessionPath = playResult.getSessionPath()
 
                 const streamSession:streamSession = {
                     id: sessionId,
                     target: target,
-                    path: playResult.sessionPath,
+                    path: sessionPath,
                     type: type,
                     playerState: 'pending',
                 }

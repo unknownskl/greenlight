@@ -2,6 +2,8 @@ import https from 'https'
 import Application from '../application'
 import { Address6 } from 'ip-address'
 
+import xCloudPlayer from 'xbox-xcloud-player'
+
 export interface playResult {
     sessionPath:string;
     sessionId?:string;
@@ -23,6 +25,7 @@ export default class xCloudApi {
     _host:string
     _token:string
     _type:'home'|'cloud'
+    _apiClient:InstanceType<typeof xCloudPlayer.ApiClient>
 
     _sessionPath:string
 
@@ -35,6 +38,13 @@ export default class xCloudApi {
         this._host = host
         this._token = token
         this._type = type
+
+        this._apiClient = new xCloudPlayer.ApiClient({
+            token: this._token,
+            host: 'https://'+this._host,
+            force_1080p: this._application._store.get('force_1080p_streams', true),
+            locale: this._application._store.get('preferred_game_language', 'en-US'),
+        })
     }
 
     get(url: string, method = 'GET') {
@@ -148,7 +158,7 @@ export default class xCloudApi {
     }
 
     getWaitingTimes(titleId){
-        return this.get('/v1/waittime/'+titleId)
+        return this._apiClient.get('/v1/waittime/'+titleId)
     }
 
     getTitles() {
@@ -160,74 +170,19 @@ export default class xCloudApi {
     }
 
     stopStream(sessionId) {
-        return this.get('/v5/sessions/'+this._type+'/'+sessionId, 'DELETE')
+        return this._apiClient.delete('/v5/sessions/'+this._type+'/'+sessionId, sessionId)
     }
 
     startStream(target:string){
-        const deviceInfo = JSON.stringify({
-            'appInfo': {
-                'env': {
-                    'clientAppId': 'Microsoft.GamingApp',
-                    'clientAppType': 'native',
-                    'clientAppVersion': '2203.1001.4.0',
-                    'clientSdkVersion': '8.5.2',
-                    'httpEnvironment': 'prod',
-                    'sdkInstallId': '',
-                },
-            },
-            'dev': {
-                'hw': {
-                    'make': 'Microsoft',
-                    'model': 'Surface Pro',
-                    'sdktype': 'native',
-                },
-                'os': {
-                    'name': 'Windows 11',
-                    'ver': '22631.2715',
-                    'platform': 'desktop',
-                },
-                'displayInfo': {
-                    'dimensions': {
-                        'widthInPixels': 1920,
-                        'heightInPixels': 1080,
-                    },
-                    'pixelDensity': {
-                        'dpiX': 1,
-                        'dpiY': 1,
-                    },
-                },
-            },
-        })
-
-        const postData = {
-            'titleId': (this._type === 'cloud') ? target : '',
-            'systemUpdateGroup': '',
-            'clientSessionId': '',
-            'settings': {
-                'nanoVersion': 'V3;WebrtcTransport.dll',
-                'enableTextToSpeech': false,
-                'highContrast': 0,
-                'locale': this._application._store.get('preferred_game_language', 'en-US'),
-                'useIceConnection': false,
-                'timezoneOffsetMinutes': 120,
-                'sdkType': 'web',
-                'osName': 'windows',
-            },
-            'serverId': (this._type === 'home') ? target : '',
-            'fallbackRegionNames': [],
-        }
-
-        return this.post('/v5/sessions/'+this._type+'/play', postData, {
-            'X-MS-Device-Info': deviceInfo,
-            // 'User-Agent': deviceInfo
-        })
+        return this._apiClient.startStream(this._type, target)
     }
 
     getStreamState(sessionId:string) {
-        return this.get('/v5/sessions/'+this._type+'/'+sessionId+'/state')
+        return this._apiClient.get('/v5/sessions/'+this._type+'/'+sessionId+'/state')
     }
 
     sendSdp(sessionId:string, sdp: string){
+        // return this._apiClient.sendSdp(sessionId, sdp)
         return new Promise((resolve, reject) => {
             const postData = {
                 'messageType':'offer',
@@ -358,16 +313,16 @@ export default class xCloudApi {
     }
 
     sendMSALAuth(sessionId:string, userToken:string){
-        return this.post('/v5/sessions/'+this._type+'/'+sessionId+'/connect', {
+        return this._apiClient.post('/v5/sessions/'+this._type+'/'+sessionId+'/connect', {
             'userToken': userToken,
         })
     }
 
     sendKeepalive(sessionId:string){
-        return this.post('/v5/sessions/'+this._type+'/'+sessionId+'/keepalive')
+        return this._apiClient.post('/v5/sessions/'+this._type+'/'+sessionId+'/keepalive', {})
     }
 
     getActiveSessions(){
-        return this.get('/v5/sessions/'+this._type+'/active')
+        return this._apiClient.get('/v5/sessions/'+this._type+'/active')
     }
 }
