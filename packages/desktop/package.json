@@ -42,7 +42,7 @@
     "@types/i18next": "^12.1.0",
     "@types/react-i18next": "^8.1.0",
     "i18next": "^25.5.2",
-    "react-i18next": "^16.2.4"
+    "react-i18next": "^16.3.3"
   },
   "devDependencies": {
     "@babel/core": "^7.26.10",
@@ -51,7 +51,7 @@
     "@fortawesome/fontawesome-free": "^6.7.2",
     "@next/eslint-plugin-next": "^15.5.4",
     "@types/node": "^22.14.1",
-    "@types/react": "^19.2.2",
+    "@types/react": "^19.2.5",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "babel-loader": "^10.0.0",
     "electron": "38.2.0",
