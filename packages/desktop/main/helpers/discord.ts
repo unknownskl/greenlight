@@ -4,7 +4,7 @@ import Application from '../application'
 export default class DiscordManager {
     private _application: Application
     private _rpc: DiscordRPC.Client | null = null
-    private _clientId: string = '1322567936162598973' // Replace with your Discord Client ID
+    private _clientId: string = '' // Replace with your Discord Client ID
     private _isConnected: boolean = false
 
     constructor(application: Application) {
