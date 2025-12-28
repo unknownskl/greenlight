@@ -16,4 +16,4 @@ To use your own Discord Application ID:
 
 ## Credits
 
-Original project: [Greenlight](https://github.com/unknownproject/greenlight)
+Original project: [Greenlight](https://github.com/unknownskl/greenlight)
