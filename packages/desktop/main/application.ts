@@ -2,7 +2,7 @@ import { app as ElectronApp, BrowserWindow, dialog } from 'electron'
 import serve from 'electron-serve'
 import Store from 'electron-store'
 import Debug from 'debug'
-import { createWindow, xboxWorker, updater } from './helpers'
+import { createWindow, xboxWorker, updater, DiscordManager } from './helpers'
 import Authentication from './authentication'
 import Ipc from './ipc'
 import WebUI from './webui'
@@ -15,8 +15,8 @@ import pkg from '../package.json'
 import i18n from 'i18next';
 
 interface startupFlags {
-    fullscreen:boolean;
-    autoStream:string;
+    fullscreen: boolean;
+    autoStream: string;
 }
 
 export default class Application {
@@ -28,21 +28,22 @@ export default class Application {
         autoStream: '',
     }
 
-    public _isProduction:boolean = (process.env.NODE_ENV === 'production')
-    private _isCi:boolean = (process.env.CI !== undefined)
-    private _isMac:boolean = (process.platform === 'darwin')
-    private _isWindows:boolean = (process.platform === 'win32')
-    private _isQuitting:boolean = false
+    public _isProduction: boolean = (process.env.NODE_ENV === 'production')
+    private _isCi: boolean = (process.env.CI !== undefined)
+    private _isMac: boolean = (process.platform === 'darwin')
+    private _isWindows: boolean = (process.platform === 'win32')
+    private _isQuitting: boolean = false
 
     public _mainWindow
-    public _ipc:Ipc
-    public _webUI:WebUI
-    public _authentication:Authentication
+    public _ipc: Ipc
+    public _webUI: WebUI
+    public _authentication: Authentication
+    public _discord: DiscordManager
 
     private t = i18n.t.bind(i18n);
 
-    constructor(){
-        console.log(__filename+'[constructor()] Starting Greenlight v'+pkg.version)
+    constructor() {
+        console.log(__filename + '[constructor()] Starting Greenlight v' + pkg.version)
         this._log = Debug('greenlight')
 
         ElectronApp.commandLine.appendSwitch('use-vulkan')
@@ -64,49 +65,50 @@ export default class Application {
 
         this._ipc = new Ipc(this)
         this._authentication = new Authentication(this)
+        this._discord = new DiscordManager(this)
 
         this._ipc.startUp()
         this._webUI = new WebUI(this)
     }
 
-    log(namespace = 'application', ...args){
+    log(namespace = 'application', ...args) {
         this._log.extend(namespace)(...args)
     }
 
-    getStartupFlags(){
+    getStartupFlags() {
         return this._startupFlags
     }
 
-    resetAutostream(){
+    resetAutostream() {
         this._startupFlags.autoStream = ''
     }
 
-    readStartupFlags(){
-        this.log('application', __filename+'[readStartupFlags()] Program args detected:', process.argv)
+    readStartupFlags() {
+        this.log('application', __filename + '[readStartupFlags()] Program args detected:', process.argv)
 
-        for(const arg in process.argv){
-            if(process.argv[arg].includes('--fullscreen')){
-                this.log('application', __filename+'[readStartupFlags()] --fullscreen switch found. Setting fullscreen to true')
+        for (const arg in process.argv) {
+            if (process.argv[arg].includes('--fullscreen')) {
+                this.log('application', __filename + '[readStartupFlags()] --fullscreen switch found. Setting fullscreen to true')
                 this._startupFlags.fullscreen = true
             }
 
-            if(process.argv[arg].includes('--connect=')){
+            if (process.argv[arg].includes('--connect=')) {
                 const key = process.argv[arg].substring(10)
 
-                this.log('application', __filename+'[readStartupFlags()] --connect switch found. Setting autoStream to', key)
+                this.log('application', __filename + '[readStartupFlags()] --connect switch found. Setting autoStream to', key)
                 this._startupFlags.autoStream = key
             }
         }
 
-        this.log('application', __filename+'[readStartupFlags()] End result of startupFlags:', this._startupFlags)
+        this.log('application', __filename + '[readStartupFlags()] End result of startupFlags:', this._startupFlags)
     }
 
-    loadApplicationDefaults(){
-        if(this._isProduction === true && this._isCi === false) {
+    loadApplicationDefaults() {
+        if (this._isProduction === true && this._isCi === false) {
             serve({ directory: 'app' })
 
-        } else if(this._isCi === true) {
-            const random = Math.random()*100
+        } else if (this._isCi === true) {
+            const random = Math.random() * 100
             ElectronApp.setPath('userData', `${ElectronApp.getPath('userData')} (${random})`)
             ElectronApp.setPath('sessionData', `${ElectronApp.getPath('userData')} (${random})`)
             this._store.delete('user')
@@ -125,25 +127,27 @@ export default class Application {
                 prereleases: (ElectronApp.getVersion().includes('beta')) ? true : false,
             }, this)
 
-            this.log('electron', __filename+'[loadApplicationDefaults()] Electron has been fully loaded. Ready to open windows')
+            this.log('electron', __filename + '[loadApplicationDefaults()] Electron has been fully loaded. Ready to open windows')
 
             this.openMainWindow()
 
+            this._discord.connect()
+
             // Check authentication
-            if(! this._authentication.checkAuthentication()){
+            if (!this._authentication.checkAuthentication()) {
                 this._authentication.startAuthflow()
             }
 
         }).catch((error) => {
-            this.log('electron', __filename+'[loadApplicationDefaults()] Electron has failed to load:', error)
+            this.log('electron', __filename + '[loadApplicationDefaults()] Electron has failed to load:', error)
         })
 
         ElectronApp.on('window-all-closed', () => {
-            if(this._isMac === true){
-                this.log('electron', __filename+'[loadApplicationDefaults()] Electron detected that all windows are closed. Running in background...')
+            if (this._isMac === true) {
+                this.log('electron', __filename + '[loadApplicationDefaults()] Electron detected that all windows are closed. Running in background...')
 
             } else {
-                this.log('electron', __filename+'[loadApplicationDefaults()] Electron detected that all windows are closed. Quitting app...')
+                this.log('electron', __filename + '[loadApplicationDefaults()] Electron detected that all windows are closed. Quitting app...')
                 ElectronApp.quit()
             }
         })
@@ -154,18 +158,18 @@ export default class Application {
         ElectronApp.on('before-quit', () => this._isQuitting = true)
     }
 
-    _webApi:xboxWebApi
-    _xHomeApi:xCloudApi
-    _xCloudApi:xCloudApi
-    _xboxWorker:xboxWorker
+    _webApi: xboxWebApi
+    _xHomeApi: xCloudApi
+    _xCloudApi: xCloudApi
+    _xboxWorker: xboxWorker
 
 
-    authenticationCompleted(streamingTokens, webToken){
-        this.log('electron', __filename+'[authenticationCompleted()] authenticationCompleted called')
+    authenticationCompleted(streamingTokens, webToken) {
+        this.log('electron', __filename + '[authenticationCompleted()] authenticationCompleted called')
         // const tokens = this._authentication._tokens
         this._xHomeApi = new xCloudApi(this, streamingTokens.xHomeToken.data.offeringSettings.regions.find(region => region.isDefault).baseUri.substring(8), streamingTokens.xHomeToken.data.gsToken, 'home')
 
-        if(streamingTokens.xCloudToken !== undefined){
+        if (streamingTokens.xCloudToken !== undefined) {
             this._xCloudApi = new xCloudApi(this, streamingTokens.xCloudToken.data.offeringSettings.regions.find(region => region.isDefault).baseUri.substring(8), streamingTokens.xCloudToken.data.gsToken, 'cloud')
         }
 
@@ -178,16 +182,16 @@ export default class Application {
         this._authentication._isAuthenticated = true
 
         this._webApi.providers.profile.get('/users/me/profile/settings?settings=GameDisplayName,GameDisplayPicRaw,Gamerscore,Gamertag').then((result) => {
-            if(result.data.profileUsers.length > 0) {
-                for(const setting in result.data.profileUsers[0].settings){
+            if (result.data.profileUsers.length > 0) {
+                for (const setting in result.data.profileUsers[0].settings) {
 
-                    if(result.data.profileUsers[0].settings[setting].id === 'Gamertag'){
+                    if (result.data.profileUsers[0].settings[setting].id === 'Gamertag') {
                         this._store.set('user.gamertag', result.data.profileUsers[0].settings[setting].value)
 
-                    } else if(result.data.profileUsers[0].settings[setting].id === 'GameDisplayPicRaw'){
+                    } else if (result.data.profileUsers[0].settings[setting].id === 'GameDisplayPicRaw') {
                         this._store.set('user.gamerpic', result.data.profileUsers[0].settings[setting].value)
 
-                    } else if(result.data.profileUsers[0].settings[setting].id === 'Gamerscore'){
+                    } else if (result.data.profileUsers[0].settings[setting].id === 'Gamerscore') {
                         this._store.set('user.gamerscore', result.data.profileUsers[0].settings[setting].value)
                     }
                 }
@@ -198,7 +202,7 @@ export default class Application {
             this._ipc.onUserLoaded()
 
         }).catch((error) => {
-            this.log('electron', __filename+'[authenticationCompleted()] Failed to retrieve user profile:', error)
+            this.log('electron', __filename + '[authenticationCompleted()] Failed to retrieve user profile:', error)
             dialog.showMessageBox({
                 message: this.t('errors.failedToRetrieveUserProfile') + JSON.stringify(error),
                 type: 'error',
@@ -206,14 +210,14 @@ export default class Application {
         })
     }
 
-    openMainWindow(){
-        this.log('electron', __filename+'[openMainWindow()] Creating new main window')
+    openMainWindow() {
+        this.log('electron', __filename + '[openMainWindow()] Creating new main window')
 
-        const windowOptions:any = {
+        const windowOptions: any = {
             title: 'Greenlight',
             backgroundColor: 'rgb(26, 27, 30)',
         }
-        if(this._startupFlags.fullscreen === true){
+        if (this._startupFlags.fullscreen === true) {
             windowOptions.fullscreen = true
         }
 
@@ -224,16 +228,16 @@ export default class Application {
         })
 
         this._mainWindow.on('show', () => {
-            this.log('electron', __filename+'[openMainWindow()] Showing Main window.')
+            this.log('electron', __filename + '[openMainWindow()] Showing Main window.')
         })
 
         this._mainWindow.on('close', (event) => {
-            if(this._isMac === true && this._isQuitting === false){
+            if (this._isMac === true && this._isQuitting === false) {
                 event.preventDefault()
-                this.log('electron', __filename+'[openMainWindow()] Main window has been hidden')
+                this.log('electron', __filename + '[openMainWindow()] Main window has been hidden')
                 this._mainWindow.hide()
             } else {
-                this.log('electron', __filename+'[openMainWindow()] Main window has been closed')
+                this.log('electron', __filename + '[openMainWindow()] Main window has been closed')
                 this._mainWindow = undefined
             }
         })
@@ -244,7 +248,7 @@ export default class Application {
             const port = process.argv[2] || 3000
             this._mainWindow.loadURL(`http://localhost:${port}/home`)
 
-            if(this._isCi !== true){
+            if (this._isCi !== true) {
                 this._mainWindow.webContents.openDevTools()
                 this.openGPUWindow()
             }
@@ -253,7 +257,7 @@ export default class Application {
 
     _gpuWindow
 
-    openGPUWindow(){
+    openGPUWindow() {
         this._gpuWindow = new BrowserWindow({
             width: 800,
             height: 600,
@@ -266,11 +270,11 @@ export default class Application {
         this._gpuWindow.webContents.openDevTools()
     }
 
-    quit(){
+    quit() {
         ElectronApp.quit()
     }
 
-    restart(){
+    restart() {
         this.quit()
         ElectronApp.relaunch()
     }

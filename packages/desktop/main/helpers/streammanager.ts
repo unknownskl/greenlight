@@ -5,10 +5,10 @@ interface streamSession {
     id: string;
     target: string;
     path: string;
-    type: string|'home'|'cloud';
+    type: string | 'home' | 'cloud';
     state?: string;
     waitingTimes?: any;
-    playerState: string|'pending'|'started'|'queued'|'failed';
+    playerState: string | 'pending' | 'started' | 'queued' | 'failed';
     errorDetails?: {
         code;
         message;
@@ -17,35 +17,35 @@ interface streamSession {
 
 export default class StreamManager {
 
-    _application:Application
+    _application: Application
 
     _sessions = {}
-    
-    constructor(application){
+
+    constructor(application) {
         this._application = application
     }
 
-    getApi(type):xCloudApi{
-        if(type === 'home'){
+    getApi(type): xCloudApi {
+        if (type === 'home') {
             return this._application._xHomeApi
         } else {
             return this._application._xCloudApi
         }
     }
 
-    getSession(sessionId:string):streamSession {
+    getSession(sessionId: string): streamSession {
         return this._sessions[sessionId]
     }
 
-    startStream(type:string|'home'|'cloud', target){
+    startStream(type: string | 'home' | 'cloud', target) {
         return new Promise((resolve, reject) => {
-            this.getApi(type).startStream(target).then((playResult:playResult) => {
-            // this._application._xCloudApi.startStream(type, target).then((playResult) => {
+            this.getApi(type).startStream(target).then((playResult: playResult) => {
+                // this._application._xCloudApi.startStream(type, target).then((playResult) => {
                 console.log('Streammanager - startStream:', playResult)
 
                 const sessionId = playResult.sessionPath.split('/')[3]
 
-                const streamSession:streamSession = {
+                const streamSession: streamSession = {
                     id: sessionId,
                     target: target,
                     path: playResult.sessionPath,
@@ -55,6 +55,8 @@ export default class StreamManager {
                 this._sessions[sessionId] = streamSession
                 this.monitorSession(sessionId)
 
+                this._application._discord.setStreamingPresence(type, target)
+
                 resolve(sessionId)
             }).catch((error) => {
                 reject(error)
@@ -62,11 +64,11 @@ export default class StreamManager {
         })
     }
 
-    stopStream(sessionId){
+    stopStream(sessionId) {
         return new Promise((resolve, reject) => {
             const session = this.getSession(sessionId)
-            if(session === undefined){
-                reject('Session not found: '+sessionId)
+            if (session === undefined) {
+                reject('Session not found: ' + sessionId)
                 return
             }
 
@@ -75,6 +77,8 @@ export default class StreamManager {
                 delete this._sessions[sessionId]
                 console.log('new sessions:', this._sessions)
 
+                this._application._discord.setIdlePresence()
+
                 resolve(result)
             }).catch((error) => {
                 reject(error)
@@ -82,11 +86,11 @@ export default class StreamManager {
         })
     }
 
-    sendSdp(sessionId:string, sdp:any){
+    sendSdp(sessionId: string, sdp: any) {
         return new Promise((resolve, reject) => {
             const session = this.getSession(sessionId)
-            if(session === undefined){
-                reject('Session not found: '+sessionId)
+            if (session === undefined) {
+                reject('Session not found: ' + sessionId)
                 return
             }
 
@@ -99,11 +103,11 @@ export default class StreamManager {
         })
     }
 
-    sendChatSdp(sessionId:string, sdp:any){
+    sendChatSdp(sessionId: string, sdp: any) {
         return new Promise((resolve, reject) => {
             const session = this.getSession(sessionId)
-            if(session === undefined){
-                reject('Session not found: '+sessionId)
+            if (session === undefined) {
+                reject('Session not found: ' + sessionId)
                 return
             }
 
@@ -116,11 +120,11 @@ export default class StreamManager {
         })
     }
 
-    sendIce(sessionId:string, ice:any){
+    sendIce(sessionId: string, ice: any) {
         return new Promise((resolve, reject) => {
             const session = this.getSession(sessionId)
-            if(session === undefined){
-                reject('Session not found: '+sessionId)
+            if (session === undefined) {
+                reject('Session not found: ' + sessionId)
                 return
             }
 
@@ -133,11 +137,11 @@ export default class StreamManager {
         })
     }
 
-    sendKeepalive(sessionId:string){
+    sendKeepalive(sessionId: string) {
         return new Promise((resolve, reject) => {
             const session = this.getSession(sessionId)
-            if(session === undefined){
-                reject('Session not found: '+sessionId)
+            if (session === undefined) {
+                reject('Session not found: ' + sessionId)
                 return
             }
 
@@ -149,28 +153,28 @@ export default class StreamManager {
         })
     }
 
-    monitorSession(sessionId){
+    monitorSession(sessionId) {
         setTimeout(() => {
-            this._application.log('StreamManager', 'monitorSession('+sessionId+') checking state')
+            this._application.log('StreamManager', 'monitorSession(' + sessionId + ') checking state')
 
             const session = this.getSession(sessionId)
-            if(session === undefined){
-                this._application.log('StreamManager', 'monitorSession('+sessionId+') session not found')
+            if (session === undefined) {
+                this._application.log('StreamManager', 'monitorSession(' + sessionId + ') session not found')
                 return
             }
-            this.getApi(this.getSession(sessionId).type).getStreamState(sessionId).then((result:any) => {
+            this.getApi(this.getSession(sessionId).type).getStreamState(sessionId).then((result: any) => {
                 console.log('Streammanager - state:', result)
 
                 this.getSession(sessionId).state = result.state
 
-                if(result.state === 'Provisioned'){
+                if (result.state === 'Provisioned') {
                     this.getSession(sessionId).playerState = 'started'
 
-                } else if(result.state === 'Provisioning'){
+                } else if (result.state === 'Provisioning') {
                     // Lets loop again
                     this.monitorSession(sessionId)
 
-                } else if(result.state === 'ReadyToConnect'){
+                } else if (result.state === 'ReadyToConnect') {
                     // Do MSAL Auth
                     // @TODO: Refresh token if expired?
                     this._application._authentication._msal.getMsalToken().then((msalToken) => {
@@ -179,38 +183,38 @@ export default class StreamManager {
 
                         }).catch((error) => {
                             console.log('MSAL AUTH Error:', error)
-                            alert('MSAL AUTH Error:'+ error)
+                            alert('MSAL AUTH Error:' + error)
                         })
                     }).catch((error) => {
                         console.log('MSAL AUTH Error:', error)
-                        alert('MSAL AUTH Error:'+ error)
+                        alert('MSAL AUTH Error:' + error)
                     })
 
-                } else if(result.state === 'WaitingForResources'){
+                } else if (result.state === 'WaitingForResources') {
                     // Do Queue logic
-                    if(this.getSession(sessionId).waitingTimes === undefined){
+                    if (this.getSession(sessionId).waitingTimes === undefined) {
                         this.getApi(this.getSession(sessionId).type).getWaitingTimes(this.getSession(sessionId).target).then((waitingTimes) => {
                             this.getSession(sessionId).waitingTimes = waitingTimes
                             this.getSession(sessionId).playerState = 'queued'
 
                         })
                     }
-                    
+
                     this.monitorSession(sessionId)
 
-                } else if(result.state === 'Failed'){
+                } else if (result.state === 'Failed') {
                     this.getSession(sessionId).errorDetails = result.errorDetails
                     this.getSession(sessionId).playerState = 'failed'
 
                 } else {
-                    
+
                     console.log('Unknown state:', result)
                 }
 
             }).catch((error) => {
                 console.log('Streammanager - error checking state:', sessionId, error)
 
-                if(error.status === 404){
+                if (error.status === 404) {
                     this._application.log('StreamManager', 'Session not found on server. Removing session...')
                     delete this._sessions[sessionId]
                 } else {
@@ -220,7 +224,7 @@ export default class StreamManager {
         }, 1000)
     }
 
-    getActiveSessions(){
+    getActiveSessions() {
         return new Promise((resolve, reject) => {
             this.getApi('cloud').getActiveSessions().then((result) => {
 
