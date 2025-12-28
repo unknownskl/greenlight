@@ -4,7 +4,7 @@ import Application from '../application'
 export default class DiscordManager {
     private _application: Application
     private _rpc: DiscordRPC.Client | null = null
-    private _clientId: string = '' // Replace with your Discord Client ID
+    private _clientId: string = 'REPLACE THIS BROSKI' // Replace with your Discord Client ID
     private _isConnected: boolean = false
 
     constructor(application: Application) {
@@ -49,13 +49,16 @@ export default class DiscordManager {
 
         const details = type === 'home' ? 'Streaming from Console' : 'Streaming from xCloud'
         const titleName = this.getTitleName(type, target)
+        const titleImage = this.getTitleImage(type, target)
 
         this._rpc.setActivity({
             details: details,
             state: `Playing ${titleName}`,
             startTimestamp: new Date(),
-            largeImageKey: 'logo',
-            largeImageText: 'Greenlight',
+            largeImageKey: titleImage,
+            largeImageText: titleName,
+            smallImageKey: 'logo',
+            smallImageText: 'Greenlight',
             instance: true,
         }).catch((err) => {
             this._application.log('DiscordRPC', 'Failed to set streaming activity:', err.message)
@@ -69,6 +72,15 @@ export default class DiscordManager {
         } else {
             const title = this._application._ipc._channels.xCloud._titleManager.findTitle(target)
             return title && title.catalogDetails ? title.catalogDetails.ProductTitle : target
+        }
+    }
+
+    private getTitleImage(type: string, target: string): string {
+        if (type === 'home') {
+            return 'logo'
+        } else {
+            const title = this._application._ipc._channels.xCloud._titleManager.findTitle(target)
+            return (title && title.catalogDetails && title.catalogDetails.Image_Tile) ? 'https:' + title.catalogDetails.Image_Tile.URL : 'logo'
         }
     }
 
