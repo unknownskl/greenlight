@@ -2,7 +2,7 @@
   "name": "@greenlight/platform",
   "version": "0.1.0",
   "dependencies": {
-    "@trpc/server": "^10.45.3",
+    "@trpc/server": "^11.8.1",
     "xal-node": "^1.1.5",
     "xbox-webapi": "2.0.0-beta4",
     "zod": "^4.3.5"

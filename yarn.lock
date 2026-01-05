@@ -2542,10 +2542,10 @@
   resolved "https://registry.yarnpkg.com/@tootallnate/once/-/once-2.0.0.tgz#f544a148d3ab35801c1f633a7441fd87c2e484bf"
   integrity sha512-XCuKFP5PS55gnMVu3dty8KPatLqUoy/ZYzDzAGCQ8JNFCkLXzmI7vNHCR+XpbZaMWQK/vQubr7PkYq8g470J/A==
 
-"@trpc/server@^10.45.3":
-  version "10.45.3"
-  resolved "https://registry.yarnpkg.com/@trpc/server/-/server-10.45.3.tgz#4f9fc58c5aafeca1f041ffd39113517f16eef2f6"
-  integrity sha512-CVZM42FdGwqYQxV7vSRwb//AF8REfV60S/fUnwx7xqCnnSDus0FW/UuAOW4eQJ30RQlOPy4MYU8B3dbTAx85Ew==
+"@trpc/server@^11.8.1":
+  version "11.8.1"
+  resolved "https://registry.yarnpkg.com/@trpc/server/-/server-11.8.1.tgz#0850e511497630bdf4c720ae10a71ddd66966d7e"
+  integrity sha512-P4rzZRpEL7zDFgjxK65IdyH0e41FMFfTkQkuq0BA5tKcr7E6v9/v38DEklCpoDN6sPiB1Sigy/PUEzHENhswDA==
 
 "@ts-morph/common@~0.28.1":
   version "0.28.1"
