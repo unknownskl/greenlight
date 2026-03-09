@@ -9,10 +9,10 @@
     "postinstall2": "fumadocs-mdx"
   },
   "dependencies": {
-    "fumadocs-core": "^16.6.9",
+    "fumadocs-core": "^16.6.12",
     "fumadocs-mdx": "^14.2.9",
     "fumadocs-typescript": "^5.1.5",
-    "fumadocs-ui": "^16.6.9",
+    "fumadocs-ui": "^16.6.12",
     "next": "^16.1.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4"
