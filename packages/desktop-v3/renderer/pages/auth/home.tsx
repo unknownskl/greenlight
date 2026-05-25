@@ -57,16 +57,15 @@ export default function HomePage() {
                     <p className="text-white/40 text-sm">Login with your xbox account to continue</p>
 
                     <div className="flex mt-10">
-                      <div className="w-64 flex-auto">
+                      <div className="w-64 flex-auto content-center">
                         <p id="login-message">{ authFlow?.message || 'Retrieving login details...'}</p>
                       </div>
-                      <div className="w-64 flex-auto">
+                      <div className="w-1 border-l border-white/20"></div>
+                      <div className="w-64 flex-auto content-center justify-items-center">
                         <p className="pb-4">
                           Or scan the QR code below with your phone to sign in.
                         </p>
-                        <div className="content-center justify-items-center">
-                          { (authFlow?.verification_uri && authFlow?.user_code) ? <QRCode value={`${authFlow.verification_uri}?otc=${authFlow.user_code}`} size={100} bgColor="#0d0d0d" fgColor="#ffffff" /> : ''}
-                        </div>
+                        { (authFlow?.verification_uri && authFlow?.user_code) ? <QRCode value={`${authFlow.verification_uri}?otc=${authFlow.user_code}`} size={100} bgColor="#0d0d0d" fgColor="#ffffff" /> : ''}
                       </div>
                     </div>
 
