@@ -44,18 +44,7 @@ function getTrpcErrorMessage(error: unknown): string {
 function getQueryClient() {
     return makeQueryClient();
 }
-// function createWebsocketUrl() {
-//     let wsPort = 5050
-//     let wsHost = 'localhost'
-//     let wsProtocol = 'ws'
 
-//     if (typeof window !== "undefined") {
-//       wsPort = Number(localStorage.getItem('ws_port')) || 5050
-//       wsHost = localStorage.getItem('ws_host') || 'localhost'
-//       wsProtocol = localStorage.getItem('ws_protocol') || 'ws'
-//     }
-//     return `${wsProtocol}://${wsHost}:${wsPort}`;
-// }
 export const TrpcProviderComponent = ({ children }: { children: ReactNode }) => {
   const queryClient = getQueryClient();
   const [trpcClient] = useState(() =>
