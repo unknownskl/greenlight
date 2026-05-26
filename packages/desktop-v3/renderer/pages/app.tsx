@@ -1,8 +1,8 @@
 import React from 'react'
 
 import { useAuth } from '../contexts/AuthContext'
-import AuthHome from './auth/home'
-import AuthLoading from './auth/loading'
+import AuthHome from '../components/auth/home'
+import AuthLoading from '../components/auth/loading'
 
 export default function App({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isAuthenticating } = useAuth();

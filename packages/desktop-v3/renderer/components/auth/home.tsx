@@ -57,11 +57,11 @@ export default function HomePage() {
                     <p className="text-white/40 text-sm">Login with your xbox account to continue</p>
 
                     <div className="flex mt-10">
-                      <div className="w-64 flex-auto content-center">
+                      <div className="w-64 flex-auto content-center p-4">
                         <p id="login-message">{ authFlow?.message || 'Retrieving login details...'}</p>
                       </div>
                       <div className="w-1 border-l border-white/20"></div>
-                      <div className="w-64 flex-auto content-center justify-items-center">
+                      <div className="w-64 flex-auto content-center justify-items-center p-4">
                         <p className="pb-4">
                           Or scan the QR code below with your phone to sign in.
                         </p>
