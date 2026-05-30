@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Head from 'next/head'
 
 import QRCode from "react-qr-code";
@@ -15,25 +15,27 @@ export default function HomePage() {
   const { startAuth, verifyCode } = useAuth();
   const [authFlow, setAuthFlow] = useState<RouterOutputs["auth_msal_start"] | undefined>(undefined);
 
-  if(!authFlow){
-    // const authState = useQuery(trpc.auth_msal_start.queryOptions());
-    // const authState = await queryClient.fetchQuery(trpc.auth_msal_start.queryOptions());
-    startAuth().then(async (authState) => {
-      console.log('Authentication flow started:', authState);
-      setAuthFlow(authState)
+  useEffect(() => {
+    if(!authFlow){
+      // const authState = useQuery(trpc.auth_msal_start.queryOptions());
+      // const authState = await queryClient.fetchQuery(trpc.auth_msal_start.queryOptions());
+      startAuth().then(async (authState) => {
+        console.log('Authentication flow started:', authState);
+        setAuthFlow(authState)
 
-      if(authState) {
-        const tokens = await verifyCode(authState.device_code);
-        console.log('Device code verified, tokens:', tokens);
+        if(authState) {
+          const tokens = await verifyCode(authState.device_code);
+          console.log('Device code verified, tokens:', tokens);
 
-      } else {
-        console.error('Failed to start authentication flow');
-      }
+        } else {
+          console.error('No auth session yet, starting one...');
+        }
 
-    }).catch((error) => {
-      console.error('Failed to start authentication flow:', error);
-    });
-  }
+      }).catch((error) => {
+        console.error('Failed to start authentication flow:', error);
+      });
+    }
+  }, [authFlow, startAuth, verifyCode]);
 
   return (
     <React.Fragment>

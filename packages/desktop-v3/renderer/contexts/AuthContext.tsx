@@ -18,6 +18,7 @@ interface AuthContextType {
   };
   isAuthenticated: boolean;
   isAuthenticating: boolean;
+  hasUserTokens: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -38,10 +39,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isAuthenticating, setIsAuthenticating] = useState<boolean>(false);
+  const [hasUserTokens, setHasUserTokens] = useState<boolean>(true);
   const [hasLoadedFromStorage, setHasLoadedFromStorage] = useState<boolean>(false);
 
   // Load saved auth state from localStorage on mount
   useEffect(() => {
+    setHasUserTokens(localStorage.getItem('userToken') ? true : false);
+
     const loadAuthState = async () => {
       setIsAuthenticating(true);
       const savedUserToken = localStorage.getItem('userToken');
@@ -78,6 +82,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             //   streamingTokens: null,
             // });
             // setIsAuthenticated(false);
+
+            setHasUserTokens(false);
+            setIsAuthenticating(false);
           }
         } catch (e) {
           console.error('Failed to parse saved user token', e);
@@ -189,6 +196,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         authState,
         isAuthenticated,
         isAuthenticating,
+        hasUserTokens,
         getWebToken,
         getxHomeToken,
         getxCloudToken,

@@ -5,11 +5,12 @@ import AuthHome from '../components/auth/home'
 import AuthLoading from '../components/auth/loading'
 
 export default function App({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, isAuthenticating } = useAuth();
+  const { isAuthenticated, isAuthenticating, hasUserTokens } = useAuth();
+  console.log('Authentication status:', { isAuthenticated, isAuthenticating, hasUserTokens });
 
   return (
     <React.Fragment>
-      { !isAuthenticated ? (isAuthenticating ? <AuthLoading /> : <AuthHome />) : children}
+      { !isAuthenticated ? ((isAuthenticating || hasUserTokens) ? <AuthLoading /> : <AuthHome />) : children}
     </React.Fragment>
   )
 }
