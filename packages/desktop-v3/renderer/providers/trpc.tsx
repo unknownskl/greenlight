@@ -1,3 +1,4 @@
+'client'
 import { QueryClient, QueryClientProvider, QueryCache, MutationCache } from '@tanstack/react-query';
 import { httpBatchLink, createTRPCClient, TRPCClientError } from '@trpc/client';
 import { useState, ReactNode } from 'react';
@@ -5,7 +6,11 @@ import { TRPCProvider } from '../utils/trpc';
 import { appRouter } from '@greenlight/platform';
 import { ipcLink } from '../utils/ipc-link';
 
+import { useToast } from '../contexts/ToastContext';
+
 function makeQueryClient() {
+  const toast = useToast();
+
   return new QueryClient({
     defaultOptions: {
       queries: {
@@ -17,14 +22,14 @@ function makeQueryClient() {
     queryCache: new QueryCache({
       onError: (error) => {
         const message = getTrpcErrorMessage(error);
-        // showErrorToast(message);
+        toast.error('TRPC Error: ' + message);
         console.log("Query Error:", message);
       },
     }),
     mutationCache: new MutationCache({
       onError: (error) => {
         const message = getTrpcErrorMessage(error);
-        // showErrorToast(message);
+        toast.error('TRPC Error: ' + message);
         console.log("Mutation Error:", message);
       },
     }),
@@ -36,6 +41,7 @@ function getTrpcErrorMessage(error: unknown): string {
     return error.message;
   }
   if (error instanceof Error) {
+    console.error('Non-tRPC error:', error);
     return error.message;
   }
   return "An unknown error occurred.";
