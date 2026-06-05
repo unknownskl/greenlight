@@ -6,7 +6,6 @@ import AuthLoading from '../components/auth/loading'
 
 export default function App({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isAuthenticating, hasUserTokens } = useAuth();
-  console.log('Authentication status:', { isAuthenticated, isAuthenticating, hasUserTokens });
 
   return (
     <React.Fragment>

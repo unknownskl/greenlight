@@ -1,5 +1,6 @@
 import { useAuth } from "../contexts/AuthContext";
 import Link from 'next/link'
+import { useTranslations } from 'next-intl';
 
 import HomeIcon from '@heroicons/react/24/outline/HomeIcon'
 import CloudIcon from '@heroicons/react/24/outline/CloudIcon'
@@ -8,7 +9,7 @@ import WrenchScrewdriverIcon from '@heroicons/react/24/outline/WrenchScrewdriver
 // import StopIcon from '@heroicons/react/24/outline/StopIcon'
 
 export default function Sidebar() {
-
+  const t = useTranslations('Sidebar');
   const { authState, logout } = useAuth();
 
   function handleLogout() {
@@ -26,7 +27,7 @@ export default function Sidebar() {
                 <div className="mb-6">
                 <h2 className="text-2xl font-bold text-white mb-1">Greenlight</h2>
                 <p className="text-white/40 text-sm">{ (authState?.webToken?.data.DisplayClaims?.xui?.[0] as any)?.gtg || 'Gamertag'}</p>
-                <p className="text-white/70 text-sm"><Link href="#" onClick={handleLogout}>Logout</Link></p>
+                <p className="text-white/70 text-sm"><Link href="#" onClick={handleLogout}>{t('logout')}</Link></p>
                 </div>
             </div>
 
@@ -34,25 +35,25 @@ export default function Sidebar() {
                 <li>
                     <Link href="/home/">
                         <HomeIcon className="size-5" />
-                        Overview
+                        {t('home')}
                     </Link>
                 </li>
                 <li>
                     <Link href="/consoles/">
                         <ArrowIcon className="size-5" />
-                        My Consoles
+                        {t('myConsoles')}
                     </Link>
                 </li>
                 <li>
                     <Link href="/xcloud/" aria-disabled={true} className="cursor-not-allowed opacity-50">
                         <CloudIcon className="size-5" />
-                        xCloud
+                        {t('xcloud')}
                     </Link>
                 </li>
                 <li>
                     <Link href="/settings/" aria-disabled={true} className="cursor-not-allowed opacity-50">
                         <WrenchScrewdriverIcon className="size-5" />
-                        Settings
+                        {t('settings')}
                     </Link>
                 </li>
                 {/* <li className="bg-red-900">

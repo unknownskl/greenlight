@@ -9,44 +9,57 @@ import Sidebar from '../components/sidebar'
 
 import '../styles/globals.css'
 
+interface MessageFallbackParams {
+  namespace: string;
+  key: string;
+  error: Error;
+}
+
 function GreenlightDesktop({ Component, pageProps }: AppProps) {
 
-  const translations = require('../languages/en.json');
+  const translations = require('../languages/nl.json');
+
+  const getMessageFallback = ({ namespace, key, error}: MessageFallbackParams) => {
+    const fallbackTranslation = require('../languages/en.json');
+    console.error(`Missing translation key for ${namespace}.${key}:`, error);
+    return fallbackTranslation[namespace]?.[key] || 'MISSING_TRANSLATION('+namespace+'.'+key+')';
+  }
 
   return (
     <NextIntlClientProvider
-      locale='en'
+      locale='nl'
       timeZone="Europe/Vienna"
       messages={translations}
+      getMessageFallback={getMessageFallback}
     >
-    <ToastProvider>
-      <TrpcProviderComponent>
-        <AuthProvider>
-          <App>
-            <Head>
-              <title>Greenlight</title>
-            </Head>
-            <div className="flex h-screen bg-[#0d0d0d] bg-pattern overflow-hidden">
-              {/* Sidebar */}
-              <Sidebar />
+      <ToastProvider>
+        <TrpcProviderComponent>
+          <AuthProvider>
+            <App>
+              <Head>
+                <title>Greenlight</title>
+              </Head>
+              <div className="flex h-screen bg-[#0d0d0d] bg-pattern overflow-hidden">
+                {/* Sidebar */}
+                <Sidebar />
 
-              {/* Main content */}
-              <main className="flex-1 overflow-hidden relative">
-                {/* Ambient background glow */}
-                <div className="absolute top-0 right-0 w-96 h-96 bg-[#107C10]/3 rounded-full blur-3xl pointer-events-none" />
-                <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#107C10]/2 rounded-full blur-3xl pointer-events-none" />
+                {/* Main content */}
+                <main className="flex-1 overflow-hidden relative">
+                  {/* Ambient background glow */}
+                  <div className="absolute top-0 right-0 w-96 h-96 bg-[#107C10]/3 rounded-full blur-3xl pointer-events-none" />
+                  <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#107C10]/2 rounded-full blur-3xl pointer-events-none" />
 
-                {/* Main content area */}
+                  {/* Main content area */}
 
-                <div className="h-full overflow-y-auto">
-                  <Component {...pageProps} />
-                </div>
-              </main>
-            </div>
-          </App>
-        </AuthProvider>
-      </TrpcProviderComponent>
-    </ToastProvider>
+                  <div className="h-full overflow-y-auto">
+                    <Component {...pageProps} />
+                  </div>
+                </main>
+              </div>
+            </App>
+          </AuthProvider>
+        </TrpcProviderComponent>
+      </ToastProvider>
     </NextIntlClientProvider>
   );
 }

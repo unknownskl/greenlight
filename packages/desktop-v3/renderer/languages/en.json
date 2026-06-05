@@ -1,5 +1,26 @@
 {
-  "HomePage": {
+  "AuthHome": {
+    "title": "Authentication",
+    "authNeeded": "You need to authenticate",
+    "authNeededSubtitle": "Login with your xbox account to continue",
+    "scanQrCode": "Or scan the QR code below with your phone to sign in.",
+    "retrievingLoginDetails": "Retrieving login details. Please wait..."
+  },
+  "AuthLoading": {
+    "title": "Authenticating...",
+    "authenticating": "Authenticating...",
+    "authenticatingSubtitle": "Welcome back..."
+  },
+  "Sidebar": {
+    "logout": "Logout",
+    "home": "Home",
+    "myConsoles": "My Consoles",
+    "xcloud": "xCloud",
+    "settings": "Settings"
+  }
+
+
+  ,"HomePage": {
     "title": "Hello world!"
   }
 }

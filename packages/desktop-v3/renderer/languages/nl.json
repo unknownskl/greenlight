@@ -1,0 +1,26 @@
+{
+  "AuthHome": {
+    "title": "Authenticatie",
+    "authNeeded": "Je moet je authenticeren",
+    "authNeededSubtitle": "Log in met je Xbox-account om door te gaan",
+    "scanQrCode": "Of scan de QR-code hieronder met je telefoon om in te loggen.",
+    "retrievingLoginDetails": "Logingegevens ophalen. Even geduld..."
+  },
+  "AuthLoading": {
+    "title": "Bezig met aanmelden...",
+    "authenticating": "Bezig met aanmelden...",
+    "authenticatingSubtitle": "Welkom terug..."
+  },
+  "Sidebar": {
+    "logout": "Uitloggen",
+    "home": "Home",
+    "myConsoles": "Mijn Consoles",
+    "xcloud": "xCloud",
+    "settings": "Instellingen"
+  }
+
+
+  ,"HomePage": {
+    "title": "Hallo wereld!"
+  }
+}

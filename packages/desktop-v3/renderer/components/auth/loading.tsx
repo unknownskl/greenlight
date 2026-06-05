@@ -1,15 +1,14 @@
 import React from 'react'
 import Head from 'next/head'
-
-// import { useAuth } from '../../contexts/AuthContext';
+import { useTranslations } from 'next-intl';
 
 export default function AuthLoadingPage() {
-  // const { authState } = useAuth();
+  const t = useTranslations('AuthLoading');
 
   return (
     <React.Fragment>
       <Head>
-        <title>Greenlight Authenticating...</title>
+        <title>{'Greenlight - ' + t('title')}</title>
       </Head>
       <div className="flex h-screen bg-[#0d0d0d] bg-pattern overflow-hidden">
             {/* Main content */}
@@ -24,12 +23,9 @@ export default function AuthLoadingPage() {
                 <div className="p-6 md:p-8 max-w-5xl mx-auto">
                   {/* Header */}
                   <div className="mb-6 animate-fade-in-up">
-                    <h2 className="text-2xl font-bold text-white mb-1">Authenticating...</h2>
+                    <h2 className="text-2xl font-bold text-white mb-1">{t('authenticating')}</h2>
                     <p className="text-white/40 text-sm">
-                      Welcome back... <br />
-                      {/* userToken: { authState?.userToken ? 'Present' : 'Not present'} <br />
-                      webToken: { authState?.webToken ? 'Present' : 'Not present'} <br />
-                      streamingTokens: { authState?.streamingTokens ? 'Present' : 'Not present'} <br /> */}
+                      {t('authenticatingSubtitle')} <br />
                     </p>
                   </div>
                 </div>

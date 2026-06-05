@@ -1,24 +1,18 @@
 import React, { useState, useEffect } from 'react'
 import Head from 'next/head'
-
 import QRCode from "react-qr-code";
 
-// import { useQueryClient } from "@tanstack/react-query";
 import { RouterOutputs } from "../../utils/trpc";
 import { useAuth } from '../../contexts/AuthContext';
+import { useTranslations } from 'next-intl';
 
 export default function HomePage() {
-  // const trpc = useTRPC();
-  // const queryClient = useQueryClient();
-
-  // const { isAuthenticated, isAuthenticating, authState, startAuth } = useAuth();
   const { startAuth, verifyCode } = useAuth();
   const [authFlow, setAuthFlow] = useState<RouterOutputs["auth_msal_start"] | undefined>(undefined);
+  const t = useTranslations('AuthHome');
 
   useEffect(() => {
     if(!authFlow){
-      // const authState = useQuery(trpc.auth_msal_start.queryOptions());
-      // const authState = await queryClient.fetchQuery(trpc.auth_msal_start.queryOptions());
       startAuth().then(async (authState) => {
         console.log('Authentication flow started:', authState);
         setAuthFlow(authState)
@@ -40,7 +34,7 @@ export default function HomePage() {
   return (
     <React.Fragment>
       <Head>
-        <title>Greenlight Authentication</title>
+        <title>{'Greenlight - ' + t('title')}</title>
       </Head>
       <div className="flex h-screen bg-[#0d0d0d] bg-pattern overflow-hidden">
             {/* Main content */}
@@ -55,17 +49,17 @@ export default function HomePage() {
                 <div className="p-6 md:p-8 max-w-5xl mx-auto">
                   {/* Header */}
                   <div className="mb-6 animate-fade-in-up">
-                    <h2 className="text-2xl font-bold text-white mb-1">You need to authenticate</h2>
-                    <p className="text-white/40 text-sm">Login with your xbox account to continue</p>
+                    <h2 className="text-2xl font-bold text-white mb-1">{t('authNeeded')}</h2>
+                    <p className="text-white/40 text-sm">{t('authNeededSubtitle')}</p>
 
                     <div className="flex mt-10">
                       <div className="w-64 flex-auto content-center p-4">
-                        <p id="login-message">{ authFlow?.message || 'Retrieving login details...'}</p>
+                        <p id="login-message">{ authFlow?.message || t('retrievingLoginDetails')}</p>
                       </div>
                       <div className="w-1 border-l border-white/20"></div>
                       <div className="w-64 flex-auto content-center justify-items-center p-4">
                         <p className="pb-4">
-                          Or scan the QR code below with your phone to sign in.
+                          {t('scanQrCode')}
                         </p>
                         { (authFlow?.verification_uri && authFlow?.user_code) ? <QRCode value={`${authFlow.verification_uri}?otc=${authFlow.user_code}`} size={100} bgColor="#0d0d0d" fgColor="#ffffff" /> : ''}
                       </div>
