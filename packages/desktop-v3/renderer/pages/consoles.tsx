@@ -5,19 +5,18 @@ import Head from 'next/head'
 
 import { useQueryClient } from "@tanstack/react-query";
 import { useTRPC } from "../utils/trpc";
-// import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function HomePage() {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
-  // const { getWebToken } = useAuth();
+  const { getWebToken } = useAuth();
 
   const [consoles, setConsoles] = React.useState<any[]>([])
 
 
   if(consoles.length === 0){
-    // queryClient.fetchQuery(trpc.smartglass_consoles_list.queryOptions({ uhs: getWebToken().uhs, token: getWebToken().token }))
-    queryClient.fetchQuery(trpc.smartglass_consoles_list.queryOptions({ uhs: '', token: '' }))
+    queryClient.fetchQuery(trpc.smartglass_consoles_list.queryOptions({ uhs: getWebToken().uhs, token: getWebToken().token }))
       .then((consolesResponse) => {
         setConsoles(consolesResponse.data.result)
       })
