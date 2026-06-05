@@ -5,12 +5,12 @@ import Head from 'next/head'
 
 import { useQueryClient } from "@tanstack/react-query";
 import { useTRPC } from "../utils/trpc";
-import { useAuth } from '../contexts/AuthContext';
+// import { useAuth } from '../contexts/AuthContext';
 
 export default function HomePage() {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
-  const { getWebToken } = useAuth();
+  // const { getWebToken } = useAuth();
 
   const [consoles, setConsoles] = React.useState<any[]>([])
 

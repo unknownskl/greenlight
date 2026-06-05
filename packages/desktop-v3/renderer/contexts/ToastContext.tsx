@@ -1,5 +1,5 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { ToastContainer, toast } from 'react-toastify';
+import { createContext, useContext, ReactNode } from 'react';
+import { ToastContainer, toast, type ToastOptions } from 'react-toastify';
 
 interface ToastContextType {
   log: (message: string, title?: string) => void;
@@ -11,10 +11,9 @@ const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
 export function ToastProvider({ children }: { children: ReactNode }) {
 
-  const toastOptions = {
+  const toastOptions: ToastOptions = {
     position: 'bottom-right',
     className: 'p-0 w-[400px]',
-    bodyClassName: 'p-4 text-sm text-white',
     progressClassName: 'bg-black-600/80',
     hideProgressBar: false,
     closeButton: true,
