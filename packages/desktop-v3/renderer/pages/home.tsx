@@ -1,6 +1,7 @@
 import React from 'react'
 // import Link from 'next/link'
 // import Image from 'next/image'
+import {useTranslations} from 'next-intl';
 
 import { useQueryClient } from "@tanstack/react-query";
 import { useTRPC } from "../utils/trpc";
@@ -11,6 +12,7 @@ import { useToast } from '../contexts/ToastContext'
 export default function HomePage() {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
+  const t = useTranslations('HomePage');
 
 
 
@@ -60,8 +62,10 @@ console.log('Authentication status in _app:', { isAuthenticated, isAuthenticatin
           <button onClick={getVersion}>getVersion</button>
           <button onClick={showToast}>Show Toast</button>
 
+          <p> Translated: {t('title')}</p>
 
-          <pre>{ JSON.stringify(authState, null, 2) }</pre>
+
+          {/* <pre>{ JSON.stringify(authState, null, 2) }</pre> */}
         </div>
       </div>
     </React.Fragment>

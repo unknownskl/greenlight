@@ -25,6 +25,7 @@
     "daisyui": "^5.5.20",
     "electron-serve": "^3.0.0",
     "electron-store": "^11.0.2",
+    "next-intl": "^4.13.0",
     "react-qr-code": "^2.0.21",
     "react-toastify": "^11.1.0",
     "wrangler": "^4.92.0"

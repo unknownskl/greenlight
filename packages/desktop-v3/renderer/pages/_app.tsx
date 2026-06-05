@@ -2,6 +2,7 @@ import type { AppProps } from 'next/app'
 import { TrpcProviderComponent } from '../providers/trpc'
 import { AuthProvider } from '../contexts/AuthContext'
 import { ToastProvider } from '../contexts/ToastContext'
+import { NextIntlClientProvider } from 'next-intl';
 import App from './app'
 import Head from 'next/head'
 import Sidebar from '../components/sidebar'
@@ -10,7 +11,14 @@ import '../styles/globals.css'
 
 function GreenlightDesktop({ Component, pageProps }: AppProps) {
 
+  const translations = require('../languages/en.json');
+
   return (
+    <NextIntlClientProvider
+      locale='en'
+      timeZone="Europe/Vienna"
+      messages={translations}
+    >
     <ToastProvider>
       <TrpcProviderComponent>
         <AuthProvider>
@@ -39,6 +47,7 @@ function GreenlightDesktop({ Component, pageProps }: AppProps) {
         </AuthProvider>
       </TrpcProviderComponent>
     </ToastProvider>
+    </NextIntlClientProvider>
   );
 }
 
