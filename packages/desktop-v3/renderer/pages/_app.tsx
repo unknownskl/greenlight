@@ -10,19 +10,22 @@ import Sidebar from '../components/sidebar'
 import '../styles/globals.css'
 
 interface MessageFallbackParams {
-  namespace: string;
+  namespace?: string;
   key: string;
-  error: Error;
+  error: unknown;
 }
 
 function GreenlightDesktop({ Component, pageProps }: AppProps) {
 
   const translations = require('../languages/nl.json');
 
-  const getMessageFallback = ({ namespace, key, error}: MessageFallbackParams) => {
+  const getMessageFallback = ({ namespace, key, error}: MessageFallbackParams):string => {
     const fallbackTranslation = require('../languages/en.json');
-    console.error(`Missing translation key for ${namespace}.${key}:`, error);
-    return fallbackTranslation[namespace]?.[key] || 'MISSING_TRANSLATION('+namespace+'.'+key+')';
+    const messageKey = namespace ? `${namespace}.${key}` : key;
+    console.error(`Missing translation key for ${messageKey}:`, error);
+    return namespace
+      ? fallbackTranslation[namespace]?.[key] || `MISSING_TRANSLATION(${messageKey})`
+      : fallbackTranslation[key] || `MISSING_TRANSLATION(${messageKey})`;
   }
 
   return (
