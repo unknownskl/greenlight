@@ -14,7 +14,7 @@ export default function HomePage() {
   const queryClient = useQueryClient();
   const t = useTranslations('HomePage');
 
-
+  
 
 const { isAuthenticated, isAuthenticating, authState } = useAuth();
 

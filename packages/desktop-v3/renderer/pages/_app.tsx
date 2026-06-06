@@ -2,39 +2,17 @@ import type { AppProps } from 'next/app'
 import { TrpcProviderComponent } from '../providers/trpc'
 import { AuthProvider } from '../contexts/AuthContext'
 import { ToastProvider } from '../contexts/ToastContext'
-import { NextIntlClientProvider } from 'next-intl';
+import { I18nProvider } from '../contexts/I18nContext'
 import App from './app'
 import Head from 'next/head'
 import Sidebar from '../components/sidebar'
 
 import '../styles/globals.css'
 
-interface MessageFallbackParams {
-  namespace?: string;
-  key: string;
-  error: unknown;
-}
-
 function GreenlightDesktop({ Component, pageProps }: AppProps) {
 
-  const translations = require('../languages/nl.json');
-
-  const getMessageFallback = ({ namespace, key, error}: MessageFallbackParams):string => {
-    const fallbackTranslation = require('../languages/en.json');
-    const messageKey = namespace ? `${namespace}.${key}` : key;
-    console.error(`Missing translation key for ${messageKey}:`, error);
-    return namespace
-      ? fallbackTranslation[namespace]?.[key] || `MISSING_TRANSLATION(${messageKey})`
-      : fallbackTranslation[key] || `MISSING_TRANSLATION(${messageKey})`;
-  }
-
   return (
-    <NextIntlClientProvider
-      locale='nl'
-      timeZone="Europe/Vienna"
-      messages={translations}
-      getMessageFallback={getMessageFallback}
-    >
+    <I18nProvider>
       <ToastProvider>
         <TrpcProviderComponent>
           <AuthProvider>
@@ -63,7 +41,7 @@ function GreenlightDesktop({ Component, pageProps }: AppProps) {
           </AuthProvider>
         </TrpcProviderComponent>
       </ToastProvider>
-    </NextIntlClientProvider>
+    </I18nProvider>
   );
 }
 

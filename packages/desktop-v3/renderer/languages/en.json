@@ -17,6 +17,10 @@
     "myConsoles": "My Consoles",
     "xcloud": "xCloud",
     "settings": "Settings"
+  },
+  "Settings": {
+    "title": "Settings",
+    "language": "Language"
   }
 
 

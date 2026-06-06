@@ -51,7 +51,7 @@ export default function Sidebar() {
                     </Link>
                 </li>
                 <li>
-                    <Link href="/settings/" aria-disabled={true} className="cursor-not-allowed opacity-50">
+                    <Link href="/settings/">
                         <WrenchScrewdriverIcon className="size-5" />
                         {t('settings')}
                     </Link>
