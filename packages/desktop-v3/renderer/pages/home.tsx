@@ -22,8 +22,7 @@ console.log('Authentication status in _app:', { isAuthenticated, isAuthenticatin
   const toast = useToast();
 
 
-  const ping = (e) => {
-    console.log('Ping clicked', e)
+  const ping = () => {
     queryClient.fetchQuery(trpc.ping.queryOptions())
       .then((data) => {
           console.log(data)
