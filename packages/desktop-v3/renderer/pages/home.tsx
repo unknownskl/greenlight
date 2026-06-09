@@ -22,7 +22,8 @@ console.log('Authentication status in _app:', { isAuthenticated, isAuthenticatin
   const toast = useToast();
 
 
-  const ping = () => {
+  const ping = (e) => {
+    console.log('Ping clicked', e)
     queryClient.fetchQuery(trpc.ping.queryOptions())
       .then((data) => {
           console.log(data)
@@ -58,9 +59,9 @@ console.log('Authentication status in _app:', { isAuthenticated, isAuthenticatin
           <h2 className="text-2xl font-bold text-white mb-1">Game Library</h2>
           <p className="text-white/40 text-sm">0 titles in your collection</p>
 
-          <button onClick={ping}>Ping</button>
-          <button onClick={getVersion}>getVersion</button>
-          <button onClick={showToast}>Show Toast</button>
+          <a data-focusable onClick={ping}>Ping</a><br />
+          <a data-focusable onClick={getVersion}>getVersion</a><br />
+          <a data-focusable onClick={showToast}>Show Toast</a><br />
 
           <p> Translated: {t('title')}</p>
 

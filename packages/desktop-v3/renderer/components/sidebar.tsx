@@ -32,25 +32,25 @@ export default function Sidebar() {
             </div>
 
             <ul className="menu rounded-box w-full">
-                <li>
+                <li data-focusable>
                     <Link href="/home/">
                         <HomeIcon className="size-5" />
                         {t('home')}
                     </Link>
                 </li>
-                <li>
+                <li data-focusable>
                     <Link href="/consoles/">
                         <ArrowIcon className="size-5" />
                         {t('myConsoles')}
                     </Link>
                 </li>
-                <li>
-                    <Link href="/xcloud/" aria-disabled={true} className="cursor-not-allowed opacity-50">
+                <li data-focusable>
+                    <Link href="/xcloud/">
                         <CloudIcon className="size-5" />
                         {t('xcloud')}
                     </Link>
                 </li>
-                <li>
+                <li data-focusable>
                     <Link href="/settings/">
                         <WrenchScrewdriverIcon className="size-5" />
                         {t('settings')}

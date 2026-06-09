@@ -3,12 +3,14 @@ import Head from 'next/head'
 import {useTranslations} from 'next-intl';
 import { useAuth } from '../contexts/AuthContext';
 import { useI18n } from '../contexts/I18nContext';
+import { useInput } from '../contexts/InputContext';
 
 // import { useToast } from '../contexts/ToastContext'
 
 export default function HomePage() {
   const t = useTranslations('Settings');
   const { language, setLanguage } = useI18n();
+  const { inputMethod } = useInput();
 
 
 const { isAuthenticated, isAuthenticating, authState } = useAuth();
@@ -38,10 +40,22 @@ console.log('Authentication status in _app:', { isAuthenticated, isAuthenticatin
             <legend className="fieldset-legend">Language</legend>
             {/* <input type="text" className="input" placeholder="My awesome page" /> */}
 
-            <select value={language} className="select" onChange={languageChange}>
+            <select value={language} className="select" onChange={languageChange} data-focusable>
                 <option value="en">EN</option>
                 <option value="nl">NL</option>
             </select>
+
+            <p className="label">This option will only change the application language and not the language in-game.</p>
+          </fieldset>
+
+          <fieldset className="fieldset">
+            <legend className="fieldset-legend">Input Info</legend>
+            {/* <input type="text" className="input" placeholder="My awesome page" /> */}
+
+            <label className="input">
+              <span className="label">Input Method</span>
+              <p>{inputMethod}</p>
+            </label>
 
             <p className="label">This option will only change the application language and not the language in-game.</p>
           </fieldset>
