@@ -14,7 +14,7 @@ export default function FocusRing() {
 
     const update = () => {
       const r = focusedEl.getBoundingClientRect()
-      if (r.width === 0) { setStyle(null); return }
+      if (r.width === 0 || r.height === 0) { setStyle(null); return }
       const br = window.getComputedStyle(focusedEl).borderRadius
       setStyle({
         top:    r.top    - 3,
@@ -22,6 +22,7 @@ export default function FocusRing() {
         width:  r.width  + 6,
         height: r.height + 6,
         borderRadius: br,
+        position: 'fixed'
       })
     }
 
@@ -36,16 +37,18 @@ export default function FocusRing() {
 
   if (!style) return null
 
+  const popoverEl = focusedEl.closest('[popover]')
+  const target = popoverEl ?? document.body
+
   return createPortal(
     <div
       className="focus-ring"
       style={{
         position: 'fixed',
         pointerEvents: 'none',
-        zIndex: 9999,
         ...style,
       }}
     />,
-    document.body
+    target
   )
 }

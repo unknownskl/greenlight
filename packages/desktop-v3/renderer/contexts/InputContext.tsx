@@ -5,6 +5,7 @@ interface InputContextType {
   setInputMethod: (method: 'mouse' | 'keyboard' | 'gamepad') => void;
   inputMethod: 'mouse' | 'keyboard' | 'gamepad';
   focusedEl: Element | null;
+  focusElement: (el: Element) => void;
 }
 
 const InputContext = createContext<InputContextType | undefined>(undefined);
@@ -15,6 +16,7 @@ export function InputProvider({ children }: { children: ReactNode }) {
   const [focusedEl, _setFocusedEl] = useState<Element | null>(null)
   const focusRef = useRef<Element | null>(null);
   const lastClickedRef = useRef<Element | null>(null);
+  // const selectOpenRef = useRef<Element | null>(null);
 
   function setInputMethod(method: 'mouse' | 'keyboard' | 'gamepad') {
     _setInputMethod(method)
@@ -48,26 +50,41 @@ export function InputProvider({ children }: { children: ReactNode }) {
     }
   }, [focusRef.current])
 
+  // useEffect(() => {
+  //   if(inputMethod === 'mouse') return
+
+  //   const detectFocusables = () => {
+  //       const f = getFocusables()[0];
+  //       if(f){
+  //           focusEl(f)
+  //       } else {
+  //           setTimeout(detectFocusables, 160)
+  //       }
+  //   }
+  //   setTimeout(detectFocusables, 160)
+  // }, [inputMethod, focusEl])
+
   useEffect(() => {
     if(inputMethod === 'mouse') return
-    
-    const detectFocusables = () => {
-        const f = getFocusables()[0];
-        if(f){
-            focusEl(f)
-        } else {
-            setTimeout(detectFocusables, 160)
-        }
-    }
 
-    setTimeout(detectFocusables, 160)
-  }, [inputMethod, focusEl])
+    const interval = setInterval(() => {
+      if(focusRef.current && focusRef.current.clientHeight === 0) {
+        const focusNewElement = findNearest(focusRef.current, 'up')
+        if(focusNewElement){
+          focusEl(focusNewElement)
+        }
+        console.log('Focus interval: focused element is hidden, moving focus to nearest element', focusNewElement)
+      }
+    }, 160);
+    return () => clearInterval(interval);
+  }, [inputMethod, focusRef, focusEl])
 
   // Keyboard navigation
   useEffect(() => {
     const DIR = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right' }
     const onKey = (e: KeyboardEvent) => {
       setInputMethod('keyboard')
+
       switch(e.key) {
         case 'ArrowUp':
         case 'ArrowDown':
@@ -77,10 +94,11 @@ export function InputProvider({ children }: { children: ReactNode }) {
           break
         case 'Enter':
           if (focusedEl) {
-            e.preventDefault();
-            // (focusedEl as HTMLElement).click()
-            handleClick(focusedEl)
+            handleClick(e, focusedEl)
           }
+          break
+        case 'Escape':
+          // selectOpenRef.current = null;
           break
         default:
             e.preventDefault();
@@ -105,21 +123,12 @@ export function InputProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const handleClick = useCallback((target: Element) => {
+  const handleClick = useCallback((event: KeyboardEvent, target: Element) => {
     const allow_click = ['a', 'button']
-    if(! allow_click.includes(target.tagName.toLowerCase())) {
-      const clickTarget = (target.querySelector('[data-clickable]') || target.firstChild) as HTMLElement
-      if(clickTarget && clickTarget.click) {
-        if(lastClickedRef.current === clickTarget) return
+    if(allow_click.includes(target.tagName.toLowerCase())) {
+      event.preventDefault();
 
-        setTimeout(() => {
-          lastClickedRef.current = null;
-        }, 500)
-
-        lastClickedRef.current = clickTarget;
-        clickTarget.click()
-      }
-    } else {
+      // console.log('handleClick: Default target', target)
 
       if(target && (target as HTMLElement).click) {
         if(lastClickedRef.current === target) return
@@ -130,6 +139,53 @@ export function InputProvider({ children }: { children: ReactNode }) {
         }, 500);
         (target as HTMLElement).click()
       }
+
+    } else if(target.tagName.toLowerCase() === "summary") {
+      (target as HTMLElement).click();
+
+
+    // } else if(target.tagName.toLowerCase() === "select") {
+
+    //   // @TODO: Handle select dropdowns when using keyboard navigation. This is tricky because we don't want to trigger the select's click event when pressing Enter to open the dropdown, but we do want to trigger it when clicking with the mouse.
+    //   console.log('Opening select dropdown for', target);
+    //   (target as HTMLSelectElement).showPicker();
+    //   selectOpenRef.current = target;
+
+    //   const onSelectClose = () => {
+    //   console.log('Removing event listeners to detect select close', target)
+
+    //     selectOpenRef.current = null;
+    //     target.removeEventListener('change', onSelectClose);
+    //     // target.removeEventListener('blur', onSelectClose);
+    //   };
+    //   console.log('Adding event listeners to detect select close', target)
+    //   target.addEventListener('change', onSelectClose);
+    //   // target.addEventListener('blur', onSelectClose);
+
+    // } else if(target.tagName.toLowerCase() === "option") {
+
+    //   console.log('Non-native click on option', target);
+    //   selectOpenRef.current = null;
+    //   (target as HTMLElement).parentElement?.blur();
+      
+
+    } else {
+      event.preventDefault();
+      // console.log('handleClick: Looking for clickable inside', target)
+
+      const clickTarget = (target.querySelector('[data-clickable]') || target.firstChild) as HTMLElement
+      if(clickTarget && clickTarget.click) {
+        if(lastClickedRef.current === clickTarget) return
+
+        setTimeout(() => {
+          lastClickedRef.current = null;
+        }, 500)
+
+        lastClickedRef.current = clickTarget;
+        // console.log('handleClick: Clicking on', clickTarget)
+        clickTarget.click()
+      }
+      
     }
   }, [])
 
@@ -182,6 +238,7 @@ export function InputProvider({ children }: { children: ReactNode }) {
         inputMethod,
         setInputMethod,
         focusedEl,
+        focusElement: focusEl,
       }}
     >
         {children}

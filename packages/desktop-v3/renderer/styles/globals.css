@@ -193,6 +193,8 @@ body {
     width  0.12s cubic-bezier(0.4, 0, 0.2, 1),
     height 0.12s cubic-bezier(0.4, 0, 0.2, 1);
   animation: focusRingAppear 0.15s ease forwards;
+  z-index: 1000;
+
 }
 
 /* ─── Gamepad HUD slide-up entrance ─── */
@@ -204,3 +206,21 @@ body {
 .gamepad-hud {
   animation: hudSlideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
+
+
+label.item {
+  color: #ffffff;
+}
+
+label.item.label {
+  
+}
+
+/* .menu {
+  padding: 0px;
+  background-color: none;
+}
+
+.menu li a {
+  margin: 0px;
+} */
