@@ -26,22 +26,22 @@
     "electron-serve": "^3.0.0",
     "electron-store": "^11.0.2",
     "next-intl": "^4.13.0",
-    "react-qr-code": "^2.0.21",
     "react-toastify": "^11.1.0",
+    "react-qr-code": "^2.2.0",
     "wrangler": "^4.92.0"
   },
   "devDependencies": {
     "@greenlight/platform": "*",
     "@tailwindcss/postcss": "^4.2.2",
     "@types/node": "^25.9.1",
-    "@types/react": "^19.2.15",
+    "@types/react": "^19.2.17",
     "electron": "^41.0.3",
     "electron-builder": "^26.8.1",
     "next": "^16.2.1",
     "nextron": "^10.0.0",
     "postcss": "^8.5.8",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
     "tailwindcss": "^4.2.2",
     "typescript": "^5.7.3"
   }

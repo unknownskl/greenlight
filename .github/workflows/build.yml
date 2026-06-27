@@ -39,7 +39,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Git repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: recursive
 
@@ -73,7 +73,7 @@ jobs:
     needs: ['lint']
     steps:
       - name: Checkout Git repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: recursive
 
@@ -105,7 +105,7 @@ jobs:
 
     steps:
       # Install node tools
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           repository: 'flatpak/flatpak-builder-tools'
 
@@ -117,7 +117,7 @@ jobs:
 
       # Generate sources
       - name: Checkout Git repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: recursive
           # clean: true
@@ -161,7 +161,7 @@ jobs:
 
     steps:
       - name: Checkout Git repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: recursive
 
@@ -225,7 +225,7 @@ jobs:
 
     steps:
       - name: Checkout Git repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: recursive
 
@@ -304,7 +304,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Git repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: recursive
 
@@ -342,7 +342,7 @@ jobs:
 
     steps:
       - name: Checkout Git repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: recursive
 
@@ -391,7 +391,7 @@ jobs:
 
     steps:
       - name: Checkout Git repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: recursive
 
@@ -463,7 +463,7 @@ jobs:
 
     steps:
       - name: Checkout Git repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: recursive
 
@@ -550,7 +550,7 @@ jobs:
 
     steps:
       - name: Checkout Git repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: recursive
 

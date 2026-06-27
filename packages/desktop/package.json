@@ -51,7 +51,7 @@
     "@fortawesome/fontawesome-free": "^7.2.0",
     "@next/eslint-plugin-next": "^16.2.6",
     "@types/node": "^25.9.1",
-    "@types/react": "^19.2.15",
+    "@types/react": "^19.2.17",
     "@typescript-eslint/eslint-plugin": "^8.52.0",
     "babel-loader": "^10.0.0",
     "electron": "42.0.1",
@@ -60,8 +60,8 @@
     "next": "^16.1.0",
     "nextron": "^10.0.0",
     "node-loader": "^2.1.0",
-    "react": "^19.2.6",
-    "react-dom": "^19.2.6",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
     "typescript": "^5.9.3"
   },
   "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
