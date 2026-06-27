@@ -35,7 +35,9 @@ function GreenlightDesktop({ Component, pageProps }: AppProps) {
                     {/* Main content area */}
 
                     <div className="h-full overflow-y-auto">
-                      <Component {...pageProps} />
+                      <div className="p-6 md:p-8 max-w-5xl mx-auto animate-fade-in-up delay-100">
+                        <Component {...pageProps} />
+                      </div>
                     </div>
                   </main>
                 </div>

@@ -1,24 +1,18 @@
 import React from 'react'
-// import Link from 'next/link'
-// import Image from 'next/image'
 import {useTranslations} from 'next-intl';
 
 import { useQueryClient } from "@tanstack/react-query";
 import { useTRPC } from "../utils/trpc";
-import { useAuth } from '../contexts/AuthContext';
 
 import { useToast } from '../contexts/ToastContext'
+
+import PageHeader from '../components/ui/pageheader';
+import Content from '../components/ui/content';
 
 export default function HomePage() {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
   const t = useTranslations('HomePage');
-
-  
-
-const { isAuthenticated, isAuthenticating, authState } = useAuth();
-
-console.log('Authentication status in _app:', { isAuthenticated, isAuthenticating, authState });
   const toast = useToast();
 
 
@@ -52,22 +46,21 @@ console.log('Authentication status in _app:', { isAuthenticated, isAuthenticatin
 
   return (
     <React.Fragment>
-      <div className="p-6 md:p-8 max-w-5xl mx-auto">
-        {/* Header */}
-        <div className="mb-6 animate-fade-in-up">
-          <h2 className="text-2xl font-bold text-white mb-1">Game Library</h2>
-          <p className="text-white/40 text-sm">0 titles in your collection</p>
+      
+      <PageHeader title="Game Library" subtitle="0 titles in your collection" />
 
+      <Content>
+        <p>
           <a data-focusable onClick={ping}>Ping</a><br />
           <a data-focusable onClick={getVersion}>getVersion</a><br />
           <a data-focusable onClick={showToast}>Show Toast</a><br />
+        </p>
 
-          <p> Translated: {t('title')}</p>
+        <p> Translated: {t('title')}</p>
 
 
-          {/* <pre>{ JSON.stringify(authState, null, 2) }</pre> */}
-        </div>
-      </div>
+        {/* <pre>{ JSON.stringify(authState, null, 2) }</pre> */}
+      </Content>
     </React.Fragment>
   )
 }

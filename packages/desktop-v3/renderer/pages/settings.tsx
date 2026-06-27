@@ -5,6 +5,8 @@ import { useI18n } from '../contexts/I18nContext';
 import { useInput } from '../contexts/InputContext';
 
 import Select from '../components/input/select';
+import PageHeader from '../components/ui/pageheader';
+import Content from '../components/ui/content';
 
 // import { useToast } from '../contexts/ToastContext'
 
@@ -23,12 +25,11 @@ export default function HomePage() {
       <Head>
         <title>{`Greenlight - ${t('title')}`}</title>
       </Head>
-      <div className="p-6 md:p-8 max-w-5xl mx-auto">
-        {/* Header */}
-        <div className="mb-6 animate-fade-in-up">
-          <h2 className="text-2xl font-bold text-white mb-1">{t('title')}</h2>
-          {/* <p className="text-white/40 text-sm">0 titles in your collection</p> */}
 
+        {/* Header */}
+        <PageHeader title={t('title')} />
+
+        <Content>
           <fieldset className="fieldset">
             <legend className="fieldset-legend">Language</legend>
 
@@ -60,7 +61,7 @@ export default function HomePage() {
             </label>
           </fieldset>
 
-           <fieldset className="fieldset">
+            <fieldset className="fieldset">
             <legend className="fieldset-legend">Debug Options</legend>
 
             <label className="item">
@@ -84,10 +85,7 @@ export default function HomePage() {
 
             <p className="label">This option will only change the application language and not the language in-game.</p>
           </fieldset>
-
-          {/* <pre>{ JSON.stringify(authState, null, 2) }</pre> */}
-        </div>
-      </div>
+        </Content>
     </React.Fragment>
   )
 }
