@@ -27,7 +27,7 @@ export default function Sidebar() {
                 <div className="mb-6">
                 <h2 className="text-2xl font-bold text-white mb-1">Greenlight</h2>
                 <p className="text-white/40 text-sm">{ (authState?.webToken?.data.DisplayClaims?.xui?.[0] as any)?.gtg || 'Gamertag'}</p>
-                <p className="text-white/70 text-sm"><Link href="#" onClick={handleLogout}>{t('logout')}</Link></p>
+                <p className="text-white/70 text-sm" data-focusable><Link href="#" onClick={handleLogout}>{t('logout')}</Link></p>
                 </div>
             </div>
 

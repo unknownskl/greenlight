@@ -212,8 +212,10 @@ label.item {
   color: #ffffff;
 }
 
-label.item.label {
-  
+label.item span.label {
+  vertical-align: middle;
+  padding-top: 10px;
+  color: #cccccc !important;
 }
 
 /* .menu {

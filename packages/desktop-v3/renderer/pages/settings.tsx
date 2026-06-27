@@ -48,14 +48,14 @@ export default function HomePage() {
             <label className="item">
               <span className="label">Select Option (Array)</span>
               <span className="ml-auto inline-flex float-right items-center gap-2">
-                <Select name="debug" options={['option 1', 'option 2']} />
+                <Select name="debug_option1" options={['option 1', 'option 2']} />
               </span>
             </label>
 
             <label className="item">
               <span className="label">Select Option (Object)</span>
               <span className="ml-auto inline-flex float-right items-center gap-2">
-                <Select name="debug2" options={{'option 1':'yes', 'option 2':'no'}} />
+                <Select name="debug_option2" options={{'option 1':'yes', 'option 2':'no'}} />
               </span>
             </label>
           </fieldset>
@@ -66,7 +66,7 @@ export default function HomePage() {
             <label className="item">
               <span className="label">Enable Debug</span>
               <span className="ml-auto inline-flex float-right items-center gap-2">
-                <Select name="debug" defaultValue="false" options={{'true': 'Enabled', 'false': 'Disabled'}} />
+                <Select name="debug_enabled" defaultValue="false" options={{'true': 'Enabled', 'false': 'Disabled'}} />
               </span>
             </label>
             
