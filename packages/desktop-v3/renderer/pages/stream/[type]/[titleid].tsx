@@ -18,7 +18,7 @@ export default function XcloudPage() {
   const { getxCloudToken, getxHomeToken, getUserRefreshToken } = useAuth();
 
   const [streamConfig, setStreamConfig] = useState<xCloudStreamConfig | undefined>(undefined);
-  const [session, setSession] = useState<{ sessionId: string; sessionPath: string; state: string } | undefined>(undefined);
+  const [session, setSession] = useState<{ sessionPath: string; state: string } | undefined>(undefined);
 
   const startStreamMutation = useMutation(trpc.streaming_start_stream.mutationOptions());
   const streamGetStatus = useMutation(trpc.streaming_get_status.mutationOptions());
@@ -63,13 +63,13 @@ export default function XcloudPage() {
         });
         console.log('Stream session started:', streamSession);
 
-        if (!("sessionId" in streamSession) || !("sessionPath" in streamSession)) {
+        if (!("sessionPath" in streamSession)) {
             throw new Error('Invalid stream session response');
         }
 
         setStreamConfig(config);
         setSession({
-            sessionId: streamSession.sessionId,
+            // sessionId: streamSession.sessionId,
             sessionPath: streamSession.sessionPath,
             state: typeof streamSession.state === 'string' ? streamSession.state : ''
         });
@@ -79,13 +79,12 @@ export default function XcloudPage() {
     class communicationHandler {
 
         _token:xStreamToken
-        _sessionId:string
+        _sessionId:string = '<no id>'
         _sessionPath:string
         _streamConfig:xCloudStreamConfig
 
-        constructor(token: xStreamToken, streamConfig:xCloudStreamConfig, session:{ sessionId: string; sessionPath: string; state: string }) {
+        constructor(token: xStreamToken, streamConfig:xCloudStreamConfig, session:{ sessionPath: string; state: string }) {
             this._token = token
-            this._sessionId = session.sessionId
             this._sessionPath = session.sessionPath
             this._streamConfig = streamConfig
         }
