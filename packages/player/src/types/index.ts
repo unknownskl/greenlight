@@ -33,3 +33,11 @@ export interface SDPResponse {
     }
     exchangeResponse: string | null;
 }
+
+export interface ICEResponse {
+    errorDetails?: {
+        code: number | null;
+        message: string | null;
+    }
+    exchangeResponse: string | null;
+}

@@ -1,5 +1,5 @@
-import type { xStreamToken, xCloudStreamConfig, SDPResponse, startStreamResponse, StatusResponse, ErrorResponse } from '../types/index';
-export type { xStreamToken, startStreamResponse, SDPResponse, xCloudStreamConfig, StatusResponse, ErrorResponse };
+import type { xStreamToken, xCloudStreamConfig, SDPResponse, ICEResponse, startStreamResponse, StatusResponse, ErrorResponse } from '../types/index';
+export type { xStreamToken, startStreamResponse, SDPResponse, ICEResponse, xCloudStreamConfig, StatusResponse, ErrorResponse };
 
 export const ping = () => 'pong';
 
@@ -72,7 +72,11 @@ export const sendSDPOffer = async (xStreamToken:xStreamToken, xCloudStreamConfig
     }))
 
     // @TODO: Await for 200 status?
-    const sdpResponse = await httpGet<SDPResponse>(xStreamToken, xCloudStreamConfig, '/'+sessionPath+'/sdp')
+    let sdpResponse = await httpGet<SDPResponse>(xStreamToken, xCloudStreamConfig, '/'+sessionPath+'/sdp')
+    while((sdpResponse as StatusResponse).status && (sdpResponse as StatusResponse).status === 204){
+        sdpResponse = await httpGet<SDPResponse>(xStreamToken, xCloudStreamConfig, '/'+sessionPath+'/sdp')
+    }
+
     return sdpResponse
 }
 
@@ -81,9 +85,9 @@ export const sendICECandidates = async (xStreamToken:xStreamToken, xCloudStreamC
         candidates: candidates
     }))
 
-    let iceResponse = await httpGet<any>(xStreamToken, xCloudStreamConfig, '/'+sessionPath+'/ice')
-    while(iceResponse.status && iceResponse.status === 204){
-        iceResponse = await httpGet<any>(xStreamToken, xCloudStreamConfig, '/'+sessionPath+'/ice')
+    let iceResponse = await httpGet<ICEResponse>(xStreamToken, xCloudStreamConfig, '/'+sessionPath+'/ice')
+    while((iceResponse as StatusResponse).status && (iceResponse as StatusResponse).status === 204){
+        iceResponse = await httpGet<ICEResponse>(xStreamToken, xCloudStreamConfig, '/'+sessionPath+'/ice')
     }
     return iceResponse
 }
