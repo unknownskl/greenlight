@@ -20,7 +20,9 @@
   },
   "Settings": {
     "title": "Settings",
-    "language": "Language"
+    "language": "Language",
+    "applicationLanguage": "Application Language",
+    "applicationLanguageDescription": "This option will only change the application language and not the language in-game."
   }
 
 

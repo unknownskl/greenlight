@@ -2,6 +2,7 @@ import React from 'react'
 import Head from 'next/head'
 // import Link from 'next/link'
 // import Image from 'next/image'
+import { useRouter } from 'next/router'
 
 import { useQueryClient } from "@tanstack/react-query";
 import { useTRPC } from "../utils/trpc";
@@ -13,6 +14,7 @@ export default function HomePage() {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
   const { getWebToken } = useAuth();
+  const router = useRouter();
 
   const [consoles, setConsoles] = React.useState<any[]>([])
 
@@ -25,6 +27,11 @@ export default function HomePage() {
       .catch((error) => {
         console.error('Error fetching data:', error);
       });
+  }
+
+  function handleStreamClick(consoleid:string) {
+    console.log(`Starting stream, redirecting user to /stream/home/${consoleid}`)
+    router.push(`/stream/home/${consoleid}`)
   }
 
   return (
@@ -54,7 +61,7 @@ export default function HomePage() {
 
               </div>
               <div className="flex gap-2 pt-1">
-                <button onClick={() => { console.log('Stream clicked')}} data-clickable className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 bg-[#107C10] hover:bg-[#15a015] text-white hover:shadow-[0_0_15px_rgba(16,124,16,0.35)] active:scale-95">
+                <button onClick={() => handleStreamClick(device.id)} data-clickable className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 bg-[#107C10] hover:bg-[#15a015] text-white hover:shadow-[0_0_15px_rgba(16,124,16,0.35)] active:scale-95">
                   <svg className="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M2 5a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V5zm3.293 1.293a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 01-1.414-1.414L7.586 10 5.293 7.707a1 1 0 010-1.414zM11 12a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"></path>
                   </svg>
                     Stream

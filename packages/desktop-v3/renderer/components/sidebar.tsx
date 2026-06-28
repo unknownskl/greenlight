@@ -19,7 +19,7 @@ export default function Sidebar() {
   }
 
   return (
-    <aside className="w-64 h-full flex flex-col bg-[#0d0d0d] border-r border-white/5 relative z-20">
+    <aside id="appSidebar" className="w-64 h-full flex flex-col bg-[#0d0d0d] border-r border-white/5 relative z-20">
     
         <div className="h-full overflow-y-auto">
             <div className="p-6 md:p-8 max-w-5xl mx-auto">

@@ -6,6 +6,7 @@ interface InputContextType {
   inputMethod: 'mouse' | 'keyboard' | 'gamepad';
   focusedEl: Element | null;
   focusElement: (el: Element) => void;
+  enableControls: (enable: boolean) => void;
 }
 
 const InputContext = createContext<InputContextType | undefined>(undefined);
@@ -14,6 +15,7 @@ export function InputProvider({ children }: { children: ReactNode }) {
 
   const [inputMethod, _setInputMethod] = useState<'mouse' | 'keyboard' | 'gamepad'>('mouse');
   const [focusedEl, _setFocusedEl] = useState<Element | null>(null)
+  const [controlsEnabled, setEnableControls] = useState<boolean>(true)
   const focusRef = useRef<Element | null>(null);
   const lastClickedRef = useRef<Element | null>(null);
   // const selectOpenRef = useRef<Element | null>(null);
@@ -50,22 +52,10 @@ export function InputProvider({ children }: { children: ReactNode }) {
     }
   }, [focusRef.current])
 
-  // useEffect(() => {
-  //   if(inputMethod === 'mouse') return
-
-  //   const detectFocusables = () => {
-  //       const f = getFocusables()[0];
-  //       if(f){
-  //           focusEl(f)
-  //       } else {
-  //           setTimeout(detectFocusables, 160)
-  //       }
-  //   }
-  //   setTimeout(detectFocusables, 160)
-  // }, [inputMethod, focusEl])
-
   useEffect(() => {
-    if(inputMethod === 'mouse') return
+    if(controlsEnabled === false) return;
+
+    if(inputMethod === 'mouse') return;
 
     const interval = setInterval(() => {
       if(focusRef.current && focusRef.current.clientHeight === 0) {
@@ -77,10 +67,12 @@ export function InputProvider({ children }: { children: ReactNode }) {
       }
     }, 160);
     return () => clearInterval(interval);
-  }, [inputMethod, focusRef, focusEl])
+  }, [inputMethod, focusRef, focusEl, controlsEnabled])
 
   // Keyboard navigation
   useEffect(() => {
+    if(controlsEnabled === false) return;
+
     const DIR = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right' }
     const onKey = (e: KeyboardEvent) => {
       setInputMethod('keyboard')
@@ -101,13 +93,13 @@ export function InputProvider({ children }: { children: ReactNode }) {
           // selectOpenRef.current = null;
           break
         default:
-            e.preventDefault();
+            // e.preventDefault();
           break
       }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [moveFocus, setInputMethod])
+  }, [moveFocus, setInputMethod, controlsEnabled])
 
   useEffect(() => {
 
@@ -239,6 +231,7 @@ export function InputProvider({ children }: { children: ReactNode }) {
         setInputMethod,
         focusedEl,
         focusElement: focusEl,
+        enableControls: setEnableControls
       }}
     >
         {children}

@@ -15,7 +15,6 @@ import Touch from './lib/input/touch';
 // export { Gamepad, MouseKeyboard, Touch };
 
 export interface StreamPlayerProps {
-    onStatusChanged: (newStatus: string) => void;
     communicationHandler: communicationHandler
 }
 export interface StreamPlayerHandle {
@@ -38,7 +37,6 @@ export interface communicationHandler {
 
 export const StreamPlayer = forwardRef<StreamPlayerHandle, StreamPlayerProps>(
     ({
-        onStatusChanged,
         communicationHandler
     }, ref): ReactElement => {
         const [playerState, setPlayerState] = useState<string>('Initializing');
@@ -75,6 +73,10 @@ export const StreamPlayer = forwardRef<StreamPlayerHandle, StreamPlayerProps>(
                 player.toggleDebugOverlay()
             }
         }));
+
+        useEffect(() => {
+            console.log('StreamPlayer useEffect - playerState:', playerState);
+        }, [playerState])
 
         useEffect(() => {
             let interval: NodeJS.Timeout;
@@ -128,6 +130,8 @@ export const StreamPlayer = forwardRef<StreamPlayerHandle, StreamPlayerProps>(
             if(player){
                 player.init();
 
+                setPlayerState('Connecting')
+
                 player.createOffer().then(async (offer) => {
                     console.log('Created offer:', offer);
                     const serverOffer = await communicationHandler.sendSDPOffer(offer)
@@ -150,9 +154,26 @@ export const StreamPlayer = forwardRef<StreamPlayerHandle, StreamPlayerProps>(
                     console.log('Received ICE Candidates 2:', serverIce);
                     player.setRemoteIceCandidates(serverIce)
 
+                    setPlayerState('Connected')
+
+                    const playerStateInterval = setInterval(() => {
+                        if(player.playerState === 'Destroyed'){
+                            clearInterval(keepaliveInterval)
+                            clearInterval(playerStateInterval)
+                            setPlayerState('Destroyed')
+                        }
+                    }, 1000)
+
                     keepaliveInterval = setInterval(async () => {
-                        console.log('Sending keepalive...');
-                        await communicationHandler.sendKeepalive()
+                        console.log('Sending keepalive...', player.playerState);
+                        if(player.playerState === 'Destroyed'){
+                            clearInterval(keepaliveInterval)
+                            clearInterval(playerStateInterval)
+                            setPlayerState('Destroyed')
+                            return
+                        } else {
+                            await communicationHandler.sendKeepalive()
+                        }
                     }, 30 * 1000);
                 })
             }
@@ -168,11 +189,11 @@ export const StreamPlayer = forwardRef<StreamPlayerHandle, StreamPlayerProps>(
         return (
             <div ref={playerInstance}>
                 <div id="playerContainer"></div>
-                <p>
+                {/* <p>
                     Player loaded from <span className='redPlayer'>@greenlight/player/client</span>
                 </p>
                 <pre>{JSON.stringify(communicationHandler.getStreamConfig(), null, 2)}</pre>
-                <pre>Status: {playerState}</pre>
+                <pre>Status: {playerState}</pre> */}
             </div>
         );
     }

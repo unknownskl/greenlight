@@ -65,5 +65,7 @@ export default class Channel {
     }
 
     // Channel destroy function
-    destroy() {}
+    destroy() {
+        this._player.playerState = 'Destroyed'
+    }
 }

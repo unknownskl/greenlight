@@ -26,6 +26,7 @@ export default class xCloudPlayer {
     private _iceHelper = new Ice(this)
     private _sdpHelper = new Sdp(this)
     private _statsHelper = new Stats(this)
+    public playerState: 'Initializing' | 'Connecting' | 'Connected' | 'Destroyed' = 'Initializing'
 
     private _videoComponent: VideoComponent | WebGpuComponent | undefined
     private _audioComponent: AudioComponent | undefined
@@ -39,6 +40,7 @@ export default class xCloudPlayer {
         videoTransceiver.setCodecPreferences(this._sdpHelper.getDefaultCodecPreferences())
 
         this._peerConnection.ontrack = (event) => {
+            this.playerState = 'Connected'
 
             if(event.track.kind === 'video'){
                 // this._videoComponent = new VideoComponent(this)
@@ -55,6 +57,7 @@ export default class xCloudPlayer {
         }
 
         console.log('xCloudPlayer constructed.');
+        this.playerState = 'Connecting'
     }
 
     init() {
@@ -136,6 +139,7 @@ export default class xCloudPlayer {
             if(this._audioComponent){ this._audioComponent.destroy() }
 
             this._isDestoyed = true
+            this.playerState = 'Destroyed'
         } else {
             console.log('Cannot destroy because the player is already destroyed.')
         }

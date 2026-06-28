@@ -30,18 +30,22 @@ export default function HomePage() {
         <PageHeader title={t('title')} />
 
         <Content>
-          <fieldset className="fieldset">
-            <legend className="fieldset-legend">Language</legend>
+          <fieldset className="fieldset pb-8">
+            <legend className="fieldset-legend">{t('language')}</legend>
 
             <label className="item">
-              <span className="label">Application Language</span>
+              <span className="label">{t('applicationLanguage')}</span>
               <span className="ml-auto inline-flex float-right items-center gap-2">
                 <Select name="language" defaultValue={language} options={{'en': 'English', 'nl': 'Dutch'}} onChange={languageChangeDropdown} />
               </span>
             </label>
             
-            <p className="label">This option will only change the application language and not the language in-game.</p>
+            <p className="label">{t('applicationLanguageDescription')}</p>
           </fieldset>
+
+          <PageHeader title={t('title')} />
+
+          {/* Debug Options */}
 
           <fieldset className="fieldset">
             <legend className="fieldset-legend">Debug Selects</legend>
@@ -71,7 +75,6 @@ export default function HomePage() {
               </span>
             </label>
             
-            {/* <p className="label">This option will only change the application language and not the language in-game.</p> */}
           </fieldset>
 
           <fieldset className="fieldset">
@@ -83,8 +86,10 @@ export default function HomePage() {
               <p>{inputMethod}</p>
             </label>
 
-            <p className="label">This option will only change the application language and not the language in-game.</p>
+            <p className="label">{t('applicationLanguageDescription')}</p>
           </fieldset>
+
+          {/* End Debug Options */}
         </Content>
     </React.Fragment>
   )

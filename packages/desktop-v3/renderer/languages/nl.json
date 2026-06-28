@@ -17,6 +17,12 @@
     "myConsoles": "Mijn Consoles",
     "xcloud": "xCloud",
     "settings": "Instellingen"
+  },
+  "Settings": {
+    "title": "Instellingen",
+    "language": "Taal",
+    "applicationLanguage": "Applicatietaal",
+    "applicationLanguageDescription": "Deze optie verandert alleen de applicatietaal en niet de taal in het spel."
   }
 
 
