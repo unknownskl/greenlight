@@ -20,7 +20,7 @@
   "dependencies": {
     "@trpc/client": "^11.17.0",
     "@trpc/server": "^11.17.0",
-    "@trpc/tanstack-react-query": "^11.17.0",
+    "@trpc/tanstack-react-query": "^11.18.0",
     "electron-serve": "^3.0.0",
     "electron-store": "^11.0.2",
     "react-qr-code": "^2.2.0",
