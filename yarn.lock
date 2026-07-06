@@ -6537,10 +6537,10 @@ fsevents@~2.3.2, fsevents@~2.3.3:
   resolved "https://registry.yarnpkg.com/fsevents/-/fsevents-2.3.3.tgz#cac6407785d03675a2a5e1a5305c697b347d90d6"
   integrity sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==
 
-fumadocs-core@^16.10.6:
-  version "16.10.6"
-  resolved "https://registry.yarnpkg.com/fumadocs-core/-/fumadocs-core-16.10.6.tgz#9b49491caaededdc538268274737f64f1c969b7f"
-  integrity sha512-vd/hidAsC1d8ldrfCvr/vb/H46AC/iRm0Zp4SOWWWfa1iNoFw1mFIRGHwaNDB9ETkZPZ7xUwhi3QkhlXPrYbVw==
+fumadocs-core@^16.10.7:
+  version "16.10.7"
+  resolved "https://registry.yarnpkg.com/fumadocs-core/-/fumadocs-core-16.10.7.tgz#8b2729eb73da2b8d0f7ff828f9a97c151fdb5c15"
+  integrity sha512-lR1hDOtJ8ubsLKYH2VMkp+iVZTDdOiMh4StFaWtuTvy8Wfnngz0YSHeFijmm2K+4lg2DLXLMuCEHQ6my54g2Eg==
   dependencies:
     "@orama/orama" "^3.1.18"
     estree-util-value-to-estree "^3.5.0"
@@ -6597,10 +6597,10 @@ fumadocs-typescript@^5.2.7:
     unified "^11.0.5"
     unist-util-visit "^5.1.0"
 
-fumadocs-ui@^16.10.6:
-  version "16.10.6"
-  resolved "https://registry.yarnpkg.com/fumadocs-ui/-/fumadocs-ui-16.10.6.tgz#c855b80a36d927b976972bc51e79296ec8ba8131"
-  integrity sha512-Sgp3r1FKNMnuG1AQlLUDsOcuE9kR3GU6RGuIUC5io3PFUNRc+IE4cjwGYv4i8vZi+VPV1Qqwm8oWztHCkwLvsg==
+fumadocs-ui@^16.10.7:
+  version "16.10.7"
+  resolved "https://registry.yarnpkg.com/fumadocs-ui/-/fumadocs-ui-16.10.7.tgz#95f1edc60b479038e215c6521bef3539979a112d"
+  integrity sha512-zE93/DKW5bhedXRKHYg3rhE/juYi+kXx1xl3ey1dArWbCiPx6lq6/4RLswYXS0lQp1W1f8NsbY1TeA8wSQuEvw==
   dependencies:
     "@fuma-translate/react" "^1.0.2"
     "@fumadocs/tailwind" "0.0.5"
