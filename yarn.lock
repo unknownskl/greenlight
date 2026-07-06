@@ -3166,10 +3166,10 @@
   resolved "https://registry.yarnpkg.com/@trpc/server/-/server-11.17.0.tgz#62e92adb65b59cad432d39d6c9f034a8d3fc8802"
   integrity sha512-jbAOUe0PpUTCYqziyu+8vYXZdDXPudZgnEhWCQ2NjKnVEjfE93RqHTt1oycZJv/HNf51YlRXfEEwSIAbb161rw==
 
-"@trpc/tanstack-react-query@^11.17.0":
-  version "11.17.0"
-  resolved "https://registry.yarnpkg.com/@trpc/tanstack-react-query/-/tanstack-react-query-11.17.0.tgz#36d95a25e2eb0fba1a5dea55a064d86d07512c48"
-  integrity sha512-OFxjvCgisP0yaCj7lgP6qPaFwJvJDgnrAUxH3cNIPPR89TpYbndn5vsdKNkc7EnvER9b6wq9Yz8aCcPcOBpDXg==
+"@trpc/tanstack-react-query@^11.18.0":
+  version "11.18.0"
+  resolved "https://registry.yarnpkg.com/@trpc/tanstack-react-query/-/tanstack-react-query-11.18.0.tgz#bb9656a2334644ce64878564f661f414568c2d4a"
+  integrity sha512-dm5xIlN0SEzJAbQ34EHdb1Kgd/zWZ63ZMviQEw3WCWCIPz8MjLKAhquncPcn+YxFUJa+Qi4qatdGFymmM4HmAQ==
 
 "@ts-morph/common@~0.29.0":
   version "0.29.0"
