@@ -35,7 +35,7 @@
     "github-url-to-object": "^4.0.6",
     "i18next": "^25.8.0",
     "ip-address": "^10.2.0",
-    "react-i18next": "^17.0.7",
+    "react-i18next": "^17.0.9",
     "react-query": "^3.39.3",
     "typescript-eslint": "^8.59.4",
     "uplot": "^1.6.30",
