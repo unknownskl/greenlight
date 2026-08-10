@@ -43,7 +43,7 @@
     "sinon": "^22.0.0",
     "tsup": "^8.5.0",
     "tsx": "^4.21.0",
-    "typescript": "^5.9.3",
+    "typescript": "^7.0.2",
     "vite": "^8.1.0",
     "vite-plugin-dts": "^4.5.4"
   },
