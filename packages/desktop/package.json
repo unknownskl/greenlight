@@ -37,7 +37,7 @@
     "ip-address": "^10.2.0",
     "react-i18next": "^17.0.11",
     "react-query": "^3.39.3",
-    "typescript-eslint": "^8.59.4",
+    "typescript-eslint": "^8.67.0",
     "uplot": "^1.6.30",
     "xal-node": "^1.1.6-beta2",
     "xbox-webapi": "^2.0.0-beta4",
