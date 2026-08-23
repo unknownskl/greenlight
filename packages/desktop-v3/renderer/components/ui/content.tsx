@@ -13,7 +13,7 @@ export default function Content({
   return (
     <React.Fragment>
 
-        <div className={fullscreen ? 'fullscreen' : 'mb-8 animate-fade-in-up p-1'}>
+        <div className={fullscreen ? 'fullscreen' : 'mb-8 animate-fade-in-up p-4'}>
             {children}
         </div>
       

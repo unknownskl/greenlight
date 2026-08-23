@@ -63,6 +63,7 @@ export default function Select({
         ref={popoverRef}
         className="dropdown dropdown-bottom dropdown-end menu w-52 rounded-box bg-base-100 shadow-sm"
         popover="auto"
+        data-inputgroup="true"
         style={{ positionAnchor: `--anchor-${name}` } as React.CSSProperties}
       >
         {Array.isArray(options) ? options.map((option) => (

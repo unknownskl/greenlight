@@ -25,15 +25,16 @@ export default function HomePage() {
       <Head>
         <title>{`Greenlight - ${t('title')}`}</title>
       </Head>
-
+      
         {/* Header */}
         <PageHeader title={t('title')} />
 
         <Content>
+
           <fieldset className="fieldset pb-8">
             <legend className="fieldset-legend">{t('language')}</legend>
 
-            <label className="item">
+            <label className="item" htmlFor="">
               <span className="label">{t('applicationLanguage')}</span>
               <span className="ml-auto inline-flex float-right items-center gap-2">
                 <Select name="language" defaultValue={language} options={{'en': 'English', 'nl': 'Dutch'}} onChange={languageChangeDropdown} />
@@ -50,14 +51,14 @@ export default function HomePage() {
           <fieldset className="fieldset">
             <legend className="fieldset-legend">Debug Selects</legend>
 
-            <label className="item">
+            <label className="item" htmlFor="">
               <span className="label">Select Option (Array)</span>
               <span className="ml-auto inline-flex float-right items-center gap-2">
                 <Select name="debug_option1" options={['option 1', 'option 2']} />
               </span>
             </label>
 
-            <label className="item">
+            <label className="item" htmlFor="">
               <span className="label">Select Option (Object)</span>
               <span className="ml-auto inline-flex float-right items-center gap-2">
                 <Select name="debug_option2" options={{'option 1':'yes', 'option 2':'no'}} />
@@ -68,7 +69,7 @@ export default function HomePage() {
             <fieldset className="fieldset">
             <legend className="fieldset-legend">Debug Options</legend>
 
-            <label className="item">
+            <label className="item" htmlFor="">
               <span className="label">Enable Debug</span>
               <span className="ml-auto inline-flex float-right items-center gap-2">
                 <Select name="debug_enabled" defaultValue="false" options={{'true': 'Enabled', 'false': 'Disabled'}} />

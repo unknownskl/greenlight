@@ -44,6 +44,11 @@ export default function HomePage() {
 
       <Content>
         <div className="grid grid-cols-3 gap-4 mb-8 animate-fade-in-up delay-100 p-5">
+          {consoles.length === 0 && (
+            <div className="col-span-3 text-center text-white/40 text-sm">
+              No consoles found. Please make sure your console is set up for Remote Streaming.
+            </div>
+          )}
           {consoles.map((device) => (
             <div key={device.id} data-focusable className="glass rounded-2xl p-5 flex flex-col gap-4 hover:border-[#107C10]/20 transition-all duration-300 group animate-fade-in-up">
               <div className="flex items-start justify-between">

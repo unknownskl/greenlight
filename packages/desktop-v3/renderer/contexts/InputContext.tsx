@@ -182,7 +182,7 @@ export function InputProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const findNearest = (fromEl: Element, direction: 'up' | 'down' | 'left' | 'right') => {
-    const all = getFocusables()
+    const all = getFocusables(fromEl)
     const fr = fromEl.getBoundingClientRect()
     const fc = centerOf(fr)
 
@@ -217,8 +217,10 @@ export function InputProvider({ children }: { children: ReactNode }) {
     return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 }
   }
 
-  function getFocusables() {
-    return Array.from(document.querySelectorAll('[data-focusable]')).filter(el => {
+  function getFocusables(fromEl?: Element | null) {
+    const group = fromEl?.closest('[data-inputgroup="true"]') ?? null;
+    const root: Element | Document = group ?? document;
+    return Array.from(root.querySelectorAll('[data-focusable]')).filter(el => {
         const r = el.getBoundingClientRect()
         return r.width > 0 && r.height > 0 && !el.closest('[data-focusable-disabled]')
     })

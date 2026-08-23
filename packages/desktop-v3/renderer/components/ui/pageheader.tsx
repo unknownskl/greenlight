@@ -13,7 +13,7 @@ export default function PageHeader({
   return (
     <React.Fragment>
 
-        <div className="mb-6 animate-fade-in-up">
+        <div className="m-4 animate-fade-in-up">
           <h2 className="text-2xl font-bold text-white mb-1">{title}</h2>
           {subtitle && <p className="text-white/40 text-sm">{subtitle}</p>}
         </div>

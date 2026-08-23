@@ -22,7 +22,7 @@ function GreenlightDesktop({ Component, pageProps }: AppProps) {
                 <Head>
                   <title>Greenlight</title>
                 </Head>
-                <div className="flex h-screen bg-[#0d0d0d] bg-pattern overflow-hidden">
+                <div className="flex h-screen bg-[#0d0d0d] bg-pattern overflow-hidden" data-theme="dark">
                   {/* Sidebar */}
                   <Sidebar />
 
