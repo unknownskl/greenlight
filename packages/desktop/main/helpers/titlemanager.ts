@@ -24,7 +24,7 @@ interface FilterArgs {
 export default class TitleManager {
 
     _application:Application
-    _store = new Store()
+    _store = new Store({ name: 'xcloud-title-cache' })
     _http:HTTP
 
     _xCloudTitles = {}
@@ -39,57 +39,85 @@ export default class TitleManager {
         this._http = new HTTP(this._application)
     }
 
-    setCloudTitles(titles){
-        return new Promise((resolve, reject) => {
-            this._xCloudTitles = {}
+    async setCloudTitles(titles){
+        this._xCloudTitles = {}
+        this._productIdQueue = []
 
-            for(const title in titles.results){
-                const titleItem = new Title(titles.results[title])
-                this._xCloudTitles[titles.results[title].titleId] = titleItem
-                
-                this._productIdQueue.push(titles.results[title].details.productId)
+        for(const title in titles.results){
+            const titleItem = new Title(titles.results[title])
+            this._xCloudTitles[titles.results[title].titleId] = titleItem
+
+            this._productIdQueue.push(titles.results[title].details.productId)
+        }
+
+        const cachedProducts = this._store.get('products', {}) as object
+        this.populateTitleInfo(cachedProducts)
+
+        if(this._productIdQueue.length > 0){
+            const missingProducts = this._productIdQueue.filter((productId) => {
+                return this.findTitleByProductId(productId)?.catalogDetails === undefined
+            })
+
+            if(missingProducts.length > 0){
+                await this.refreshCatalog(this._productIdQueue, cachedProducts)
+            } else {
+                // Cached metadata is enough to render immediately. Refresh it in
+                // the background so the next launch has current catalog details.
+                this.refreshCatalog(this._productIdQueue, cachedProducts).catch((error) => {
+                    this._application.log('TitleManager', 'Unable to refresh title cache:', error)
+                })
             }
+        }
 
-            if(this._productIdQueue.length > 0){
+        return true
+    }
 
-                // Create batches of 100
-                const batches = []
-                for(let i = 0; i < this._productIdQueue.length; i += 100) {
-                    batches.push(this._productIdQueue.slice(i, i + 100))
-                }
+    async refreshCatalog(productIds, cachedProducts){
+        const batches = []
+        for(let i = 0; i < productIds.length; i += 100) {
+            batches.push(productIds.slice(i, i + 100))
+        }
 
-                // Create promises for each batch
-                const batchPromises = batches.map(batch => 
-                    this._http.post('catalog.gamepass.com', '/v3/products?market=US&language=en-US&hydration=RemoteHighSapphire0', {
+        const results:any[] = []
+        let nextBatch = 0
+
+        // Keep a small number of requests in flight. This is substantially faster
+        // than serial loading without bursting the endpoint with every batch.
+        const workers = Array.from({ length: Math.min(3, batches.length) }, async () => {
+            while(nextBatch < batches.length){
+                const batch = batches[nextBatch++]
+                try {
+                    const result:any = await this._http.post('catalog.gamepass.com', '/v3/products?market=US&language=en-US&hydration=RemoteHighSapphire0', {
                         'Products': batch,
                     }, {
                         'ms-cv': 0,
                         'calling-app-name': 'Xbox Cloud Gaming Web',
                         'calling-app-version': '21.0.0',
                     })
-                )
-
-                // Execute all batches and merge results
-                Promise.all(batchPromises).then((results: any[]) => {
-                    const allProducts = results.reduce((current, result) => {
-                        return { ...current, ...result.Products }
-                    }, {})
-
-                    console.log('Retrieved information from store:', allProducts)
-                    this.populateTitleInfo(allProducts)
-                    resolve(true)
-
-                }).catch((error) => {
-                    console.log('Error:', error)
-                    reject(error)
-                })
-            } else {
-                resolve(true)
+                    results.push(result)
+                } catch(error) {
+                    this._application.log('TitleManager', 'Unable to resolve catalog batch:', error)
+                }
             }
-
-            // We got all info!
-            // console.log(this)
         })
+
+        await Promise.all(workers)
+
+        const allProducts = results.reduce((current, result) => {
+            return { ...current, ...result.Products }
+        }, {})
+
+        console.log('Retrieved information from store:', allProducts)
+        this.populateTitleInfo(allProducts)
+
+        const currentProductIds = new Set(productIds)
+        const productsToCache = Object.entries({ ...cachedProducts, ...allProducts }).reduce((current, [key, product]:[string, any]) => {
+            if(currentProductIds.has(product.StoreId)){
+                current[key] = product
+            }
+            return current
+        }, {})
+        this._store.set('products', productsToCache)
     }
 
     getNewTitles(){
