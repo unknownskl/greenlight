@@ -12,6 +12,7 @@ interface GameTitleProps {
 
 interface titleDataState {
     titleId?: string;
+    hasEntitlement?: boolean;
     catalogDetails?: {
         ProductTitle: string;
         Image_Tile: {
@@ -28,12 +29,12 @@ function GameTitleDynamic({
 
     return (
         <React.Fragment>
-            <div className='component_gametitle'>
+            <div className={ `component_gametitle${titleData.data?.hasEntitlement === false ? ' component_gametitle_unentitled' : ''}` }>
                 <div className='component_gametitle_infopage'>
                     <Link href={ '/xcloud/info/'+titleId } title={t("page.xCloudLibrary.viewGamePageIcon")}><i className="fa-solid fa-info" /></Link>
                 </div>
 
-                { (titleData.isFetched === true && titleData.data.titleId !== undefined) ? <Link href={ `/stream/xcloud_${ titleId }` }>
+                { (titleData.isFetched === true && titleData.data.titleId !== undefined) ? <Link href={ titleData.data.hasEntitlement === false ? `/xcloud/info/${ titleId }` : `/stream/xcloud_${ titleId }` }>
 
                     <Image
                         src={ 'https:'+titleData.data.catalogDetails.Image_Tile?.URL }
