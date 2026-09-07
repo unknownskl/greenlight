@@ -14,7 +14,7 @@
 		"@greenlight/platform": "*",
 		"@cloudflare/vitest-pool-workers": "^0.20.3",
 		"@types/node": "^25.9.1",
-		"typescript": "^5.5.2",
+		"typescript": "^7.0.2",
 		"vitest": "~3.2.0",
 		"wrangler": "^4.92.0"
 	}
