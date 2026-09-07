@@ -90,6 +90,7 @@
         "description": "xHome and xCloud do not support more than 20mbps by default. This setting does not override this limit.",
         "xCloudStreamingBitrateLabel": "xCloud Streaming Bitrate",
         "xHomeStreamingBitrateLabel": "xHome Streaming Bitrate",
+        "showNonEntitledLabel": "Show games that require purchase",
         "unlimitedLabel": "Unlimited / Off",
         "mbpsLabel": "mbps",
         "setH264ProfileLabel": "Set H.264 Profile",
@@ -209,7 +210,8 @@
         "by": "by",
         "descriptionTitle": "Description",
         "capabilitiesTitle": "Capabilities",
-        "startStreamBtn": "Start Stream"
+        "startStreamBtn": "Start Stream",
+        "purchaseRequiredBtn": "Purchase required"
       },
 
       "page404": {

@@ -1,6 +1,7 @@
 export const defaultSettings = {
     xhome_bitrate: 0,
     xcloud_bitrate: 0,
+    xcloud_show_non_entitled: true,
     video_profiles: [],
     preferred_game_language: 'en-US',
     controller_vibration: true,

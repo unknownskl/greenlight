@@ -90,6 +90,7 @@
         "description": "xHome и xCloud по умолчанию не поддерживают более 20 Мбит/с. Эта настройка не отменяет это ограничение.",
         "xCloudStreamingBitrateLabel": "Битрейт трансляции xCloud",
         "xHomeStreamingBitrateLabel": "Битрейт трансляции xHome",
+        "showNonEntitledLabel": "Показывать игры, требующие покупки",
         "unlimitedLabel": "Без ограничений / Выкл.",
         "mbpsLabel": "Мбит/с",
         "setH264ProfileLabel": "Установить профиль H.264",
@@ -209,7 +210,8 @@
         "by": "От",
         "descriptionTitle": "Описание",
         "capabilitiesTitle": "Возможности",
-        "startStreamBtn": "Начать трансляцию"
+        "startStreamBtn": "Начать трансляцию",
+        "purchaseRequiredBtn": "Требуется покупка"
       },
 
       "page404": {

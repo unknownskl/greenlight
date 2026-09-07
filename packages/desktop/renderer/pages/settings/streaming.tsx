@@ -34,6 +34,13 @@ function SettingsStreaming() {
         })
     }
 
+    function setShowNonEntitled(e){
+        setSettings({
+            ...settings,
+            xcloud_show_non_entitled: e.target.checked,
+        })
+    }
+
     function setVideoProfile(profile){
         console.log('Set video profile to:', profile)
         setSettings({
@@ -87,6 +94,11 @@ function SettingsStreaming() {
                         <label>{t('settings.streaming.xHomeStreamingBitrateLabel')}</label>
                         <input type="range" min="0" max="40960" step="1024" value={settings.xhome_bitrate} onChange={ setxHomeBitrate } />
                 ({ settings.xhome_bitrate === 0 ? t('settings.streaming.unlimitedLabel') : Math.floor(settings.xhome_bitrate / 1024) + ' ' + t('settings.streaming.mbpsLabel') })
+                    </p>
+
+                    <p>
+                        <label>{t('settings.streaming.showNonEntitledLabel')}</label>
+                        <input type='checkbox' checked={settings.xcloud_show_non_entitled} onChange={setShowNonEntitled} />
                     </p>
 
                     <p>

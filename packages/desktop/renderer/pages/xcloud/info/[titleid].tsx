@@ -17,6 +17,7 @@ function xCloudInfo() {
     const productDetails = useQuery('xcloudinfo_titleId_'+router.query.titleid, () => Ipc.send('xCloud', 'getTitle', { titleId: router.query.titleid}), { staleTime: 10*1000 })
     const [productName, setProductName] = React.useState('...')
     const { t } = useTranslation()
+    const hasEntitlement = productDetails.data?.hasEntitlement !== false
 
     if(productDetails.isFetched === true && productName === '...')
         setProductName(productDetails.data.catalogDetails.ProductTitle)
@@ -52,9 +53,9 @@ function xCloudInfo() {
                         <Image src={ 'https:'+productDetails.data.catalogDetails.Image_Poster?.URL } alt={productName} width={ 640/4 } height={ 960/4 } /><br />
                         <br />
 
-                        <Link href={ '/stream/xcloud_'+router.query.titleid }>
+                        {hasEntitlement ? <Link href={ '/stream/xcloud_'+router.query.titleid }>
                             <Button label={ t('page.titleInfo.startStreamBtn') } className='btn-primary'></Button>
-                        </Link>
+                        </Link> : <Button label={ t('page.titleInfo.purchaseRequiredBtn') } className='btn-primary' disabled={true}></Button>}
                     </div>
 
                     <div id="page_info_titleid_content">
