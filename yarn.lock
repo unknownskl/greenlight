@@ -3630,10 +3630,10 @@
     "@types/http-errors" "*"
     "@types/node" "*"
 
-"@types/sinon@^21.0.0":
-  version "21.0.1"
-  resolved "https://registry.yarnpkg.com/@types/sinon/-/sinon-21.0.1.tgz#f995e2afdf15be832d5f1645803d82a8eb95a1bc"
-  integrity sha512-5yoJSqLbjH8T9V2bksgRayuhpZy+723/z6wBOR+Soe4ZlXC0eW8Na71TeaZPUWDQvM7LYKa9UGFc6LRqxiR5fQ==
+"@types/sinon@^22.0.0":
+  version "22.0.0"
+  resolved "https://registry.yarnpkg.com/@types/sinon/-/sinon-22.0.0.tgz#396af07c4452efb57950ec260d450acedf025508"
+  integrity sha512-TDbVpbccc2HfiqHR09Argj3mHV1KMW7sCCKj52fsl8lbRLkEn7fB1966EWhOKWUBcqfBueZuPoA7/OK1CKiy3g==
   dependencies:
     "@types/sinonjs__fake-timers" "*"
 
@@ -10964,10 +10964,10 @@ simple-update-notifier@2.0.0:
   dependencies:
     semver "^7.5.3"
 
-sinon@^22.0.0:
-  version "22.0.0"
-  resolved "https://registry.yarnpkg.com/sinon/-/sinon-22.0.0.tgz#01cea95c919468f6ef01e21d406397e5c02aad9b"
-  integrity sha512-sq/6DpdXOrLyfbKlXLg/Usc7xu8YXPeLkOFZRvA3bNUSA2lhbrZ06yuXbH1fkzBPCbz9O10+7hznzUsjaYNm0Q==
+sinon@^22.1.0:
+  version "22.1.0"
+  resolved "https://registry.yarnpkg.com/sinon/-/sinon-22.1.0.tgz#df5a9308d1818166d1370795a4953ceadc5ff706"
+  integrity sha512-n1ajF2rBWMTtEwbKcw4UdFg4nCnDdq/U6RDoxtOd7oapOlRoJ5ynwFx60owROyhDpA9QhMZi0pCO/xtmwFjG7w==
   dependencies:
     "@sinonjs/commons" "^3.0.1"
     "@sinonjs/fake-timers" "^15.4.0"
