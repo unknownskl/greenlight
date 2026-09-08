@@ -33,7 +33,7 @@ function GameTitleDynamic({
                     <Link href={ '/xcloud/info/'+titleId } title={t("page.xCloudLibrary.viewGamePageIcon")}><i className="fa-solid fa-info" /></Link>
                 </div>
 
-                { (titleData.isFetched === true && titleData.data.titleId !== undefined) ? <Link href={ `/stream/xcloud_${ titleId }` }>
+                { (titleData.isFetched === true && titleData.data?.catalogDetails !== undefined) ? <Link href={ `/stream/xcloud_${ titleId }` }>
 
                     <Image
                         src={ 'https:'+titleData.data.catalogDetails.Image_Tile?.URL }
