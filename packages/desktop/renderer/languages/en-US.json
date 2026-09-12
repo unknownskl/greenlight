@@ -186,6 +186,8 @@
         "breadcrumb2": "Library",
         "title": "Library",
         "searchPlaceholder": "Search",
+        "gamePassOnly": "Game Pass Games",
+        "noGamesFound": "No games found",
         "previousPageBtn": "Previous Page",
         "nextPageBtn": "Next Page",
         "viewGamePageIcon": "View game page"

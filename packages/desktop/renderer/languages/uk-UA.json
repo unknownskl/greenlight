@@ -186,6 +186,8 @@
         "breadcrumb2": "Бібліотека",
         "title": "Бібліотека",
         "searchPlaceholder": "Пошук",
+        "gamePassOnly": "Ігри Game Pass",
+        "noGamesFound": "Ігор не знайдено",
         "previousPageBtn": "Попередня сторінка",
         "nextPageBtn": "Наступна сторінка",
         "viewGamePageIcon": "Переглянути сторінку гри"

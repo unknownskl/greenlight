@@ -6,31 +6,58 @@ import Loader from '../../components/ui/loader'
 import ViewportGrid from '../../components/ui/viewportgrid'
 import GameTitleDynamic from '../../components/ui/game/titledynamic'
 import BreadcrumbBar from '../../components/ui/breadcrumbbar'
-import { useQuery, QueryClient } from 'react-query'
+import { useQuery } from 'react-query'
 import { useTranslation } from 'react-i18next'
 
 
 function xCloudLibrary() {
     const { t } = useTranslation()
-    const [filter, setFilter] = React.useState({
-        name: '',
-    })
+    const [searchTerm, setSearchTerm] = React.useState('')
+    const [debouncedSearch, setDebouncedSearch] = React.useState('')
+    const [gamePassOnly, setGamePassOnly] = React.useState(true)
 
-    const xCloudTitles = useQuery('xCloudTitles', () => Ipc.send('xCloud', 'getTitles'), { staleTime: 300*1000 })
-    const xCloudSearch = useQuery(['xCloudSearch', filter], () => Ipc.send('xCloud', 'filterTitles', filter))
-    const queryClient = new QueryClient()
+    // Debounce search input by 250ms to prevent query churn
+    React.useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedSearch(searchTerm)
+        }, 250)
+        return () => {
+            clearTimeout(handler)
+        }
+    }, [searchTerm])
 
-    function performFilter(){
-        console.log(filter)
+    const trimmedSearch = debouncedSearch.trim()
+    const titlesQuery = useQuery(
+        ['xCloudTitles', trimmedSearch, gamePassOnly],
+        () => Ipc.send('xCloud', 'filterTitles', { name: trimmedSearch, onlyEntitled: gamePassOnly }),
+        { staleTime: 60 * 1000, keepPreviousData: true }
+    )
 
-        // if(filter.name !== ''){
-        //   // const xCloudSearch = useQuery('xCloudSearch', () => Ipc.send('xCloud', 'filterTitles', filter))
-        queryClient.invalidateQueries('xCloudSearch')
-        return (xCloudSearch.isFetched === true) ? xCloudSearch.data : xCloudTitles.data
-        // }
+    const titles: string[] = titlesQuery.data || []
 
-        // return (xCloudSearch.isFetched === true) ? xCloudSearch.data : xCloudTitles.data
-        return xCloudTitles.data
+    const renderContent = () => {
+        if (titlesQuery.isLoading && !titlesQuery.data) {
+            return <Loader />
+        }
+
+        if (titles.length === 0) {
+            return (
+                <div style={{ textAlign: 'center', padding: '60px 20px', color: '#888888', fontSize: '16px' }}>
+                    {t('page.xCloudLibrary.noGamesFound')}
+                </div>
+            )
+        }
+
+        return (
+            <ViewportGrid key={`library_${trimmedSearch}_${gamePassOnly}`} drawPagination={true}>
+                { titles.map((item) => (
+                    <GameTitleDynamic
+                        titleId={ item }
+                        key={ item }
+                    />
+                )) }
+            </ViewportGrid>
+        )
     }
 
     return (
@@ -47,28 +74,33 @@ function xCloudLibrary() {
             <h2 className="title">
                 {t('page.xCloudLibrary.title')}
 
-                <input type="text" className="text h2-search" placeholder={t('page.xCloudLibrary.searchPlaceholder')} onChange={
-                    (e) => {
-                        setFilter({
-                            name: e.target.value,
-                        })
-                    }
-                }></input>
+                <div style={{ float: 'right', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <label style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '13px', cursor: 'pointer', userSelect: 'none', fontWeight: 300, minWidth: 0, paddingRight: '4px' }}>
+                        <input
+                            type="checkbox"
+                            checked={gamePassOnly}
+                            onChange={(e) => setGamePassOnly(e.target.checked)}
+                            style={{ cursor: 'pointer' }}
+                        />
+                        <span>{t('page.xCloudLibrary.gamePassOnly')}</span>
+                    </label>
+
+                    <input
+                        type="text"
+                        className="text h2-search"
+                        style={{ float: 'none', margin: 0 }}
+                        placeholder={t('page.xCloudLibrary.searchPlaceholder')}
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                </div>
             </h2>
 
-            <ViewportGrid key='library' drawPagination={true}>{
-                (xCloudTitles.isFetched !== true) ? (<Loader></Loader>) : performFilter().map((item) => {
-                    return (
-                        <GameTitleDynamic
-                            titleId={ item }
-                            key={ item }
-                        ></GameTitleDynamic>
-                    )
-                })
-            }</ViewportGrid>
+            { renderContent() }
 
         </React.Fragment>
     )
 }
 
 export default xCloudLibrary
+

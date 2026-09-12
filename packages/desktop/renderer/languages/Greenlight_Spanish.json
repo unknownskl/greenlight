@@ -177,6 +177,8 @@
         "breadcrumb2": "Biblioteca",
         "title": "Biblioteca",
         "searchPlaceholder": "Buscar",
+        "gamePassOnly": "Juegos de Game Pass",
+        "noGamesFound": "No se encontraron juegos",
         "previousPageBtn": "Página anterior",
         "nextPageBtn": "Página siguiente",
         "viewGamePageIcon": "Ver página del juego"

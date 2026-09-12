@@ -33,18 +33,18 @@ function GameTitleDynamic({
                     <Link href={ '/xcloud/info/'+titleId } title={t("page.xCloudLibrary.viewGamePageIcon")}><i className="fa-solid fa-info" /></Link>
                 </div>
 
-                { (titleData.isFetched === true && titleData.data.titleId !== undefined) ? <Link href={ `/stream/xcloud_${ titleId }` }>
+                { (titleData.isFetched === true && titleData.data?.titleId !== undefined) ? <Link href={ `/stream/xcloud_${ titleId }` }>
 
                     <Image
-                        src={ 'https:'+titleData.data.catalogDetails.Image_Tile?.URL }
-                        alt={ titleData.data.catalogDetails.ProductTitle }
+                        src={ titleData.data.catalogDetails?.Image_Tile?.URL ? ('https:'+titleData.data.catalogDetails.Image_Tile.URL) : '' }
+                        alt={ titleData.data.catalogDetails?.ProductTitle || titleId }
                         width='280' height='280' style={{
                             width: 140,
                             height: 140,
                             borderRadius: '4px',
                         }} ></Image>
 
-                    <div className='component_gametitle_title'><p>{ titleData.data.catalogDetails.ProductTitle }</p></div>
+                    <div className='component_gametitle_title'><p>{ titleData.data.catalogDetails?.ProductTitle || titleId }</p></div>
                 </Link> : <Loader></Loader> }
             </div>
         </React.Fragment>

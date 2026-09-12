@@ -19,6 +19,7 @@ interface titleInfoArgs {
 
 interface FilterArgs {
     name: string;
+    onlyEntitled?: boolean;
 }
 
 export default class TitleManager {
@@ -42,12 +43,21 @@ export default class TitleManager {
     setCloudTitles(titles){
         return new Promise((resolve, reject) => {
             this._xCloudTitles = {}
+            this._productIdQueue = []
 
             for(const title in titles.results){
                 const titleItem = new Title(titles.results[title])
                 this._xCloudTitles[titles.results[title].titleId] = titleItem
                 
-                this._productIdQueue.push(titles.results[title].details.productId)
+                if(titles.results[title].details?.productId){
+                    this._productIdQueue.push(titles.results[title].details.productId)
+                }
+            }
+
+            // Restore from cache if available so titles are immediately populated
+            const cachedCatalog = this._store.get('xcloud_catalog_cache', {}) as Record<string, titleInfoArgs>
+            if(cachedCatalog && Object.keys(cachedCatalog).length > 0){
+                this.populateTitleInfo(cachedCatalog)
             }
 
             if(this._productIdQueue.length > 0){
@@ -77,6 +87,7 @@ export default class TitleManager {
 
                     console.log('Retrieved information from store:', allProducts)
                     this.populateTitleInfo(allProducts)
+                    this._store.set('xcloud_catalog_cache', allProducts)
                     resolve(true)
 
                 }).catch((error) => {
@@ -96,7 +107,7 @@ export default class TitleManager {
         return this._http.get('catalog.gamepass.com', '/sigls/v2?id=f13cf6b4-57e6-4459-89df-6aec18cf0538&market=US&language=en-US')
     }
 
-    populateTitleInfo(titleInfo:titleInfoArgs[]){
+    populateTitleInfo(titleInfo:Record<string, titleInfoArgs> | titleInfoArgs[]){
         for(const product in titleInfo){
             const xCloudTitle = titleInfo[product].XCloudTitleId
 
@@ -122,23 +133,6 @@ export default class TitleManager {
             }
         }
 
-        // Perform a lookup?
-        // this._application.log('TitleManager', 'Title not found in cache:', productId, 'Trying to get info from store...')
-        // this._http.post('catalog.gamepass.com', '/v3/products?market=US&language=en-US&hydration=RemoteHighSapphire0', { // RemoteLowJade0
-        //     "Products": [productId]
-        // }, {
-        //     'ms-cv': 0,
-        //     'calling-app-name': 'Xbox Cloud Gaming Web',
-        //     'calling-app-version': '21.0.0',
-
-        // }).then((result:any) => {
-        //     this._application.log('TitleManager', 'Retrieved information from store:', result.Products)
-        //     this.populateTitleInfo(result.Products)
-
-        // }).catch((error) => {
-        //     console.log('Error:', error)
-        // })
-
         return undefined
     }
 
@@ -150,16 +144,36 @@ export default class TitleManager {
         return undefined
     }
 
-    filterTitles(filter:FilterArgs){
+    getTitles(onlyEntitled = true){
         const returnTitles = []
 
         for(const title in this._xCloudTitles){
-            if(this._xCloudTitles[title].catalogDetails !== undefined){
+            const titleObj = this._xCloudTitles[title]
+            if(!onlyEntitled || titleObj.hasEntitlement === true){
+                returnTitles.push(titleObj.titleId)
+            }
+        }
 
-                if(this._xCloudTitles[title].catalogDetails.ProductTitle.toLowerCase().includes(filter.name.toLowerCase())){
-                    returnTitles.push(this._xCloudTitles[title].titleId)
+        return returnTitles
+    }
+
+    filterTitles(filter:FilterArgs){
+        const returnTitles = []
+        const query = (filter.name || '').trim().toLowerCase()
+        const onlyEntitled = filter.onlyEntitled !== false
+
+        for(const title in this._xCloudTitles){
+            const titleObj = this._xCloudTitles[title]
+            if(onlyEntitled && titleObj.hasEntitlement !== true){
+                continue
+            }
+
+            if(query === ''){
+                returnTitles.push(titleObj.titleId)
+            } else if(titleObj.catalogDetails !== undefined && titleObj.catalogDetails.ProductTitle){
+                if(titleObj.catalogDetails.ProductTitle.toLowerCase().includes(query)){
+                    returnTitles.push(titleObj.titleId)
                 }
-
             }
         }
 
@@ -186,17 +200,19 @@ interface TitleDetails {
 
 export class Title {
 
-    titleId
-    productId
-    xboxTitleId
-    supportedInputTypes
-    catalogDetails
+    titleId: string
+    productId: string
+    xboxTitleId: number
+    supportedInputTypes: any
+    catalogDetails: any
+    hasEntitlement: boolean
 
     constructor(title:TitleDetails){
         this.titleId = title.titleId
-        this.productId = title.details.productId
-        this.xboxTitleId = title.details.xboxTitleId
-        this.supportedInputTypes = title.details.supportedInputTypes
+        this.productId = title.details?.productId
+        this.xboxTitleId = title.details?.xboxTitleId
+        this.supportedInputTypes = title.details?.supportedInputTypes
+        this.hasEntitlement = Boolean(title.details?.hasEntitlement || title.details?.isFreeInStore)
     }
 
     setCatalogDetails(titleInfo:titleInfoArgs){
