@@ -30,14 +30,14 @@
     "@greenlight/platform": "*",
     "@tailwindcss/postcss": "^4.2.2",
     "@types/node": "^25.9.1",
-    "@types/react": "^19.2.18",
+    "@types/react": "^19.3.0",
     "electron": "43.2.0",
     "electron-builder": "^26.8.1",
     "next": "^16.2.1",
     "nextron": "^10.0.0",
     "postcss": "^8.5.8",
-    "react": "^19.2.8",
-    "react-dom": "^19.2.8",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
     "tailwindcss": "^4.2.2",
     "typescript": "^5.7.3"
   }
