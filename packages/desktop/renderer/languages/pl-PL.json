@@ -1,0 +1,286 @@
+{
+  "translation": {
+    "languageName": "Polski",
+    "authorOfLocalization": "Polskie tłumaczenie autorstwa PlFarmer",
+
+    "header": {
+      "myConsoles": "Moje Konsole",
+      "viewConsoles": "Wyświetl konsole",
+      "xCloudLibrary": "Biblioteka xCloud",
+      "browseXCloudLibrary": "Przeglądaj bibliotekę xCloud",
+      "settings": "Ustawienia",
+      "changeSettings": "Zmień ustawienia aplikacji",
+      "viewProfile": "Wyświetl profil",
+      "quitQuestion": "Na pewno chcesz wyjść?",
+      "home": "Strona główna"
+    },
+
+    "auth": {
+      "logoutQuestion": "Na pewno chcesz się wylogować?",
+      "clearDataBtn": "Wyczyść Dane",
+      "clearDataQuestion": "To usunie wszystkie dane aplikacji, które są przydatne czasem, gdy utkniesz w pętli logowania. Chcesz kontynuować?",
+      "gamerscore": "Gamerscore",
+      "loggingIn": "Logowanie...",
+      "loginBtn": "Zaloguj się",
+      "logoutBtn": "Wyloguj się",
+      "loginWithXbox": "Zaloguj się przez Xbox",
+      "pleaseAuthenticate": "Proszę uwierzytelnić się poniżej, aby uzyskać dostęp do xCloud i strumieniowania xHome",
+      "windowTitle": "Authentication"
+    },
+
+    "settings": {
+      "sidebar": {
+        "about": "Informacje",
+        "streaming": "Strumieniowanie",
+        "input": "Wejścia",
+        "videoAudio": "Obraz i Dźwięk",
+        "webUI": "Interfejs webowy",
+        "debug": "Debugowanie"
+      },
+
+      "about": {
+        "logoutQuestion": "Na pewno chcesz się wylogować?",
+        "title": "Ustawienia",
+        "gamerscore": "Gamerscore",
+        "selectorSelectLanguage": "Wybierz język",
+        "logout": "Wyloguj się",
+        "version": "Wersja",
+        "website": "Strona",
+        "websiteLinkTitle": "Otwórz link w zewnętrznej przeglądarce"
+      },
+
+      "input": {
+        "settingsInputPageTitle": "Ustawienia: Wejścia",
+        "dPadUp": "Pad kierunkowy Góra",
+        "dPadDown": "Pad kierunkowy Dół",
+        "dPadLeft": "Pad kierunkowy Lewo",
+        "dPadRight": "Pad kierunkowy Prawo",
+        "leftShoulder": "Lewy Bumper",
+        "rightShoulder": "Prawy Bumper",
+        "leftTrigger": "Lewy Spust",
+        "rightTrigger": "Prawy Spust",
+        "leftThumb": "Lewa Gałka Analogowa",
+        "rightThumb": "Prawa Gałka Analogowa",
+        "view": "Wyświetl",
+        "menu": "Menu",
+        "nexus": "Nexus",
+        "none": "Brak",
+        "enabledLabel": "Wł.",
+        "disabledLabel": "Wył.",
+        "axesLabel": "osie",
+        "buttonsLabel": "przyciski",
+        "rumbleLabel": "wibracje",
+        "notSupportedLabel": "Nie wspierane",
+        "title": "Wejścia",
+        "enableVibration": "Włącz wibracje",
+        "enableTouch": "Włącz wejście Dotyku",
+        "enableMouseKeyboard": "Włącz Klawiaturę i Mysz",
+        "legacyWarning": "Używanie sterownika Klawiatury i Myszy razem z mapowaniem klawiatury do kontrolera będzie wywoływać konflikty",
+        "enableLegacy": "Włącz Klawiatura jako Kontroler",
+        "enableLegacyDescription": "(Wyłączenie tej funkcji wyłączy mapowanie klawiatury do kontrolera i zezwala wyłącznie na sterowanie kontrolerem.)",
+        "controllerDetectedTitle": "Wykryte kontrolery",
+        "controllerDetectedDescription": "Jeśli masz kontroler, ale się nie pokazuje spróbuj wcisnąć przycisk na kontrolerze, aby go wykryć.",
+        "noControllerDetected": "Nie wykryto kontrolera",
+        "keyboardMappingsTitle": "Mapowanie klawiatury"
+      },
+
+      "streaming": {
+        "pageTitle": "Ustawienia: Strumieniowanie",
+        "title": "Ustawienia Strumieniowania",
+        "description": "xHome i xCloud domyślnie nie wspierają więcej niż 20mbps. To ustawienie nie nadpisuje tego limitu.",
+        "xCloudStreamingBitrateLabel": "Bitrate Strumieniowania xCloud",
+        "xHomeStreamingBitrateLabel": "Bitrate Strumieniowania xHome",
+        "unlimitedLabel": "Nieskończony / Wył.",
+        "mbpsLabel": "mbps",
+        "setH264ProfileLabel": "Ustaw Profil H.264",
+        "setH264ProfileValueAuto": "Autonegocjacja",
+        "setH264ProfileValueHigh": "Wysoki",
+        "setH264ProfileValueMedium": "Średni",
+        "setH264ProfileValueLow": "Niski",
+        "forceRegionTitle": "Wymuś region",
+        "setRegionLabel": "Ustaw region:",
+        "setRegionValueDisabled": "Wył.",
+        "setRegionValueAustralia": "Australia",
+        "setRegionValueBrazil": "Brazylia",
+        "setRegionValueEurope": "Europa",
+        "setRegionValueJapan": "Japonia",
+        "setRegionValueKorea": "Korea",
+        "setRegionValueUS": "Stany Zjednoczone",
+        "preferredGameLanguageLabel": "Preferowany język gier:",
+        "preferredGameLanguageValueArabic": "Arabski (Arabia Saudyjska)",
+        "preferredGameLanguageValueCzech": "Czeski",
+        "preferredGameLanguageValueDanish": "Duński",
+        "preferredGameLanguageValueGerman": "Niemiecki",
+        "preferredGameLanguageValueGreek": "Grecki",
+        "preferredGameLanguageValueEnglishUK": "Angielski (Wielka Brytania)",
+        "preferredGameLanguageValueEnglishUS": "Angielski (Stany Zjednoczone)",
+        "preferredGameLanguageValueSpanish": "Hiszpański (Hiszpania)",
+        "preferredGameLanguageValueSpanishMX": "Hiszpański (Meksyk)",
+        "preferredGameLanguageValueFinnish": "Fiński",
+        "preferredGameLanguageValueFrench": "Francuski",
+        "preferredGameLanguageValueHebrew": "Hebrajski",
+        "preferredGameLanguageValueHungarian": "Węgierski",
+        "preferredGameLanguageValueItalian": "Włoski",
+        "preferredGameLanguageValueJapanese": "Japoński",
+        "preferredGameLanguageValueKorean": "Koreański",
+        "preferredGameLanguageValueNorwegian": "Norweski",
+        "preferredGameLanguageValueDutch": "Holenderski",
+        "preferredGameLanguageValuePolish": "Polski",
+        "preferredGameLanguageValuePortugueseBR": "Portugalski (Brazylia)",
+        "preferredGameLanguageValuePortuguese": "Portugalski (Portugalia)",
+        "preferredGameLanguageValueRussian": "Rosyjski",
+        "preferredGameLanguageValueSlovak": "Słowacki",
+        "preferredGameLanguageValueSwedish": "Szwedzki",
+        "preferredGameLanguageValueTurkish": "Turecki",
+        "preferredGameLanguageValueChineseCN": "Chiński (Uproszczony)",
+        "preferredGameLanguageValueChineseTW": "Chiński (Tradycyjny)"
+      },
+
+      "videoAudio": {
+        "pageTitle": "Ustawienia: Obraz i Dźwięk",
+        "title": "Obraz",
+        "disableVideoLabel": "Wyłącz obraz",
+        "disabledLabel": "Wył.",
+        "enabledLabel": "Wł.",
+        "aspectSizeLabel": "Wielkość proporcji obrazu",
+        "aspectSizeValueDefault": "Domyślna",
+        "aspectSizeValueStretch": "Rozszerz",
+        "aspectSizeValueZoom": "Przybliż",
+        "forceLowResLabel": "Wymuś obraz niskiej rozdzielczości",
+        "forceLowResDescription": "(Ta opcja jest przydatna na Steam Decku i pozwala aplikacji renderować w niższej rozdzielczości aby dało się użyć FSR.)",
+        "audioTitle": "Dźwięk",
+        "disableAudioLabel": "Wyłącz dźwięk"
+      },
+
+      "webUI": {
+        "pageTitle": "Ustawienia: Interfejs webowy",
+        "title": "Interfejs webowy",
+        "enableWebUILabel": "Włącz Interfejs webowy",
+        "stopWebUIBtn": "Zatrzymaj Interfejs webowy",
+        "startWebUIBtn": "Uruchom Interfejs webowy",
+        "openWebUIBtn": "Otwórz Interfejs webowy",
+        "autostartLabel": "Włącz Interfejs webowy przy uruchomieniu aplikacji",
+        "autostartEnabled": "Wł.",
+        "autostartDisabled": "Wył.",
+        "portLabel": "Port",
+        "portPlaceholder": "przykład: 9003"
+      },
+
+      "debug": {
+        "pageTitle": "Ustawienia: Debugowanie"
+      }
+    },
+
+    "page": {
+      "xCloud": {
+        "pageTitle": "Biblioteka xCloud",
+        "breadcrumb": "xCloud",
+        "recentGames": "Ostatnie gry",
+        "recentlyAdded": "Ostatnio dodane",
+        "viewLibraryBtn": "Wyświetl Bibliotekę"
+      },
+
+      "xCloudLibrary": {
+        "pageTitle": "Biblioteka xCloud",
+        "breadcrumb1": "xCloud",
+        "breadcrumb2": "Biblioteka",
+        "title": "Biblioteka",
+        "searchPlaceholder": "Wyszukaj",
+        "previousPageBtn": "Poprzednia Strona",
+        "nextPageBtn": "Następna Strona",
+        "viewGamePageIcon": "Wyświetl stronę gry"
+      },
+
+      "myConsoles": {
+        "pageTitle": "Moje Konsole",
+        "poweredOn": "Włączona",
+        "standby": "Uśpiona",
+        "warningLabel": "Ostrzeżenie",
+        "managementWarning": "Zdalne zarządzanie nie jest włączone",
+        "streamingWarning": "Strumieniowanie z konsoli nie jest włączone",
+        "startStreamBtn": "Uruchom Strumień",
+        "noConsoles": "Nie znaleziono konsol na twoim koncie. Jeśli masz konsolę Xbox, upewnij się że granie zdalne jest włączone i że konsola jest widoczna w oficjalnej Aplikacji Xbox."
+      },
+
+      "titleInfo": {
+        "pageTitle": "Wyświetlanie informacji o tytule:",
+        "breadcrumb1": "xCloud",
+        "breadcrumb2": "Biblioteka",
+        "by": "od",
+        "descriptionTitle": "Opis",
+        "capabilitiesTitle": "Funkcje",
+        "startStreamBtn": "Uruchom Strumień"
+      },
+
+      "page404": {
+        "pageTitle": "Błąd",
+        "message": "Ups 404.. Nie znaleziono akcji"
+      },
+
+      "page500": {
+        "pageTitle": "Błąd",
+        "message": "Ups 500.. Aplikacja ma problem"
+      }
+    },
+
+    "friends": {
+      "allFriendsOffline": "Wszyscy twoi znajomi są offline"
+    },
+
+    "streamWindow": {
+      "pageTitle": "Strumieniowanie",
+      "endStreamConfirmMessage": "Na pewno chcesz zakończyć strumień?",
+      "estimatedWaitingTimeMessage": "Szacowany czas oczekiwania w kolejce:",
+      "timeHours": "godzin(a)",
+      "timeMinutes": "minut(a)",
+      "timeSeconds": "sekund(a)",
+      "loadingStreamTitle": "Ładowanie...",
+      "gettingStreamReadyMessage": "Przygotowujemy twój strumień...",
+      "endStreamBtn": "Zakończ Strumień",
+      "disconnectBtn": "Rozłącz",
+      "menuBtn": "Menu",
+      "menuTitle": "Otwórz menu Xbox",
+      "micMuted": "Wyciszony",
+      "micActive": "Aktywny",
+      "enableMic": "Włącz mikrofon",
+      "disableMic": "Wyłącz mikrofon",
+      "debugTitle": "Debugowanie",
+      "itsTakingALittleLonger": "Zajmie to chwilę dłużej.. Twój strumień może się rozpocząć za niedługo.",
+      "startingConnection": "Rozpoczynanie połączenia...",
+      "connectingToConsole": "Łączenie z konsolą...",
+      "clientHasBeenDisconnected": "Klient został rozłączony."
+    },
+
+    "updater": {
+      "unableToCheckForUpdates": "Nie udało się sprawdzić czy jest dostępna aktualizacja w tej chwili. Spróbuj ponownie.",
+      "alreadyOnLatestVersion": "Używasz już najnowszej wersji. Aktualna wersja:",
+      "newestVersion": "Najnowsza wersja:",
+      "newReleaseAvailable": "Nowe wydanie dostępne",
+      "installedVersion": "Zainstalowana wersja:",
+      "latestVersion": "Najnowsza wersja:",
+      "downloadBtn": "Pobierz",
+      "laterBtn": "Później",
+      "updateChecker": "Sprawdzanie Aktualizacji",
+      "closeBtn": "Zamknij"
+    },
+
+    "errors": {
+      "failedToRetrieveUserProfile": "Błąd: Nie udało się uzyskać profilu użytkownika:",
+      "repositoryNotFound": "Nie znaleziono URL repozytorium w pliku package.json.",
+      "failedToRetrieveStreamingTokens": "Błąd: Nie udało się otrzymać tokenów strumieniowania:",
+      "errorAuthentificationUser": "Błąd w uwierzytelnianiu użytkownika. Szczegóły błędu:",
+      "errorGettingRedirectURI": "Błąd w uzyskaniu przekierowania URI. Szczegóły błędu:",
+      "authentificationCallbackIsNotDefined": "Callback Uwierzytelniania nie jest zdefiniowany. Szczegóły błędu:",
+      "sisuTokenIsMissing": "Brakuje tokena Sisu. Najpierw się uwierzytelnij",
+      "failedToRetrieveWebTokens": "Błąd: Nie udało się uzyskać tokenów webowych:",
+      "chatSDPExchangeError": "ChatSDP Exchange error:",
+      "ICEExchangeError": "ICE Exchange error:",
+      "SDPExchangeError": "SDP Exchange error:",
+      "failedToStartStream": "Nie udało się rozpocząć nowego strumienia. Szczegóły błędu:",
+      "unableToStartStreamSession": "Nie udało się zacząć sesji strumieniowania na konsoli. Konsola nie jest podłączona do serwerów Xbox. To się dzieje okazjonalnie gdy jest aktualizacja albo gdy użytkownik nie jest zalogowany do konsoli. Wykonaj pełny restart konsoli i spróbuj ponownie.",
+      "streamErrorResult": "Wynik błędu strumienia:",
+      "details": "Szczegóły:",
+      "failedToGetPlayerState": "Nie udało się uzyskać stanu gracza. Szczegóły błędu:"
+    }
+  }
+}
