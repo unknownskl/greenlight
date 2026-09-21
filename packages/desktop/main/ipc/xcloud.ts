@@ -87,7 +87,7 @@ export default class IpcxCloud extends IpcBase {
 
     getTitles(){
         return new Promise((resolve, reject) => {
-            if(this._recentTitlesLastUpdate < Date.now() - 3600*1000){
+            if(this._titlesLastUpdate < Date.now() - 3600*1000){
                 this._application._xCloudApi.getTitles().then((titles:any) => {
                     const returnTitles = []
                     console.log('titles:', titles)
