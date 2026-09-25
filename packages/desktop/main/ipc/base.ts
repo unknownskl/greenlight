@@ -26,11 +26,15 @@ export default class IpcBase {
                 })
             }).catch((error) => {
                 console.log('ERROR: IPC communication error from backend:', error)
+                const serializedError = error instanceof Error ? {
+                    name: error.name,
+                    message: error.message,
+                } : error
                 this.send(channel, {
                     action: args.action,
                     id: args.id,
                     data: {},
-                    error: error,
+                    error: serializedError,
                 })
             })
 

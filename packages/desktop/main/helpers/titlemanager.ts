@@ -19,6 +19,7 @@ interface titleInfoArgs {
 
 interface FilterArgs {
     name: string;
+    showNonEntitled?: boolean;
 }
 
 export default class TitleManager {
@@ -155,6 +156,8 @@ export default class TitleManager {
 
         for(const title in this._xCloudTitles){
             if(this._xCloudTitles[title].catalogDetails !== undefined){
+                if(filter.showNonEntitled === false && this._xCloudTitles[title].hasEntitlement === false)
+                    continue
 
                 if(this._xCloudTitles[title].catalogDetails.ProductTitle.toLowerCase().includes(filter.name.toLowerCase())){
                     returnTitles.push(this._xCloudTitles[title].titleId)
@@ -189,6 +192,7 @@ export class Title {
     titleId
     productId
     xboxTitleId
+    hasEntitlement
     supportedInputTypes
     catalogDetails
 
@@ -196,6 +200,7 @@ export class Title {
         this.titleId = title.titleId
         this.productId = title.details.productId
         this.xboxTitleId = title.details.xboxTitleId
+        this.hasEntitlement = title.details.hasEntitlement
         this.supportedInputTypes = title.details.supportedInputTypes
     }
 
