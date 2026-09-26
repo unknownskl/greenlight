@@ -18,6 +18,15 @@ function ViewportGrid({
     const [page, setPage] = React.useState(0)
     const { t } = useTranslation()
 
+    const totalChildren = React.Children.count(children)
+
+    React.useEffect(() => {
+        const totalPages = Math.ceil(totalChildren / showItems)
+        if(totalPages > 0 && page >= totalPages){
+            setPage(0)
+        }
+    }, [totalChildren, showItems, page])
+
     React.useEffect(() => {
         // Mount
         let resizeLastUpdate = Date.now()
@@ -50,7 +59,7 @@ function ViewportGrid({
                 setShowItems(itemsShown)
             }
 
-            const totalPages = Math.ceil(Object.keys(children).length/showItems)
+            const totalPages = Math.ceil(React.Children.count(children)/showItems)
             if(totalPages !== 0 && totalPages <= page){
                 console.log('Page is too high, resetting to: ', totalPages, page)
                 setPage(0)
@@ -86,7 +95,7 @@ function ViewportGrid({
 
     function drawPageButtons(){
         const buttons = []
-        const totalPages = Math.ceil(Object.keys(children).length/showItems)
+        const totalPages = Math.ceil(React.Children.count(children)/showItems)
 
         buttons.push((<Button key="page_prev" onClick={ prevPage } disabled={page <= 0} className='btn-small' label={t('page.xCloudLibrary.previousPageBtn')}></Button>))
         for(let i=1; i <= totalPages; i++){

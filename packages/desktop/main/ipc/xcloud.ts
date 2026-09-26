@@ -8,6 +8,7 @@ interface getTitleArgs {
 
 interface TitleListArgs {
     showNonEntitled?: boolean;
+    onlyEntitled?: boolean;
 }
 
 export default class IpcxCloud extends IpcBase {
@@ -90,32 +91,42 @@ export default class IpcxCloud extends IpcBase {
         })
     }
 
+    _entitledTitles = []
+
     getTitles(args:TitleListArgs = {}){
+        const onlyEntitled = args ? (args?.onlyEntitled !== false) : true
+
         return new Promise((resolve, reject) => {
-            if(this._recentTitlesLastUpdate < Date.now() - 3600*1000){
+            if(this._titlesLastUpdate < Date.now() - 3600*1000){
                 this._application._xCloudApi.getTitles().then((titles:any) => {
-                    const returnTitles = []
-                    const nonEntitledTitles = []
+                    const allTitles = []
+                    const entitledTitles = []
                     console.log('titles:', titles)
 
                     for(const title in titles.results){
-                        if(titles.results[title].titleId){
-                            returnTitles.push(titles.results[title].titleId)
-                            if(titles.results[title].details?.hasEntitlement === false)
-                                nonEntitledTitles.push(titles.results[title].titleId)
-                        } else
-                            this._application.log('Ipc:xCloud', 'Title found without a titleID:', titles.results[title])
+                        const item = titles.results[title]
+                        if(item.titleId){
+                            allTitles.push(item.titleId)
+                            if(item.details?.hasEntitlement || item.details?.isFreeInStore){
+                                entitledTitles.push(item.titleId)
+                            }
+                        } else {
+                            this._application.log('Ipc:xCloud', 'Title found without a titleID:', item)
+                        }
                     }
 
-                    this._titles = returnTitles
-                    this._nonEntitledTitles = nonEntitledTitles
+                    this._titles = allTitles
+                    this._entitledTitles = entitledTitles
                     this._titlesLastUpdate = Date.now()
 
-                    resolve(this.filterTitlesByEntitlement(returnTitles, args.showNonEntitled))
+                    resolve(onlyEntitled ? entitledTitles : allTitles)
                 })
                     .catch((error) => {
                         reject(error)
                     })
+            } else if (onlyEntitled) {
+                const entitled = this._entitledTitles.length > 0 ? this._entitledTitles : this._titleManager.getTitles(true)
+                resolve(entitled)
             } else {
                 resolve(this.filterTitlesByEntitlement(this._titles, args.showNonEntitled))
             }
@@ -129,7 +140,7 @@ export default class IpcxCloud extends IpcBase {
         return titles.filter((titleId) => !this._nonEntitledTitles.includes(titleId))
     }
 
-    filterTitles(filter){
+    filterTitles(filter: { name: string; onlyEntitled?: boolean }){
         return new Promise((resolve) => {
             const titles = this._titleManager.filterTitles(filter)
 
