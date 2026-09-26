@@ -542,11 +542,7 @@ jobs:
 
   build_docs:
     name: "Global: Build Docs"
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Git repository
