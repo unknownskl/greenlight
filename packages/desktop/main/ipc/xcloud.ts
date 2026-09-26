@@ -6,6 +6,11 @@ interface getTitleArgs {
     titleId: string;
 }
 
+interface TitleListArgs {
+    showNonEntitled?: boolean;
+    onlyEntitled?: boolean;
+}
+
 export default class IpcxCloud extends IpcBase {
 
     _titleManager:TitleManager
@@ -13,6 +18,7 @@ export default class IpcxCloud extends IpcBase {
     _titlesAreLoaded = false
 
     _titles = []
+    _nonEntitledTitles = []
     _titlesLastUpdate = 0
 
     _recentTitles = []
@@ -87,8 +93,9 @@ export default class IpcxCloud extends IpcBase {
 
     _entitledTitles = []
 
-    getTitles(args?: { onlyEntitled?: boolean }){
-        const onlyEntitled = args ? (args.onlyEntitled !== false) : true
+    getTitles(args:TitleListArgs = {}){
+        const onlyEntitled = args ? (args?.onlyEntitled !== false) : true
+
         return new Promise((resolve, reject) => {
             if(this._titlesLastUpdate < Date.now() - 3600*1000){
                 this._application._xCloudApi.getTitles().then((titles:any) => {
@@ -121,9 +128,16 @@ export default class IpcxCloud extends IpcBase {
                 const entitled = this._entitledTitles.length > 0 ? this._entitledTitles : this._titleManager.getTitles(true)
                 resolve(entitled)
             } else {
-                resolve(this._titles)
+                resolve(this.filterTitlesByEntitlement(this._titles, args.showNonEntitled))
             }
         })
+    }
+
+    filterTitlesByEntitlement(titles, showNonEntitled = true){
+        if(showNonEntitled)
+            return titles
+
+        return titles.filter((titleId) => !this._nonEntitledTitles.includes(titleId))
     }
 
     filterTitles(filter: { name: string; onlyEntitled?: boolean }){
@@ -134,7 +148,7 @@ export default class IpcxCloud extends IpcBase {
         })
     }
 
-    getNewTitles(){
+    getNewTitles(args:TitleListArgs = {}){
         return new Promise((resolve, reject) => {
             if(this._newTitlesLastUpdate < Date.now() - 3600*1000){
                 this._titleManager.getNewTitles().then((titles:any) => {
@@ -158,12 +172,12 @@ export default class IpcxCloud extends IpcBase {
                     this._newTitles = returnTitles
                     this._newTitlesLastUpdate = Date.now()
 
-                    resolve(returnTitles)
+                    resolve(this.filterTitlesByEntitlement(returnTitles, args.showNonEntitled))
                 }).catch((error) => {
                     reject(error)
                 })
             } else {
-                resolve(this._newTitles)
+                resolve(this.filterTitlesByEntitlement(this._newTitles, args.showNonEntitled))
             }
         })
     }

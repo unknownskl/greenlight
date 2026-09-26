@@ -3,6 +3,16 @@ div.component_gametitle {
     width: 140px;
 }
 
+div.component_gametitle_unentitled img {
+    filter: grayscale(1);
+    opacity: 0.45;
+    transition: opacity 0.2s ease-in-out;
+}
+
+div.component_gametitle_unentitled:hover img {
+    opacity: 0.65;
+}
+
 div.component_gametitle div.component_gametitle_title {
     background: #000000;
     background: linear-gradient(0deg, rgba(0,135,70,0.5) 50%, rgba(0,0,0,0) 100%);

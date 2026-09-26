@@ -41,6 +41,12 @@ export default class IpcStreaming extends IpcBase {
         if(args.type === 'home'){
             this._application._ipc._channels.consoles._consolesLastUpdate = 0
         } else {
+            const title = this._application._ipc._channels.xCloud._titleManager.findTitle(args.target)
+            if(title?.hasEntitlement === false){
+                const error = new Error('User is not entitled to stream this title')
+                error.name = 'NoEntitlement'
+                return Promise.reject(error)
+            }
             this._application._ipc._channels.xCloud._recentTitlesLastUpdate = 0
         }
 
