@@ -63,8 +63,7 @@ export default class IpcxCloud extends IpcBase {
             const allTitles = []
             const entitledTitles = []
 
-            for(const title in titles.results){
-                const item = titles.results[title]
+            for(const item of Object.values(titles.results || {}) as any[]){
                 if(item.titleId){
                     allTitles.push(item.titleId)
                     if(item.details?.hasEntitlement || item.details?.isFreeInStore){
@@ -167,17 +166,17 @@ export default class IpcxCloud extends IpcBase {
             const titles:any = await this._titleManager.getNewTitles()
             const returnTitles = []
 
-            for(const title in titles){
-                if(titles[title].id !== undefined){
-                    const storeTitle = this._titleManager.findTitleByProductId(titles[title].id)
+            for(const title of Object.values(titles) as any[]){
+                if(title.id !== undefined){
+                    const storeTitle = this._titleManager.findTitleByProductId(title.id)
 
                     if(storeTitle === undefined){
-                        this._application.log('Ipc:xCloud', 'Title not found in cache:', storeTitle, titles[title])
+                        this._application.log('Ipc:xCloud', 'Title not found in cache:', storeTitle, title)
                     } else {
                         returnTitles.push(storeTitle.titleId)
                     }
                 } else {
-                    this._application.log('Ipc:xCloud', 'Title found without an id:', titles[title])
+                    this._application.log('Ipc:xCloud', 'Title found without an id:', title)
                 }
             }
 

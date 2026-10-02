@@ -48,8 +48,7 @@ export default class TitleManager {
         this._xCloudTitles = {}
 
         const entitledProductIds = []
-        for(const title in titles.results){
-            const rawTitle = titles.results[title]
+        for(const rawTitle of Object.values(titles.results || {}) as TitleDetails[]){
             if(!rawTitle?.titleId){
                 this._application.log('TitleManager', 'Ignoring title without a title ID:', rawTitle)
                 continue
@@ -151,23 +150,23 @@ export default class TitleManager {
     }
 
     populateTitleInfo(titleInfo:Record<string, titleInfoArgs> | titleInfoArgs[]){
-        for(const product in titleInfo){
-            if(!titleInfo[product]){
+        for(const product of Object.values(titleInfo)){
+            if(!product){
                 continue
             }
 
-            const xCloudTitle = titleInfo[product].XCloudTitleId
+            const xCloudTitle = product.XCloudTitleId
 
             if(this._xCloudTitles[xCloudTitle] !== undefined){
-                this._xCloudTitles[xCloudTitle].setCatalogDetails(titleInfo[product])
+                this._xCloudTitles[xCloudTitle].setCatalogDetails(product)
 
             } else {
-                const altTitle = this.findTitleByProductId(titleInfo[product].StoreId)
+                const altTitle = this.findTitleByProductId(product.StoreId)
                 if(altTitle !== undefined){
-                    altTitle.setCatalogDetails(titleInfo[product])
+                    altTitle.setCatalogDetails(product)
 
                 } else {
-                    this._application.log('TitleManager', 'Title not found in cache:', titleInfo[product].XCloudTitleId, titleInfo[product].StoreId, titleInfo[product])
+                    this._application.log('TitleManager', 'Title not found in cache:', product.XCloudTitleId, product.StoreId, product)
                 }
             }
         }
