@@ -6,6 +6,7 @@ interface getTitleArgs {
     titleId: string;
 }
 
+
 interface TitleListArgs {
     showNonEntitled?: boolean;
     onlyEntitled?: boolean;
@@ -43,6 +44,15 @@ export default class IpcxCloud extends IpcBase {
         void this.loadTitles().catch((error) => {
             this._application.log('Ipc:xCloud', 'Could not preload titles:', error)
         })
+    }
+
+    async monitorCatalogRefresh(catalogRefresh:Promise<void>):Promise<void>{
+        try {
+            await catalogRefresh
+            this._application.log('Ipc:xCloud', 'Titlemanager has refreshed catalog metadata.')
+        } catch(error) {
+            this._application.log('Ipc:xCloud', 'Titlemanager could not refresh catalog metadata:', error)
+        }
     }
 
     loadTitles(force = false):Promise<void>{
@@ -85,11 +95,7 @@ export default class IpcxCloud extends IpcBase {
             this._titlesAreLoaded = true
 
             this._application.log('Ipc:xCloud', 'Titlemanager has loaded title records.')
-            void catalogRefresh.then(() => {
-                this._application.log('Ipc:xCloud', 'Titlemanager has refreshed catalog metadata.')
-            }).catch((error) => {
-                this._application.log('Ipc:xCloud', 'Titlemanager could not refresh catalog metadata:', error)
-            })
+            void this.monitorCatalogRefresh(catalogRefresh)
         }).finally(() => {
             this._titlesLoadPromise = undefined
         })
