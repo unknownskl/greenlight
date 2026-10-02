@@ -4,8 +4,6 @@ import Store from 'electron-store'
 
 const CATALOG_BATCH_SIZE = 100
 const CATALOG_CONCURRENCY = 3
-const CATALOG_REQUEST_TIMEOUT = 10*1000
-const CATALOG_WAIT_TIMEOUT = 15*1000
 
 interface titleInfoArgs {
     ProductTitle: string;
@@ -50,8 +48,6 @@ export default class TitleManager {
         this._xCloudTitles = {}
 
         const entitledProductIds = []
-        const otherProductIds = []
-
         for(const title in titles.results){
             const rawTitle = titles.results[title]
             if(!rawTitle?.titleId){
@@ -65,18 +61,14 @@ export default class TitleManager {
             if(titleItem.productId){
                 if(titleItem.hasEntitlement){
                     entitledProductIds.push(titleItem.productId)
-                } else {
-                    otherProductIds.push(titleItem.productId)
                 }
             }
         }
 
-        // Load entitled titles first so the default library becomes usable while
-        // the rest of the catalogue is enriched in the background.
-        this._productIdQueue = Array.from(new Set([
-            ...entitledProductIds,
-            ...otherProductIds,
-        ]))
+        // The default library only shows entitled titles. Restricting enrichment
+        // to those products avoids requesting metadata for thousands of entries
+        // that cannot be launched by the current user.
+        this._productIdQueue = Array.from(new Set(entitledProductIds))
 
         const cachedCatalog = this._store.get('xcloud_catalog_cache', {}) as Record<string, titleInfoArgs>
         if(cachedCatalog && Object.keys(cachedCatalog).length > 0){
@@ -105,17 +97,8 @@ export default class TitleManager {
         return this._catalogRefresh
     }
 
-    async waitForCatalog(){
-        let timeout:ReturnType<typeof setTimeout> | undefined
-        await Promise.race([
-            this._catalogRefresh,
-            new Promise<void>((resolve) => {
-                timeout = setTimeout(resolve, CATALOG_WAIT_TIMEOUT)
-            }),
-        ])
-        if(timeout !== undefined){
-            clearTimeout(timeout)
-        }
+    waitForCatalog(){
+        return this._catalogRefresh
     }
 
     async refreshCatalog(productIds:string[], cachedCatalog:Record<string, titleInfoArgs>){
@@ -131,7 +114,13 @@ export default class TitleManager {
             while(nextBatch < batches.length){
                 const batch = batches[nextBatch++]
                 try {
-                    const result:any = await this.getCatalogBatch(batch)
+                    const result:any = await this._http.post('catalog.gamepass.com', '/v3/products?market=US&language=en-US&hydration=RemoteHighSapphire0', {
+                        'Products': batch,
+                    }, {
+                        'ms-cv': 0,
+                        'calling-app-name': 'Xbox Cloud Gaming Web',
+                        'calling-app-version': '21.0.0',
+                    })
                     if(result?.Products && typeof result.Products === 'object'){
                         Object.assign(allProducts, result.Products)
                         this.populateTitleInfo(result.Products)
@@ -155,30 +144,6 @@ export default class TitleManager {
         }, {} as Record<string, titleInfoArgs>)
 
         this._store.set('xcloud_catalog_cache', productsToCache)
-    }
-
-    async getCatalogBatch(batch:string[]){
-        let timeout:ReturnType<typeof setTimeout> | undefined
-        const request = this._http.post('catalog.gamepass.com', '/v3/products?market=US&language=en-US&hydration=RemoteHighSapphire0', {
-            'Products': batch,
-        }, {
-            'ms-cv': 0,
-            'calling-app-name': 'Xbox Cloud Gaming Web',
-            'calling-app-version': '21.0.0',
-        })
-
-        try {
-            return await Promise.race([
-                request,
-                new Promise((_resolve, reject) => {
-                    timeout = setTimeout(() => reject(new Error('Catalog request timed out')), CATALOG_REQUEST_TIMEOUT)
-                }),
-            ])
-        } finally {
-            if(timeout !== undefined){
-                clearTimeout(timeout)
-            }
-        }
     }
 
     getNewTitles(){
