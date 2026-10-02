@@ -40,7 +40,7 @@ export default class IpcxCloud extends IpcBase {
     }
 
     onUserLoaded(){
-        this.loadTitles().catch((error) => {
+        void this.loadTitles().catch((error) => {
             this._application.log('Ipc:xCloud', 'Could not preload titles:', error)
         })
     }
@@ -54,11 +54,12 @@ export default class IpcxCloud extends IpcBase {
             return Promise.resolve()
         }
 
-        if(this._application._xCloudApi === undefined){
+        const xCloudApi = this._application._xCloudApi
+        if(xCloudApi === undefined){
             return Promise.reject(new Error('Cannot load xCloud titles without a valid token'))
         }
 
-        const request = this._application._xCloudApi.getTitles().then((titles:any) => {
+        const request = xCloudApi.getTitles().then((titles:any) => {
             const allTitles = []
             const entitledTitles = []
 
@@ -85,13 +86,13 @@ export default class IpcxCloud extends IpcBase {
             this._titlesAreLoaded = true
 
             this._application.log('Ipc:xCloud', 'Titlemanager has loaded title records.')
-            catalogRefresh.then(() => {
+            void catalogRefresh.then(() => {
                 this._application.log('Ipc:xCloud', 'Titlemanager has refreshed catalog metadata.')
+            }).catch((error) => {
+                this._application.log('Ipc:xCloud', 'Titlemanager could not refresh catalog metadata:', error)
             })
         }).finally(() => {
-            if(this._titlesLoadPromise === request){
-                this._titlesLoadPromise = undefined
-            }
+            this._titlesLoadPromise = undefined
         })
 
         this._titlesLoadPromise = request
