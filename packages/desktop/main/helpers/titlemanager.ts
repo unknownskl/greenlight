@@ -20,6 +20,7 @@ interface titleInfoArgs {
     StoreId: string;
 }
 
+
 interface FilterArgs {
     name: string;
     onlyEntitled?: boolean;
@@ -109,28 +110,17 @@ export default class TitleManager {
         const allProducts:Record<string, titleInfoArgs> = {}
         let nextBatch = 0
 
-        const workers = Array.from({ length: Math.min(CATALOG_CONCURRENCY, batches.length) }, async () => {
-            while(nextBatch < batches.length){
-                const batch = batches[nextBatch++]
-                try {
-                    const result:any = await this._http.post('catalog.gamepass.com', '/v3/products?market=US&language=en-US&hydration=RemoteHighSapphire0', {
-                        'Products': batch,
-                    }, {
-                        'ms-cv': 0,
-                        'calling-app-name': 'Xbox Cloud Gaming Web',
-                        'calling-app-version': '21.0.0',
-                    })
-                    if(result?.Products && typeof result.Products === 'object'){
-                        Object.assign(allProducts, result.Products)
-                        this.populateTitleInfo(result.Products)
-                    } else {
-                        this._application.log('TitleManager', 'Catalog batch returned no products:', batch)
-                    }
-                } catch(error) {
-                    this._application.log('TitleManager', 'Unable to resolve catalog batch:', error)
-                }
+        const processNextBatch = async ():Promise<void> => {
+            const batch = batches[nextBatch++]
+            if(batch === undefined){
+                return
             }
-        })
+
+            await this.processCatalogBatch(batch, allProducts)
+            return processNextBatch()
+        }
+
+        const workers = Array.from({ length: Math.min(CATALOG_CONCURRENCY, batches.length) }, processNextBatch)
 
         await Promise.all(workers)
 
@@ -143,6 +133,27 @@ export default class TitleManager {
         }, {} as Record<string, titleInfoArgs>)
 
         this._store.set('xcloud_catalog_cache', productsToCache)
+    }
+
+    async processCatalogBatch(batch:string[], allProducts:Record<string, titleInfoArgs>):Promise<void>{
+        try {
+            const result:any = await this._http.post('catalog.gamepass.com', '/v3/products?market=US&language=en-US&hydration=RemoteHighSapphire0', {
+                'Products': batch,
+            }, {
+                'ms-cv': 0,
+                'calling-app-name': 'Xbox Cloud Gaming Web',
+                'calling-app-version': '21.0.0',
+            })
+
+            if(result?.Products && typeof result.Products === 'object'){
+                Object.assign(allProducts, result.Products)
+                this.populateTitleInfo(result.Products)
+            } else {
+                this._application.log('TitleManager', 'Catalog batch returned no products:', batch)
+            }
+        } catch(error) {
+            this._application.log('TitleManager', 'Unable to resolve catalog batch:', error)
+        }
     }
 
     getNewTitles(){
