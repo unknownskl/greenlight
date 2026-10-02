@@ -27,6 +27,10 @@ function GameTitleDynamic({
     const titleData = useQuery<titleDataState>('titledynamic_titleId_'+titleId, () => Ipc.send('xCloud', 'getTitle', { titleId: titleId }), { staleTime: 300*1000 })
     const { t } = useTranslation()
 
+    const title = titleData.data?.catalogDetails?.ProductTitle || titleId
+    const catalogImage = titleData.data?.catalogDetails?.Image_Tile?.URL
+    const image = catalogImage ? 'https:'+catalogImage : '/images/logo.png'
+
     return (
         <React.Fragment>
             <div className={ `component_gametitle${titleData.data?.hasEntitlement === false ? ' component_gametitle_unentitled' : ''}` }>
@@ -37,15 +41,16 @@ function GameTitleDynamic({
                 { (titleData.isFetched === true && titleData.data?.titleId !== undefined) ? <Link href={ titleData.data?.hasEntitlement === false ? `/xcloud/info/${ titleId }` : `/stream/xcloud_${ titleId }` }>
 
                     <Image
-                        src={ titleData.data.catalogDetails?.Image_Tile?.URL ? ('https:'+titleData.data.catalogDetails.Image_Tile.URL) : '' }
-                        alt={ titleData.data.catalogDetails?.ProductTitle || titleId }
+                        src={ image }
+                        alt={ title }
                         width='280' height='280' style={{
                             width: 140,
                             height: 140,
                             borderRadius: '4px',
+                            objectFit: 'contain',
                         }} ></Image>
 
-                    <div className='component_gametitle_title'><p>{ titleData.data.catalogDetails?.ProductTitle || titleId }</p></div>
+                    <div className='component_gametitle_title'><p>{ title }</p></div>
                 </Link> : <Loader></Loader> }
             </div>
         </React.Fragment>
