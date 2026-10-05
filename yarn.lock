@@ -6954,10 +6954,10 @@ fsevents@2.3.3, fsevents@~2.3.2, fsevents@~2.3.3:
   resolved "https://registry.yarnpkg.com/fsevents/-/fsevents-2.3.3.tgz#cac6407785d03675a2a5e1a5305c697b347d90d6"
   integrity sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==
 
-fumadocs-core@^16.15.14:
-  version "16.15.14"
-  resolved "https://registry.yarnpkg.com/fumadocs-core/-/fumadocs-core-16.15.14.tgz#62fc721bd9a4fe14102e8c211afc4af141a820da"
-  integrity sha512-2Jov3x/wCkz8C8MWpmWHoWyLn+pBNrER49m35qqAV0OZekVE8mgs71TS6OfgJHzO00jICkIB+NFhv/XQx/yf/Q==
+fumadocs-core@^16.15.18:
+  version "16.15.18"
+  resolved "https://registry.yarnpkg.com/fumadocs-core/-/fumadocs-core-16.15.18.tgz#2d1501bb5d0362928eb50c715d6fe5931b2921c1"
+  integrity sha512-w5VV92FbtBJHIBdTtb/UgUMwALseE6D98Rr/ErV8eCPdtQcjP9ttR8IcjuV6C+JTc1NSSOZBK4CAUNhDIU8MIA==
   dependencies:
     "@fumari/image-size" "^0.1.1"
     estree-util-value-to-estree "^3.5.0"
@@ -6979,10 +6979,10 @@ fumadocs-core@^16.15.14:
     yaml "^2.9.1"
     zbsearch "^4.0.0"
 
-fumadocs-mdx@^15.4.5:
-  version "15.4.5"
-  resolved "https://registry.yarnpkg.com/fumadocs-mdx/-/fumadocs-mdx-15.4.5.tgz#aeded9db3a00869e5334087195eb9f2f694100e1"
-  integrity sha512-r8gzaqleN+YXgPIbkYSZ05zr89dsr67/64Ar/00Uu7dRWTIHzbgmN1nC0lB8RFNeWnrL41bOTJilhLM4PAsrbw==
+fumadocs-mdx@^15.4.6:
+  version "15.4.6"
+  resolved "https://registry.yarnpkg.com/fumadocs-mdx/-/fumadocs-mdx-15.4.6.tgz#0d815f624805e5f2b716e2650a621f4247c0410f"
+  integrity sha512-R8bdonO7+vDplod2YOLohH8cqr6ALVD/oaURObRoh+aKKyWeC5pTia2KkDNzOoUnkQLpTS9hTsaf5zt5RqMHUA==
   dependencies:
     "@mdx-js/mdx" "^3.1.1"
     "@standard-schema/spec" "^1.1.0"
@@ -7019,10 +7019,10 @@ fumadocs-typescript@^5.4.1:
     unified "^11.0.5"
     unist-util-visit "^5.1.0"
 
-fumadocs-ui@^16.15.14:
-  version "16.15.14"
-  resolved "https://registry.yarnpkg.com/fumadocs-ui/-/fumadocs-ui-16.15.14.tgz#b604e0cd0eeb24df5f750015f1cbab9f276a45fb"
-  integrity sha512-yYnun6im7eBK3gMrErl69QRt+C7/KV5exZFFnoOnRx3HRi9WwAgPtAhwNhFIx1gAYLioSaSjP12+ZrpH9x2b7w==
+fumadocs-ui@^16.15.18:
+  version "16.15.18"
+  resolved "https://registry.yarnpkg.com/fumadocs-ui/-/fumadocs-ui-16.15.18.tgz#1569bba39c6e46d29a3a5b5572e0ff865fe00b40"
+  integrity sha512-cRgFwYsdjnDJIt5m+3+CQdnP+1iKgvbVLhKQtJfNLz9ieE6PtenaU9CGMQMvOFEQQDTPDh9K60jxA/DQ3uLa1w==
   dependencies:
     "@fuma-translate/react" "^1.0.2"
     "@fumadocs/tailwind" "0.1.2"
