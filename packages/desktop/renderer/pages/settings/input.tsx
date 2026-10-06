@@ -66,6 +66,7 @@ function KeySettings({keyConfigs, setKeyConfig}) {
                             break
                         case 'Nexus':
                             fullBtnText = t('settings.input.nexus')
+                            break
                         default:
                             fullBtnText = btn
                             break
