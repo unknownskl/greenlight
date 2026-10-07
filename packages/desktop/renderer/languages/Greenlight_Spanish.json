@@ -28,6 +28,11 @@
     "settings": {
       "sidebar": {
         "about": "Acerca de",
+        "common": {
+          "resetDefaultsBtn": "Restablecer valores predeterminados",
+          "resetDefaultsConfirm": "¿Restablecer los ajustes de esta página a sus valores predeterminados?",
+          "savedNotice": "Guardado"
+        },
         "streaming": "Streaming",
         "input": "Controles",
         "videoAudio": "Video y audio",
@@ -93,6 +98,7 @@
         "setH264ProfileValueHigh": "Alto",
         "setH264ProfileValueMedium": "Medio",
         "setH264ProfileValueLow": "Bajo",
+        "setH264ProfileDescription": "Avanzado: fuerza el perfil de vídeo H.264. Déjalo en Automático salvo que tengas problemas de codificación.",
         "forceRegionTitle": "Forzar región",
         "setRegionLabel": "Establecer región:",
         "setRegionValueDisabled": "Desactivado",
@@ -102,6 +108,7 @@
         "setRegionValueJapan": "Japón",
         "setRegionValueKorea": "Corea",
         "setRegionValueUS": "Estados Unidos",
+        "setRegionDescription": "Avanzado: enruta la transmisión a través de los servidores de la región seleccionada. Úsalo solo si tu región tiene problemas de conexión.",
         "preferredGameLanguageLabel": "Idioma preferido del juego:",
         "preferredGameLanguageValueArabic": "Árabe (Arabia Saudí)",
         "preferredGameLanguageValueCzech": "Checo",
@@ -158,7 +165,8 @@
         "autostartEnabled": "Activado",
         "autostartDisabled": "Desactivado",
         "portLabel": "Puerto",
-        "portPlaceholder": "ejemplo: 9003"
+        "portPlaceholder": "ejemplo: 9003",
+        "portInvalid": "El puerto debe ser un número entre 1024 y 65535."
       },
       "debug": {
         "pageTitle": "Configuración: Depuración"

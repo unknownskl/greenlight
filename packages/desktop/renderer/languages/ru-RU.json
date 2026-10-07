@@ -31,6 +31,11 @@
     "settings": {
       "sidebar": {
         "about": "О программе",
+        "common": {
+          "resetDefaultsBtn": "Сбросить настройки",
+          "resetDefaultsConfirm": "Сбросить настройки на этой странице к значениям по умолчанию?",
+          "savedNotice": "Сохранено"
+        },
         "streaming": "Трансляция",
         "input": "Ввод",
         "videoAudio": "Видео и аудио",
@@ -98,6 +103,7 @@
         "setH264ProfileValueHigh": "Высокий",
         "setH264ProfileValueMedium": "Средний",
         "setH264ProfileValueLow": "Низкий",
+        "setH264ProfileDescription": "Дополнительно: принудительно задаёт видеопрофиль H.264. Оставьте «Авто», если нет проблем с кодированием.",
         "forceRegionTitle": "Принудительный регион",
         "setRegionLabel": "Установить регион:",
         "setRegionValueDisabled": "Отключено",
@@ -107,6 +113,7 @@
         "setRegionValueJapan": "Япония",
         "setRegionValueKorea": "Корея",
         "setRegionValueUS": "США",
+        "setRegionDescription": "Дополнительно: направляет поток через серверы выбранного региона. Используйте только если в вашем регионе есть проблемы с подключением.",
         "preferredGameLanguageLabel": "Предпочтительный язык игры:",
         "preferredGameLanguageValueArabic": "Арабский (Саудовская Аравия)",
         "preferredGameLanguageValueCzech": "Чешский",
@@ -164,7 +171,8 @@
         "autostartEnabled": "Включено",
         "autostartDisabled": "Отключено",
         "portLabel": "Порт",
-        "portPlaceholder": "например: 9003"
+        "portPlaceholder": "например: 9003",
+        "portInvalid": "Порт должен быть числом от 1024 до 65535."
       },
 
       "debug": {
