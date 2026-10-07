@@ -8,10 +8,10 @@ function Error500Page() {
     return (
         <React.Fragment>
             <Head>
-                <title>Greenlight - {t("page500.pageTitle")}</title>
+                <title>Greenlight - {t("page.page500.pageTitle")}</title>
             </Head>
 
-            <p>{t("page500.message")}</p>
+            <p>{t("page.page500.message")}</p>
         </React.Fragment>
     )
 }
