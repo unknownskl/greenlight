@@ -1,0 +1,291 @@
+{
+  "translation": {
+    "languageName": "日本語",
+    "authorOfLocalization": "日本語翻訳",
+
+    "header": {
+      "myConsoles": "マイ コンソール",
+      "viewConsoles": "コンソールを表示",
+      "xCloudLibrary": "xCloud ライブラリ",
+      "browseXCloudLibrary": "xCloud ライブラリを見る",
+      "settings": "設定",
+      "changeSettings": "アプリの設定を変更",
+      "viewProfile": "プロフィールを表示",
+      "quitQuestion": "終了してもよろしいですか?",
+      "home": "ホーム"
+    },
+
+    "auth": {
+      "logoutQuestion": "サインアウトしてもよろしいですか?",
+      "clearDataBtn": "データを消去",
+      "clearDataQuestion": "アプリのデータがすべて削除されます。サインインを繰り返してしまう場合に有効なことがあります。続行しますか?",
+      "gamerscore": "ゲーマースコア",
+      "loggingIn": "サインインしています...",
+      "loginBtn": "サインイン",
+      "logoutBtn": "サインアウト",
+      "loginWithXbox": "Xbox でサインイン",
+      "pleaseAuthenticate": "xCloud と xHome のストリーミングを利用するには、以下で認証してください",
+      "windowTitle": "認証"
+    },
+
+    "settings": {
+      "sidebar": {
+        "about": "バージョン情報",
+        "streaming": "ストリーミング",
+        "input": "入力",
+        "videoAudio": "ビデオとオーディオ",
+        "webUI": "Web UI",
+        "debug": "デバッグ"
+      },
+
+      "about": {
+        "logoutQuestion": "サインアウトしてもよろしいですか?",
+        "title": "設定",
+        "gamerscore": "ゲーマースコア",
+        "selectorSelectLanguage": "言語を選択",
+        "logout": "サインアウト",
+        "version": "バージョン",
+        "website": "Web サイト",
+        "websiteLinkTitle": "外部ブラウザーでリンクを開く"
+      },
+
+      "input": {
+        "settingsInputPageTitle": "設定: 入力",
+        "pageTitle": "設定: 入力",
+        "dPadUp": "方向パッド 上",
+        "dPadDown": "方向パッド 下",
+        "dPadLeft": "方向パッド 左",
+        "dPadRight": "方向パッド 右",
+        "leftShoulder": "L バンパー (LB)",
+        "rightShoulder": "R バンパー (RB)",
+        "leftTrigger": "L トリガー (LT)",
+        "rightTrigger": "R トリガー (RT)",
+        "leftThumb": "L スティック",
+        "rightThumb": "R スティック",
+        "view": "ビュー",
+        "menu": "メニュー",
+        "nexus": "Xbox ボタン",
+        "none": "なし",
+        "enabledLabel": "有効",
+        "disabledLabel": "無効",
+        "axesLabel": "軸",
+        "buttonsLabel": "ボタン",
+        "rumbleLabel": "振動",
+        "notSupportedLabel": "非対応",
+        "title": "入力",
+        "enableVibration": "振動を有効にする",
+        "enableTouch": "タッチ入力を有効にする",
+        "enableMouseKeyboard": "マウスとキーボードを有効にする",
+        "legacyWarning": "マウスとキーボードのドライバーを、キーボードのゲームパッド割り当てと同時に使用すると競合が発生します",
+        "enableLegacy": "キーボードをゲームパッドとして使用する",
+        "enableLegacyDescription": "(この機能を無効にすると、キーボードからゲームパッドへの割り当てが無効になり、ゲームパッドの操作のみ受け付けます。)",
+        "controllerDetectedTitle": "検出されたコントローラー",
+        "controllerDetectedDescription": "コントローラーを接続しても表示されない場合は、コントローラーのボタンを押して検出させてください。",
+        "noControllerDetected": "コントローラーが検出されません",
+        "keyboardMappingsTitle": "キーボードの割り当て"
+      },
+
+      "streaming": {
+        "pageTitle": "設定: ストリーミング",
+        "title": "ストリーミング設定",
+        "description": "xHome と xCloud は既定で 20 Mbps を超える通信に対応していません。この設定でその上限を超えることはできません。",
+        "xCloudStreamingBitrateLabel": "xCloud ストリーミングのビットレート",
+        "xHomeStreamingBitrateLabel": "xHome ストリーミングのビットレート",
+        "showNonEntitledLabel": "購入が必要なゲームを表示",
+        "unlimitedLabel": "無制限",
+        "mbpsLabel": "Mbps",
+        "setH264ProfileLabel": "H.264 プロファイルを設定",
+        "setH264ProfileValueAuto": "自動ネゴシエーション",
+        "setH264ProfileValueHigh": "高",
+        "setH264ProfileValueMedium": "中",
+        "setH264ProfileValueLow": "低",
+        "forceRegionTitle": "地域を強制",
+        "setRegionLabel": "地域を設定:",
+        "setRegionValueDisabled": "無効",
+        "setRegionValueAustralia": "オーストラリア",
+        "setRegionValueBrazil": "ブラジル",
+        "setRegionValueEurope": "ヨーロッパ",
+        "setRegionValueJapan": "日本",
+        "setRegionValueKorea": "韓国",
+        "setRegionValueUS": "米国",
+        "preferredGameLanguageLabel": "優先するゲーム言語:",
+        "preferredGameLanguageValueArabic": "アラビア語 (サウジアラビア)",
+        "preferredGameLanguageValueCzech": "チェコ語",
+        "preferredGameLanguageValueDanish": "デンマーク語",
+        "preferredGameLanguageValueGerman": "ドイツ語",
+        "preferredGameLanguageValueGreek": "ギリシャ語",
+        "preferredGameLanguageValueEnglishUK": "英語 (英国)",
+        "preferredGameLanguageValueEnglishUS": "英語 (米国)",
+        "preferredGameLanguageValueSpanish": "スペイン語 (スペイン)",
+        "preferredGameLanguageValueSpanishMX": "スペイン語 (メキシコ)",
+        "preferredGameLanguageValueFinnish": "フィンランド語",
+        "preferredGameLanguageValueFrench": "フランス語",
+        "preferredGameLanguageValueHebrew": "ヘブライ語",
+        "preferredGameLanguageValueHungarian": "ハンガリー語",
+        "preferredGameLanguageValueItalian": "イタリア語",
+        "preferredGameLanguageValueJapanese": "日本語",
+        "preferredGameLanguageValueKorean": "韓国語",
+        "preferredGameLanguageValueNorwegian": "ノルウェー語",
+        "preferredGameLanguageValueDutch": "オランダ語",
+        "preferredGameLanguageValuePolish": "ポーランド語",
+        "preferredGameLanguageValuePortugueseBR": "ポルトガル語 (ブラジル)",
+        "preferredGameLanguageValuePortuguese": "ポルトガル語 (ポルトガル)",
+        "preferredGameLanguageValueRussian": "ロシア語",
+        "preferredGameLanguageValueSlovak": "スロバキア語",
+        "preferredGameLanguageValueSwedish": "スウェーデン語",
+        "preferredGameLanguageValueTurkish": "トルコ語",
+        "preferredGameLanguageValueChineseCN": "中国語 (簡体字)",
+        "preferredGameLanguageValueChineseTW": "中国語 (繁体字)"
+      },
+
+      "videoAudio": {
+        "pageTitle": "設定: ビデオとオーディオ",
+        "title": "ビデオ",
+        "disableVideoLabel": "ビデオを無効にする",
+        "disabledLabel": "無効",
+        "enabledLabel": "有効",
+        "aspectSizeLabel": "ビデオの表示サイズ",
+        "aspectSizeValueDefault": "既定",
+        "aspectSizeValueStretch": "引き伸ばし",
+        "aspectSizeValueZoom": "ズーム",
+        "forceLowResLabel": "低解像度ビデオを強制",
+        "forceLowResDescription": "(このオプションは Steam Deck で便利です。アプリを低解像度で描画し、FSR を有効にできます。)",
+        "audioTitle": "オーディオ",
+        "disableAudioLabel": "オーディオを無効にする"
+      },
+
+      "webUI": {
+        "pageTitle": "設定: Web UI",
+        "title": "Web UI",
+        "enableWebUILabel": "Web UI を有効にする",
+        "stopWebUIBtn": "Web UI を停止",
+        "startWebUIBtn": "Web UI を開始",
+        "openWebUIBtn": "Web UI を開く",
+        "autostartLabel": "アプリの起動時に開始",
+        "autostartEnabled": "有効",
+        "autostartDisabled": "無効",
+        "portLabel": "ポート",
+        "portPlaceholder": "例: 9003"
+      },
+
+      "debug": {
+        "pageTitle": "設定: デバッグ"
+      }
+    },
+
+    "page": {
+      "xCloud": {
+        "pageTitle": "xCloud ライブラリ",
+        "breadcrumb": "xCloud",
+        "recentGames": "最近プレイしたゲーム",
+        "recentlyAdded": "最近追加されたゲーム",
+        "viewLibraryBtn": "ライブラリを表示"
+      },
+
+      "xCloudLibrary": {
+        "pageTitle": "xCloud ライブラリ",
+        "breadcrumb1": "xCloud",
+        "breadcrumb2": "ライブラリ",
+        "title": "ライブラリ",
+        "searchPlaceholder": "検索",
+        "gamePassOnly": "Game Pass のゲームのみ",
+        "noGamesFound": "ゲームが見つかりません",
+        "previousPageBtn": "前のページ",
+        "nextPageBtn": "次のページ",
+        "viewGamePageIcon": "ゲームのページを表示"
+      },
+
+      "myConsoles": {
+        "pageTitle": "マイ コンソール",
+        "poweredOn": "電源オン",
+        "standby": "スタンバイ",
+        "warningLabel": "警告",
+        "managementWarning": "リモート管理が有効になっていません",
+        "streamingWarning": "コンソールのストリーミングが有効になっていません",
+        "startStreamBtn": "ストリーミングを開始",
+        "noConsoles": "アカウントにコンソールが見つかりません。Xbox 本体をお持ちの場合は、リモート プレイが有効になっていること、公式の Xbox アプリに本体が表示されていることを確認してください。"
+      },
+
+      "titleInfo": {
+        "pageTitle": "タイトル情報:",
+        "breadcrumb1": "xCloud",
+        "breadcrumb2": "ライブラリ",
+        "by": "開発元:",
+        "descriptionTitle": "説明",
+        "capabilitiesTitle": "機能",
+        "startStreamBtn": "ストリーミングを開始",
+        "purchaseRequiredBtn": "購入が必要です"
+      },
+
+      "page404": {
+        "pageTitle": "エラー",
+        "message": "404 エラー: 操作が見つかりません"
+      },
+
+      "page500": {
+        "pageTitle": "エラー",
+        "message": "500 エラー: アプリでエラーが発生しました"
+      }
+    },
+
+    "friends": {
+      "allFriendsOffline": "フレンドは全員オフラインです"
+    },
+
+    "streamWindow": {
+      "pageTitle": "ストリーミング",
+      "endStreamConfirmMessage": "ストリーミングを終了してもよろしいですか?",
+      "estimatedWaitingTimeMessage": "待ち時間の目安:",
+      "timeHours": "時間",
+      "timeMinutes": "分",
+      "timeSeconds": "秒",
+      "loadingStreamTitle": "読み込み中...",
+      "gettingStreamReadyMessage": "ストリーミングを準備しています...",
+      "endStreamBtn": "ストリーミングを終了",
+      "disconnectBtn": "切断",
+      "menuBtn": "メニュー",
+      "menuTitle": "Xbox メニューを開く",
+      "micMuted": "ミュート中",
+      "micActive": "オン",
+      "enableMic": "マイクを有効にする",
+      "disableMic": "マイクを無効にする",
+      "debugTitle": "デバッグ",
+      "itsTakingALittleLonger": "少し時間がかかっています... まもなくストリーミングが始まります。",
+      "startingConnection": "接続を開始しています...",
+      "connectingToConsole": "コンソールに接続しています...",
+      "clientHasBeenDisconnected": "クライアントが切断されました。"
+    },
+
+    "updater": {
+      "unableToCheckForUpdates": "現在、更新プログラムを確認できません。もう一度お試しください。",
+      "alreadyOnLatestVersion": "既に最新バージョンを使用しています。現在のバージョン:",
+      "newestVersion": "最新バージョン:",
+      "newReleaseAvailable": "新しいバージョンがあります",
+      "installedVersion": "インストール済みのバージョン:",
+      "latestVersion": "最新バージョン:",
+      "downloadBtn": "ダウンロード",
+      "laterBtn": "後で",
+      "updateChecker": "更新の確認",
+      "closeBtn": "閉じる"
+    },
+
+    "errors": {
+      "failedToRetrieveUserProfile": "エラー: ユーザー プロフィールを取得できませんでした:",
+      "repositoryNotFound": "package.json ファイルにリポジトリの URL が見つかりません。",
+      "failedToRetrieveStreamingTokens": "エラー: ストリーミング トークンを取得できませんでした:",
+      "errorAuthentificationUser": "ユーザーの認証中にエラーが発生しました。エラーの詳細:",
+      "errorGettingRedirectURI": "リダイレクト URI の取得中にエラーが発生しました。エラーの詳細:",
+      "authentificationCallbackIsNotDefined": "認証コールバックが定義されていません。エラーの詳細:",
+      "sisuTokenIsMissing": "Sisu トークンがありません。先に認証してください",
+      "failedToRetrieveWebTokens": "エラー: Web トークンを取得できませんでした:",
+      "chatSDPExchangeError": "ChatSDP 交換エラー:",
+      "ICEExchangeError": "ICE 交換エラー:",
+      "SDPExchangeError": "SDP 交換エラー:",
+      "failedToStartStream": "新しいストリーミングを開始できませんでした。エラーの詳細:",
+      "unableToStartStreamSession": "コンソールでストリーミング セッションを開始できません。コンソールが Xbox サーバーに接続されていません。更新中や、コンソールにサインインしていない場合に起こることがあります。コンソールを完全に再起動してから、もう一度お試しください。",
+      "streamErrorResult": "ストリーミング エラーの結果:",
+      "details": "詳細:",
+      "failedToGetPlayerState": "プレーヤーの状態を取得できませんでした。エラーの詳細:"
+    }
+  }
+}

@@ -1,0 +1,291 @@
+{
+  "translation": {
+    "languageName": "简体中文",
+    "authorOfLocalization": "简体中文翻译",
+
+    "header": {
+      "myConsoles": "我的主机",
+      "viewConsoles": "查看主机",
+      "xCloudLibrary": "xCloud 游戏库",
+      "browseXCloudLibrary": "浏览 xCloud 游戏库",
+      "settings": "设置",
+      "changeSettings": "更改应用程序设置",
+      "viewProfile": "查看个人资料",
+      "quitQuestion": "确定要退出吗？",
+      "home": "主页"
+    },
+
+    "auth": {
+      "logoutQuestion": "确定要注销吗？",
+      "clearDataBtn": "清除数据",
+      "clearDataQuestion": "此操作将删除所有应用程序数据，在陷入登录循环时可能有所帮助。是否继续？",
+      "gamerscore": "玩家分数",
+      "loggingIn": "正在登录...",
+      "loginBtn": "登录",
+      "logoutBtn": "注销",
+      "loginWithXbox": "使用 Xbox 登录",
+      "pleaseAuthenticate": "请在下方完成身份验证，以访问 xCloud 和 xHome 串流",
+      "windowTitle": "身份验证"
+    },
+
+    "settings": {
+      "sidebar": {
+        "about": "关于",
+        "streaming": "串流",
+        "input": "输入",
+        "videoAudio": "视频和音频",
+        "webUI": "Web 界面",
+        "debug": "调试"
+      },
+
+      "about": {
+        "logoutQuestion": "确定要注销吗？",
+        "title": "设置",
+        "gamerscore": "玩家分数",
+        "selectorSelectLanguage": "选择语言",
+        "logout": "注销",
+        "version": "版本",
+        "website": "网站",
+        "websiteLinkTitle": "在外部浏览器中打开链接"
+      },
+
+      "input": {
+        "settingsInputPageTitle": "设置：输入",
+        "pageTitle": "设置：输入",
+        "dPadUp": "方向键上",
+        "dPadDown": "方向键下",
+        "dPadLeft": "方向键左",
+        "dPadRight": "方向键右",
+        "leftShoulder": "左缓冲键 (LB)",
+        "rightShoulder": "右缓冲键 (RB)",
+        "leftTrigger": "左扳机键 (LT)",
+        "rightTrigger": "右扳机键 (RT)",
+        "leftThumb": "左摇杆",
+        "rightThumb": "右摇杆",
+        "view": "视图键",
+        "menu": "菜单键",
+        "nexus": "Xbox 键",
+        "none": "无",
+        "enabledLabel": "已启用",
+        "disabledLabel": "已禁用",
+        "axesLabel": "轴",
+        "buttonsLabel": "按键",
+        "rumbleLabel": "振动",
+        "notSupportedLabel": "不支持",
+        "title": "输入",
+        "enableVibration": "启用振动",
+        "enableTouch": "启用触控输入",
+        "enableMouseKeyboard": "启用鼠标和键盘",
+        "legacyWarning": "同时使用鼠标键盘驱动和键盘映射手柄功能会产生冲突",
+        "enableLegacy": "启用键盘映射手柄",
+        "enableLegacyDescription": "（禁用此功能后，键盘到手柄的映射将关闭，仅接受手柄的操作。）",
+        "controllerDetectedTitle": "检测到的手柄",
+        "controllerDetectedDescription": "如果已连接手柄但未显示，请尝试按下手柄上的任意按键以进行检测。",
+        "noControllerDetected": "未检测到手柄",
+        "keyboardMappingsTitle": "键盘映射"
+      },
+
+      "streaming": {
+        "pageTitle": "设置：串流",
+        "title": "串流设置",
+        "description": "默认情况下，xHome 和 xCloud 不支持超过 20 Mbps。此设置无法突破该限制。",
+        "xCloudStreamingBitrateLabel": "xCloud 串流码率",
+        "xHomeStreamingBitrateLabel": "xHome 串流码率",
+        "showNonEntitledLabel": "显示需要购买的游戏",
+        "unlimitedLabel": "无限制",
+        "mbpsLabel": "Mbps",
+        "setH264ProfileLabel": "设置 H.264 配置",
+        "setH264ProfileValueAuto": "自动协商",
+        "setH264ProfileValueHigh": "高",
+        "setH264ProfileValueMedium": "中",
+        "setH264ProfileValueLow": "低",
+        "forceRegionTitle": "强制指定地区",
+        "setRegionLabel": "设置地区：",
+        "setRegionValueDisabled": "已禁用",
+        "setRegionValueAustralia": "澳大利亚",
+        "setRegionValueBrazil": "巴西",
+        "setRegionValueEurope": "欧洲",
+        "setRegionValueJapan": "日本",
+        "setRegionValueKorea": "韩国",
+        "setRegionValueUS": "美国",
+        "preferredGameLanguageLabel": "首选游戏语言：",
+        "preferredGameLanguageValueArabic": "阿拉伯语（沙特阿拉伯）",
+        "preferredGameLanguageValueCzech": "捷克语",
+        "preferredGameLanguageValueDanish": "丹麦语",
+        "preferredGameLanguageValueGerman": "德语",
+        "preferredGameLanguageValueGreek": "希腊语",
+        "preferredGameLanguageValueEnglishUK": "英语（英国）",
+        "preferredGameLanguageValueEnglishUS": "英语（美国）",
+        "preferredGameLanguageValueSpanish": "西班牙语（西班牙）",
+        "preferredGameLanguageValueSpanishMX": "西班牙语（墨西哥）",
+        "preferredGameLanguageValueFinnish": "芬兰语",
+        "preferredGameLanguageValueFrench": "法语",
+        "preferredGameLanguageValueHebrew": "希伯来语",
+        "preferredGameLanguageValueHungarian": "匈牙利语",
+        "preferredGameLanguageValueItalian": "意大利语",
+        "preferredGameLanguageValueJapanese": "日语",
+        "preferredGameLanguageValueKorean": "韩语",
+        "preferredGameLanguageValueNorwegian": "挪威语",
+        "preferredGameLanguageValueDutch": "荷兰语",
+        "preferredGameLanguageValuePolish": "波兰语",
+        "preferredGameLanguageValuePortugueseBR": "葡萄牙语（巴西）",
+        "preferredGameLanguageValuePortuguese": "葡萄牙语（葡萄牙）",
+        "preferredGameLanguageValueRussian": "俄语",
+        "preferredGameLanguageValueSlovak": "斯洛伐克语",
+        "preferredGameLanguageValueSwedish": "瑞典语",
+        "preferredGameLanguageValueTurkish": "土耳其语",
+        "preferredGameLanguageValueChineseCN": "中文（简体）",
+        "preferredGameLanguageValueChineseTW": "中文（繁体）"
+      },
+
+      "videoAudio": {
+        "pageTitle": "设置：视频和音频",
+        "title": "视频",
+        "disableVideoLabel": "禁用视频",
+        "disabledLabel": "已禁用",
+        "enabledLabel": "已启用",
+        "aspectSizeLabel": "视频画面比例",
+        "aspectSizeValueDefault": "默认",
+        "aspectSizeValueStretch": "拉伸",
+        "aspectSizeValueZoom": "缩放",
+        "forceLowResLabel": "强制使用低分辨率视频",
+        "forceLowResDescription": "（此选项适用于 Steam Deck，可让应用程序以低分辨率渲染，以便启用 FSR。）",
+        "audioTitle": "音频",
+        "disableAudioLabel": "禁用音频"
+      },
+
+      "webUI": {
+        "pageTitle": "设置：Web 界面",
+        "title": "Web 界面",
+        "enableWebUILabel": "启用 Web 界面",
+        "stopWebUIBtn": "停止 Web 界面",
+        "startWebUIBtn": "启动 Web 界面",
+        "openWebUIBtn": "打开 Web 界面",
+        "autostartLabel": "随应用程序启动",
+        "autostartEnabled": "已启用",
+        "autostartDisabled": "已禁用",
+        "portLabel": "端口",
+        "portPlaceholder": "例如：9003"
+      },
+
+      "debug": {
+        "pageTitle": "设置：调试"
+      }
+    },
+
+    "page": {
+      "xCloud": {
+        "pageTitle": "xCloud 游戏库",
+        "breadcrumb": "xCloud",
+        "recentGames": "最近游玩",
+        "recentlyAdded": "最近添加",
+        "viewLibraryBtn": "查看游戏库"
+      },
+
+      "xCloudLibrary": {
+        "pageTitle": "xCloud 游戏库",
+        "breadcrumb1": "xCloud",
+        "breadcrumb2": "游戏库",
+        "title": "游戏库",
+        "searchPlaceholder": "搜索",
+        "gamePassOnly": "仅显示 Game Pass 游戏",
+        "noGamesFound": "未找到游戏",
+        "previousPageBtn": "上一页",
+        "nextPageBtn": "下一页",
+        "viewGamePageIcon": "查看游戏页面"
+      },
+
+      "myConsoles": {
+        "pageTitle": "我的主机",
+        "poweredOn": "已开机",
+        "standby": "待机",
+        "warningLabel": "警告",
+        "managementWarning": "未启用远程管理",
+        "streamingWarning": "未启用主机串流",
+        "startStreamBtn": "开始串流",
+        "noConsoles": "您的帐户中未找到主机。如果您拥有 Xbox 主机，请确保已启用远程游玩，并且该主机在官方 Xbox 应用中可见。"
+      },
+
+      "titleInfo": {
+        "pageTitle": "游戏信息：",
+        "breadcrumb1": "xCloud",
+        "breadcrumb2": "游戏库",
+        "by": "开发商：",
+        "descriptionTitle": "简介",
+        "capabilitiesTitle": "功能",
+        "startStreamBtn": "开始串流",
+        "purchaseRequiredBtn": "需要购买"
+      },
+
+      "page404": {
+        "pageTitle": "错误",
+        "message": "糟糕，404 错误……未找到该操作"
+      },
+
+      "page500": {
+        "pageTitle": "错误",
+        "message": "糟糕，500 错误……应用程序出现错误"
+      }
+    },
+
+    "friends": {
+      "allFriendsOffline": "您的所有好友均处于离线状态"
+    },
+
+    "streamWindow": {
+      "pageTitle": "串流",
+      "endStreamConfirmMessage": "确定要结束串流吗？",
+      "estimatedWaitingTimeMessage": "预计排队等待时间：",
+      "timeHours": "小时",
+      "timeMinutes": "分钟",
+      "timeSeconds": "秒",
+      "loadingStreamTitle": "正在加载...",
+      "gettingStreamReadyMessage": "正在为您准备串流...",
+      "endStreamBtn": "结束串流",
+      "disconnectBtn": "断开连接",
+      "menuBtn": "菜单",
+      "menuTitle": "打开 Xbox 菜单",
+      "micMuted": "已静音",
+      "micActive": "已开启",
+      "enableMic": "开启麦克风",
+      "disableMic": "关闭麦克风",
+      "debugTitle": "调试",
+      "itsTakingALittleLonger": "所需时间稍长……串流可能即将开始。",
+      "startingConnection": "正在建立连接...",
+      "connectingToConsole": "正在连接主机...",
+      "clientHasBeenDisconnected": "客户端已断开连接。"
+    },
+
+    "updater": {
+      "unableToCheckForUpdates": "目前无法检查更新，请重试。",
+      "alreadyOnLatestVersion": "您使用的已是最新版本。当前版本：",
+      "newestVersion": "最新版本：",
+      "newReleaseAvailable": "有新版本可用",
+      "installedVersion": "已安装版本：",
+      "latestVersion": "最新版本：",
+      "downloadBtn": "下载",
+      "laterBtn": "稍后",
+      "updateChecker": "更新检查",
+      "closeBtn": "关闭"
+    },
+
+    "errors": {
+      "failedToRetrieveUserProfile": "错误：无法获取用户个人资料：",
+      "repositoryNotFound": "在 package.json 文件中未找到仓库 URL。",
+      "failedToRetrieveStreamingTokens": "错误：无法获取串流令牌：",
+      "errorAuthentificationUser": "用户身份验证出错。错误详情：",
+      "errorGettingRedirectURI": "获取重定向 URI 出错。错误详情：",
+      "authentificationCallbackIsNotDefined": "未定义身份验证回调。错误详情：",
+      "sisuTokenIsMissing": "缺少 Sisu 令牌，请先进行身份验证",
+      "failedToRetrieveWebTokens": "错误：无法获取 Web 令牌：",
+      "chatSDPExchangeError": "ChatSDP 交换错误：",
+      "ICEExchangeError": "ICE 交换错误：",
+      "SDPExchangeError": "SDP 交换错误：",
+      "failedToStartStream": "无法开始新的串流。错误详情：",
+      "unableToStartStreamSession": "无法在主机上启动串流会话。主机未连接到 Xbox 服务器。这种情况偶尔会在更新期间或用户未在主机上登录时出现。请将主机完全重启后重试。",
+      "streamErrorResult": "串流错误结果：",
+      "details": "详情：",
+      "failedToGetPlayerState": "无法获取播放器状态。错误详情："
+    }
+  }
+}
