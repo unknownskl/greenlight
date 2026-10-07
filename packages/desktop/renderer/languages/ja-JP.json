@@ -31,6 +31,11 @@
     "settings": {
       "sidebar": {
         "about": "バージョン情報",
+        "common": {
+          "resetDefaultsBtn": "初期設定に戻す",
+          "resetDefaultsConfirm": "このページの設定を初期値に戻しますか？",
+          "savedNotice": "保存しました"
+        },
         "streaming": "ストリーミング",
         "input": "入力",
         "videoAudio": "ビデオとオーディオ",
@@ -99,6 +104,7 @@
         "setH264ProfileValueHigh": "高",
         "setH264ProfileValueMedium": "中",
         "setH264ProfileValueLow": "低",
+        "setH264ProfileDescription": "詳細設定：H.264 ビデオプロファイルを強制します。エンコードに問題がなければ「自動」のままにしてください。",
         "forceRegionTitle": "地域を強制",
         "setRegionLabel": "地域を設定:",
         "setRegionValueDisabled": "無効",
@@ -108,6 +114,7 @@
         "setRegionValueJapan": "日本",
         "setRegionValueKorea": "韓国",
         "setRegionValueUS": "米国",
+        "setRegionDescription": "詳細設定：選択したリージョンのサーバー経由でストリームを転送します。お住まいのリージョンで接続の問題がある場合のみ使用してください。",
         "preferredGameLanguageLabel": "優先するゲーム言語:",
         "preferredGameLanguageValueArabic": "アラビア語 (サウジアラビア)",
         "preferredGameLanguageValueCzech": "チェコ語",
@@ -165,7 +172,8 @@
         "autostartEnabled": "有効",
         "autostartDisabled": "無効",
         "portLabel": "ポート",
-        "portPlaceholder": "例: 9003"
+        "portPlaceholder": "例: 9003",
+        "portInvalid": "ポートは 1024 ～ 65535 の数値である必要があります。"
       },
 
       "debug": {

@@ -31,6 +31,11 @@
     "settings": {
       "sidebar": {
         "about": "À propos",
+        "common": {
+          "resetDefaultsBtn": "Réinitialiser les valeurs par défaut",
+          "resetDefaultsConfirm": "Réinitialiser les paramètres de cette page à leurs valeurs par défaut ?",
+          "savedNotice": "Enregistré"
+        },
         "streaming": "Streaming",
         "input": "Commandes",
         "videoAudio": "Vidéo et audio",
@@ -99,6 +104,7 @@
         "setH264ProfileValueHigh": "Élevé",
         "setH264ProfileValueMedium": "Moyen",
         "setH264ProfileValueLow": "Faible",
+        "setH264ProfileDescription": "Avancé : force le profil vidéo H.264. Laissez sur Auto sauf en cas de problèmes d'encodage.",
         "forceRegionTitle": "Forcer la région",
         "setRegionLabel": "Définir la région :",
         "setRegionValueDisabled": "Désactivé",
@@ -108,6 +114,7 @@
         "setRegionValueJapan": "Japon",
         "setRegionValueKorea": "Corée",
         "setRegionValueUS": "États-Unis",
+        "setRegionDescription": "Avancé : achemine le flux via les serveurs de la région sélectionnée. À utiliser uniquement si votre région a des problèmes de connexion.",
         "preferredGameLanguageLabel": "Langue préférée des jeux :",
         "preferredGameLanguageValueArabic": "Arabe (Arabie saoudite)",
         "preferredGameLanguageValueCzech": "Tchèque",
@@ -165,7 +172,8 @@
         "autostartEnabled": "Activé",
         "autostartDisabled": "Désactivé",
         "portLabel": "Port",
-        "portPlaceholder": "exemple : 9003"
+        "portPlaceholder": "exemple : 9003",
+        "portInvalid": "Le port doit être un nombre compris entre 1024 et 65535."
       },
 
       "debug": {

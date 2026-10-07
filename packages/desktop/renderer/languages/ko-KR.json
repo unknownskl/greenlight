@@ -31,6 +31,11 @@
     "settings": {
       "sidebar": {
         "about": "정보",
+        "common": {
+          "resetDefaultsBtn": "기본값으로 재설정",
+          "resetDefaultsConfirm": "이 페이지의 설정을 기본값으로 재설정하시겠습니까?",
+          "savedNotice": "저장됨"
+        },
         "streaming": "스트리밍",
         "input": "입력",
         "videoAudio": "비디오 및 오디오",
@@ -99,6 +104,7 @@
         "setH264ProfileValueHigh": "높음",
         "setH264ProfileValueMedium": "중간",
         "setH264ProfileValueLow": "낮음",
+        "setH264ProfileDescription": "고급: H.264 비디오 프로필을 강제합니다. 인코딩 문제가 없으면 자동으로 두세요.",
         "forceRegionTitle": "지역 강제 지정",
         "setRegionLabel": "지역 설정:",
         "setRegionValueDisabled": "사용 안 함",
@@ -108,6 +114,7 @@
         "setRegionValueJapan": "일본",
         "setRegionValueKorea": "대한민국",
         "setRegionValueUS": "미국",
+        "setRegionDescription": "고급: 선택한 지역의 서버를 통해 스트림을 전송합니다. 해당 지역에 연결 문제가 있을 때만 사용하세요.",
         "preferredGameLanguageLabel": "선호하는 게임 언어:",
         "preferredGameLanguageValueArabic": "아랍어(사우디아라비아)",
         "preferredGameLanguageValueCzech": "체코어",
@@ -165,7 +172,8 @@
         "autostartEnabled": "사용",
         "autostartDisabled": "사용 안 함",
         "portLabel": "포트",
-        "portPlaceholder": "예: 9003"
+        "portPlaceholder": "예: 9003",
+        "portInvalid": "포트는 1024에서 65535 사이의 숫자여야 합니다."
       },
 
       "debug": {

@@ -31,6 +31,11 @@
     "settings": {
       "sidebar": {
         "about": "Hakkında",
+        "common": {
+          "resetDefaultsBtn": "Varsayılanlara sıfırla",
+          "resetDefaultsConfirm": "Bu sayfadaki ayarlar varsayılan değerlerine sıfırlansın mı?",
+          "savedNotice": "Kaydedildi"
+        },
         "streaming": "Yayın",
         "input": "Giriş aygıtları",
         "videoAudio": "Görüntü ve Ses",
@@ -99,6 +104,7 @@
         "setH264ProfileValueHigh": "Yüksek",
         "setH264ProfileValueMedium": "Orta",
         "setH264ProfileValueLow": "Düşük",
+        "setH264ProfileDescription": "Gelişmiş: H.264 video profilini zorlar. Kodlama sorunları yaşamıyorsanız Otomatik bırakın.",
         "forceRegionTitle": "Bölgeyi zorla",
         "setRegionLabel": "Bölgeyi ayarla:",
         "setRegionValueDisabled": "Devre dışı",
@@ -108,6 +114,7 @@
         "setRegionValueJapan": "Japonya",
         "setRegionValueKorea": "Kore",
         "setRegionValueUS": "Amerika Birleşik Devletleri",
+        "setRegionDescription": "Gelişmiş: yayını seçilen bölgenin sunucuları üzerinden yönlendirir. Yalnızca bölgenizde bağlantı sorunu varsa kullanın.",
         "preferredGameLanguageLabel": "Tercih edilen oyun dili:",
         "preferredGameLanguageValueArabic": "Arapça (Suudi Arabistan)",
         "preferredGameLanguageValueCzech": "Çekçe",
@@ -165,7 +172,8 @@
         "autostartEnabled": "Etkin",
         "autostartDisabled": "Devre dışı",
         "portLabel": "Bağlantı noktası",
-        "portPlaceholder": "örnek: 9003"
+        "portPlaceholder": "örnek: 9003",
+        "portInvalid": "Bağlantı noktası 1024 ile 65535 arasında bir sayı olmalıdır."
       },
 
       "debug": {

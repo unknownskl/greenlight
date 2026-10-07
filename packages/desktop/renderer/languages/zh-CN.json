@@ -31,6 +31,11 @@
     "settings": {
       "sidebar": {
         "about": "关于",
+        "common": {
+          "resetDefaultsBtn": "恢复默认",
+          "resetDefaultsConfirm": "将此页面的设置恢复为默认值吗？",
+          "savedNotice": "已保存"
+        },
         "streaming": "串流",
         "input": "输入",
         "videoAudio": "视频和音频",
@@ -99,6 +104,7 @@
         "setH264ProfileValueHigh": "高",
         "setH264ProfileValueMedium": "中",
         "setH264ProfileValueLow": "低",
+        "setH264ProfileDescription": "高级：强制使用 H.264 视频配置。除非有编码问题，否则请保持“自动”。",
         "forceRegionTitle": "强制指定地区",
         "setRegionLabel": "设置地区：",
         "setRegionValueDisabled": "已禁用",
@@ -108,6 +114,7 @@
         "setRegionValueJapan": "日本",
         "setRegionValueKorea": "韩国",
         "setRegionValueUS": "美国",
+        "setRegionDescription": "高级：通过所选区域的服务器转发串流。仅在你所在区域存在连接问题时使用。",
         "preferredGameLanguageLabel": "首选游戏语言：",
         "preferredGameLanguageValueArabic": "阿拉伯语（沙特阿拉伯）",
         "preferredGameLanguageValueCzech": "捷克语",
@@ -165,7 +172,8 @@
         "autostartEnabled": "已启用",
         "autostartDisabled": "已禁用",
         "portLabel": "端口",
-        "portPlaceholder": "例如：9003"
+        "portPlaceholder": "例如：9003",
+        "portInvalid": "端口必须是 1024 到 65535 之间的数字。"
       },
 
       "debug": {
