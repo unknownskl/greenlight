@@ -1,7 +1,7 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 
-// Language used when no language is set or when a translation is missing
+// Language used when no translation matches or when a translation is missing
 const FALLBACK_LANGUAGE = "en-US";
 
 // Import all JSON files from the languages directory
@@ -21,10 +21,31 @@ const resources = importAllLanguages();
 
 let isInitStarted = false;
 
+// Pick the language to display: the saved one when we have a translation for it,
+// otherwise the first system language we have a translation for, otherwise English.
+function resolveLanguage(preferred?: string): string {
+  const available = Object.keys(resources);
+  if (preferred && available.includes(preferred)) {
+    return preferred;
+  }
+
+  const systemLanguages = typeof navigator !== "undefined" ? navigator.languages || [navigator.language] : [];
+  for (const systemLanguage of systemLanguages) {
+    const wanted = (systemLanguage || "").toLowerCase();
+    const match = available.find((code) => code.toLowerCase() === wanted)
+      || available.find((code) => code.toLowerCase().split("-")[0] === wanted.split("-")[0]);
+    if (match) {
+      return match;
+    }
+  }
+
+  return FALLBACK_LANGUAGE;
+}
+
 // Function to initialize i18n with language from settings.
 // The first call initializes i18next, later calls only switch the language.
 export function initI18nWithLanguage(settings) {
-  const language = settings?.language || FALLBACK_LANGUAGE;
+  const language = resolveLanguage(settings?.language);
 
   if (isInitStarted) {
     if (i18n.language !== language) {
