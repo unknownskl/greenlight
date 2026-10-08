@@ -31,11 +31,6 @@
     "settings": {
       "sidebar": {
         "about": "Sobre",
-        "common": {
-          "resetDefaultsBtn": "Restaurar padrões",
-          "resetDefaultsConfirm": "Restaurar as configurações desta página para os valores padrão?",
-          "savedNotice": "Salvo"
-        },
         "streaming": "Streaming",
         "input": "Controles",
         "videoAudio": "Vídeo e áudio",
@@ -90,6 +85,11 @@
         "keyboardMappingsTitle": "Mapeamento do teclado"
       },
 
+      "common": {
+        "resetDefaultsBtn": "Restaurar padrões",
+        "resetDefaultsConfirm": "Restaurar as configurações desta página para os valores padrão?",
+        "savedNotice": "Salvo"
+      },
       "streaming": {
         "pageTitle": "Configurações: Streaming",
         "title": "Configurações de streaming",

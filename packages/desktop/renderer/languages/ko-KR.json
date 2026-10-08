@@ -31,11 +31,6 @@
     "settings": {
       "sidebar": {
         "about": "정보",
-        "common": {
-          "resetDefaultsBtn": "기본값으로 재설정",
-          "resetDefaultsConfirm": "이 페이지의 설정을 기본값으로 재설정하시겠습니까?",
-          "savedNotice": "저장됨"
-        },
         "streaming": "스트리밍",
         "input": "입력",
         "videoAudio": "비디오 및 오디오",
@@ -90,6 +85,11 @@
         "keyboardMappingsTitle": "키보드 매핑"
       },
 
+      "common": {
+        "resetDefaultsBtn": "기본값으로 재설정",
+        "resetDefaultsConfirm": "이 페이지의 설정을 기본값으로 재설정하시겠습니까?",
+        "savedNotice": "저장됨"
+      },
       "streaming": {
         "pageTitle": "설정: 스트리밍",
         "title": "스트리밍 설정",

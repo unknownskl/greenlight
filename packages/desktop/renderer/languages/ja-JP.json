@@ -31,11 +31,6 @@
     "settings": {
       "sidebar": {
         "about": "バージョン情報",
-        "common": {
-          "resetDefaultsBtn": "初期設定に戻す",
-          "resetDefaultsConfirm": "このページの設定を初期値に戻しますか？",
-          "savedNotice": "保存しました"
-        },
         "streaming": "ストリーミング",
         "input": "入力",
         "videoAudio": "ビデオとオーディオ",
@@ -90,6 +85,11 @@
         "keyboardMappingsTitle": "キーボードの割り当て"
       },
 
+      "common": {
+        "resetDefaultsBtn": "初期設定に戻す",
+        "resetDefaultsConfirm": "このページの設定を初期値に戻しますか？",
+        "savedNotice": "保存しました"
+      },
       "streaming": {
         "pageTitle": "設定: ストリーミング",
         "title": "ストリーミング設定",

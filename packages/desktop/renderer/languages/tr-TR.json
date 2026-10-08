@@ -31,11 +31,6 @@
     "settings": {
       "sidebar": {
         "about": "Hakkında",
-        "common": {
-          "resetDefaultsBtn": "Varsayılanlara sıfırla",
-          "resetDefaultsConfirm": "Bu sayfadaki ayarlar varsayılan değerlerine sıfırlansın mı?",
-          "savedNotice": "Kaydedildi"
-        },
         "streaming": "Yayın",
         "input": "Giriş aygıtları",
         "videoAudio": "Görüntü ve Ses",
@@ -90,6 +85,11 @@
         "keyboardMappingsTitle": "Klavye eşlemeleri"
       },
 
+      "common": {
+        "resetDefaultsBtn": "Varsayılanlara sıfırla",
+        "resetDefaultsConfirm": "Bu sayfadaki ayarlar varsayılan değerlerine sıfırlansın mı?",
+        "savedNotice": "Kaydedildi"
+      },
       "streaming": {
         "pageTitle": "Ayarlar: Yayın",
         "title": "Yayın ayarları",

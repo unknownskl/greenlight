@@ -31,11 +31,6 @@
     "settings": {
       "sidebar": {
         "about": "关于",
-        "common": {
-          "resetDefaultsBtn": "恢复默认",
-          "resetDefaultsConfirm": "将此页面的设置恢复为默认值吗？",
-          "savedNotice": "已保存"
-        },
         "streaming": "串流",
         "input": "输入",
         "videoAudio": "视频和音频",
@@ -90,6 +85,11 @@
         "keyboardMappingsTitle": "键盘映射"
       },
 
+      "common": {
+        "resetDefaultsBtn": "恢复默认",
+        "resetDefaultsConfirm": "将此页面的设置恢复为默认值吗？",
+        "savedNotice": "已保存"
+      },
       "streaming": {
         "pageTitle": "设置：串流",
         "title": "串流设置",
