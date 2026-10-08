@@ -49,6 +49,12 @@
         "websiteLinkTitle": "Open link in external browser"
       },
 
+      "common": {
+        "resetDefaultsBtn": "Reset to defaults",
+        "resetDefaultsConfirm": "Reset the settings on this page to their defaults?",
+        "savedNotice": "Saved"
+      },
+
       "input": {
         "settingsInputPageTitle": "Settings: Input",
         "dPadUp": "DPad Up",
@@ -98,6 +104,7 @@
         "setH264ProfileValueHigh": "High",
         "setH264ProfileValueMedium": "Medium",
         "setH264ProfileValueLow": "Low",
+        "setH264ProfileDescription": "Advanced: forces the H.264 video profile. Leave on Auto unless you have encoding issues.",
         "forceRegionTitle": "Force region",
         "setRegionLabel": "Set region:",
         "setRegionValueDisabled": "Disabled",
@@ -107,6 +114,7 @@
         "setRegionValueJapan": "Japan",
         "setRegionValueKorea": "Korea",
         "setRegionValueUS": "United States",
+        "setRegionDescription": "Advanced: routes the stream through the selected region's servers. Use only if your region has connection issues.",
         "preferredGameLanguageLabel": "Preferred game language:",
         "preferredGameLanguageValueArabic": "Arabic (Saudi Arabia)",
         "preferredGameLanguageValueCzech": "Czech",
@@ -164,7 +172,8 @@
         "autostartEnabled": "Enabled",
         "autostartDisabled": "Disabled",
         "portLabel": "Port",
-        "portPlaceholder": "example: 9003"
+        "portPlaceholder": "example: 9003",
+        "portInvalid": "Port must be a number between 1024 and 65535."
       },
 
       "debug": {

@@ -84,6 +84,11 @@
         "keyboardMappingsTitle": "Призначення клавіш"
       },
 
+      "common": {
+        "resetDefaultsBtn": "Скинути до типових",
+        "resetDefaultsConfirm": "Скинути налаштування на цій сторінці до типових значень?",
+        "savedNotice": "Збережено"
+      },
       "streaming": {
         "pageTitle": "Налаштування: Трансляція",
         "title": "Налаштування трансляції",
@@ -98,6 +103,7 @@
         "setH264ProfileValueHigh": "Високий",
         "setH264ProfileValueMedium": "Середній",
         "setH264ProfileValueLow": "Низький",
+        "setH264ProfileDescription": "Додатково: примусово задає відеопрофіль H.264. Залиште «Авто», якщо немає проблем із кодуванням.",
         "forceRegionTitle": "Примусовий регіон",
         "setRegionLabel": "Встановити регіон:",
         "setRegionValueDisabled": "Вимкнено",
@@ -107,6 +113,7 @@
         "setRegionValueJapan": "Японія",
         "setRegionValueKorea": "Корея",
         "setRegionValueUS": "США",
+        "setRegionDescription": "Додатково: спрямовує потік через сервери вибраного регіону. Використовуйте, лише якщо у вашому регіоні є проблеми зі з’єднанням.",
         "preferredGameLanguageLabel": "Бажана мова гри:",
         "preferredGameLanguageValueArabic": "Арабська (Саудівська Аравія)",
         "preferredGameLanguageValueCzech": "Чеська",
@@ -164,7 +171,8 @@
         "autostartEnabled": "Увімкнено",
         "autostartDisabled": "Вимкнено",
         "portLabel": "Порт",
-        "portPlaceholder": "наприклад: 9003"
+        "portPlaceholder": "наприклад: 9003",
+        "portInvalid": "Порт має бути числом від 1024 до 65535."
       },
 
       "debug": {
