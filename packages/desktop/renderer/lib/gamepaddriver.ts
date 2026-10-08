@@ -120,6 +120,6 @@ export default class CompactGamepadDriver extends GamepadDriver {
     }
 
     connectedGamepads(){
-        return navigator.getGamepads().filter((gamepad) => gamepad !== null && gamepad.connected)
+        return navigator.getGamepads().filter((gamepad) => gamepad?.connected)
     }
 }
