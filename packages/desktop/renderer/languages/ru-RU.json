@@ -31,11 +31,6 @@
     "settings": {
       "sidebar": {
         "about": "О программе",
-        "common": {
-          "resetDefaultsBtn": "Сбросить настройки",
-          "resetDefaultsConfirm": "Сбросить настройки на этой странице к значениям по умолчанию?",
-          "savedNotice": "Сохранено"
-        },
         "streaming": "Трансляция",
         "input": "Ввод",
         "videoAudio": "Видео и аудио",
@@ -89,6 +84,11 @@
         "keyboardMappingsTitle": "Назначения клавиш"
       },
 
+      "common": {
+        "resetDefaultsBtn": "Сбросить настройки",
+        "resetDefaultsConfirm": "Сбросить настройки на этой странице к значениям по умолчанию?",
+        "savedNotice": "Сохранено"
+      },
       "streaming": {
         "pageTitle": "Настройки: Трансляция",
         "title": "Настройки трансляции",

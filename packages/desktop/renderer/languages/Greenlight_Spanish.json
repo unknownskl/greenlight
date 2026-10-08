@@ -28,11 +28,6 @@
     "settings": {
       "sidebar": {
         "about": "Acerca de",
-        "common": {
-          "resetDefaultsBtn": "Restablecer valores predeterminados",
-          "resetDefaultsConfirm": "¿Restablecer los ajustes de esta página a sus valores predeterminados?",
-          "savedNotice": "Guardado"
-        },
         "streaming": "Streaming",
         "input": "Controles",
         "videoAudio": "Video y audio",
@@ -83,6 +78,11 @@
         "noControllerDetected": "No se ha detectado ningún mando",
         "keyboardMappingsTitle": "Asignación de teclas",
         "pageTitle": "Título página"
+      },
+      "common": {
+        "resetDefaultsBtn": "Restablecer valores predeterminados",
+        "resetDefaultsConfirm": "¿Restablecer los ajustes de esta página a sus valores predeterminados?",
+        "savedNotice": "Guardado"
       },
       "streaming": {
         "pageTitle": "Configuración: Streaming",

@@ -31,11 +31,6 @@
     "settings": {
       "sidebar": {
         "about": "Informacje",
-        "common": {
-          "resetDefaultsBtn": "Przywróć domyślne",
-          "resetDefaultsConfirm": "Przywrócić ustawienia na tej stronie do wartości domyślnych?",
-          "savedNotice": "Zapisano"
-        },
         "streaming": "Strumieniowanie",
         "input": "Wejścia",
         "videoAudio": "Obraz i Dźwięk",
@@ -89,6 +84,11 @@
         "keyboardMappingsTitle": "Mapowanie klawiatury"
       },
 
+      "common": {
+        "resetDefaultsBtn": "Przywróć domyślne",
+        "resetDefaultsConfirm": "Przywrócić ustawienia na tej stronie do wartości domyślnych?",
+        "savedNotice": "Zapisano"
+      },
       "streaming": {
         "pageTitle": "Ustawienia: Strumieniowanie",
         "title": "Ustawienia Strumieniowania",

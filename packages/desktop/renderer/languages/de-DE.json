@@ -28,11 +28,6 @@
     "settings": {
       "sidebar": {
         "about": "Über",
-        "common": {
-          "resetDefaultsBtn": "Auf Standard zurücksetzen",
-          "resetDefaultsConfirm": "Die Einstellungen auf dieser Seite auf die Standardwerte zurücksetzen?",
-          "savedNotice": "Gespeichert"
-        },
         "streaming": "Streaming",
         "input": "Eingabe",
         "videoAudio": "Video & Audio",
@@ -83,6 +78,11 @@
         "noControllerDetected": "Kein Controller erkannt",
         "keyboardMappingsTitle": "Tastaturbelegungen",
         "pageTitle": "pageTitle"
+      },
+      "common": {
+        "resetDefaultsBtn": "Auf Standard zurücksetzen",
+        "resetDefaultsConfirm": "Die Einstellungen auf dieser Seite auf die Standardwerte zurücksetzen?",
+        "savedNotice": "Gespeichert"
       },
       "streaming": {
         "pageTitle": "Einstellungen: Streaming",

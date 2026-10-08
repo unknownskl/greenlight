@@ -31,11 +31,6 @@
     "settings": {
       "sidebar": {
         "about": "Про програму",
-        "common": {
-          "resetDefaultsBtn": "Скинути до типових",
-          "resetDefaultsConfirm": "Скинути налаштування на цій сторінці до типових значень?",
-          "savedNotice": "Збережено"
-        },
         "streaming": "Трансляція",
         "input": "Ввід",
         "videoAudio": "Відео та аудіо",
@@ -89,6 +84,11 @@
         "keyboardMappingsTitle": "Призначення клавіш"
       },
 
+      "common": {
+        "resetDefaultsBtn": "Скинути до типових",
+        "resetDefaultsConfirm": "Скинути налаштування на цій сторінці до типових значень?",
+        "savedNotice": "Збережено"
+      },
       "streaming": {
         "pageTitle": "Налаштування: Трансляція",
         "title": "Налаштування трансляції",
