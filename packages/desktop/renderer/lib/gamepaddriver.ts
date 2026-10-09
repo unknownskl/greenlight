@@ -119,7 +119,14 @@ export default class CompactGamepadDriver extends GamepadDriver {
         }
     }
 
+    // Controllers with the standard mapping come first, then the other devices in browser order, so that
+    // headsets, UPS units or keyboards exposed as gamepads do not take the controller 0 slot.
+    // Devices with fewer than 4 buttons cannot be used as a controller.
     connectedGamepads(){
-        return navigator.getGamepads().filter((gamepad) => gamepad?.connected)
+        const gamepads = navigator.getGamepads().filter((gamepad) => gamepad?.connected && gamepad.buttons.length >= 4)
+        return [
+            ...gamepads.filter((gamepad) => gamepad.mapping === 'standard'),
+            ...gamepads.filter((gamepad) => gamepad.mapping !== 'standard'),
+        ]
     }
 }
