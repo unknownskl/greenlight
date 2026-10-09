@@ -78,9 +78,7 @@ function Header({
     function drawMenu() {
         return headerLinks.map((link) => (
             <li key={link.url}>
-                <Link legacyBehavior href={link.url} key={link.url}>
-                    <a title={link.title} className={isActive(link.url) ? 'active' : ''}>{link.name}</a>
-                </Link>
+                <Link href={link.url} title={link.title} className={isActive(link.url) ? 'active' : ''}>{link.name}</Link>
             </li>
         ));
     }
