@@ -16,8 +16,8 @@ function isActive(channel: any): boolean {
 }
 
 // The keys whose press was not sent, so that their release is not sent either (and a key sent is always released).
-const skipped = new Set<number>()
-const sentAsKey = new Set<number>()
+const skipped = new Set<string>()
+const sentAsKey = new Set<string>()
 
 // The player sends the state of the controller 60 times a second and keeps the Home button pressed while this is set.
 function setHome(channel: any, pressed: boolean) {
@@ -49,7 +49,7 @@ export function applyEscapeAsHome() {
 
     proto.onKeyDown = function (event: KeyboardEvent) {
         if (event.key === 'Meta' || event.metaKey) {
-            skipped.add(event.keyCode)
+            skipped.add(event.code)
             return
         }
 
@@ -58,11 +58,11 @@ export function applyEscapeAsHome() {
         }
 
         if (event.shiftKey) {
-            sentAsKey.add(event.keyCode)
+            sentAsKey.add(event.code)
             return onKeyDown.call(this, event)
         }
 
-        skipped.add(event.keyCode)
+        skipped.add(event.code)
 
         if (!event.repeat && isActive(this)) {
             setHome(this, true)
@@ -71,7 +71,7 @@ export function applyEscapeAsHome() {
     }
 
     proto.onKeyUp = function (event: KeyboardEvent) {
-        if (sentAsKey.delete(event.keyCode)) {
+        if (sentAsKey.delete(event.code)) {
             return onKeyUp.call(this, event)
         }
 
@@ -79,7 +79,7 @@ export function applyEscapeAsHome() {
             setHome(this, false)
         }
 
-        if (skipped.delete(event.keyCode)) {
+        if (skipped.delete(event.code)) {
             return
         }
 

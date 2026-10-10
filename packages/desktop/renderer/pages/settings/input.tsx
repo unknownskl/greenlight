@@ -61,30 +61,6 @@ function KeySettings({keyConfigs, setKeyConfig}) {
                         case 'RightThumb':
                             fullBtnText = t('settings.input.rightThumb')
                             break
-                        case 'LeftStickUp':
-                            fullBtnText = t('settings.input.leftStickUp')
-                            break
-                        case 'LeftStickDown':
-                            fullBtnText = t('settings.input.leftStickDown')
-                            break
-                        case 'LeftStickLeft':
-                            fullBtnText = t('settings.input.leftStickLeft')
-                            break
-                        case 'LeftStickRight':
-                            fullBtnText = t('settings.input.leftStickRight')
-                            break
-                        case 'RightStickUp':
-                            fullBtnText = t('settings.input.rightStickUp')
-                            break
-                        case 'RightStickDown':
-                            fullBtnText = t('settings.input.rightStickDown')
-                            break
-                        case 'RightStickLeft':
-                            fullBtnText = t('settings.input.rightStickLeft')
-                            break
-                        case 'RightStickRight':
-                            fullBtnText = t('settings.input.rightStickRight')
-                            break
                         case 'View':
                             fullBtnText = t('settings.input.view')
                             break
@@ -94,7 +70,8 @@ function KeySettings({keyConfigs, setKeyConfig}) {
                         case 'Nexus':
                             fullBtnText = t('settings.input.nexus')
                         default:
-                            fullBtnText = btn
+                            // The directions of the sticks have one string each: leftStickUp, rightStickLeft, ...
+                            fullBtnText = STICK_KEYS.includes(btn) ? t(`settings.input.${btn.charAt(0).toLowerCase()}${btn.slice(1)}`) : btn
                             break
                     }
 
