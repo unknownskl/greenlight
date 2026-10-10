@@ -144,14 +144,14 @@
         "forceLowResLabel": "Forzar video en baja resolución",
         "forceLowResDescription": "(Esta opción es útil en dispositivos como Steam Deck, ya que permite que la aplicación renderice a menor resolución para poder activar el escalado FSR).",
         "audioTitle": "Audio",
-        "disableAudioLabel": "Desactivar audio",
-        "videoTitle": "Título Vídeo",
         "micLabel": "Micrófono",
         "micDefault": "Predeterminado del sistema",
         "micUnnamed": "Micrófono",
         "micUnavailable": "Micrófono elegido (no conectado)",
         "micRefreshBtn": "Actualizar la lista de micrófonos",
-        "micDescription": "Se usa al activar el micrófono durante una transmisión. Si faltan los nombres, pulsa el botón de actualizar y permite el acceso al micrófono."
+        "micDescription": "Se usa al activar el micrófono durante una transmisión. Si faltan los nombres, pulsa el botón de actualizar y permite el acceso al micrófono.",
+        "disableAudioLabel": "Desactivar audio",
+        "videoTitle": "Título Vídeo"
       },
       "webUI": {
         "pageTitle": "Configuración: Interfaz Web",
@@ -237,14 +237,14 @@
       "menuTitle": "Abrir menú de Xbox",
       "micMuted": "Silenciado",
       "micActive": "Activo",
+      "micAccessDenied": "Greenlight no tiene permiso para usar el micrófono. ¿Abrir los ajustes del sistema para permitirlo?",
       "enableMic": "Activar micrófono",
       "disableMic": "Silenciar micrófono",
       "debugTitle": "Depuración",
       "itsTakingALittleLonger": "Está tardando un poco más de lo habitual... El streaming debería comenzar pronto.",
       "startingConnection": "Iniciando conexión...",
       "connectingToConsole": "Conectando con la consola...",
-      "clientHasBeenDisconnected": "El cliente se ha desconectado.",
-      "micAccessDenied": "Greenlight no tiene permiso para usar el micrófono. ¿Abrir los ajustes del sistema para permitirlo?"
+      "clientHasBeenDisconnected": "El cliente se ha desconectado."
     },
     "updater": {
       "unableToCheckForUpdates": "No se ha podido comprobar si hay actualizaciones en este momento. Inténtalo de nuevo.",
