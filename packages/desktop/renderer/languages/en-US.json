@@ -149,13 +149,13 @@
         "aspectSizeValueZoom": "Zoom",
         "forceLowResLabel": "Force low resolution video",
         "forceLowResDescription": "(This option is useful on the Steam Deck and enables the application to render in a low resolution so FSR can be enabled.)",
-        "audioTitle": "Audio",
         "micLabel": "Microphone",
         "micDefault": "System default",
         "micUnnamed": "Microphone",
         "micUnavailable": "Chosen microphone (not connected)",
         "micRefreshBtn": "Refresh the list of microphones",
         "micDescription": "Used when you unmute the microphone during a stream. If the names are missing, press the refresh button and allow access to the microphone.",
+        "audioTitle": "Audio",
         "disableAudioLabel": "Disable audio"
       },
 

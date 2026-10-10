@@ -148,13 +148,13 @@
         "aspectSizeValueZoom": "Przybliż",
         "forceLowResLabel": "Wymuś obraz niskiej rozdzielczości",
         "forceLowResDescription": "(Ta opcja jest przydatna na Steam Decku i pozwala aplikacji renderować w niższej rozdzielczości aby dało się użyć FSR.)",
-        "audioTitle": "Dźwięk",
         "micLabel": "Mikrofon",
         "micDefault": "Domyślny systemowy",
         "micUnnamed": "Mikrofon",
         "micUnavailable": "Wybrany mikrofon (niepodłączony)",
         "micRefreshBtn": "Odśwież listę mikrofonów",
         "micDescription": "Używany po włączeniu mikrofonu podczas transmisji. Jeśli brakuje nazw, naciśnij przycisk odświeżania i zezwól na dostęp do mikrofonu.",
+        "audioTitle": "Dźwięk",
         "disableAudioLabel": "Wyłącz dźwięk"
       },
 
