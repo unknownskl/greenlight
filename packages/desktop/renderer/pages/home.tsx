@@ -62,6 +62,13 @@ function getPowerTitle(pendingCommand: '' | 'on' | 'off' | undefined, isOn: bool
     return t('page.myConsoles.powerOnBtn')
 }
 
+// CSS class of the power button: green to turn on, red to turn off, plain grey when it can't be used.
+function getPowerClass(isOn: boolean, isShutDown: boolean): string {
+    if (isShutDown) return 'btn-icon'
+
+    return isOn ? 'btn-icon btn-power-off' : 'btn-icon btn-power-on'
+}
+
 // navigator.clipboard is only available on secure origins, the Web UI over plain http needs the fallback.
 function copyText(text: string): Promise<void> {
     if (navigator.clipboard && window.isSecureContext) {
@@ -278,7 +285,7 @@ function Home() {
                                             <Button className='btn-icon btn-primary' label={ <i className='fa-solid fa-play'></i> } title={t('page.myConsoles.startStreamBtn')} />
                                         </Link>
                                         <div style={ { marginLeft: '24px' } }>
-                                            <Button className={ isShutDown ? 'btn-icon' : 'btn-icon ' + (isOn ? 'btn-power-off' : 'btn-power-on') }
+                                            <Button className={ getPowerClass(isOn, isShutDown) }
                                                 label={ <i className={ busy ? 'fa-solid fa-circle-notch fa-spin' : 'fa-solid fa-power-off' }></i> }
                                                 title={ getPowerTitle(pending[item.id], isOn, isShutDown, t) }
                                                 disabled={ !canPower || busy || isShutDown }
