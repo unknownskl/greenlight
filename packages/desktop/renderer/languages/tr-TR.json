@@ -1,0 +1,320 @@
+{
+  "translation": {
+    "languageName": "Türkçe",
+    "authorOfLocalization": "Türkçe çeviri",
+
+    "header": {
+      "myConsoles": "Konsollarım",
+      "viewConsoles": "Konsolları görüntüle",
+      "xCloudLibrary": "xCloud Kitaplığı",
+      "browseXCloudLibrary": "xCloud kitaplığına göz at",
+      "settings": "Ayarlar",
+      "changeSettings": "Uygulama ayarlarını değiştir",
+      "viewProfile": "Profili görüntüle",
+      "quitQuestion": "Çıkmak istediğinizden emin misiniz?",
+      "home": "Giriş"
+    },
+
+    "auth": {
+      "logoutQuestion": "Oturumu kapatmak istediğinizden emin misiniz?",
+      "clearDataBtn": "Verileri temizle",
+      "clearDataQuestion": "Bu işlem tüm uygulama verilerini siler; oturum açma döngüsünde takılı kaldığınızda işe yarayabilir. Devam etmek istiyor musunuz?",
+      "gamerscore": "Oyuncu Skoru",
+      "loggingIn": "Oturum açılıyor...",
+      "loginBtn": "Oturum aç",
+      "logoutBtn": "Oturumu kapat",
+      "loginWithXbox": "Xbox ile oturum aç",
+      "pleaseAuthenticate": "xCloud ve xHome yayınına erişmek için aşağıdan kimliğinizi doğrulayın",
+      "windowTitle": "Kimlik doğrulama"
+    },
+
+    "settings": {
+      "sidebar": {
+        "about": "Hakkında",
+        "streaming": "Yayın",
+        "input": "Giriş aygıtları",
+        "videoAudio": "Görüntü ve Ses",
+        "webUI": "Web arayüzü",
+        "debug": "Hata ayıklama"
+      },
+
+      "about": {
+        "logoutQuestion": "Oturumu kapatmak istediğinizden emin misiniz?",
+        "title": "Ayarlar",
+        "gamerscore": "Oyuncu Skoru",
+        "selectorSelectLanguage": "Dil seç",
+        "logout": "Oturumu kapat",
+        "version": "Sürüm",
+        "website": "Web sitesi",
+        "websiteLinkTitle": "Bağlantıyı harici tarayıcıda aç"
+      },
+
+      "input": {
+        "settingsInputPageTitle": "Ayarlar: Giriş aygıtları",
+        "pageTitle": "Ayarlar: Giriş aygıtları",
+        "dPadUp": "Yön tuşu yukarı",
+        "dPadDown": "Yön tuşu aşağı",
+        "dPadLeft": "Yön tuşu sol",
+        "dPadRight": "Yön tuşu sağ",
+        "leftShoulder": "Sol tampon (LB)",
+        "rightShoulder": "Sağ tampon (RB)",
+        "leftTrigger": "Sol tetik (LT)",
+        "rightTrigger": "Sağ tetik (RT)",
+        "leftThumb": "Sol çubuk",
+        "rightThumb": "Sağ çubuk",
+        "view": "Görünüm",
+        "menu": "Menü",
+        "nexus": "Xbox düğmesi",
+        "none": "Yok",
+        "enabledLabel": "Etkin",
+        "disabledLabel": "Devre dışı",
+        "axesLabel": "eksen",
+        "buttonsLabel": "düğme",
+        "rumbleLabel": "titreşim",
+        "notSupportedLabel": "Desteklenmiyor",
+        "title": "Giriş aygıtları",
+        "enableVibration": "Titreşimi etkinleştir",
+        "enableTouch": "Dokunmatik girişi etkinleştir",
+        "enableMouseKeyboard": "Fare ve klavyeyi etkinleştir",
+        "legacyWarning": "Fare ve klavye ile klavyeyi oyun kumandası olarak kullanma aynı anda etkin olamaz",
+        "enableLegacy": "Klavyeyi oyun kumandası olarak kullan",
+        "enableLegacyDescription": "Bu özellik devre dışı bırakılırsa klavye-oyun kumandası eşlemesi kapatılır ve yalnızca oyun kumandasından gelen komutlar kabul edilir.",
+        "controllerDetectedTitle": "Algılanan oyun kumandaları",
+        "controllerDetectedDescription": "Bağlı bir oyun kumandanız görünmüyorsa algılanması için kumandadaki bir düğmeye basın.",
+        "noControllerDetected": "Oyun kumandası algılanmadı",
+        "keyboardMappingsTitle": "Klavye eşlemeleri"
+      },
+
+      "common": {
+        "resetDefaultsBtn": "Varsayılanlara sıfırla",
+        "resetDefaultsConfirm": "Bu sayfadaki ayarlar varsayılan değerlerine sıfırlansın mı?",
+        "savedNotice": "Kaydedildi"
+      },
+      "streaming": {
+        "pageTitle": "Ayarlar: Yayın",
+        "title": "Yayın ayarları",
+        "description": "xHome ve xCloud varsayılan olarak 20 Mbps'den fazlasını desteklemez. Bu ayar söz konusu sınırı aşmaz.",
+        "xCloudStreamingBitrateLabel": "xCloud yayın bit hızı",
+        "xHomeStreamingBitrateLabel": "xHome yayın bit hızı",
+        "showNonEntitledLabel": "Satın alma gerektiren oyunları göster",
+        "unlimitedLabel": "Sınırsız",
+        "mbpsLabel": "Mbps",
+        "setH264ProfileLabel": "H.264 profilini ayarla",
+        "setH264ProfileValueAuto": "Otomatik anlaşma",
+        "setH264ProfileValueHigh": "Yüksek",
+        "setH264ProfileValueMedium": "Orta",
+        "setH264ProfileValueLow": "Düşük",
+        "setH264ProfileDescription": "Gelişmiş: H.264 video profilini zorlar. Kodlama sorunları yaşamıyorsanız Otomatik bırakın.",
+        "forceRegionTitle": "Bölgeyi zorla",
+        "setRegionLabel": "Bölgeyi ayarla:",
+        "setRegionValueDisabled": "Devre dışı",
+        "setRegionValueAustralia": "Avustralya",
+        "setRegionValueBrazil": "Brezilya",
+        "setRegionValueEurope": "Avrupa",
+        "setRegionValueJapan": "Japonya",
+        "setRegionValueKorea": "Kore",
+        "setRegionValueUS": "Amerika Birleşik Devletleri",
+        "setRegionDescription": "Gelişmiş: yayını seçilen bölgenin sunucuları üzerinden yönlendirir. Yalnızca bölgenizde bağlantı sorunu varsa kullanın.",
+        "preferredGameLanguageLabel": "Tercih edilen oyun dili:",
+        "preferredGameLanguageValueArabic": "Arapça (Suudi Arabistan)",
+        "preferredGameLanguageValueCzech": "Çekçe",
+        "preferredGameLanguageValueDanish": "Danca",
+        "preferredGameLanguageValueGerman": "Almanca",
+        "preferredGameLanguageValueGreek": "Yunanca",
+        "preferredGameLanguageValueEnglishUK": "İngilizce (Birleşik Krallık)",
+        "preferredGameLanguageValueEnglishUS": "İngilizce (Amerika Birleşik Devletleri)",
+        "preferredGameLanguageValueSpanish": "İspanyolca (İspanya)",
+        "preferredGameLanguageValueSpanishMX": "İspanyolca (Meksika)",
+        "preferredGameLanguageValueFinnish": "Fince",
+        "preferredGameLanguageValueFrench": "Fransızca",
+        "preferredGameLanguageValueHebrew": "İbranice",
+        "preferredGameLanguageValueHungarian": "Macarca",
+        "preferredGameLanguageValueItalian": "İtalyanca",
+        "preferredGameLanguageValueJapanese": "Japonca",
+        "preferredGameLanguageValueKorean": "Korece",
+        "preferredGameLanguageValueNorwegian": "Norveççe",
+        "preferredGameLanguageValueDutch": "Felemenkçe",
+        "preferredGameLanguageValuePolish": "Lehçe",
+        "preferredGameLanguageValuePortugueseBR": "Portekizce (Brezilya)",
+        "preferredGameLanguageValuePortuguese": "Portekizce (Portekiz)",
+        "preferredGameLanguageValueRussian": "Rusça",
+        "preferredGameLanguageValueSlovak": "Slovakça",
+        "preferredGameLanguageValueSwedish": "İsveççe",
+        "preferredGameLanguageValueTurkish": "Türkçe",
+        "preferredGameLanguageValueChineseCN": "Çince (Basitleştirilmiş)",
+        "preferredGameLanguageValueChineseTW": "Çince (Geleneksel)"
+      },
+
+      "videoAudio": {
+        "pageTitle": "Ayarlar: Görüntü ve Ses",
+        "title": "Görüntü",
+        "disableVideoLabel": "Görüntüyü devre dışı bırak",
+        "disabledLabel": "Devre dışı",
+        "enabledLabel": "Etkin",
+        "aspectSizeLabel": "Görüntü en boy oranı",
+        "aspectSizeValueDefault": "Varsayılan",
+        "aspectSizeValueStretch": "Uzat",
+        "aspectSizeValueZoom": "Yakınlaştır",
+        "forceLowResLabel": "Düşük çözünürlüklü görüntüyü zorla",
+        "forceLowResDescription": "(Bu seçenek Steam Deck'te kullanışlıdır: uygulamanın düşük çözünürlükte işleme yapmasını sağlar, böylece FSR etkinleştirilebilir.)",
+        "micLabel": "Mikrofon",
+        "micDefault": "Sistem varsayılanı",
+        "micUnnamed": "Mikrofon",
+        "micUnavailable": "Seçilen mikrofon (bağlı değil)",
+        "micRefreshBtn": "Mikrofon listesini yenile",
+        "micDescription": "Yayın sırasında mikrofonu açtığınızda kullanılır. İsimler görünmüyorsa yenile düğmesine basın ve mikrofon erişimine izin verin.",
+        "audioTitle": "Ses",
+        "disableAudioLabel": "Sesi devre dışı bırak"
+      },
+
+      "webUI": {
+        "pageTitle": "Ayarlar: Web arayüzü",
+        "title": "Web arayüzü",
+        "enableWebUILabel": "Web arayüzünü etkinleştir",
+        "stopWebUIBtn": "Web arayüzünü durdur",
+        "startWebUIBtn": "Web arayüzünü başlat",
+        "openWebUIBtn": "Web arayüzünü aç",
+        "autostartLabel": "Uygulamayla birlikte başlat",
+        "autostartEnabled": "Etkin",
+        "autostartDisabled": "Devre dışı",
+        "portLabel": "Bağlantı noktası",
+        "portPlaceholder": "örnek: 9003",
+        "portInvalid": "Bağlantı noktası 1024 ile 65535 arasında bir sayı olmalıdır."
+      },
+
+      "debug": {
+        "pageTitle": "Ayarlar: Hata ayıklama"
+      }
+    },
+
+    "page": {
+      "xCloud": {
+        "pageTitle": "xCloud Kitaplığı",
+        "breadcrumb": "xCloud",
+        "recentGames": "Son oynanan oyunlar",
+        "recentlyAdded": "Son eklenenler",
+        "viewLibraryBtn": "Kitaplığı görüntüle"
+      },
+
+      "xCloudLibrary": {
+        "pageTitle": "xCloud Kitaplığı",
+        "breadcrumb1": "xCloud",
+        "breadcrumb2": "Kitaplık",
+        "title": "Kitaplık",
+        "searchPlaceholder": "Ara",
+        "gamePassOnly": "Yalnızca Game Pass oyunları",
+        "noGamesFound": "Oyun bulunamadı",
+        "previousPageBtn": "Önceki sayfa",
+        "nextPageBtn": "Sonraki sayfa",
+        "viewGamePageIcon": "Oyun sayfasını görüntüle"
+      },
+
+      "myConsoles": {
+        "pageTitle": "Konsollarım",
+        "poweredOn": "Açık",
+        "standby": "Bekleme modunda",
+        "powerOnBtn": "Aç",
+        "poweringOn": "Açılıyor...",
+        "powerOffBtn": "Kapat",
+        "poweringOff": "Kapatılıyor...",
+        "powerOffConfirm": "{{name}} kapatılsın mı? Devam eden oyun kapatılacak.",
+        "refreshBtn": "Yenile",
+        "off": "Kapalı",
+        "copyIdTitle": "Konsol kimliğini kopyala",
+        "idCopied": "Kopyalandı",
+        "powerOnFailed": "Açma komutu konsola gönderilemedi.",
+        "powerOnTimeout": "Konsol açılmadı. Muhtemelen tamamen kapalı: kendi düğmesiyle açın. Greenlight'tan açmak için güç modunu Uyku (anında açılma) olarak ayarlayın.",
+        "powerOffFailed": "Kapatma komutu konsola gönderilemedi.",
+        "powerOffTimeout": "Konsol zamanında kapanmadı. Durumunu Yenile ile kontrol edin.",
+        "powerOnUnavailable": "Konsol tamamen kapalı: kendi düğmesiyle açın.",
+        "warningLabel": "Uyarı",
+        "managementWarning": "Uzaktan yönetim etkin değil",
+        "streamingWarning": "Konsol yayını etkin değil",
+        "startStreamBtn": "Yayını başlat",
+        "noConsoles": "Hesabınızda konsol bulunamadı. Bir Xbox konsolunuz varsa uzaktan oynatmanın etkin olduğundan ve konsolun resmi Xbox uygulamasında göründüğünden emin olun."
+      },
+
+      "titleInfo": {
+        "pageTitle": "Oyun bilgileri:",
+        "breadcrumb1": "xCloud",
+        "breadcrumb2": "Kitaplık",
+        "by": "yapımcı:",
+        "descriptionTitle": "Açıklama",
+        "capabilitiesTitle": "Özellikler",
+        "startStreamBtn": "Yayını başlat",
+        "purchaseRequiredBtn": "Satın alma gerekli"
+      },
+
+      "page404": {
+        "pageTitle": "Hata",
+        "message": "Hata 404... Eylem bulunamadı"
+      },
+
+      "page500": {
+        "pageTitle": "Hata",
+        "message": "Hata 500... Uygulamada bir hata oluştu"
+      }
+    },
+
+    "friends": {
+      "allFriendsOffline": "Tüm arkadaşlarınız çevrimdışı"
+    },
+
+    "streamWindow": {
+      "pageTitle": "Yayın",
+      "endStreamConfirmMessage": "Yayını sonlandırmak istediğinizden emin misiniz?",
+      "estimatedWaitingTimeMessage": "Kuyrukta tahmini bekleme süresi:",
+      "timeHours": "sa",
+      "timeMinutes": "dk",
+      "timeSeconds": "sn",
+      "loadingStreamTitle": "Yükleniyor...",
+      "gettingStreamReadyMessage": "Yayınınız hazırlanıyor...",
+      "endStreamBtn": "Yayını sonlandır",
+      "disconnectBtn": "Bağlantıyı kes",
+      "menuBtn": "Menü",
+      "menuTitle": "Xbox menüsünü aç",
+      "micMuted": "Sessiz",
+      "micActive": "Açık",
+      "micAccessDenied": "Greenlight'ın mikrofonu kullanma izni yok. İzin vermek için sistem ayarları açılsın mı?",
+      "enableMic": "Mikrofonu aç",
+      "disableMic": "Mikrofonu kapat",
+      "debugTitle": "Hata ayıklama",
+      "itsTakingALittleLonger": "Biraz daha uzun sürüyor... Yayınınız birazdan başlayabilir.",
+      "startingConnection": "Bağlantı başlatılıyor...",
+      "connectingToConsole": "Konsola bağlanılıyor...",
+      "clientHasBeenDisconnected": "İstemcinin bağlantısı kesildi."
+    },
+
+    "updater": {
+      "unableToCheckForUpdates": "Şu anda güncelleştirmeler denetlenemiyor. Yeniden deneyin.",
+      "alreadyOnLatestVersion": "Zaten en son sürümü kullanıyorsunuz. Geçerli sürüm:",
+      "newestVersion": "En yeni sürüm:",
+      "newReleaseAvailable": "Yeni sürüm mevcut",
+      "installedVersion": "Yüklü sürüm:",
+      "latestVersion": "En son sürüm:",
+      "downloadBtn": "İndir",
+      "laterBtn": "Daha sonra",
+      "updateChecker": "Güncelleştirme denetleyicisi",
+      "closeBtn": "Kapat"
+    },
+
+    "errors": {
+      "failedToRetrieveUserProfile": "Hata: Kullanıcı profili alınamadı:",
+      "repositoryNotFound": "package.json dosyasında depo URL'si bulunamadı.",
+      "failedToRetrieveStreamingTokens": "Hata: Yayın belirteçleri alınamadı:",
+      "errorAuthentificationUser": "Kullanıcının kimliği doğrulanırken hata oluştu. Hata ayrıntıları:",
+      "errorGettingRedirectURI": "Yönlendirme URI'si alınırken hata oluştu. Hata ayrıntıları:",
+      "authentificationCallbackIsNotDefined": "Kimlik doğrulama geri çağırması tanımlı değil. Hata ayrıntıları:",
+      "sisuTokenIsMissing": "Sisu belirteci eksik. Lütfen önce kimliğinizi doğrulayın",
+      "failedToRetrieveWebTokens": "Hata: Web belirteçleri alınamadı:",
+      "chatSDPExchangeError": "ChatSDP değişim hatası:",
+      "ICEExchangeError": "ICE değişim hatası:",
+      "SDPExchangeError": "SDP değişim hatası:",
+      "failedToStartStream": "Yeni yayın başlatılamadı. Hata ayrıntıları:",
+      "unableToStartStreamSession": "Konsolda yayın oturumu başlatılamıyor. Konsol Xbox sunucularına bağlı değil. Bu durum bazen bir güncelleştirme sırasında veya kullanıcı konsolda oturum açmamışken oluşur. Lütfen konsolunuzu tamamen yeniden başlatıp tekrar deneyin.",
+      "streamErrorResult": "Yayın hatası sonucu:",
+      "details": "Ayrıntılar:",
+      "failedToGetPlayerState": "Oynatıcı durumu alınamadı. Hata ayrıntıları:"
+    }
+  }
+}
