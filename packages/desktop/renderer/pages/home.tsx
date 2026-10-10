@@ -1,9 +1,9 @@
-import React from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Head from 'next/head'
 import Link from 'next/link'
 import Image from 'next/image'
 import Ipc from '../lib/ipc'
-import { useQuery } from 'react-query'
+import { useQuery, useQueryClient } from 'react-query'
 import { useTranslation } from 'react-i18next'
 
 import Button from '../components/ui/button'
@@ -11,9 +11,162 @@ import Card from '../components/ui/card'
 import Label from '../components/ui/label'
 import Loader from '../components/ui/loader'
 
+// How often (ms) and how many times to check the power state after sending a power command.
+const POWER_CHECK_INTERVAL = 4000
+const POWER_CHECK_ATTEMPTS = 15
+
+// "XboxSeriesX" -> "Xbox Series X"
+function formatConsoleType(consoleType?: string): string {
+    return (consoleType || '').replace(/([a-z])([A-Z])/g, '$1 $2')
+}
+
+// Keeps only the entries whose console still has the power state the entry was made for.
+function keepWhileSameState<T>(entries: Record<string, T | undefined>, list: any[], getState: (entry: T) => string) {
+    const kept: Record<string, T | undefined> = {}
+
+    Object.keys(entries).forEach((id) => {
+        const entry = entries[id]
+        const item = list.find((console) => console.id === id)
+
+        if (entry && item && item.powerState === getState(entry)) {
+            kept[id] = entry
+        }
+    })
+
+    return kept
+}
+
+// navigator.clipboard is only available on secure origins, the Web UI over plain http needs the fallback.
+function copyText(text: string): Promise<void> {
+    if (navigator.clipboard && window.isSecureContext) {
+        return navigator.clipboard.writeText(text)
+    }
+
+    return new Promise((resolve, reject) => {
+        const area = document.createElement('textarea')
+        area.value = text
+        area.style.position = 'fixed'
+        area.style.opacity = '0'
+        document.body.appendChild(area)
+        area.select()
+
+        try {
+            document.execCommand('copy') ? resolve() : reject(new Error('Copy failed'))
+        } catch (error) {
+            reject(error)
+        } finally {
+            document.body.removeChild(area)
+        }
+    })
+}
+
 function Home() {
     const consoles = useQuery('consoles', () => Ipc.send('consoles', 'get'), { staleTime: 60*1000 })
+    const queryClient = useQueryClient()
     const { t } = useTranslation()
+
+    // Power command in progress for each console: turning it on or off.
+    const [pending, setPending] = useState<Record<string, '' | 'on' | 'off'>>({})
+    // Last power command error of each console. It is only shown while the console is still in the state it
+    // had when the command failed: once the state changes the message makes no sense anymore.
+    const [powerError, setPowerError] = useState<Record<string, { key: string, state: string } | undefined>>({})
+    // Consoles that did not turn on after the power-on command: they are shown as shut down (a console that is not in
+    // sleep mode ignores the command) while they keep reporting the same state; a new state clears it.
+    const [assumedShutDown, setAssumedShutDown] = useState<Record<string, string | undefined>>({})
+    const [refreshing, setRefreshing] = useState(false)
+    const [copiedId, setCopiedId] = useState('')
+    const mounted = useRef(true)
+    const timers = useRef<ReturnType<typeof setTimeout>[]>([])
+
+    useEffect(() => {
+        mounted.current = true
+
+        return () => {
+            mounted.current = false
+            timers.current.forEach((timer) => clearTimeout(timer))
+        }
+    }, [])
+
+    // When a console changes state, the notes about its last failed power command are not true anymore.
+    useEffect(() => {
+        if (!Array.isArray(consoles.data)) return
+
+        setAssumedShutDown((current) => keepWhileSameState(current, consoles.data, (state) => state))
+        setPowerError((current) => keepWhileSameState(current, consoles.data, (error) => error.state))
+    }, [consoles.data])
+
+    const refreshConsoles = () => {
+        return Ipc.send('consoles', 'refresh').then((list: any) => {
+            if (mounted.current) {
+                queryClient.setQueryData('consoles', list)
+            }
+
+            return list
+        })
+    }
+
+    const refreshAll = () => {
+        const done = () => {
+            if (mounted.current) setRefreshing(false)
+        }
+
+        setRefreshing(true)
+        refreshConsoles().then(done, done)
+    }
+
+    const stopPending = (consoleId: string, errorKey: string, state: string) => {
+        if (!mounted.current) return
+
+        setPending((current) => ({ ...current, [consoleId]: '' }))
+        setPowerError((current) => ({ ...current, [consoleId]: errorKey ? { key: errorKey, state } : undefined }))
+    }
+
+    // Checks the power state until the console is on (turnOn) or not on anymore (!turnOn).
+    const waitForPowerState = (consoleId: string, turnOn: boolean, attempt: number, stateAtStart: string) => {
+        timers.current.push(setTimeout(() => {
+            refreshConsoles().then((list: any) => {
+                const current = list.find((item) => item.id === consoleId)
+
+                if (current && (current.powerState === 'On') === turnOn) {
+                    stopPending(consoleId, '', '')
+                } else if (attempt + 1 >= POWER_CHECK_ATTEMPTS) {
+                    const state = current ? current.powerState : stateAtStart
+
+                    if (turnOn && mounted.current) {
+                        setAssumedShutDown((assumed) => ({ ...assumed, [consoleId]: state }))
+                    }
+                    stopPending(consoleId, turnOn ? 'powerOnTimeout' : 'powerOffTimeout', state)
+                } else {
+                    waitForPowerState(consoleId, turnOn, attempt + 1, stateAtStart)
+                }
+            }).catch(() => stopPending(consoleId, turnOn ? 'powerOnFailed' : 'powerOffFailed', stateAtStart))
+        }, POWER_CHECK_INTERVAL))
+    }
+
+    const sendPowerCommand = (consoleId: string, turnOn: boolean, stateAtStart: string) => {
+        setPowerError((current) => ({ ...current, [consoleId]: undefined }))
+        setPending((current) => ({ ...current, [consoleId]: turnOn ? 'on' : 'off' }))
+
+        Ipc.send('consoles', turnOn ? 'powerOn' : 'powerOff', { consoleId }).then(() => {
+            waitForPowerState(consoleId, turnOn, 0, stateAtStart)
+        }).catch(() => stopPending(consoleId, turnOn ? 'powerOnFailed' : 'powerOffFailed', stateAtStart))
+    }
+
+    const powerOff = (item) => {
+        // Turning the console off closes the game that is running on it.
+        if (confirm(t('page.myConsoles.powerOffConfirm', { name: item.name }))) {
+            sendPowerCommand(item.id, false, item.powerState)
+        }
+    }
+
+    const copyConsoleId = (consoleId: string) => {
+        copyText(consoleId).then(() => {
+            setCopiedId(consoleId)
+            timers.current.push(setTimeout(() => {
+                if (mounted.current) setCopiedId('')
+            }, 1500))
+        }).catch(() => { /* nothing to do: the id stays selectable on screen */ })
+    }
 
     return (
         <React.Fragment>
@@ -30,6 +183,15 @@ function Home() {
             }}>
                 { (consoles.isLoading === true) ? <Loader></Loader> :
                     (consoles.isFetched === true && consoles.data.length > 0) ? consoles.data.map((item, i) => {
+                        const canPower = item.remoteManagementEnabled === true && item.consoleStreamingEnabled === true
+                        const isOn = item.powerState === 'On'
+                        const busy = !!pending[item.id]
+                        // A console that is shut down (not in sleep mode) can't be turned on from Greenlight.
+                        const isShutDown = !isOn && (item.powerState === 'Off' || (!!assumedShutDown[item.id] && assumedShutDown[item.id] === item.powerState))
+                        const ledState = isOn ? 'on' : isShutDown ? 'off' : item.powerState === 'ConnectedStandby' ? 'standby' : ''
+                        const stateName = ledState === 'on' ? t('page.myConsoles.poweredOn') : ledState === 'off' ? t('page.myConsoles.off') :
+                            ledState === 'standby' ? t('page.myConsoles.standby') : item.powerState
+
                         return (
                             <Card className='padbottom' key={i}>
                                 <h1>{item.name}</h1>
@@ -47,15 +209,20 @@ function Home() {
 
                                 <h2 className='grey' style={{
                                     textAlign: 'center',
-                                    fontSize: 12,
-                                }}>{item.id}</h2>
+                                    fontSize: 11,
+                                    fontWeight: 'normal',
+                                    opacity: 0.35,
+                                }}>
+                                    {formatConsoleType(item.consoleType)}
+                                    {item.consoleType ? ' \u00b7 ' : ''}
+                                    <span role='button' title={t('page.myConsoles.copyIdTitle')} onClick={ () => copyConsoleId(item.id) } style={{
+                                        cursor: 'pointer',
+                                    }}>{copiedId === item.id ? t('page.myConsoles.idCopied') : item.id}</span>
+                                </h2>
 
                                 <br />
 
-                                {(item.remoteManagementEnabled === true && item.consoleStreamingEnabled === true) ?
-                                    (item.powerState === 'On' ? <Label className='green'>{t('page.myConsoles.poweredOn')}</Label> :
-                                        item.powerState === 'ConnectedStandby' ? <Label>{t('page.myConsoles.standby')}</Label> :
-                                            <Label>{item.powerState}</Label>) :
+                                {canPower ? '' :
                                     (<div>
                                         {!item.remoteManagementEnabled ? '' : <p><Label className='orange'>{t('page.myConsoles.warningLabel')}</Label> {t('page.myConsoles.managementWarning')}</p>}
                                         {!item.consoleStreamingEnabled ? '' : <p><Label className='orange'>{t('page.myConsoles.warningLabel')}</Label> {t('page.myConsoles.streamingWarning')}</p>}
@@ -69,11 +236,36 @@ function Home() {
                                 <p>Remote: {item.remoteManagementEnabled ? 'Enabled' : 'Disabled'}</p>
                                 <p>Streaming: {item.consoleStreamingEnabled ? 'Enabled' : 'Disabled'}</p><br /> */}
 
-                                <div style={ { display: 'flex', gap: '20px', minWidth: 280 }}>
-                                    <Link href={ `stream/${item.id}` }>
-                                        <Button label={t('page.myConsoles.startStreamBtn')} className='btn-primary' />
-                                    </Link>
+                                <div style={ { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', minWidth: 280 }}>
+                                    {canPower ?
+                                        <span className='status_led_label'>
+                                            <i className={ 'status_led ' + ledState }></i>
+                                            {stateName}
+                                        </span> : <span></span>}
+
+                                    <div style={ { display: 'flex', alignItems: 'center' } }>
+                                        <Link href={ `stream/${item.id}` }>
+                                            <Button className='btn-icon btn-primary' label={ <i className='fa-solid fa-play'></i> } title={t('page.myConsoles.startStreamBtn')} />
+                                        </Link>
+                                        <div style={ { marginLeft: '24px' } }>
+                                            <Button className={ 'btn-icon ' + (isShutDown ? '' : isOn ? 'btn-power-off' : 'btn-power-on') }
+                                                label={ <i className={ busy ? 'fa-solid fa-circle-notch fa-spin' : 'fa-solid fa-power-off' }></i> }
+                                                title={ busy ? (pending[item.id] === 'on' ? t('page.myConsoles.poweringOn') : t('page.myConsoles.poweringOff')) :
+                                                    isOn ? t('page.myConsoles.powerOffBtn') :
+                                                        isShutDown ? t('page.myConsoles.powerOnUnavailable') : t('page.myConsoles.powerOnBtn') }
+                                                disabled={ !canPower || busy || isShutDown }
+                                                onClick={ () => isOn ? powerOff(item) : sendPowerCommand(item.id, true, item.powerState) } />
+                                        </div>
+                                        <div style={ { marginLeft: '10px' } }>
+                                            <Button className='btn-icon' label={ <i className={ 'fa-solid fa-arrows-rotate' + (refreshing ? ' fa-spin' : '') }></i> }
+                                                title={t('page.myConsoles.refreshBtn')} disabled={refreshing} onClick={ refreshAll } />
+                                        </div>
+                                    </div>
                                 </div>
+
+                                {(powerError[item.id] && powerError[item.id]?.state === item.powerState) ?
+                                    // width 0 + min-width 100%: the text wraps inside the card instead of making it wider
+                                    <p style={ { width: 0, minWidth: '100%', marginTop: '16px', color: '#ff9f1a', opacity: 1, fontSize: 12, textAlign: 'justify' } }>{t('page.myConsoles.' + powerError[item.id]?.key)}</p> : ''}
                             </Card>
                         )
                     }) : <Card className='padbottom' key='noconsoles'>{t('page.myConsoles.noConsoles')}</Card>
