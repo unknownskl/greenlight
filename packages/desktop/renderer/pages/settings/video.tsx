@@ -2,6 +2,7 @@ import React from 'react'
 import Head from 'next/head'
 import SettingsSidebar from '../../components/settings/sidebar'
 import Card from '../../components/ui/card'
+import Button from '../../components/ui/button'
 import Ipc from '../../lib/ipc'
 import { useSettings } from '../../context/userContext'
 import { useTranslation } from 'react-i18next'
@@ -11,9 +12,32 @@ function SettingsVideo() {
     const { settings, setSettings} = useSettings()
     const { t } = useTranslation()
 
+    const [micDevices, setMicDevices] = React.useState<MediaDeviceInfo[]>([])
+
+    // The "default" and "communications" entries are aliases of a real device: the choice "System default" replaces them.
+    function loadMicDevices() {
+        return navigator.mediaDevices.enumerateDevices().then((devices) => {
+            setMicDevices(devices.filter((device) => device.kind === 'audioinput' && device.deviceId !== 'default' && device.deviceId !== 'communications'))
+        })
+    }
+
+    // The names of the devices are only shown once the microphone has been allowed, so the button asks for it first.
+    function refreshMicDevices() {
+        navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
+            stream.getTracks().forEach((track) => track.stop())
+        }).catch(() => { /* not allowed: the list keeps the numbered names */ }).then(loadMicDevices)
+    }
+
+    function setMicDevice(deviceId: string){
+        setSettings({
+            ...settings,
+            mic_device_id: deviceId,
+        })
+    }
+
     React.useEffect(() => {
-    //
-    })
+        loadMicDevices()
+    }, [])
 
     function setVideoSize(e){
         setSettings({
@@ -91,6 +115,23 @@ function SettingsVideo() {
                         <label style={{ minWidth: 0 }}>
                             <input type='checkbox' onChange={ setAudioEnabled } checked={!settings.audio_enabled} />&nbsp; ({ !settings.audio_enabled ? t('settings.videoAudio.enabledLabel') : t('settings.videoAudio.disabledLabel')})
                         </label>
+                    </p>
+
+                    <p>
+                        <label>{t('settings.videoAudio.micLabel')}</label>
+                        <select value={ settings.mic_device_id || '' } onChange={(e) => {
+                            setMicDevice(e.target.value)
+                        }}>
+                            <option value=''>{t('settings.videoAudio.micDefault')}</option>
+                            {(settings.mic_device_id && !micDevices.some((device) => device.deviceId === settings.mic_device_id)) ?
+                                <option value={settings.mic_device_id}>{t('settings.videoAudio.micUnavailable')}</option> : ''}
+                            {micDevices.map((device, i) => {
+                                return <option key={device.deviceId} value={device.deviceId}>{device.label || (t('settings.videoAudio.micUnnamed') + ' ' + (i + 1))}</option>
+                            })}
+                        </select>
+                        &nbsp;
+                        <Button label={<span><i className="fa-solid fa-arrows-rotate"></i></span>} title={t('settings.videoAudio.micRefreshBtn')} className='btn-small' onClick={ refreshMicDevices } /><br />
+                        <small>{t('settings.videoAudio.micDescription')}</small>
                     </p>
                 </Card>
             </SettingsSidebar>

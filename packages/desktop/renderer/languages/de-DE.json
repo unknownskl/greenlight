@@ -145,7 +145,13 @@
         "forceLowResDescription": "(Diese Einstellung ist auf dem Steam Deck hilfreich und erlaubt der Anwendung, in einer niedrigen Auflösung dargestellt und mittels FSR skaliert zu werden.)",
         "audioTitle": "Audio",
         "disableAudioLabel": "Audio deaktivieren",
-        "videoTitle": "videoTitle"
+        "videoTitle": "videoTitle",
+        "micLabel": "Mikrofon",
+        "micDefault": "Systemstandard",
+        "micUnnamed": "Mikrofon",
+        "micUnavailable": "Gewähltes Mikrofon (nicht verbunden)",
+        "micRefreshBtn": "Mikrofonliste aktualisieren",
+        "micDescription": "Wird verwendet, wenn du das Mikrofon während eines Streams einschaltest. Fehlen die Namen, klicke auf die Schaltfläche zum Aktualisieren und erlaube den Zugriff auf das Mikrofon."
       },
       "webUI": {
         "pageTitle": "Einstellungen: Weboberfläche",
@@ -237,7 +243,8 @@
       "itsTakingALittleLonger": "Es dauert noch einen Moment.. Dein Stream startet bald.",
       "startingConnection": "Verbindungsaufbau...",
       "connectingToConsole": "Verbinde mit Konsole...",
-      "clientHasBeenDisconnected": "Der Client wurde getrennt."
+      "clientHasBeenDisconnected": "Der Client wurde getrennt.",
+      "micAccessDenied": "Greenlight hat keine Berechtigung, das Mikrofon zu verwenden. Systemeinstellungen öffnen, um sie zu erteilen?"
     },
     "updater": {
       "unableToCheckForUpdates": "Nach Aktualisierungen kann derzeit nicht gesucht werden. Versuche es erneut.",

@@ -149,7 +149,13 @@
         "forceLowResLabel": "Wymuś obraz niskiej rozdzielczości",
         "forceLowResDescription": "(Ta opcja jest przydatna na Steam Decku i pozwala aplikacji renderować w niższej rozdzielczości aby dało się użyć FSR.)",
         "audioTitle": "Dźwięk",
-        "disableAudioLabel": "Wyłącz dźwięk"
+        "disableAudioLabel": "Wyłącz dźwięk",
+        "micLabel": "Mikrofon",
+        "micDefault": "Domyślny systemowy",
+        "micUnnamed": "Mikrofon",
+        "micUnavailable": "Wybrany mikrofon (niepodłączony)",
+        "micRefreshBtn": "Odśwież listę mikrofonów",
+        "micDescription": "Używany po włączeniu mikrofonu podczas transmisji. Jeśli brakuje nazw, naciśnij przycisk odświeżania i zezwól na dostęp do mikrofonu."
       },
 
       "webUI": {
@@ -248,7 +254,8 @@
       "itsTakingALittleLonger": "Zajmie to chwilę dłużej.. Twój strumień może się rozpocząć za niedługo.",
       "startingConnection": "Rozpoczynanie połączenia...",
       "connectingToConsole": "Łączenie z konsolą...",
-      "clientHasBeenDisconnected": "Klient został rozłączony."
+      "clientHasBeenDisconnected": "Klient został rozłączony.",
+      "micAccessDenied": "Greenlight nie ma zgody na używanie mikrofonu. Otworzyć ustawienia systemu, aby ją nadać?"
     },
 
     "updater": {
