@@ -81,6 +81,16 @@
         "controllerDetectedTitle": "Controllers detected",
         "controllerDetectedDescription": "If you have a controller connected but it is not showing up, try to press a button on the controller to detect it.",
         "noControllerDetected": "No controller detected",
+        "leftStickUp": "Left stick up",
+        "leftStickDown": "Left stick down",
+        "leftStickLeft": "Left stick left",
+        "leftStickRight": "Left stick right",
+        "rightStickUp": "Right stick up",
+        "rightStickDown": "Right stick down",
+        "rightStickLeft": "Right stick left",
+        "rightStickRight": "Right stick right",
+        "mouseSensitivity": "Mouse sensitivity",
+        "mouseSensitivityDescription": "Speed of the pointer of the console: lower it if it moves too fast. It applies the next time a stream is started.",
         "keyboardMappingsTitle": "Keyboard mappings"
       },
 
@@ -234,6 +244,8 @@
     "streamWindow": {
       "pageTitle": "Streaming",
       "endStreamConfirmMessage": "Are you sure you want to end your stream?",
+      "mouseHint": "Press Cmd+Esc to free the mouse and show the bar",
+      "mouseHintHoldEsc": "Hold Esc to free the mouse and show the bar",
       "estimatedWaitingTimeMessage": "Estimated waiting time in queue:",
       "timeHours": "hour(s)",
       "timeMinutes": "minute(s)",
