@@ -82,6 +82,16 @@
         "controllerDetectedTitle": "감지된 컨트롤러",
         "controllerDetectedDescription": "컨트롤러를 연결했는데 표시되지 않으면 컨트롤러의 버튼을 눌러 감지되도록 하세요.",
         "noControllerDetected": "감지된 컨트롤러 없음",
+        "leftStickUp": "왼쪽 스틱 위",
+        "leftStickDown": "왼쪽 스틱 아래",
+        "leftStickLeft": "왼쪽 스틱 왼쪽",
+        "leftStickRight": "왼쪽 스틱 오른쪽",
+        "rightStickUp": "오른쪽 스틱 위",
+        "rightStickDown": "오른쪽 스틱 아래",
+        "rightStickLeft": "오른쪽 스틱 왼쪽",
+        "rightStickRight": "오른쪽 스틱 오른쪽",
+        "mouseSensitivity": "마우스 감도",
+        "mouseSensitivityDescription": "콘솔 포인터의 속도: 너무 빠르면 낮추세요. 다음에 스트림을 시작할 때 적용됩니다.",
         "keyboardMappingsTitle": "키보드 매핑"
       },
 
@@ -263,6 +273,8 @@
     "streamWindow": {
       "pageTitle": "스트리밍",
       "endStreamConfirmMessage": "스트리밍을 종료하시겠습니까?",
+      "mouseHint": "Cmd+Esc를 누르면 마우스가 해제되고 막대가 표시됩니다",
+      "mouseHintHoldEsc": "Esc를 길게 누르면 마우스가 해제되고 막대가 표시됩니다",
       "estimatedWaitingTimeMessage": "예상 대기 시간:",
       "timeHours": "시간",
       "timeMinutes": "분",

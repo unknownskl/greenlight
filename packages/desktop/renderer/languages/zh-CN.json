@@ -82,6 +82,16 @@
         "controllerDetectedTitle": "检测到的手柄",
         "controllerDetectedDescription": "如果已连接手柄但未显示，请尝试按下手柄上的任意按键以进行检测。",
         "noControllerDetected": "未检测到手柄",
+        "leftStickUp": "左摇杆向上",
+        "leftStickDown": "左摇杆向下",
+        "leftStickLeft": "左摇杆向左",
+        "leftStickRight": "左摇杆向右",
+        "rightStickUp": "右摇杆向上",
+        "rightStickDown": "右摇杆向下",
+        "rightStickLeft": "右摇杆向左",
+        "rightStickRight": "右摇杆向右",
+        "mouseSensitivity": "鼠标灵敏度",
+        "mouseSensitivityDescription": "主机指针的速度：如果移动过快，请调低此值。下次开始串流时生效。",
         "keyboardMappingsTitle": "键盘映射"
       },
 
@@ -263,6 +273,8 @@
     "streamWindow": {
       "pageTitle": "串流",
       "endStreamConfirmMessage": "确定要结束串流吗？",
+      "mouseHint": "按 Cmd+Esc 释放鼠标并显示栏",
+      "mouseHintHoldEsc": "按住 Esc 释放鼠标并显示栏",
       "estimatedWaitingTimeMessage": "预计排队等待时间：",
       "timeHours": "小时",
       "timeMinutes": "分钟",

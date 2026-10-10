@@ -81,6 +81,16 @@
         "controllerDetectedTitle": "Обнаружены контроллеры",
         "controllerDetectedDescription": "Если у вас подключен контроллер, но он не отображается, попробуйте нажать кнопку на контроллере для обнаружения.",
         "noControllerDetected": "Контроллер не обнаружен",
+        "leftStickUp": "Левый стик вверх",
+        "leftStickDown": "Левый стик вниз",
+        "leftStickLeft": "Левый стик влево",
+        "leftStickRight": "Левый стик вправо",
+        "rightStickUp": "Правый стик вверх",
+        "rightStickDown": "Правый стик вниз",
+        "rightStickLeft": "Правый стик влево",
+        "rightStickRight": "Правый стик вправо",
+        "mouseSensitivity": "Чувствительность мыши",
+        "mouseSensitivityDescription": "Скорость указателя консоли: уменьшите её, если он движется слишком быстро. Применяется при следующем запуске трансляции.",
         "keyboardMappingsTitle": "Назначения клавиш"
       },
 
@@ -234,6 +244,8 @@
     "streamWindow": {
       "pageTitle": "Трансляция",
       "endStreamConfirmMessage": "Вы уверены, что хотите завершить свою трансляцию?",
+      "mouseHint": "Нажмите Cmd+Esc, чтобы освободить мышь и показать панель",
+      "mouseHintHoldEsc": "Удерживайте Esc, чтобы освободить мышь и показать панель",
       "estimatedWaitingTimeMessage": "Ожидаемое время ожидания в очереди:",
       "timeHours": "час(ов)",
       "timeMinutes": "минут(ы)",

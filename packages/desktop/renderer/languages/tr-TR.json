@@ -82,6 +82,16 @@
         "controllerDetectedTitle": "Algılanan oyun kumandaları",
         "controllerDetectedDescription": "Bağlı bir oyun kumandanız görünmüyorsa algılanması için kumandadaki bir düğmeye basın.",
         "noControllerDetected": "Oyun kumandası algılanmadı",
+        "leftStickUp": "Sol çubuk yukarı",
+        "leftStickDown": "Sol çubuk aşağı",
+        "leftStickLeft": "Sol çubuk sola",
+        "leftStickRight": "Sol çubuk sağa",
+        "rightStickUp": "Sağ çubuk yukarı",
+        "rightStickDown": "Sağ çubuk aşağı",
+        "rightStickLeft": "Sağ çubuk sola",
+        "rightStickRight": "Sağ çubuk sağa",
+        "mouseSensitivity": "Fare hassasiyeti",
+        "mouseSensitivityDescription": "Konsolun imlecinin hızı: çok hızlı hareket ediyorsa düşürün. Bir sonraki yayın başlatıldığında geçerli olur.",
         "keyboardMappingsTitle": "Klavye eşlemeleri"
       },
 
@@ -263,6 +273,8 @@
     "streamWindow": {
       "pageTitle": "Yayın",
       "endStreamConfirmMessage": "Yayını sonlandırmak istediğinizden emin misiniz?",
+      "mouseHint": "Fareyi serbest bırakıp çubuğu göstermek için Cmd+Esc tuşlarına basın",
+      "mouseHintHoldEsc": "Fareyi serbest bırakıp çubuğu göstermek için Esc tuşunu basılı tutun",
       "estimatedWaitingTimeMessage": "Kuyrukta tahmini bekleme süresi:",
       "timeHours": "sa",
       "timeMinutes": "dk",

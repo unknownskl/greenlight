@@ -82,6 +82,16 @@
         "controllerDetectedTitle": "検出されたコントローラー",
         "controllerDetectedDescription": "コントローラーを接続しても表示されない場合は、コントローラーのボタンを押して検出させてください。",
         "noControllerDetected": "コントローラーが検出されません",
+        "leftStickUp": "左スティック上",
+        "leftStickDown": "左スティック下",
+        "leftStickLeft": "左スティック左",
+        "leftStickRight": "左スティック右",
+        "rightStickUp": "右スティック上",
+        "rightStickDown": "右スティック下",
+        "rightStickLeft": "右スティック左",
+        "rightStickRight": "右スティック右",
+        "mouseSensitivity": "マウス感度",
+        "mouseSensitivityDescription": "コンソールのポインターの速度：速すぎる場合は下げてください。次にストリームを開始するときに反映されます。",
         "keyboardMappingsTitle": "キーボードの割り当て"
       },
 
@@ -263,6 +273,8 @@
     "streamWindow": {
       "pageTitle": "ストリーミング",
       "endStreamConfirmMessage": "ストリーミングを終了してもよろしいですか?",
+      "mouseHint": "Cmd+Esc を押すとマウスを解放してバーを表示します",
+      "mouseHintHoldEsc": "Esc を長押しするとマウスを解放してバーを表示します",
       "estimatedWaitingTimeMessage": "待ち時間の目安:",
       "timeHours": "時間",
       "timeMinutes": "分",

@@ -81,6 +81,16 @@
         "controllerDetectedTitle": "Wykryte kontrolery",
         "controllerDetectedDescription": "Jeśli masz kontroler, ale się nie pokazuje spróbuj wcisnąć przycisk na kontrolerze, aby go wykryć.",
         "noControllerDetected": "Nie wykryto kontrolera",
+        "leftStickUp": "Lewy drążek w górę",
+        "leftStickDown": "Lewy drążek w dół",
+        "leftStickLeft": "Lewy drążek w lewo",
+        "leftStickRight": "Lewy drążek w prawo",
+        "rightStickUp": "Prawy drążek w górę",
+        "rightStickDown": "Prawy drążek w dół",
+        "rightStickLeft": "Prawy drążek w lewo",
+        "rightStickRight": "Prawy drążek w prawo",
+        "mouseSensitivity": "Czułość myszy",
+        "mouseSensitivityDescription": "Prędkość wskaźnika konsoli: zmniejsz ją, jeśli porusza się zbyt szybko. Zmiana działa przy następnym uruchomieniu streamu.",
         "keyboardMappingsTitle": "Mapowanie klawiatury"
       },
 
@@ -230,6 +240,8 @@
     "streamWindow": {
       "pageTitle": "Strumieniowanie",
       "endStreamConfirmMessage": "Na pewno chcesz zakończyć strumień?",
+      "mouseHint": "Naciśnij Cmd+Esc, aby uwolnić mysz i pokazać pasek",
+      "mouseHintHoldEsc": "Przytrzymaj Esc, aby uwolnić mysz i pokazać pasek",
       "estimatedWaitingTimeMessage": "Szacowany czas oczekiwania w kolejce:",
       "timeHours": "godzin(a)",
       "timeMinutes": "minut(a)",

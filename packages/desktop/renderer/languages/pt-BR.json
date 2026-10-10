@@ -82,6 +82,16 @@
         "controllerDetectedTitle": "Controles detectados",
         "controllerDetectedDescription": "Se um controle estiver conectado, mas não aparecer, pressione um botão dele para que seja detectado.",
         "noControllerDetected": "Nenhum controle detectado",
+        "leftStickUp": "Analógico esquerdo para cima",
+        "leftStickDown": "Analógico esquerdo para baixo",
+        "leftStickLeft": "Analógico esquerdo para a esquerda",
+        "leftStickRight": "Analógico esquerdo para a direita",
+        "rightStickUp": "Analógico direito para cima",
+        "rightStickDown": "Analógico direito para baixo",
+        "rightStickLeft": "Analógico direito para a esquerda",
+        "rightStickRight": "Analógico direito para a direita",
+        "mouseSensitivity": "Sensibilidade do mouse",
+        "mouseSensitivityDescription": "Velocidade do ponteiro do console: diminua se ele se mover rápido demais. Vale a partir do próximo início de uma transmissão.",
         "keyboardMappingsTitle": "Mapeamento do teclado"
       },
 
@@ -263,6 +273,8 @@
     "streamWindow": {
       "pageTitle": "Streaming",
       "endStreamConfirmMessage": "Tem certeza de que deseja encerrar o streaming?",
+      "mouseHint": "Pressione Cmd+Esc para liberar o mouse e mostrar a barra",
+      "mouseHintHoldEsc": "Mantenha Esc pressionado para liberar o mouse e mostrar a barra",
       "estimatedWaitingTimeMessage": "Tempo de espera estimado na fila:",
       "timeHours": "h",
       "timeMinutes": "min",

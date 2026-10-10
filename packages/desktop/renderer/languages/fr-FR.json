@@ -82,6 +82,16 @@
         "controllerDetectedTitle": "Manettes détectées",
         "controllerDetectedDescription": "Si une manette est connectée mais n'apparaît pas, appuyez sur l'une de ses touches pour qu'elle soit détectée.",
         "noControllerDetected": "Aucune manette détectée",
+        "leftStickUp": "Joystick gauche haut",
+        "leftStickDown": "Joystick gauche bas",
+        "leftStickLeft": "Joystick gauche gauche",
+        "leftStickRight": "Joystick gauche droite",
+        "rightStickUp": "Joystick droit haut",
+        "rightStickDown": "Joystick droit bas",
+        "rightStickLeft": "Joystick droit gauche",
+        "rightStickRight": "Joystick droit droite",
+        "mouseSensitivity": "Sensibilité de la souris",
+        "mouseSensitivityDescription": "Vitesse du pointeur de la console : réduisez-la s'il se déplace trop vite. Elle s'applique au prochain démarrage d'un stream.",
         "keyboardMappingsTitle": "Mappage du clavier"
       },
 
@@ -263,6 +273,8 @@
     "streamWindow": {
       "pageTitle": "Streaming",
       "endStreamConfirmMessage": "Voulez-vous vraiment mettre fin au streaming ?",
+      "mouseHint": "Appuyez sur Cmd+Échap pour libérer la souris et afficher la barre",
+      "mouseHintHoldEsc": "Maintenez Échap pour libérer la souris et afficher la barre",
       "estimatedWaitingTimeMessage": "Temps d'attente estimé dans la file :",
       "timeHours": "h",
       "timeMinutes": "min",
