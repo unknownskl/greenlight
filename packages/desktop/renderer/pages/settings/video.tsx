@@ -18,12 +18,12 @@ function SettingsVideo() {
     function loadMicDevices() {
         return navigator.mediaDevices.enumerateDevices().then((devices) => {
             setMicDevices(devices.filter((device) => device.kind === 'audioinput' && device.deviceId !== 'default' && device.deviceId !== 'communications'))
-        })
+        }).catch(() => setMicDevices([]))
     }
 
     // The names of the devices are only shown once the microphone has been allowed, so the button asks for it first.
     function refreshMicDevices() {
-        navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
+        void navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
             stream.getTracks().forEach((track) => track.stop())
         }).catch(() => { /* not allowed: the list keeps the numbered names */ }).then(loadMicDevices)
     }
@@ -36,7 +36,7 @@ function SettingsVideo() {
     }
 
     React.useEffect(() => {
-        loadMicDevices()
+        void loadMicDevices()
     }, [])
 
     function setVideoSize(e){

@@ -321,7 +321,15 @@ function StreamComponent({
             return
         }
 
-        if (await hasMicrophoneAccess()) {
+        let allowed = true
+
+        try {
+            allowed = await hasMicrophoneAccess()
+        } catch (error) {
+            // The system could not be asked: try anyway, the player reports the problem itself.
+        }
+
+        if (allowed) {
             startMic(settings.mic_device_id)
             setMicStatus(true)
         }
@@ -441,7 +449,7 @@ function StreamComponent({
                                 e.target.blur(); onMenu()
                             }}></Button> &nbsp;
                             <Button label={(micStatus === false) ? <span><i className="fa-solid fa-microphone-slash"></i> {t("streamWindow.micMuted")}</span> : <span><i className="fa-solid fa-microphone"></i> {t("streamWindow.micActive")}</span>} title={(micStatus === false) ? t("streamWindow.enableMic") : t("streamWindow.disableMic")} className={(micStatus === false) ? 'btn-cancel' : 'btn-primary'} onClick={(e) => {
-                                e.target.blur(); toggleMic()
+                                e.target.blur(); void toggleMic()
                             }}></Button>
                         </div>
 
