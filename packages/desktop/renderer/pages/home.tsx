@@ -28,12 +28,38 @@ function keepWhileSameState<T>(entries: Record<string, T | undefined>, list: any
         const entry = entries[id]
         const item = list.find((console) => console.id === id)
 
-        if (entry && item && item.powerState === getState(entry)) {
+        if (entry && item?.powerState === getState(entry)) {
             kept[id] = entry
         }
     })
 
     return kept
+}
+
+// A console that is shut down (not in sleep mode) can't be turned on from Greenlight.
+function isConsoleShutDown(item: any, assumedState?: string): boolean {
+    if (item.powerState === 'On') return false
+
+    return item.powerState === 'Off' || (!!assumedState && assumedState === item.powerState)
+}
+
+// Look of the state LED and name of the state of a console.
+function getStateView(item: any, isOn: boolean, isShutDown: boolean, t: (key: string) => string) {
+    if (isOn) return { led: 'on', name: t('page.myConsoles.poweredOn') }
+    if (isShutDown) return { led: 'off', name: t('page.myConsoles.off') }
+    if (item.powerState === 'ConnectedStandby') return { led: 'standby', name: t('page.myConsoles.standby') }
+
+    return { led: '', name: item.powerState }
+}
+
+// Tooltip of the power button.
+function getPowerTitle(pendingCommand: '' | 'on' | 'off' | undefined, isOn: boolean, isShutDown: boolean, t: (key: string) => string): string {
+    if (pendingCommand === 'on') return t('page.myConsoles.poweringOn')
+    if (pendingCommand === 'off') return t('page.myConsoles.poweringOff')
+    if (isOn) return t('page.myConsoles.powerOffBtn')
+    if (isShutDown) return t('page.myConsoles.powerOnUnavailable')
+
+    return t('page.myConsoles.powerOnBtn')
 }
 
 // navigator.clipboard is only available on secure origins, the Web UI over plain http needs the fallback.
@@ -51,11 +77,12 @@ function copyText(text: string): Promise<void> {
         area.select()
 
         try {
+            // Deprecated, but it is the only way to copy on a page that is not a secure context (Web UI over http).
             document.execCommand('copy') ? resolve() : reject(new Error('Copy failed'))
         } catch (error) {
             reject(error)
         } finally {
-            document.body.removeChild(area)
+            area.remove()
         }
     })
 }
@@ -186,11 +213,8 @@ function Home() {
                         const canPower = item.remoteManagementEnabled === true && item.consoleStreamingEnabled === true
                         const isOn = item.powerState === 'On'
                         const busy = !!pending[item.id]
-                        // A console that is shut down (not in sleep mode) can't be turned on from Greenlight.
-                        const isShutDown = !isOn && (item.powerState === 'Off' || (!!assumedShutDown[item.id] && assumedShutDown[item.id] === item.powerState))
-                        const ledState = isOn ? 'on' : isShutDown ? 'off' : item.powerState === 'ConnectedStandby' ? 'standby' : ''
-                        const stateName = ledState === 'on' ? t('page.myConsoles.poweredOn') : ledState === 'off' ? t('page.myConsoles.off') :
-                            ledState === 'standby' ? t('page.myConsoles.standby') : item.powerState
+                        const isShutDown = isConsoleShutDown(item, assumedShutDown[item.id])
+                        const stateView = getStateView(item, isOn, isShutDown, t)
 
                         return (
                             <Card className='padbottom' key={i}>
@@ -215,9 +239,15 @@ function Home() {
                                 }}>
                                     {formatConsoleType(item.consoleType)}
                                     {item.consoleType ? ' \u00b7 ' : ''}
-                                    <span role='button' title={t('page.myConsoles.copyIdTitle')} onClick={ () => copyConsoleId(item.id) } style={{
+                                    <button type='button' title={t('page.myConsoles.copyIdTitle')} onClick={ () => copyConsoleId(item.id) } style={{
+                                        // looks like the text around it
+                                        background: 'none',
+                                        border: 0,
+                                        padding: 0,
+                                        color: 'inherit',
+                                        font: 'inherit',
                                         cursor: 'pointer',
-                                    }}>{copiedId === item.id ? t('page.myConsoles.idCopied') : item.id}</span>
+                                    }}>{copiedId === item.id ? t('page.myConsoles.idCopied') : item.id}</button>
                                 </h2>
 
                                 <br />
@@ -239,8 +269,8 @@ function Home() {
                                 <div style={ { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', minWidth: 280 }}>
                                     {canPower ?
                                         <span className='status_led_label'>
-                                            <i className={ 'status_led ' + ledState }></i>
-                                            {stateName}
+                                            <i className={ 'status_led ' + stateView.led }></i>
+                                            {stateView.name}
                                         </span> : <span></span>}
 
                                     <div style={ { display: 'flex', alignItems: 'center' } }>
@@ -248,11 +278,9 @@ function Home() {
                                             <Button className='btn-icon btn-primary' label={ <i className='fa-solid fa-play'></i> } title={t('page.myConsoles.startStreamBtn')} />
                                         </Link>
                                         <div style={ { marginLeft: '24px' } }>
-                                            <Button className={ 'btn-icon ' + (isShutDown ? '' : isOn ? 'btn-power-off' : 'btn-power-on') }
+                                            <Button className={ isShutDown ? 'btn-icon' : 'btn-icon ' + (isOn ? 'btn-power-off' : 'btn-power-on') }
                                                 label={ <i className={ busy ? 'fa-solid fa-circle-notch fa-spin' : 'fa-solid fa-power-off' }></i> }
-                                                title={ busy ? (pending[item.id] === 'on' ? t('page.myConsoles.poweringOn') : t('page.myConsoles.poweringOff')) :
-                                                    isOn ? t('page.myConsoles.powerOffBtn') :
-                                                        isShutDown ? t('page.myConsoles.powerOnUnavailable') : t('page.myConsoles.powerOnBtn') }
+                                                title={ getPowerTitle(pending[item.id], isOn, isShutDown, t) }
                                                 disabled={ !canPower || busy || isShutDown }
                                                 onClick={ () => isOn ? powerOff(item) : sendPowerCommand(item.id, true, item.powerState) } />
                                         </div>

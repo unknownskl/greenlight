@@ -38,39 +38,36 @@ span.status_led_label {
 }
 
 i.status_led {
+    --led: #777777;
     display: inline-block;
     width: 11px;
     height: 11px;
     border-radius: 50%;
-    background: #777777;
-    color: #777777;
+    background: var(--led);
 }
 
 i.status_led.on {
-    background: #1fae5b;
-    color: #1fae5b;
-    box-shadow: 0 0 10px 2px #1fae5b;
+    --led: #1fae5b;
+    box-shadow: 0 0 10px 2px var(--led);
 }
 
 i.status_led.standby {
-    background: #ff9f1a;
-    color: #ff9f1a;
+    --led: #ff9f1a;
     animation: status_led_breathe 2.6s ease-in-out infinite;
 }
 
 i.status_led.off {
-    background: #e5322d;
-    color: #e5322d;
+    --led: #e5322d;
 }
 
 @keyframes status_led_breathe {
     0%, 100% {
         opacity: 0.35;
-        box-shadow: 0 0 0 0 currentColor;
+        box-shadow: 0 0 0 0 var(--led);
     }
     50% {
         opacity: 1;
-        box-shadow: 0 0 10px 2px currentColor;
+        box-shadow: 0 0 10px 2px var(--led);
     }
 }
 
