@@ -1,0 +1,320 @@
+{
+  "translation": {
+    "languageName": "Italiano",
+    "authorOfLocalization": "Traduzione italiana di IU5GAL",
+
+    "header": {
+      "myConsoles": "Le mie console",
+      "viewConsoles": "Visualizza le console",
+      "xCloudLibrary": "Libreria xCloud",
+      "browseXCloudLibrary": "Sfoglia la libreria xCloud",
+      "settings": "Impostazioni",
+      "changeSettings": "Modifica le impostazioni dell'applicazione",
+      "viewProfile": "Visualizza il profilo",
+      "quitQuestion": "Vuoi davvero chiudere l'applicazione?",
+      "home": "Home"
+    },
+
+    "auth": {
+      "logoutQuestion": "Vuoi davvero uscire dall'account?",
+      "clearDataBtn": "Cancella dati",
+      "clearDataQuestion": "Questa operazione rimuove tutti i dati dell'applicazione. A volte è utile se la procedura di accesso continua a ripetersi senza completarsi. Vuoi continuare?",
+      "gamerscore": "Punteggio giocatore",
+      "loggingIn": "Accesso in corso...",
+      "loginBtn": "Accedi",
+      "logoutBtn": "Esci",
+      "loginWithXbox": "Accedi con Xbox",
+      "pleaseAuthenticate": "Esegui l'accesso qui sotto per usare lo streaming xCloud e xHome",
+      "windowTitle": "Autenticazione"
+    },
+
+    "settings": {
+      "sidebar": {
+        "about": "Informazioni",
+        "streaming": "Streaming",
+        "input": "Input",
+        "videoAudio": "Video e audio",
+        "webUI": "Interfaccia web",
+        "debug": "Debug"
+      },
+
+      "about": {
+        "logoutQuestion": "Vuoi davvero uscire dall'account?",
+        "title": "Impostazioni",
+        "gamerscore": "Punteggio giocatore",
+        "selectorSelectLanguage": "Seleziona la lingua",
+        "logout": "Esci",
+        "version": "Versione",
+        "website": "Sito web",
+        "websiteLinkTitle": "Apri il link nel browser esterno"
+      },
+
+      "input": {
+        "settingsInputPageTitle": "Impostazioni: Input",
+        "pageTitle": "Impostazioni: Input",
+        "dPadUp": "Croce direzionale su",
+        "dPadDown": "Croce direzionale giù",
+        "dPadLeft": "Croce direzionale sinistra",
+        "dPadRight": "Croce direzionale destra",
+        "leftShoulder": "Dorsale sinistro (LB)",
+        "rightShoulder": "Dorsale destro (RB)",
+        "leftTrigger": "Grilletto sinistro (LT)",
+        "rightTrigger": "Grilletto destro (RT)",
+        "leftThumb": "Levetta sinistra",
+        "rightThumb": "Levetta destra",
+        "view": "Visualizza",
+        "menu": "Menu",
+        "nexus": "Pulsante Xbox",
+        "none": "Nessuno",
+        "enabledLabel": "Attivato",
+        "disabledLabel": "Disattivato",
+        "axesLabel": "assi",
+        "buttonsLabel": "pulsanti",
+        "rumbleLabel": "vibrazione",
+        "notSupportedLabel": "non supportata",
+        "title": "Input",
+        "enableVibration": "Attiva vibrazione",
+        "enableTouch": "Attiva input touch",
+        "enableMouseKeyboard": "Attiva mouse e tastiera",
+        "legacyWarning": "Mouse e tastiera e Tastiera come gamepad non possono essere attivi contemporaneamente",
+        "enableLegacy": "Attiva tastiera come gamepad",
+        "enableLegacyDescription": "Se disattivi questa funzione, la mappatura della tastiera sul gamepad non sarà più attiva e i comandi saranno accettati solo dal gamepad.",
+        "controllerDetectedTitle": "Controller rilevati",
+        "controllerDetectedDescription": "Se hai collegato un controller ma non compare nell'elenco, prova a premere un pulsante sul controller per farlo rilevare.",
+        "noControllerDetected": "Nessun controller rilevato",
+        "keyboardMappingsTitle": "Mappatura della tastiera"
+      },
+
+      "common": {
+        "resetDefaultsBtn": "Ripristina predefiniti",
+        "resetDefaultsConfirm": "Ripristinare le impostazioni di questa pagina ai valori predefiniti?",
+        "savedNotice": "Salvato"
+      },
+      "streaming": {
+        "pageTitle": "Impostazioni: Streaming",
+        "title": "Impostazioni di streaming",
+        "description": "Per impostazione predefinita, xHome e xCloud non supportano più di 20 Mbps. Questa impostazione non permette di superare tale limite.",
+        "xCloudStreamingBitrateLabel": "Bitrate dello streaming xCloud",
+        "xHomeStreamingBitrateLabel": "Bitrate dello streaming xHome",
+        "showNonEntitledLabel": "Mostra i giochi da acquistare",
+        "unlimitedLabel": "Nessun limite",
+        "mbpsLabel": "Mbps",
+        "setH264ProfileLabel": "Imposta profilo H.264",
+        "setH264ProfileValueAuto": "Negoziazione automatica",
+        "setH264ProfileValueHigh": "Alto",
+        "setH264ProfileValueMedium": "Medio",
+        "setH264ProfileValueLow": "Basso",
+        "setH264ProfileDescription": "Avanzato: forza il profilo video H.264. Lascia su Auto se non hai problemi di codifica.",
+        "forceRegionTitle": "Forza regione",
+        "setRegionLabel": "Imposta regione:",
+        "setRegionValueDisabled": "Disattivato",
+        "setRegionValueAustralia": "Australia",
+        "setRegionValueBrazil": "Brasile",
+        "setRegionValueEurope": "Europa",
+        "setRegionValueJapan": "Giappone",
+        "setRegionValueKorea": "Corea",
+        "setRegionValueUS": "Stati Uniti",
+        "setRegionDescription": "Avanzato: instrada lo streaming attraverso i server della regione selezionata. Usalo solo se la tua regione ha problemi di connessione.",
+        "preferredGameLanguageLabel": "Lingua preferita dei giochi:",
+        "preferredGameLanguageValueArabic": "Arabo (Arabia Saudita)",
+        "preferredGameLanguageValueCzech": "Ceco",
+        "preferredGameLanguageValueDanish": "Danese",
+        "preferredGameLanguageValueGerman": "Tedesco",
+        "preferredGameLanguageValueGreek": "Greco",
+        "preferredGameLanguageValueEnglishUK": "Inglese (Regno Unito)",
+        "preferredGameLanguageValueEnglishUS": "Inglese (Stati Uniti)",
+        "preferredGameLanguageValueSpanish": "Spagnolo (Spagna)",
+        "preferredGameLanguageValueSpanishMX": "Spagnolo (Messico)",
+        "preferredGameLanguageValueFinnish": "Finlandese",
+        "preferredGameLanguageValueFrench": "Francese",
+        "preferredGameLanguageValueHebrew": "Ebraico",
+        "preferredGameLanguageValueHungarian": "Ungherese",
+        "preferredGameLanguageValueItalian": "Italiano",
+        "preferredGameLanguageValueJapanese": "Giapponese",
+        "preferredGameLanguageValueKorean": "Coreano",
+        "preferredGameLanguageValueNorwegian": "Norvegese",
+        "preferredGameLanguageValueDutch": "Olandese",
+        "preferredGameLanguageValuePolish": "Polacco",
+        "preferredGameLanguageValuePortugueseBR": "Portoghese (Brasile)",
+        "preferredGameLanguageValuePortuguese": "Portoghese (Portogallo)",
+        "preferredGameLanguageValueRussian": "Russo",
+        "preferredGameLanguageValueSlovak": "Slovacco",
+        "preferredGameLanguageValueSwedish": "Svedese",
+        "preferredGameLanguageValueTurkish": "Turco",
+        "preferredGameLanguageValueChineseCN": "Cinese (semplificato)",
+        "preferredGameLanguageValueChineseTW": "Cinese (tradizionale)"
+      },
+
+      "videoAudio": {
+        "pageTitle": "Impostazioni: Video e audio",
+        "title": "Video",
+        "disableVideoLabel": "Disattiva video",
+        "disabledLabel": "Disattivato",
+        "enabledLabel": "Attivato",
+        "aspectSizeLabel": "Proporzioni video",
+        "aspectSizeValueDefault": "Predefinite",
+        "aspectSizeValueStretch": "Estendi",
+        "aspectSizeValueZoom": "Zoom",
+        "forceLowResLabel": "Forza video a bassa risoluzione",
+        "forceLowResDescription": "(Questa opzione è utile su Steam Deck: l'applicazione esegue il rendering a bassa risoluzione, così da poter attivare FSR.)",
+        "micLabel": "Microfono",
+        "micDefault": "Predefinito di sistema",
+        "micUnnamed": "Microfono",
+        "micUnavailable": "Microfono scelto (non collegato)",
+        "micRefreshBtn": "Aggiorna l'elenco dei microfoni",
+        "micDescription": "Usato quando attivi il microfono durante uno stream. Se mancano i nomi, premi il pulsante di aggiornamento e consenti l'accesso al microfono.",
+        "audioTitle": "Audio",
+        "disableAudioLabel": "Disattiva audio"
+      },
+
+      "webUI": {
+        "pageTitle": "Impostazioni: Interfaccia web",
+        "title": "Interfaccia web",
+        "enableWebUILabel": "Attiva interfaccia web",
+        "stopWebUIBtn": "Arresta interfaccia web",
+        "startWebUIBtn": "Avvia interfaccia web",
+        "openWebUIBtn": "Apri interfaccia web",
+        "autostartLabel": "Avvia con l'applicazione",
+        "autostartEnabled": "Attivato",
+        "autostartDisabled": "Disattivato",
+        "portLabel": "Porta",
+        "portPlaceholder": "esempio: 9003",
+        "portInvalid": "La porta deve essere un numero tra 1024 e 65535."
+      },
+
+      "debug": {
+        "pageTitle": "Impostazioni: Debug"
+      }
+    },
+
+    "page": {
+      "xCloud": {
+        "pageTitle": "Libreria xCloud",
+        "breadcrumb": "xCloud",
+        "recentGames": "Giochi recenti",
+        "recentlyAdded": "Aggiunti di recente",
+        "viewLibraryBtn": "Visualizza libreria"
+      },
+
+      "xCloudLibrary": {
+        "pageTitle": "Libreria xCloud",
+        "breadcrumb1": "xCloud",
+        "breadcrumb2": "Libreria",
+        "title": "Libreria",
+        "searchPlaceholder": "Cerca",
+        "gamePassOnly": "Solo giochi Game Pass",
+        "noGamesFound": "Nessun gioco trovato",
+        "previousPageBtn": "Pagina precedente",
+        "nextPageBtn": "Pagina successiva",
+        "viewGamePageIcon": "Visualizza la pagina del gioco"
+      },
+
+      "myConsoles": {
+        "pageTitle": "Le mie console",
+        "poweredOn": "Accesa",
+        "standby": "In standby",
+        "powerOnBtn": "Accendi",
+        "poweringOn": "Accensione...",
+        "powerOffBtn": "Spegni",
+        "poweringOff": "Spegnimento...",
+        "powerOffConfirm": "Spegnere {{name}}? Il gioco in corso verrà chiuso.",
+        "refreshBtn": "Aggiorna",
+        "off": "Arrestata",
+        "copyIdTitle": "Copia l'ID della console",
+        "idCopied": "Copiato",
+        "powerOnFailed": "Impossibile inviare alla console il comando di accensione.",
+        "powerOnTimeout": "La console non si è accesa. Probabilmente è arrestata: accendila con il suo pulsante. Per accenderla da Greenlight, imposta la modalità di alimentazione su Sospensione (avvio rapido).",
+        "powerOffFailed": "Impossibile inviare alla console il comando di spegnimento.",
+        "powerOffTimeout": "La console non si è spenta in tempo. Controlla lo stato con Aggiorna.",
+        "powerOnUnavailable": "La console è arrestata: accendila con il suo pulsante.",
+        "warningLabel": "Attenzione",
+        "managementWarning": "Gestione remota non attiva",
+        "streamingWarning": "Streaming della console non attivo",
+        "startStreamBtn": "Avvia streaming",
+        "noConsoles": "Nessuna console trovata nel tuo account. Se hai una console Xbox, assicurati che il gioco remoto sia attivo e che la console sia visibile nell'app Xbox ufficiale."
+      },
+
+      "titleInfo": {
+        "pageTitle": "Informazioni sul gioco:",
+        "breadcrumb1": "xCloud",
+        "breadcrumb2": "Libreria",
+        "by": "di",
+        "descriptionTitle": "Descrizione",
+        "capabilitiesTitle": "Funzionalità",
+        "startStreamBtn": "Avvia streaming",
+        "purchaseRequiredBtn": "Acquisto richiesto"
+      },
+
+      "page404": {
+        "pageTitle": "Errore",
+        "message": "Ops, errore 404... Azione non trovata"
+      },
+
+      "page500": {
+        "pageTitle": "Errore",
+        "message": "Ops, errore 500... Si è verificato un errore nell'applicazione"
+      }
+    },
+
+    "friends": {
+      "allFriendsOffline": "Tutti i tuoi amici sono offline"
+    },
+
+    "streamWindow": {
+      "pageTitle": "Streaming",
+      "endStreamConfirmMessage": "Vuoi davvero terminare lo streaming?",
+      "estimatedWaitingTimeMessage": "Tempo di attesa stimato in coda:",
+      "timeHours": "h",
+      "timeMinutes": "min",
+      "timeSeconds": "s",
+      "loadingStreamTitle": "Caricamento...",
+      "gettingStreamReadyMessage": "Stiamo preparando lo streaming...",
+      "endStreamBtn": "Termina streaming",
+      "disconnectBtn": "Disconnetti",
+      "menuBtn": "Menu",
+      "menuTitle": "Apri il menu Xbox",
+      "micMuted": "Disattivato",
+      "micActive": "Attivo",
+      "micAccessDenied": "Greenlight non ha il permesso di usare il microfono. Aprire le impostazioni di sistema per consentirlo?",
+      "enableMic": "Attiva il microfono",
+      "disableMic": "Disattiva il microfono",
+      "debugTitle": "Debug",
+      "itsTakingALittleLonger": "Ci vuole un po' più del previsto... Lo streaming potrebbe iniziare a breve.",
+      "startingConnection": "Avvio della connessione...",
+      "connectingToConsole": "Connessione alla console...",
+      "clientHasBeenDisconnected": "Il client è stato disconnesso."
+    },
+
+    "updater": {
+      "unableToCheckForUpdates": "Impossibile verificare la disponibilità di aggiornamenti in questo momento. Riprova.",
+      "alreadyOnLatestVersion": "Stai già usando l'ultima versione. Versione attuale:",
+      "newestVersion": "Versione più recente:",
+      "newReleaseAvailable": "Nuova versione disponibile",
+      "installedVersion": "Versione installata:",
+      "latestVersion": "Ultima versione:",
+      "downloadBtn": "Scarica",
+      "laterBtn": "Più tardi",
+      "updateChecker": "Controllo aggiornamenti",
+      "closeBtn": "Chiudi"
+    },
+
+    "errors": {
+      "failedToRetrieveUserProfile": "Errore: impossibile recuperare il profilo utente:",
+      "repositoryNotFound": "URL del repository non trovato nel file package.json.",
+      "failedToRetrieveStreamingTokens": "Errore: impossibile recuperare i token di streaming:",
+      "errorAuthentificationUser": "Errore durante l'autenticazione dell'utente. Dettagli dell'errore:",
+      "errorGettingRedirectURI": "Errore durante il recupero dell'URI di reindirizzamento. Dettagli dell'errore:",
+      "authentificationCallbackIsNotDefined": "La callback di autenticazione non è definita. Dettagli dell'errore:",
+      "sisuTokenIsMissing": "Token Sisu mancante. Esegui prima l'accesso",
+      "failedToRetrieveWebTokens": "Errore: impossibile recuperare i token web:",
+      "chatSDPExchangeError": "Errore di scambio ChatSDP:",
+      "ICEExchangeError": "Errore di scambio ICE:",
+      "SDPExchangeError": "Errore di scambio SDP:",
+      "failedToStartStream": "Impossibile avviare un nuovo streaming. Dettagli dell'errore:",
+      "unableToStartStreamSession": "Impossibile avviare la sessione di streaming sulla console. La console non è connessa ai server Xbox. A volte succede quando c'è un aggiornamento o quando l'utente non ha effettuato l'accesso alla console. Esegui un riavvio completo della console e riprova.",
+      "streamErrorResult": "Risultato dell'errore di streaming:",
+      "details": "Dettagli:",
+      "failedToGetPlayerState": "Impossibile ottenere lo stato del player. Dettagli dell'errore:"
+    }
+  }
+}
