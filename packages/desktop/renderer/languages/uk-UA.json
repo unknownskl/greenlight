@@ -81,6 +81,16 @@
         "controllerDetectedTitle": "Виявлено контролери",
         "controllerDetectedDescription": "Якщо у вас підключено контролер, але він не відображається, спробуйте натиснути кнопку на контролері для виявлення.",
         "noControllerDetected": "Контролер не виявлено",
+        "leftStickUp": "Лівий стік вгору",
+        "leftStickDown": "Лівий стік вниз",
+        "leftStickLeft": "Лівий стік вліво",
+        "leftStickRight": "Лівий стік вправо",
+        "rightStickUp": "Правий стік вгору",
+        "rightStickDown": "Правий стік вниз",
+        "rightStickLeft": "Правий стік вліво",
+        "rightStickRight": "Правий стік вправо",
+        "mouseSensitivity": "Чутливість миші",
+        "mouseSensitivityDescription": "Швидкість вказівника консолі: зменште її, якщо він рухається занадто швидко. Застосовується під час наступного запуску трансляції.",
         "keyboardMappingsTitle": "Призначення клавіш"
       },
 
@@ -234,6 +244,8 @@
     "streamWindow": {
       "pageTitle": "Трансляція",
       "endStreamConfirmMessage": "Ви впевнені, що хочете завершити свою трансляцію?",
+      "mouseHint": "Натисніть Cmd+Esc, щоб звільнити мишу та показати панель",
+      "mouseHintHoldEsc": "Утримуйте Esc, щоб звільнити мишу та показати панель",
       "estimatedWaitingTimeMessage": "Очікуваний час очікування в черзі:",
       "timeHours": "год(ин)",
       "timeMinutes": "хвилин(и)",

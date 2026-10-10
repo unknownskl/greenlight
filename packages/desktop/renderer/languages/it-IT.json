@@ -82,6 +82,16 @@
         "controllerDetectedTitle": "Controller rilevati",
         "controllerDetectedDescription": "Se hai collegato un controller ma non compare nell'elenco, prova a premere un pulsante sul controller per farlo rilevare.",
         "noControllerDetected": "Nessun controller rilevato",
+        "leftStickUp": "Stick sinistro su",
+        "leftStickDown": "Stick sinistro giù",
+        "leftStickLeft": "Stick sinistro sinistra",
+        "leftStickRight": "Stick sinistro destra",
+        "rightStickUp": "Stick destro su",
+        "rightStickDown": "Stick destro giù",
+        "rightStickLeft": "Stick destro sinistra",
+        "rightStickRight": "Stick destro destra",
+        "mouseSensitivity": "Sensibilità del mouse",
+        "mouseSensitivityDescription": "Velocità del puntatore della console: abbassala se si muove troppo velocemente. Vale dal prossimo avvio di uno stream.",
         "keyboardMappingsTitle": "Mappatura della tastiera"
       },
 
@@ -263,6 +273,8 @@
     "streamWindow": {
       "pageTitle": "Streaming",
       "endStreamConfirmMessage": "Vuoi davvero terminare lo streaming?",
+      "mouseHint": "Premi Cmd+Esc per liberare il mouse e mostrare la barra",
+      "mouseHintHoldEsc": "Tieni premuto Esc per liberare il mouse e mostrare la barra",
       "estimatedWaitingTimeMessage": "Tempo di attesa stimato in coda:",
       "timeHours": "h",
       "timeMinutes": "min",
