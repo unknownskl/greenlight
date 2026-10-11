@@ -9,6 +9,7 @@ const VIBRATION_REPORT = 128
 export default class CompactGamepadDriver extends GamepadDriver {
 
     _vibrationIntervals = {}
+    _runTimeout: ReturnType<typeof setTimeout>
 
     start(){
         this._activeGamepads = { 0: false, 1: false, 2: false, 3: false }
@@ -37,8 +38,22 @@ export default class CompactGamepadDriver extends GamepadDriver {
         window.addEventListener('keyup', this._upFunc)
     }
 
+    // Same as the library run(), but keeps the timer so that stop() can end the loop. The library
+    // version reschedules itself forever, so every closed stream left a loop running.
+    run(){
+        const states = this.requestStates()
+        if(states[0] !== undefined && this._nexusOverrideN === true){
+            states[0].Nexus = 1
+        }
+        const input = this._application?.getChannelProcessor('input')
+        input?._inputFps.count()
+        input?.queueGamepadStates(states)
+        this._runTimeout = setTimeout(() => this.run(), 1000 / 60)
+    }
+
     stop(){
         super.stop()
+        clearTimeout(this._runTimeout)
         for(const index in this._vibrationIntervals){
             clearInterval(this._vibrationIntervals[index])
         }
