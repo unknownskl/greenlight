@@ -44,6 +44,6 @@ export const defaultSettings = {
     webui_autostart: false,
     webui_port: 9003,
 
-    // Selected language for i18n
-    language: 'en-US',
+    // Selected language for i18n. Empty means: follow the system language
+    language: '',
 }

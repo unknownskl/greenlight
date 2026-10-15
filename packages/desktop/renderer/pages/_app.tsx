@@ -59,14 +59,6 @@ export default function MyApp({ Component, pageProps }) {
                 } else if(args.isAuthenticated === true && args.user.signedIn === true){
                     clearInterval(authInterval)
 
-                    // After successful authentication, load and apply language setting
-                    Ipc.send('settings', 'getSettings').then(settings => {
-                        if (settings.language) {
-                            const i18n = require('../lib/i18n').default;
-                            i18n.changeLanguage(settings.language);
-                        }
-                    });
-
                     if(loggedIn === false){
                         Ipc.send('app', 'onUiShown').then((result) => {
                             if(result.autoStream !== '')
@@ -147,11 +139,11 @@ export default function MyApp({ Component, pageProps }) {
                 height: '100vh',
             }}>
                 <QueryClientProvider client={queryClient}>
-                    <LanguageProvider>
-                        <UserProvider>
+                    <UserProvider>
+                        <LanguageProvider>
                             {appBody}
-                        </UserProvider>
-                    </LanguageProvider>
+                        </LanguageProvider>
+                    </UserProvider>
                 </QueryClientProvider>
             </div>
         </React.Fragment>
