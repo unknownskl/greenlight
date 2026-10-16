@@ -7,6 +7,7 @@ import { useSettings } from '../../context/userContext'
 import StreamComponent from '../../components/ui/streamcomponent'
 import StreamPreload from '../../components/ui/streampreload'
 import Ipc from '../../lib/ipc'
+import CompactGamepadDriver from '../../lib/gamepaddriver'
 import { useTranslation } from 'react-i18next'
 
 function Stream() {
@@ -176,6 +177,7 @@ function Stream() {
                                 input_touch: settings.input_touch || false,
                                 input_mousekeyboard: settings.input_mousekeyboard || false,
                                 input_legacykeyboard: (settings.input_newgamepad) ? false : true,
+                                input_driver: new CompactGamepadDriver(),
                                 input_mousekeyboard_config: settings.input_mousekeyboard_config !== undefined ? {
                                     _keymapping: settings.input_mousekeyboard_config,
                                 } : undefined as any,
