@@ -202,18 +202,26 @@ function SettingsInput() {
 
                     <div>
                         {
-                            navigator.getGamepads().map((item, index) => {
-                                return (
-                                    <p key={ index }>
-                                #{ index+1 } &nbsp;
+                            (() => {
+                                const connectedGamepads = Array.from(navigator.getGamepads()).filter((item) => item?.connected)
 
-                                        { (item) ?
-                                            item.id + ' ' + t('settings.input.axesLabel') + ': ' + item.axes.length + ', ' + t('settings.input.buttonsLabel') + ': ' + item.buttons.length + ', ' + t('settings.input.rumbleLabel') + ': ' + ((item.vibrationActuator !== null) ? (item.vibrationActuator as any).type : t('settings.input.notSupportedLabel'))
-                                            : t('settings.input.noControllerDetected')
-                                        }
-                                    </p>
-                                )
-                            })
+                                if (connectedGamepads.length === 0) {
+                                    return <p>{t('settings.input.noControllerDetected')}</p>
+                                }
+
+                                return [0, 1, 2, 3].map((slot) => {
+                                    const item = connectedGamepads[slot]
+                                    return (
+                                        <p key={ slot }>
+                                            #{ slot + 1 } &nbsp;
+                                            { (item) ?
+                                                item.id + ' ' + t('settings.input.axesLabel') + ': ' + item.axes.length + ', ' + t('settings.input.buttonsLabel') + ': ' + item.buttons.length + ', ' + t('settings.input.rumbleLabel') + ': ' + ((item.vibrationActuator !== null) ? (item.vibrationActuator as any).type : t('settings.input.notSupportedLabel'))
+                                                : t('settings.input.noControllerDetected')
+                                            }
+                                        </p>
+                                    )
+                                })
+                            })()
                         }
                     </div>
                 </Card>
