@@ -9,6 +9,7 @@ export const defaultSettings = {
     force_region_ip: '',
     input_touch: false,
     input_mousekeyboard: false,
+    input_mouse_sensitivity: 50,
     input_mousekeyboard_config: {
         ArrowLeft: 'DPadLeft',
         ArrowUp: 'DPadUp',
