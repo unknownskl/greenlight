@@ -28,3 +28,51 @@ span.component_label.red {
     background: red;
     border: 2px solid red;
 }
+
+/* Console power state: a colored LED followed by the state name */
+span.status_led_label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+}
+
+i.status_led {
+    --led: #777777;
+    display: inline-block;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: var(--led);
+}
+
+i.status_led.on {
+    --led: #1fae5b;
+    box-shadow: 0 0 10px 2px var(--led);
+}
+
+i.status_led.standby {
+    --led: #ff9f1a;
+    animation: status_led_breathe 2.6s ease-in-out infinite;
+}
+
+i.status_led.off {
+    --led: #e5322d;
+}
+
+@keyframes status_led_breathe {
+    0%, 100% {
+        opacity: 0.35;
+        box-shadow: 0 0 0 0 var(--led);
+    }
+    50% {
+        opacity: 1;
+        box-shadow: 0 0 10px 2px var(--led);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    i.status_led.standby {
+        animation: none;
+    }
+}

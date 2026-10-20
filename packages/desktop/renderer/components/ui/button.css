@@ -53,3 +53,37 @@
 .btn-cancel:hover {
     background-color: rgb(155, 0, 0);
 }
+
+/* Round buttons with only an icon (same size, so they line up evenly) */
+.btn-icon {
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    border-radius: 50%;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+}
+
+/* the play triangle looks off-center otherwise */
+.btn-icon .fa-play {
+    margin-left: 2px;
+}
+
+.btn-power-on {
+    background-color: #008746;
+    border-color: #005e31;
+}
+
+.btn-power-on:hover {
+    background-color: #005e31;
+}
+
+.btn-power-off {
+    background-color: rgb(195, 0, 0);
+    border-color: rgb(155, 0, 0);
+}
+
+.btn-power-off:hover {
+    background-color: rgb(155, 0, 0);
+}
