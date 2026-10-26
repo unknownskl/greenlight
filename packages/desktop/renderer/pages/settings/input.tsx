@@ -116,17 +116,25 @@ function SettingsInput() {
         })
     }
 
+    // "Keyboard to Gamepad" is the opposite of input_newgamepad. It conflicts with Mouse & Keyboard (every key would act twice),
+    // so at most one of the two is on: turning one on turns the other off, turning one off leaves both off.
+    const keyboardToGamepad = !settings.input_newgamepad && !settings.input_mousekeyboard
+
     function setMKBInput(){
+        const enable = !settings.input_mousekeyboard
+
         setSettings({
             ...settings,
-            input_mousekeyboard: (! settings.input_mousekeyboard),
+            input_mousekeyboard: enable,
+            input_newgamepad: enable || !keyboardToGamepad,
         })
     }
 
     function setLegacyInput(){
         setSettings({
             ...settings,
-            input_newgamepad: (! settings.input_newgamepad),
+            input_newgamepad: keyboardToGamepad,
+            input_mousekeyboard: keyboardToGamepad ? settings.input_mousekeyboard : false,
         })
     }
 
@@ -182,16 +190,19 @@ function SettingsInput() {
                         <label>{t('settings.input.enableMouseKeyboard')}</label>
                         <label style={{ minWidth: 0 }}>
                             <input type='checkbox' onChange={ setMKBInput } checked={settings.input_mousekeyboard} />&nbsp; ({ settings.input_mousekeyboard ? t('settings.input.enabledLabel') : t('settings.input.disabledLabel')})
-                        </label> <br />
-                        { (!settings.input_newgamepad && settings.input_mousekeyboard) ? <small style={{ color: 'orange' }}>{t('settings.input.legacyWarning')}</small> : '' }
+                        </label>
                     </p>
 
                     <p>
                         <label>{t('settings.input.enableLegacy')}</label>
                         <label style={{ minWidth: 0 }}>
-                            <input type='checkbox' onChange={ setLegacyInput } checked={!settings.input_newgamepad} />&nbsp; ({ !settings.input_newgamepad ? t('settings.input.enabledLabel') : t('settings.input.disabledLabel')})
+                            <input type='checkbox' onChange={ setLegacyInput } checked={keyboardToGamepad} />&nbsp; ({ keyboardToGamepad ? t('settings.input.enabledLabel') : t('settings.input.disabledLabel')})
                         </label><br />
                         <small>{t('settings.input.enableLegacyDescription')}</small>
+                    </p>
+
+                    <p>
+                        <small>{t('settings.input.legacyWarning')}</small>
                     </p>
                 </Card>
 
@@ -218,7 +229,7 @@ function SettingsInput() {
                     </div>
                 </Card>
 
-                <Card hidden={ settings.input_newgamepad }>
+                <Card hidden={ !keyboardToGamepad }>
                     <h1>{t('settings.input.keyboardMappingsTitle')}</h1>
                     <p>
                         {
