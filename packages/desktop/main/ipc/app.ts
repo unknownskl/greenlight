@@ -53,6 +53,19 @@ export default class IpcApp extends IpcBase {
         })
     }
 
+    // Microphone permission of the app. Only macOS keeps it per app: elsewhere the system or the browser asks by itself.
+    getMicrophoneAccess(){
+        return Promise.resolve(process.platform === 'darwin' ? electron.systemPreferences.getMediaAccessStatus('microphone') : 'granted')
+    }
+
+    askMicrophoneAccess(){
+        return process.platform === 'darwin' ? electron.systemPreferences.askForMediaAccess('microphone') : Promise.resolve(true)
+    }
+
+    openMicrophoneSettings(){
+        return electron.shell.openExternal('x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone').then(() => true)
+    }
+
     quit(){
         return new Promise<boolean>((resolve) => {
             resolve(true)
