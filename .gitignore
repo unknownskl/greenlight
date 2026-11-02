@@ -1,3 +1,6 @@
+# OS files
+.DS_Store
+
 node_modules/
 packages/docs/.next
 next-env.d.ts
