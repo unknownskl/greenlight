@@ -24,7 +24,7 @@
   "dependencies": {
     "@types/i18next": "^13.0.0",
     "@types/react-i18next": "^8.1.0",
-    "axios": "^1.16.0",
+    "axios": "^1.21.0",
     "compare-versions": "^6.1.1",
     "debug": "^4.3.4",
     "electron-serve": "^3.0.0",
