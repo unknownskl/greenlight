@@ -107,6 +107,8 @@
         "xCloudStreamingBitrateLabel": "xCloud yayın bit hızı",
         "xHomeStreamingBitrateLabel": "xHome yayın bit hızı",
         "showNonEntitledLabel": "Satın alma gerektiren oyunları göster",
+        "streamResolutionLabel": "Yayın çözünürlüğü",
+        "streamResolutionDescription": "Otomatikte çözünürlüğü önceden olduğu gibi konsol veya bulut hizmeti seçer: 1440p ya da 4K UHD'ye ayarlı bir konsol 1440p yayın yapar. xHome'da 1440p için konsolun ekran çözünürlüğünü 1440p veya 4K UHD yapın; xCloud'da Game Pass Ultimate ve desteklenen bir oyun gerekir.",
         "unlimitedLabel": "Sınırsız",
         "mbpsLabel": "Mbps",
         "setH264ProfileLabel": "H.264 profilini ayarla",

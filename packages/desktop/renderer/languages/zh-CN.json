@@ -107,6 +107,8 @@
         "xCloudStreamingBitrateLabel": "xCloud 串流码率",
         "xHomeStreamingBitrateLabel": "xHome 串流码率",
         "showNonEntitledLabel": "显示需要购买的游戏",
+        "streamResolutionLabel": "串流分辨率",
+        "streamResolutionDescription": "自动时与以前一样由主机或云服务决定：显示设置为 1440p 或 4K UHD 的主机会以 1440p 串流。xHome 要使用 1440p，请将主机的显示分辨率设为 1440p 或 4K UHD；xCloud 需要 Game Pass Ultimate 和支持的游戏。",
         "unlimitedLabel": "无限制",
         "mbpsLabel": "Mbps",
         "setH264ProfileLabel": "设置 H.264 配置",

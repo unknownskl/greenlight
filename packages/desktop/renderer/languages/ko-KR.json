@@ -107,6 +107,8 @@
         "xCloudStreamingBitrateLabel": "xCloud 스트리밍 비트레이트",
         "xHomeStreamingBitrateLabel": "xHome 스트리밍 비트레이트",
         "showNonEntitledLabel": "구매가 필요한 게임 표시",
+        "streamResolutionLabel": "스트리밍 해상도",
+        "streamResolutionDescription": "자동에서는 이전처럼 본체나 클라우드 서비스가 선택합니다. 디스플레이가 1440p 또는 4K UHD로 설정된 본체는 1440p로 스트리밍합니다. xHome에서 1440p를 쓰려면 본체의 디스플레이 해상도를 1440p 또는 4K UHD로 설정하세요. xCloud에서는 Game Pass Ultimate와 지원 게임이 필요합니다.",
         "unlimitedLabel": "제한 없음",
         "mbpsLabel": "Mbps",
         "setH264ProfileLabel": "H.264 프로필 설정",
