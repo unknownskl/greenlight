@@ -35,7 +35,7 @@ const LanguageSelector: React.FC = () => {
         style={{ paddingBottom: 20, display: "flex", gap: 10, alignItems: "center", justifyContent: "space-between" }}
       >
         <label htmlFor="language-select">{t("settings.about.selectorSelectLanguage")}:</label>
-        <select id="language-select" value={settings.language || ""} onChange={handleChange}>
+        <select id="language-select" value={settings.language || i18n.language || ""} onChange={handleChange}>
           {languageOptions.map(({ code, name }) => (
             <option key={code} value={code}>
               {name}
