@@ -1,5 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import Ipc from '../lib/ipc'
 import { useTranslation } from 'react-i18next'
 
@@ -17,9 +18,9 @@ function Header({
     level = 0,
 }: HeaderProps) {
     const { t } = useTranslation()
+    const router = useRouter()
 
     // console.log('level:', level)
-    const [activeIndex, setActiveIndex] = React.useState(0);
     const [headerLinks, setHeaderLinks] = React.useState([]);
 
     function createLinks(level){
@@ -69,16 +70,15 @@ function Header({
         ]
     }
 
-    function setMenuActive(id) {
-        setActiveIndex(id);
+    // The active entry follows the current page (same first path segment), however the page was opened
+    function isActive(url: string) {
+        return url.split('/')[1] === router.pathname.split('/')[1]
     }
 
     function drawMenu() {
-        return headerLinks.map((link, idx) => (
-            <li key={idx}>
-                <Link legacyBehavior href={link.url} key={link.url}>
-                    <a title={link.title} onClick={() => setMenuActive(idx)} className={idx === activeIndex ? 'active' : ''}>{link.name}</a>
-                </Link>
+        return headerLinks.map((link) => (
+            <li key={link.url}>
+                <Link href={link.url} title={link.title} className={isActive(link.url) ? 'active' : ''}>{link.name}</Link>
             </li>
         ));
     }
@@ -94,10 +94,9 @@ function Header({
 
     React.useEffect(() => {
         if (!isNaN(level)) {
-            const links = createLinks(level).map((link, idx) => ({ ...link, active: idx === activeIndex }));
-            setHeaderLinks(links);
+            setHeaderLinks(createLinks(level));
         }
-    }, [level, t, activeIndex]);
+    }, [level, t, gamertag]);
 
     return (
         <React.Fragment>
