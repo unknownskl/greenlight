@@ -3,6 +3,7 @@ export const defaultSettings = {
     xcloud_bitrate: 0,
     xcloud_show_non_entitled: true,
     video_profiles: [],
+    stream_resolution: 0,
     preferred_game_language: 'en-US',
     controller_vibration: true,
     video_size: 'default',

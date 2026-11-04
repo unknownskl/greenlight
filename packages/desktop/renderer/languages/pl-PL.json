@@ -92,6 +92,8 @@
         "xHomeStreamingBitrateLabel": "Bitrate Strumieniowania xHome",
         "unlimitedLabel": "Nieskończony / Wył.",
         "mbpsLabel": "mbps",
+        "streamResolutionLabel": "Rozdzielczość streamu",
+        "streamResolutionDescription": "W trybie automatycznym konsola lub usługa w chmurze wybiera sama, jak dotąd: konsola ustawiona na 1440p lub 4K UHD przesyła obraz w 1440p. Aby uzyskać 1440p w xHome, ustaw rozdzielczość ekranu konsoli na 1440p lub 4K UHD; w xCloud potrzebny jest Game Pass Ultimate i obsługiwana gra.",
         "setH264ProfileLabel": "Ustaw Profil H.264",
         "setH264ProfileValueAuto": "Autonegocjacja",
         "setH264ProfileValueHigh": "Wysoki",
