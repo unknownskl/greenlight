@@ -33,7 +33,10 @@ function GameTitleDynamic({
 
     const title = titleData.data?.catalogDetails?.ProductTitle || titleId
     const catalogImage = titleData.data?.catalogDetails?.Image_Tile?.URL
-    const image = catalogImage ? (catalogImage.startsWith('//') ? 'https:'+catalogImage : catalogImage) : '/images/logo.png'
+    let image = '/images/logo.png'
+    if(catalogImage){
+        image = catalogImage.startsWith('//') ? 'https:'+catalogImage : catalogImage
+    }
 
     return (
         <React.Fragment>

@@ -23,7 +23,12 @@ function xCloudInfo() {
     const productName = catalog?.ProductTitle || String(router.query.titleid || '...')
     const { t } = useTranslation()
     const hasEntitlement = productDetails.data?.hasEntitlement === true
-    const imageUrl = (url?:string) => url ? (url.startsWith('//') ? 'https:'+url : url) : '/images/logo.png'
+    const imageUrl = (url?:string) => {
+        if(!url){
+            return '/images/logo.png'
+        }
+        return url.startsWith('//') ? 'https:'+url : url
+    }
 
     return (
         <React.Fragment>
@@ -37,7 +42,7 @@ function xCloudInfo() {
                 <Link href={ '/xcloud/info/'+router.query.titleid }>{productName}</Link>
             </BreadcrumbBar>
 
-            {(productDetails.isLoading) ? <React.Fragment><Loader></Loader></React.Fragment> : <React.Fragment>
+            {(productDetails.isLoading) ? <Loader /> : <React.Fragment>
                 <div id="page_info_background" style={{
                     background: 'linear-gradient(0deg, rgba(26,27,30,0.7) 0%, rgba(26,27,30,0.7) 90%, rgba(26,27,30,0.7) 100%), url('+imageUrl(catalog?.Image_Hero?.URL)+')',
                     backgroundPosition: 'center',
