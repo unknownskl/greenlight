@@ -36,6 +36,8 @@ export default class TitleManager {
     _xCloudTitles = {}
     _productIdQueue:string[] = []
     _catalogRefresh:Promise<void> = Promise.resolve()
+    _catalogGeneration = 0
+    _catalogIsRefreshing = false
 
     _xCloudRecentTitles = {}
     _xCloudRecentTitlesLastUpdate = 0
@@ -47,8 +49,11 @@ export default class TitleManager {
 
     setCloudTitles(titles){
         this._xCloudTitles = {}
+        const generation = ++this._catalogGeneration
+        this._catalogIsRefreshing = false
 
         const entitledProductIds = []
+        const otherProductIds = []
         for(const rawTitle of Object.values(titles.results || {}) as TitleDetails[]){
             if(!rawTitle?.titleId){
                 this._application.log('TitleManager', 'Ignoring title without a title ID:', rawTitle)
@@ -61,18 +66,21 @@ export default class TitleManager {
             if(titleItem.productId){
                 if(titleItem.hasEntitlement){
                     entitledProductIds.push(titleItem.productId)
+                } else {
+                    otherProductIds.push(titleItem.productId)
                 }
             }
         }
 
-        // The default library only shows entitled titles. Restricting enrichment
-        // to those products avoids requesting metadata for thousands of entries
-        // that cannot be launched by the current user.
-        this._productIdQueue = Array.from(new Set(entitledProductIds))
+        // Enrich every title, prioritising playable titles for the default view.
+        this._productIdQueue = Array.from(new Set([...entitledProductIds, ...otherProductIds]))
 
-        const cachedCatalog = this._store.get('xcloud_catalog_cache', {}) as Record<string, titleInfoArgs>
-        if(cachedCatalog && Object.keys(cachedCatalog).length > 0){
+        let cachedCatalog:Record<string, titleInfoArgs> = {}
+        try {
+            cachedCatalog = this._store.get('xcloud_catalog_cache', {}) as Record<string, titleInfoArgs> || {}
             this.populateTitleInfo(cachedCatalog)
+        } catch(error) {
+            this._application.log('TitleManager', 'Unable to read title cache:', error)
         }
 
         if(this._productIdQueue.length === 0){
@@ -87,11 +95,16 @@ export default class TitleManager {
             return this.findTitleByProductId(productId)?.catalogDetails !== undefined
         })
 
+        this._catalogIsRefreshing = true
         this._catalogRefresh = this.refreshCatalog([
             ...uncachedProductIds,
             ...cachedProductIds,
-        ], cachedCatalog).catch((error) => {
+        ], cachedCatalog, generation).catch((error) => {
             this._application.log('TitleManager', 'Unable to refresh title cache:', error)
+        }).finally(() => {
+            if(generation === this._catalogGeneration){
+                this._catalogIsRefreshing = false
+            }
         })
 
         return this._catalogRefresh
@@ -101,7 +114,7 @@ export default class TitleManager {
         return this._catalogRefresh
     }
 
-    async refreshCatalog(productIds:string[], cachedCatalog:Record<string, titleInfoArgs>){
+    async refreshCatalog(productIds:string[], cachedCatalog:Record<string, titleInfoArgs>, generation = this._catalogGeneration){
         const batches:string[][] = []
         for(let i = 0; i < productIds.length; i += CATALOG_BATCH_SIZE) {
             batches.push(productIds.slice(i, i + CATALOG_BATCH_SIZE))
@@ -111,18 +124,25 @@ export default class TitleManager {
         let nextBatch = 0
 
         const processNextBatch = async ():Promise<void> => {
+            if(generation !== this._catalogGeneration){
+                return
+            }
             const batch = batches[nextBatch++]
             if(batch === undefined){
                 return
             }
 
-            await this.processCatalogBatch(batch, allProducts)
+            await this.processCatalogBatch(batch, allProducts, generation)
             return processNextBatch()
         }
 
         const workers = Array.from({ length: Math.min(CATALOG_CONCURRENCY, batches.length) }, processNextBatch)
 
         await Promise.all(workers)
+
+        if(generation !== this._catalogGeneration){
+            return
+        }
 
         const currentProductIds = new Set(productIds)
         const productsToCache = Object.entries({ ...cachedCatalog, ...allProducts }).reduce((current, [key, product]:[string, titleInfoArgs]) => {
@@ -135,7 +155,7 @@ export default class TitleManager {
         this._store.set('xcloud_catalog_cache', productsToCache)
     }
 
-    async processCatalogBatch(batch:string[], allProducts:Record<string, titleInfoArgs>):Promise<void>{
+    async processCatalogBatch(batch:string[], allProducts:Record<string, titleInfoArgs>, generation = this._catalogGeneration):Promise<void>{
         try {
             const result:any = await this._http.post('catalog.gamepass.com', '/v3/products?market=US&language=en-US&hydration=RemoteHighSapphire0', {
                 'Products': batch,
@@ -144,6 +164,10 @@ export default class TitleManager {
                 'calling-app-name': 'Xbox Cloud Gaming Web',
                 'calling-app-version': '21.0.0',
             })
+
+            if(generation !== this._catalogGeneration){
+                return
+            }
 
             if(result?.Products && typeof result.Products === 'object'){
                 Object.assign(allProducts, result.Products)

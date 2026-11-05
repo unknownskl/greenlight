@@ -74,7 +74,7 @@ export default class IpcxCloud extends IpcBase {
             const entitledTitles = []
 
             for(const item of Object.values(titles.results || {}) as any[]){
-                if(item.titleId){
+                if(item?.titleId){
                     allTitles.push(item.titleId)
                     if(item.details?.hasEntitlement || item.details?.isFreeInStore){
                         entitledTitles.push(item.titleId)
@@ -145,7 +145,7 @@ export default class IpcxCloud extends IpcBase {
             return this._entitledTitles.length > 0 ? this._entitledTitles : this._titleManager.getTitles(true)
         }
 
-        return this.filterTitlesByEntitlement(this._titles, args.showNonEntitled)
+        return this.filterTitlesByEntitlement(this._titles, args?.showNonEntitled)
     }
 
     filterTitlesByEntitlement(titles, showNonEntitled = true){
@@ -190,7 +190,7 @@ export default class IpcxCloud extends IpcBase {
             this._newTitlesLastUpdate = Date.now()
         }
 
-        return this.filterTitlesByEntitlement(this._newTitles, args.showNonEntitled)
+        return this.filterTitlesByEntitlement(this._newTitles, args?.showNonEntitled)
     }
 
     async getTitle(args:getTitleArgs){
@@ -198,12 +198,10 @@ export default class IpcxCloud extends IpcBase {
             await this.loadTitles()
         }
 
-        let title = this._titleManager.findTitle(args.titleId)
-        if(title?.catalogDetails === undefined){
-            await this._titleManager.waitForCatalog()
-            title = this._titleManager.findTitle(args.titleId)
-        }
-
-        return title
+        const title = this._titleManager.findTitle(args.titleId)
+        return title ? {
+            ...title,
+            catalogPending: this._titleManager._catalogIsRefreshing && !title.catalogDetails,
+        } : undefined
     }
 }

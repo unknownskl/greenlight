@@ -12,6 +12,7 @@ interface GameTitleProps {
 
 interface titleDataState {
     titleId?: string;
+    catalogPending?: boolean;
     hasEntitlement?: boolean;
     catalogDetails?: {
         ProductTitle: string;
@@ -24,12 +25,15 @@ interface titleDataState {
 function GameTitleDynamic({
     titleId,
 }: GameTitleProps) {
-    const titleData = useQuery<titleDataState>('titledynamic_titleId_'+titleId, () => Ipc.send('xCloud', 'getTitle', { titleId: titleId }), { staleTime: 300*1000 })
+    const titleData = useQuery<titleDataState>('titledynamic_titleId_'+titleId, () => Ipc.send('xCloud', 'getTitle', { titleId: titleId }), {
+        staleTime: 300*1000,
+        refetchInterval: (data) => data?.catalogPending ? 2000 : false,
+    })
     const { t } = useTranslation()
 
     const title = titleData.data?.catalogDetails?.ProductTitle || titleId
     const catalogImage = titleData.data?.catalogDetails?.Image_Tile?.URL
-    const image = catalogImage ? 'https:'+catalogImage : '/images/logo.png'
+    const image = catalogImage ? (catalogImage.startsWith('//') ? 'https:'+catalogImage : catalogImage) : '/images/logo.png'
 
     return (
         <React.Fragment>
@@ -38,7 +42,7 @@ function GameTitleDynamic({
                     <Link href={ '/xcloud/info/'+titleId } title={t("page.xCloudLibrary.viewGamePageIcon")}><i className="fa-solid fa-info" /></Link>
                 </div>
 
-                { (titleData.isFetched === true && titleData.data?.titleId !== undefined) ? <Link href={ titleData.data?.hasEntitlement === false ? `/xcloud/info/${ titleId }` : `/stream/xcloud_${ titleId }` }>
+                { (titleData.isLoading !== true) ? <Link href={ titleData.data?.hasEntitlement !== true ? `/xcloud/info/${ titleId }` : `/stream/xcloud_${ titleId }` }>
 
                     <Image
                         src={ image }

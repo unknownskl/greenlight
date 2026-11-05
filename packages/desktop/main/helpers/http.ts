@@ -81,6 +81,8 @@ export default class Http {
                 method: 'POST',
                 headers: mergedHeaders,
             }, (response:any) => {
+                response.on('error', reject)
+                response.on('aborted', () => reject(new Error('HTTP response aborted')))
 
                 response.on('data', (data:any) => {
                     responseData += data
@@ -109,9 +111,13 @@ export default class Http {
                 })
             })
 
-            req.setTimeout(REQUEST_TIMEOUT, () => {
-                req.destroy(new Error('HTTP request timed out'))
-            })
+            // A deadline also covers DNS/connect stalls and trickling responses.
+            const timeout = setTimeout(() => {
+                const error = new Error('HTTP request timed out')
+                req.destroy(error)
+                reject(error)
+            }, REQUEST_TIMEOUT)
+            req.on('close', () => clearTimeout(timeout))
 
             req.on('error', (error) => {
                 reject(error)
