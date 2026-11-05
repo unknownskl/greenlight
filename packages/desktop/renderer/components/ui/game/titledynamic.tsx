@@ -12,6 +12,7 @@ interface GameTitleProps {
 
 interface titleDataState {
     titleId?: string;
+    catalogPending?: boolean;
     hasEntitlement?: boolean;
     catalogDetails?: {
         ProductTitle: string;
@@ -24,8 +25,18 @@ interface titleDataState {
 function GameTitleDynamic({
     titleId,
 }: GameTitleProps) {
-    const titleData = useQuery<titleDataState>('titledynamic_titleId_'+titleId, () => Ipc.send('xCloud', 'getTitle', { titleId: titleId }), { staleTime: 300*1000 })
+    const titleData = useQuery<titleDataState>('titledynamic_titleId_'+titleId, () => Ipc.send('xCloud', 'getTitle', { titleId: titleId }), {
+        staleTime: 300*1000,
+        refetchInterval: (data) => data?.catalogPending ? 2000 : false,
+    })
     const { t } = useTranslation()
+
+    const title = titleData.data?.catalogDetails?.ProductTitle || titleId
+    const catalogImage = titleData.data?.catalogDetails?.Image_Tile?.URL
+    let image = '/images/logo.png'
+    if(catalogImage){
+        image = catalogImage.startsWith('//') ? 'https:'+catalogImage : catalogImage
+    }
 
     return (
         <React.Fragment>
@@ -34,18 +45,19 @@ function GameTitleDynamic({
                     <Link href={ '/xcloud/info/'+titleId } title={t("page.xCloudLibrary.viewGamePageIcon")}><i className="fa-solid fa-info" /></Link>
                 </div>
 
-                { (titleData.isFetched === true && titleData.data?.titleId !== undefined) ? <Link href={ titleData.data?.hasEntitlement === false ? `/xcloud/info/${ titleId }` : `/stream/xcloud_${ titleId }` }>
+                { (titleData.isLoading !== true) ? <Link href={ titleData.data?.hasEntitlement !== true ? `/xcloud/info/${ titleId }` : `/stream/xcloud_${ titleId }` }>
 
                     <Image
-                        src={ titleData.data.catalogDetails?.Image_Tile?.URL ? ('https:'+titleData.data.catalogDetails.Image_Tile.URL) : '' }
-                        alt={ titleData.data.catalogDetails?.ProductTitle || titleId }
+                        src={ image }
+                        alt={ title }
                         width='280' height='280' style={{
                             width: 140,
                             height: 140,
                             borderRadius: '4px',
+                            objectFit: 'contain',
                         }} ></Image>
 
-                    <div className='component_gametitle_title'><p>{ titleData.data.catalogDetails?.ProductTitle || titleId }</p></div>
+                    <div className='component_gametitle_title'><p>{ title }</p></div>
                 </Link> : <Loader></Loader> }
             </div>
         </React.Fragment>

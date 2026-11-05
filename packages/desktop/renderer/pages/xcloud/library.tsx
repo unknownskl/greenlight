@@ -30,7 +30,7 @@ function xCloudLibrary() {
     const titlesQuery = useQuery(
         ['xCloudTitles', trimmedSearch, gamePassOnly],
         () => Ipc.send('xCloud', 'filterTitles', { name: trimmedSearch, onlyEntitled: gamePassOnly }),
-        { staleTime: 60 * 1000, keepPreviousData: true }
+        { staleTime: 60 * 1000, keepPreviousData: true, refetchInterval: trimmedSearch ? 2000 : false }
     )
 
     const titles: string[] = titlesQuery.data || []
