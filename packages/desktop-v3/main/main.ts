@@ -13,7 +13,15 @@ if (isProd) {
   app.setPath('userData', `${app.getPath('userData')} (development)`)
 }
 
-;(async () => {
+app.on('window-all-closed', () => {
+  app.quit()
+})
+
+ipcMain.on('message', async (event, arg) => {
+  event.reply('message', `${arg} World!`)
+})
+
+try {
   setupTrpcHandler()
   await app.whenReady()
 
@@ -28,28 +36,12 @@ if (isProd) {
   if (isProd) {
     await mainWindow.loadURL('app://./home')
   } else {
-    let devServerUrl: URL
-
-    try {
-      devServerUrl = buildDevServerUrl(process.argv[2])
-    } catch (error) {
-      console.error(error instanceof Error ? error.message : error)
-      app.quit()
-      return
-    }
+    const devServerUrl = buildDevServerUrl(process.argv[2])
 
     await mainWindow.loadURL(devServerUrl.toString())
     mainWindow.webContents.openDevTools()
   }
-})().catch((error) => {
+} catch (error) {
   console.error('Failed to start Greenlight:', error)
   app.quit()
-})
-
-app.on('window-all-closed', () => {
-  app.quit()
-})
-
-ipcMain.on('message', async (event, arg) => {
-  event.reply('message', `${arg} World!`)
-})
+}

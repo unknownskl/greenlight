@@ -1,0 +1,28 @@
+{
+  "regions": [
+    {
+      "ip": "203.41.44.20",
+      "label": "settings.streaming.setRegionValueAustralia"
+    },
+    {
+      "ip": "200.221.11.101",
+      "label": "settings.streaming.setRegionValueBrazil"
+    },
+    {
+      "ip": "194.25.0.68",
+      "label": "settings.streaming.setRegionValueEurope"
+    },
+    {
+      "ip": "122.1.0.154",
+      "label": "settings.streaming.setRegionValueJapan"
+    },
+    {
+      "ip": "203.253.64.1",
+      "label": "settings.streaming.setRegionValueKorea"
+    },
+    {
+      "ip": "4.2.2.2",
+      "label": "settings.streaming.setRegionValueUS"
+    }
+  ]
+}

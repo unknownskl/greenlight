@@ -1,5 +1,5 @@
 const DEV_SERVER_ORIGIN = 'http://localhost'
-const DEV_SERVER_PORT_PATTERN = /^[0-9]{1,5}$/
+const DEV_SERVER_PORT_PATTERN = /^\d{1,5}$/
 const MIN_PORT = 1
 const MAX_PORT = 65535
 

@@ -571,7 +571,7 @@ jobs:
 
       - name: Upload static files as artifact
         id: deployment-pages
-        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5 # or specific "vX.X.X" version tag for this action
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5
         with:
           path: packages/docs/out/
 
