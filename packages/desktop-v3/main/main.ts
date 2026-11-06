@@ -2,6 +2,7 @@ import path from 'path'
 import { app, ipcMain } from 'electron'
 import serve from 'electron-serve'
 import { createWindow } from './helpers/create-window'
+import { buildDevServerUrl } from './helpers/dev-server-url'
 import { setupTrpcHandler } from './trpc-handler'
 
 const isProd = process.env.NODE_ENV === 'production'
@@ -27,11 +28,23 @@ if (isProd) {
   if (isProd) {
     await mainWindow.loadURL('app://./home')
   } else {
-    const port = process.argv[2]
-    await mainWindow.loadURL(`http://localhost:${port}/home`)
+    let devServerUrl: URL
+
+    try {
+      devServerUrl = buildDevServerUrl(process.argv[2])
+    } catch (error) {
+      console.error(error instanceof Error ? error.message : error)
+      app.quit()
+      return
+    }
+
+    await mainWindow.loadURL(devServerUrl.toString())
     mainWindow.webContents.openDevTools()
   }
-})()
+})().catch((error) => {
+  console.error('Failed to start Greenlight:', error)
+  app.quit()
+})
 
 app.on('window-all-closed', () => {
   app.quit()

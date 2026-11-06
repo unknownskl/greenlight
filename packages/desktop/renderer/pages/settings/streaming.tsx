@@ -10,6 +10,19 @@ import { useTranslation } from 'react-i18next'
 import { useSettings } from '../../context/userContext'
 
 
+// Public xCloud STACK endpoints, one per region. The address is sent as the
+// `X-Forwarded-For` header to pin the authentication flow to a region, so it
+// has to be an IP address instead of a hostname.
+const REGION_IPS = [
+    { ip: '203.41.44.20', label: 'settings.streaming.setRegionValueAustralia' },
+    { ip: '200.221.11.101', label: 'settings.streaming.setRegionValueBrazil' },
+    { ip: '194.25.0.68', label: 'settings.streaming.setRegionValueEurope' },
+    { ip: '122.1.0.154', label: 'settings.streaming.setRegionValueJapan' },
+    { ip: '203.253.64.1', label: 'settings.streaming.setRegionValueKorea' },
+    { ip: '4.2.2.2', label: 'settings.streaming.setRegionValueUS' },
+]
+
+
 function SettingsStreaming() {
     const { settings, setSettings} = useSettings()
     const { t } = useTranslation()
@@ -120,12 +133,9 @@ function SettingsStreaming() {
                         <label>{t('settings.streaming.setRegionLabel')}</label>
                         <select value={ settings.force_region_ip || '' } onChange={ (e) => setForceRegionIp(e.target.value) }>
                             <option value="">{t('settings.streaming.setRegionValueDisabled')}</option>
-                            <option value="203.41.44.20">{t('settings.streaming.setRegionValueAustralia')}</option>
-                            <option value="200.221.11.101">{t('settings.streaming.setRegionValueBrazil')}</option>
-                            <option value="194.25.0.68">{t('settings.streaming.setRegionValueEurope')}</option>
-                            <option value="122.1.0.154">{t('settings.streaming.setRegionValueJapan')}</option>
-                            <option value="203.253.64.1">{t('settings.streaming.setRegionValueKorea')}</option>
-                            <option value="4.2.2.2">{t('settings.streaming.setRegionValueUS')}</option>
+                            {REGION_IPS.map((region) => (
+                                <option key={region.ip} value={region.ip}>{t(region.label)}</option>
+                            ))}
                         </select>
                     </p>
                     <p>

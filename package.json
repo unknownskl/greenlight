@@ -20,7 +20,7 @@
     "build:depsv3": "yarn logger build && yarn player build && yarn platform build",
     "build:pages": "yarn build:depsv3 && yarn pages build",
     "deploy:pages": "yarn pages deploy",
-    "test:v3": "yarn logger test && yarn platform test"
+    "test:v3": "yarn logger test && yarn platform test && yarn desktopv3 test"
   },
   "workspaces": [
     "packages/logger",
