@@ -29,11 +29,20 @@
     display: none;
 }
 
-#component_header a#actionBarLogo {
+#component_header #actionBarLogo {
     float: left;
     color: #ffffff;
+
+    /* Reset the native button chrome so the logo looks exactly like the
+       anchor it replaced. */
+    background: none;
+    border: none;
+    padding: 0px;
+    margin: 0px;
+    font: inherit;
+    cursor: pointer;
 }
-#component_header a#actionBarLogo svg {
+#component_header #actionBarLogo svg {
     fill: #ffffff;
     padding: 19px;
     opacity: 0.5;
@@ -41,7 +50,7 @@
     cursor: pointer;
 }
 
-#component_header a#actionBarLogo i {
+#component_header #actionBarLogo i {
     fill: #ffffff;
     padding: 19px;
     opacity: 0.5;
@@ -50,7 +59,7 @@
     cursor: pointer;
 }
 
-#component_header a#actionBarLogo:hover img, #component_header a#actionBarLogo:hover svg, #component_header a#actionBarLogo:hover i {
+#component_header #actionBarLogo:hover img, #component_header #actionBarLogo:hover svg, #component_header #actionBarLogo:hover i {
     opacity: 1;
 }
 

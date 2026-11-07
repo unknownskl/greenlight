@@ -3,6 +3,23 @@ export type { xStreamToken, startStreamResponse, SDPResponse, xCloudStreamConfig
 
 export const ping = () => 'pong';
 
+/**
+ * Error thrown when a request against the streaming API fails.
+ *
+ * The payload of the failure is kept on the `error` property, so consumers
+ * that inspect it keep working, while the rejection itself is a proper
+ * `Error` instance with a meaningful message and stack trace.
+ */
+class HttpRequestError extends Error implements ErrorResponse {
+    error: any
+
+    constructor(error: any) {
+        super('Request to the streaming API failed')
+        this.name = 'HttpRequestError'
+        this.error = error
+    }
+}
+
 export const startStream = async (xStreamToken:xStreamToken, xCloudStreamConfig:xCloudStreamConfig) => {
     return await httpPost<startStreamResponse>(xStreamToken, xCloudStreamConfig, '/v5/sessions/'+xCloudStreamConfig.type+'/play', JSON.stringify({
         clientSessionId: '',
@@ -130,7 +147,7 @@ const httpGet = async <T>(xStreamToken:xStreamToken, xCloudStreamConfig:xCloudSt
             },
         })
     } catch (error) {
-        throw { error: error } as ErrorResponse
+        throw new HttpRequestError(error)
     }
 
     if(response.ok === true){
@@ -142,16 +159,14 @@ const httpGet = async <T>(xStreamToken:xStreamToken, xCloudStreamConfig:xCloudSt
                 return { status: response.status } as StatusResponse
             }
 
-            throw { error: error } as ErrorResponse
+            throw new HttpRequestError(error)
         }
     }
 
-    throw {
-        error: {
-            satus: response.status,
-            data: response
-        }
-    } as ErrorResponse
+    throw new HttpRequestError({
+        satus: response.status,
+        data: response
+    })
 }
 
 const httpPost = async <T>(xStreamToken:xStreamToken, xCloudStreamConfig:xCloudStreamConfig, url:string, body:string, headers = {}): Promise<T | StatusResponse | ErrorResponse> => {
@@ -172,7 +187,7 @@ const httpPost = async <T>(xStreamToken:xStreamToken, xCloudStreamConfig:xCloudS
             body: body,
         })
     } catch (error) {
-        throw { error: error } as ErrorResponse
+        throw new HttpRequestError(error)
     }
 
     if(response.ok === true){
@@ -184,16 +199,14 @@ const httpPost = async <T>(xStreamToken:xStreamToken, xCloudStreamConfig:xCloudS
                 return { status: response.status } as StatusResponse
             }
 
-            throw { error: error } as ErrorResponse
+            throw new HttpRequestError(error)
         }
     }
 
-    throw {
-        error: {
-            satus: response.status,
-            data: response.body
-        }
-    } as ErrorResponse
+    throw new HttpRequestError({
+        satus: response.status,
+        data: response.body
+    })
 }
 
 const getDeviceInfo = (xCloudStreamConfig:xCloudStreamConfig) => {

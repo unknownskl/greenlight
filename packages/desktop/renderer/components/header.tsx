@@ -92,13 +92,6 @@ function Header({
         }
     }
 
-    function handleLogoKeyDown(e: React.KeyboardEvent<HTMLAnchorElement>) {
-        if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault()
-            confirmQuit()
-        }
-    }
-
     React.useEffect(() => {
         if (!isNaN(level)) {
             const links = createLinks(level).map((link, idx) => ({ ...link, active: idx === activeIndex }));
@@ -109,9 +102,9 @@ function Header({
     return (
         <React.Fragment>
             <div id="component_header" className={hidden === true ? 'disabled' : ''}>
-                <a onClick={ confirmQuit } onKeyDown={ handleLogoKeyDown } id="actionBarLogo" title={t('header.home')} role="button" tabIndex={0}>
+                <button type="button" onClick={ confirmQuit } id="actionBarLogo" title={t('header.home')}>
                     <i className="fa-brands fa-xbox"></i>
-                </a>
+                </button>
 
                 <ul className="menu">
                     { drawMenu() }
