@@ -276,4 +276,6 @@ export default class Application {
     }
 }
 
-new Application()
+// Bootstrap the app. The Application constructor performs all startup side effects,
+// so the instance is assigned (and exported) instead of being discarded.
+export const application = new Application()

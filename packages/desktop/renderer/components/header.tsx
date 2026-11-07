@@ -77,7 +77,7 @@ function Header({
         return headerLinks.map((link, idx) => (
             <li key={idx}>
                 <Link legacyBehavior href={link.url} key={link.url}>
-                    <a title={link.title} onClick={() => setMenuActive(idx)} className={idx === activeIndex ? 'active' : ''}>{link.name}</a>
+                    <a href={link.url} title={link.title} onClick={() => setMenuActive(idx)} className={idx === activeIndex ? 'active' : ''}>{link.name}</a>
                 </Link>
             </li>
         ));
@@ -92,6 +92,13 @@ function Header({
         }
     }
 
+    function handleLogoKeyDown(e: React.KeyboardEvent<HTMLAnchorElement>) {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            confirmQuit()
+        }
+    }
+
     React.useEffect(() => {
         if (!isNaN(level)) {
             const links = createLinks(level).map((link, idx) => ({ ...link, active: idx === activeIndex }));
@@ -102,7 +109,7 @@ function Header({
     return (
         <React.Fragment>
             <div id="component_header" className={hidden === true ? 'disabled' : ''}>
-                <a onClick={ confirmQuit } id="actionBarLogo" title={t('header.home')}>
+                <a onClick={ confirmQuit } onKeyDown={ handleLogoKeyDown } id="actionBarLogo" title={t('header.home')} role="button" tabIndex={0}>
                     <i className="fa-brands fa-xbox"></i>
                 </a>
 
