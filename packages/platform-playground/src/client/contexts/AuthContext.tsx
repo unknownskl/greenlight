@@ -87,7 +87,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsAuthenticating(false);
     };
     
-    loadAuthState();
+    loadAuthState().catch((error) => {
+      console.error('Failed to load auth state:', error);
+    });
   }, []);
 
   // Save only userToken to localStorage (not web/streaming tokens)

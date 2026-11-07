@@ -45,7 +45,7 @@ div#component_streamcomponent_debug_text {
     height: 500px;
     width: 20vw;
     overflow-y: auto;
-    overflow-x: none;
+    overflow-x: hidden;
     margin-top: 5px;
     margin-left: 10px;
     margin-bottom: 5px;

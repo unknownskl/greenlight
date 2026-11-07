@@ -5,6 +5,7 @@ import MessageHandler from './message/handler'
 
 export default class MessageChannel extends Channel {
     _handshakeCompleted = false
+    _messageHandler:MessageHandler | undefined
 
     getChannelName() {
         return 'message'
@@ -44,7 +45,9 @@ export default class MessageChannel extends Channel {
 
             case 'TransactionStart':
             case 'Message':
-                new MessageHandler(this, data)
+                // The MessageHandler constructor processes the message itself.
+                // Keep a reference to the instance so it is not discarded right after creation.
+                this._messageHandler = new MessageHandler(this, data)
                 break
 
             default:

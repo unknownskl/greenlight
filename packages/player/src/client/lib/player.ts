@@ -71,7 +71,7 @@ export default class xCloudPlayer {
             offerToReceiveVideo: true,
         })
         const finalOffer = this._sdpHelper.setLocalSDP(offer)
-        this._peerConnection.setLocalDescription(finalOffer)
+        await this._peerConnection.setLocalDescription(finalOffer)
 
         return finalOffer
     }
