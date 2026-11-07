@@ -2,6 +2,7 @@ import path from 'path'
 import { app, ipcMain } from 'electron'
 import serve from 'electron-serve'
 import { createWindow } from './helpers/create-window'
+import { buildDevServerUrl } from './helpers/dev-server-url'
 import { setupTrpcHandler } from './trpc-handler'
 
 const isProd = process.env.NODE_ENV === 'production'
@@ -12,7 +13,15 @@ if (isProd) {
   app.setPath('userData', `${app.getPath('userData')} (development)`)
 }
 
-;(async () => {
+app.on('window-all-closed', () => {
+  app.quit()
+})
+
+ipcMain.on('message', async (event, arg) => {
+  event.reply('message', `${arg} World!`)
+})
+
+try {
   setupTrpcHandler()
   await app.whenReady()
 
@@ -27,16 +36,12 @@ if (isProd) {
   if (isProd) {
     await mainWindow.loadURL('app://./home')
   } else {
-    const port = process.argv[2]
-    await mainWindow.loadURL(`http://localhost:${port}/home`)
+    const devServerUrl = buildDevServerUrl(process.argv[2])
+
+    await mainWindow.loadURL(devServerUrl.toString())
     mainWindow.webContents.openDevTools()
   }
-})()
-
-app.on('window-all-closed', () => {
+} catch (error) {
+  console.error('Failed to start Greenlight:', error)
   app.quit()
-})
-
-ipcMain.on('message', async (event, arg) => {
-  event.reply('message', `${arg} World!`)
-})
+}

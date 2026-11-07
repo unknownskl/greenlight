@@ -8,6 +8,9 @@ const PORT = process.env.PORT || 3000;
 // Express server for additional flexibility
 const app = express();
 
+// Do not disclose the framework and its version in the response headers
+app.disable('x-powered-by');
+
 // Enable CORS for development
 app.use(cors({
   origin: 'http://localhost:5173',

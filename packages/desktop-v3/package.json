@@ -15,6 +15,7 @@
     "dev:web": "cd renderer && BUILD_TARGET=web next build && cd ../ && npx wrangler pages dev",
     "build": "nextron build",
     "build:web": "cd renderer && BUILD_TARGET=web next build",
+    "test": "tsx scripts/verify-dev-server-url.ts",
     "postinstall": "electron-builder install-app-deps"
   },
   "dependencies": {
@@ -39,6 +40,7 @@
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "tailwindcss": "^4.2.2",
+    "tsx": "^4.21.0",
     "typescript": "^5.7.3"
   }
 }

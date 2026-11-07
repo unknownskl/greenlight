@@ -48,7 +48,10 @@ export default {
     },
 
     websocketFallbackApi(){
-        const websocket = new WebsocketIPC('ws://'+window.location.hostname+':'+window.location.port+'/ipc')
+        // Derive the websocket scheme from the scheme the page was served over,
+        // so a secure page always uses an encrypted websocket connection.
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+        const websocket = new WebsocketIPC(`${protocol}//${window.location.host}/ipc`)
 
         console.log('Injecting Greenlight Websocker IPC')
 
