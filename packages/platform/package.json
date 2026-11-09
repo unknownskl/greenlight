@@ -13,7 +13,7 @@
     "dev:test": "start-server-and-test 'wrangler dev --local' http://127.0.0.1:8787 'tsx src/client.ts'"
   },
   "dependencies": {
-    "@cloudflare/workers-types": "^4.20260518.1",
+    "@cloudflare/workers-types": "^5.20261106.1",
     "@trpc/server": "^11.11.0",
     "wrangler": "^4.140.0",
     "xal-node": "^1.1.6-beta2",
