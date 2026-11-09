@@ -1,6 +1,8 @@
 import https from 'https'
 import Application from '../application'
 
+const REQUEST_TIMEOUT = 10*1000
+
 export default class Http {
 
     _application:Application
@@ -79,6 +81,8 @@ export default class Http {
                 method: 'POST',
                 headers: mergedHeaders,
             }, (response:any) => {
+                response.on('error', reject)
+                response.on('aborted', () => reject(new Error('HTTP response aborted')))
 
                 response.on('data', (data:any) => {
                     responseData += data
@@ -94,7 +98,7 @@ export default class Http {
                         } catch(error){
                             // Data is not JSON..
                         }
-                        
+
                         resolve(returnData)
                     } else {
                         this._application.log('HTTP', 'post('+url+') reject:', response.statusCode)
@@ -106,6 +110,14 @@ export default class Http {
                     }
                 })
             })
+
+            // A deadline also covers DNS/connect stalls and trickling responses.
+            const timeout = setTimeout(() => {
+                const error = new Error('HTTP request timed out')
+                req.destroy(error)
+                reject(error)
+            }, REQUEST_TIMEOUT)
+            req.on('close', () => clearTimeout(timeout))
 
             req.on('error', (error) => {
                 reject(error)

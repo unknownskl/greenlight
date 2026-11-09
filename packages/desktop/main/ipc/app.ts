@@ -139,6 +139,7 @@ export default class IpcApp extends IpcBase {
 
     async debug(){
         const returnValue = []
+        const formatLastUpdate = (timestamp:number) => timestamp > 0 ? new Date(timestamp).toISOString() : 'Never'
 
         const gpuInfo = await electron.app.getGPUInfo('complete')
 
@@ -157,9 +158,9 @@ export default class IpcApp extends IpcBase {
             name: 'xCloud',
             data: [
                 { name: 'Titles in cache', value: this._application._ipc._channels.xCloud._titles.length },
-                { name: 'Titles last update', value: this._application._ipc._channels.xCloud._titlesLastUpdate },
+                { name: 'Titles last update', value: formatLastUpdate(this._application._ipc._channels.xCloud._titlesLastUpdate) },
                 { name: 'Recent titles in cache', value: this._application._ipc._channels.xCloud._recentTitles.length },
-                { name: 'Recent titles last update', value: this._application._ipc._channels.xCloud._recentTitlesLastUpdate },
+                { name: 'Recent titles last update', value: formatLastUpdate(this._application._ipc._channels.xCloud._recentTitlesLastUpdate) },
                 { name: '', value: ''},
                 { name: 'Titlemanager titles loaded', value: Object.keys(this._application._ipc._channels.xCloud._titleManager._xCloudTitles).length },
 
