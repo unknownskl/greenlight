@@ -59,7 +59,11 @@ export default class IpcSettings extends IpcBase {
                     settings.app_lowresolution = false
                 }
 
-                this.setSettings(settings)
+                this.setSettings(settings).catch((error) => {
+                    console.error('ERROR: Failed to save low resolution setting:', error)
+                })
+            }).catch((error) => {
+                console.error('ERROR: Failed to retrieve settings:', error)
             })
 
 

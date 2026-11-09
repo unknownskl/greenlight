@@ -32,12 +32,18 @@ export const defaultOptions: Options = {
 export function setUpdateNotification(options: Options = defaultOptions, logger) {
     const withDefaults = Object.assign(defaultOptions, options)
 
-    if (electron.app.isReady()) {
-        checkForUpdates(withDefaults, logger)
-    } else {
-        electron.app.on('ready', () => {
-            checkForUpdates(withDefaults, logger)
+    // The update check runs detached from the caller, so log any error it may raise.
+    const runUpdateCheck = () => {
+        checkForUpdates(withDefaults, logger).catch((error) => {
+            console.error(error)
+            logger.log('updater', __filename+'[setUpdateNotification()] Error while checking for updates:', error)
         })
+    }
+
+    if (electron.app.isReady()) {
+        runUpdateCheck()
+    } else {
+        electron.app.on('ready', runUpdateCheck)
     }
 }
 

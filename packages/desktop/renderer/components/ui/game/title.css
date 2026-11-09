@@ -21,7 +21,6 @@ div.component_gametitle div.component_gametitle_title {
     right: 0px;
     bottom: 3px;
     z-index: 50;
-    opacity: 1;
     min-height: 100px;
     vertical-align: bottom;
     border-radius: 4px;
