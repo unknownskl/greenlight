@@ -175,7 +175,7 @@ function Stream() {
                                 ui_systemui: [],
                                 input_touch: settings.input_touch || false,
                                 input_mousekeyboard: settings.input_mousekeyboard || false,
-                                input_legacykeyboard: (settings.input_newgamepad) ? false : true,
+                                input_legacykeyboard: !(settings.input_newgamepad || settings.input_mousekeyboard),
                                 input_mousekeyboard_config: settings.input_mousekeyboard_config !== undefined ? {
                                     _keymapping: settings.input_mousekeyboard_config,
                                 } : undefined as any,
