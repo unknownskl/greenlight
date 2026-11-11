@@ -50,7 +50,7 @@
       },
 
       "input": {
-        "settingsInputPageTitle": "Settings: Input",
+        "pageTitle": "Settings: Input",
         "dPadUp": "DPad Up",
         "dPadDown": "DPad Down",
         "dPadLeft": "DPad Left",

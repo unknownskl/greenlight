@@ -50,7 +50,7 @@
       },
 
       "input": {
-        "settingsInputPageTitle": "Ustawienia: Wejścia",
+        "pageTitle": "Ustawienia: Wejścia",
         "dPadUp": "Pad kierunkowy Góra",
         "dPadDown": "Pad kierunkowy Dół",
         "dPadLeft": "Pad kierunkowy Lewo",
