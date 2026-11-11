@@ -5,12 +5,16 @@ import Card from '../../components/ui/card'
 import Button from '../../components/ui/button'
 import Ipc from '../../lib/ipc'
 import { useSettings } from '../../context/userContext'
+import { defaultSettings } from '../../context/userContext.defaults'
 import { useTranslation } from 'react-i18next'
 
 
 function SettingsWebUI() {
     const { settings, setSettings} = useSettings()
     const [webuiRunning, setWebuiRunning] = React.useState(false)
+    const [portInput, setPortInput] = React.useState(settings.webui_port || 9003)
+    const [portError, setPortError] = React.useState(false)
+    const [saved, setSaved] = React.useState(false)
     const { t } = useTranslation()
 
     React.useEffect(() => {
@@ -43,9 +47,33 @@ function SettingsWebUI() {
     }
 
     function setWebUIPort(e){
+        const raw = e.target.value
+        setPortInput(raw)
+
+        const port = Number.parseInt(raw, 10)
+        if(Number.isNaN(port) || port < 1024 || port > 65535){
+            setPortError(true)
+            return
+        }
+
+        setPortError(false)
         setSettings({
             ...settings,
-            webui_port: e.target.value,
+            webui_port: port,
+        })
+        setSaved(true)
+        setTimeout(() => setSaved(false), 2000)
+    }
+
+    function resetDefaults(){
+        if(!confirm(t('settings.common.resetDefaultsConfirm'))) return
+
+        setPortInput(defaultSettings.webui_port)
+        setPortError(false)
+        setSettings({
+            ...settings,
+            webui_autostart: defaultSettings.webui_autostart,
+            webui_port: defaultSettings.webui_port,
         })
     }
 
@@ -69,18 +97,24 @@ function SettingsWebUI() {
 
                     <p>
                         <label>{t('settings.webUI.autostartLabel')}</label>
-                        <label style={{ minWidth: 0 }}>
-                            <input type='checkbox' onChange={ setWebUIAutostart } checked={settings.webui_autostart} />&nbsp; ({ settings.webui_autostart ? t('settings.webUI.autostartEnabled') : t('settings.webUI.autostartDisabled') })
-                        </label>
+                        <span style={{ minWidth: 0 }}>
+                            <input type='checkbox' aria-label={t('settings.webUI.autostartLabel')} onChange={ setWebUIAutostart } checked={settings.webui_autostart} />
+                        </span>
                     </p>
 
                     <p>
                         <label>{t('settings.webUI.portLabel')}</label>
                         <label style={{ minWidth: 0 }}>
-                            <input type="text" onChange={ setWebUIPort} className="text" placeholder={t('settings.webUI.portPlaceholder')} value={ settings.webui_port || 9003 } />
+                            <input type="number" min="1024" max="65535" onChange={ setWebUIPort } className="text" placeholder={t('settings.webUI.portPlaceholder')} value={ portInput } />
                         </label>
+                        { portError && <small style={{ color: 'orange' }}>{t('settings.webUI.portInvalid')}</small> }
+                        { !portError && saved && <small style={{ color: '#5bd75b' }}>{t('settings.common.savedNotice')}</small> }
                     </p>
                 </Card>
+
+                <p style={{ textAlign: 'right' }}>
+                    <Button onClick={ resetDefaults } className='btn-small' label={ t('settings.common.resetDefaultsBtn') }></Button>
+                </p>
             </SettingsSidebar>
 
 
