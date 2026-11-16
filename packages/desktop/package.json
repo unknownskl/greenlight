@@ -52,7 +52,7 @@
     "@next/eslint-plugin-next": "^16.2.6",
     "@types/node": "^25.9.1",
     "@types/react": "^19.3.0",
-    "@typescript-eslint/eslint-plugin": "^8.52.0",
+    "@typescript-eslint/eslint-plugin": "^8.72.2",
     "babel-loader": "^10.0.0",
     "electron": "43.2.0",
     "electron-builder": "^26.8.1",
