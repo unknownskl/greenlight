@@ -2,6 +2,9 @@ import Application from '../application'
 import HTTP from './http'
 import Store from 'electron-store'
 
+const CATALOG_BATCH_SIZE = 100
+const CATALOG_CONCURRENCY = 3
+
 interface titleInfoArgs {
     ProductTitle: string;
     PublisherName: string;
@@ -17,6 +20,7 @@ interface titleInfoArgs {
     StoreId: string;
 }
 
+
 interface FilterArgs {
     name: string;
     onlyEntitled?: boolean;
@@ -30,78 +34,150 @@ export default class TitleManager {
     _http:HTTP
 
     _xCloudTitles = {}
-    _productIdQueue = []
+    _productIdQueue:string[] = []
+    _catalogRefresh:Promise<void> = Promise.resolve()
+    _catalogGeneration = 0
+    _catalogIsRefreshing = false
 
     _xCloudRecentTitles = {}
     _xCloudRecentTitlesLastUpdate = 0
 
-    
     constructor(application){
         this._application = application
         this._http = new HTTP(this._application)
     }
 
     setCloudTitles(titles){
-        return new Promise((resolve, reject) => {
-            this._xCloudTitles = {}
-            this._productIdQueue = []
+        this._xCloudTitles = {}
+        const generation = ++this._catalogGeneration
+        this._catalogIsRefreshing = false
 
-            for(const title in titles.results){
-                const titleItem = new Title(titles.results[title])
-                this._xCloudTitles[titles.results[title].titleId] = titleItem
-                
-                if(titles.results[title].details?.productId){
-                    this._productIdQueue.push(titles.results[title].details.productId)
+        const entitledProductIds = []
+        const otherProductIds = []
+        for(const rawTitle of Object.values(titles.results || {}) as TitleDetails[]){
+            if(!rawTitle?.titleId){
+                this._application.log('TitleManager', 'Ignoring title without a title ID:', rawTitle)
+                continue
+            }
+
+            const titleItem = new Title(rawTitle)
+            this._xCloudTitles[rawTitle.titleId] = titleItem
+
+            if(titleItem.productId){
+                if(titleItem.hasEntitlement){
+                    entitledProductIds.push(titleItem.productId)
+                } else {
+                    otherProductIds.push(titleItem.productId)
                 }
             }
+        }
 
-            // Restore from cache if available so titles are immediately populated
-            const cachedCatalog = this._store.get('xcloud_catalog_cache', {}) as Record<string, titleInfoArgs>
-            if(cachedCatalog && Object.keys(cachedCatalog).length > 0){
-                this.populateTitleInfo(cachedCatalog)
-            }
+        // Enrich every title, prioritising playable titles for the default view.
+        this._productIdQueue = Array.from(new Set([...entitledProductIds, ...otherProductIds]))
 
-            if(this._productIdQueue.length > 0){
+        let cachedCatalog:Record<string, titleInfoArgs> = {}
+        try {
+            cachedCatalog = this._store.get('xcloud_catalog_cache', {}) as Record<string, titleInfoArgs> || {}
+            this.populateTitleInfo(cachedCatalog)
+        } catch(error) {
+            this._application.log('TitleManager', 'Unable to read title cache:', error)
+        }
 
-                // Create batches of 100
-                const batches = []
-                for(let i = 0; i < this._productIdQueue.length; i += 100) {
-                    batches.push(this._productIdQueue.slice(i, i + 100))
-                }
+        if(this._productIdQueue.length === 0){
+            this._catalogRefresh = Promise.resolve()
+            return this._catalogRefresh
+        }
 
-                // Create promises for each batch
-                const batchPromises = batches.map(batch => 
-                    this._http.post('catalog.gamepass.com', '/v3/products?market=US&language=en-US&hydration=RemoteHighSapphire0', {
-                        'Products': batch,
-                    }, {
-                        'ms-cv': 0,
-                        'calling-app-name': 'Xbox Cloud Gaming Web',
-                        'calling-app-version': '21.0.0',
-                    })
-                )
-
-                // Execute all batches and merge results
-                Promise.all(batchPromises).then((results: any[]) => {
-                    const allProducts = results.reduce((current, result) => {
-                        return { ...current, ...result.Products }
-                    }, {})
-
-                    console.log('Retrieved information from store:', allProducts)
-                    this.populateTitleInfo(allProducts)
-                    this._store.set('xcloud_catalog_cache', allProducts)
-                    resolve(true)
-
-                }).catch((error) => {
-                    console.log('Error:', error)
-                    reject(error)
-                })
-            } else {
-                resolve(true)
-            }
-
-            // We got all info!
-            // console.log(this)
+        const uncachedProductIds = this._productIdQueue.filter((productId) => {
+            return this.findTitleByProductId(productId)?.catalogDetails === undefined
         })
+        const cachedProductIds = this._productIdQueue.filter((productId) => {
+            return this.findTitleByProductId(productId)?.catalogDetails !== undefined
+        })
+
+        this._catalogIsRefreshing = true
+        this._catalogRefresh = this.refreshCatalog([
+            ...uncachedProductIds,
+            ...cachedProductIds,
+        ], cachedCatalog, generation).catch((error) => {
+            this._application.log('TitleManager', 'Unable to refresh title cache:', error)
+        }).finally(() => {
+            if(generation === this._catalogGeneration){
+                this._catalogIsRefreshing = false
+            }
+        })
+
+        return this._catalogRefresh
+    }
+
+    waitForCatalog(){
+        return this._catalogRefresh
+    }
+
+    async refreshCatalog(productIds:string[], cachedCatalog:Record<string, titleInfoArgs>, generation = this._catalogGeneration){
+        const batches:string[][] = []
+        for(let i = 0; i < productIds.length; i += CATALOG_BATCH_SIZE) {
+            batches.push(productIds.slice(i, i + CATALOG_BATCH_SIZE))
+        }
+
+        const allProducts:Record<string, titleInfoArgs> = {}
+        let nextBatch = 0
+
+        const processNextBatch = async ():Promise<void> => {
+            if(generation !== this._catalogGeneration){
+                return
+            }
+            const batch = batches[nextBatch++]
+            if(batch === undefined){
+                return
+            }
+
+            await this.processCatalogBatch(batch, allProducts, generation)
+            return processNextBatch()
+        }
+
+        const workers = Array.from({ length: Math.min(CATALOG_CONCURRENCY, batches.length) }, processNextBatch)
+
+        await Promise.all(workers)
+
+        if(generation !== this._catalogGeneration){
+            return
+        }
+
+        const currentProductIds = new Set(productIds)
+        const productsToCache = Object.entries({ ...cachedCatalog, ...allProducts }).reduce((current, [key, product]:[string, titleInfoArgs]) => {
+            if(product?.StoreId && currentProductIds.has(product.StoreId)){
+                current[key] = product
+            }
+            return current
+        }, {} as Record<string, titleInfoArgs>)
+
+        this._store.set('xcloud_catalog_cache', productsToCache)
+    }
+
+    async processCatalogBatch(batch:string[], allProducts:Record<string, titleInfoArgs>, generation = this._catalogGeneration):Promise<void>{
+        try {
+            const result:any = await this._http.post('catalog.gamepass.com', '/v3/products?market=US&language=en-US&hydration=RemoteHighSapphire0', {
+                'Products': batch,
+            }, {
+                'ms-cv': 0,
+                'calling-app-name': 'Xbox Cloud Gaming Web',
+                'calling-app-version': '21.0.0',
+            })
+
+            if(generation !== this._catalogGeneration){
+                return
+            }
+
+            if(result?.Products && typeof result.Products === 'object'){
+                Object.assign(allProducts, result.Products)
+                this.populateTitleInfo(result.Products)
+            } else {
+                this._application.log('TitleManager', 'Catalog batch returned no products:', batch)
+            }
+        } catch(error) {
+            this._application.log('TitleManager', 'Unable to resolve catalog batch:', error)
+        }
     }
 
     getNewTitles(){
@@ -109,19 +185,23 @@ export default class TitleManager {
     }
 
     populateTitleInfo(titleInfo:Record<string, titleInfoArgs> | titleInfoArgs[]){
-        for(const product in titleInfo){
-            const xCloudTitle = titleInfo[product].XCloudTitleId
+        for(const product of Object.values(titleInfo)){
+            if(!product){
+                continue
+            }
+
+            const xCloudTitle = product.XCloudTitleId
 
             if(this._xCloudTitles[xCloudTitle] !== undefined){
-                this._xCloudTitles[xCloudTitle].setCatalogDetails(titleInfo[product])
+                this._xCloudTitles[xCloudTitle].setCatalogDetails(product)
 
             } else {
-                const altTitle = this.findTitleByProductId(titleInfo[product].StoreId)
+                const altTitle = this.findTitleByProductId(product.StoreId)
                 if(altTitle !== undefined){
-                    altTitle.setCatalogDetails(titleInfo[product])
-                    
+                    altTitle.setCatalogDetails(product)
+
                 } else {
-                    this._application.log('TitleManager', 'Title not found in cache:', titleInfo[product].XCloudTitleId, titleInfo[product].StoreId, titleInfo[product])
+                    this._application.log('TitleManager', 'Title not found in cache:', product.XCloudTitleId, product.StoreId, product)
                 }
             }
         }
@@ -155,7 +235,6 @@ export default class TitleManager {
                 returnTitles.push(titleObj.titleId)
             }
         }
-            
 
         return returnTitles
     }
@@ -186,7 +265,7 @@ export default class TitleManager {
 
 interface TitleDetails {
     titleId:string;
-    details: {
+    details?: {
         productId:string;
         xboxTitleId:number;
         hasEntitlement:boolean;
@@ -204,8 +283,8 @@ interface TitleDetails {
 export class Title {
 
     titleId: string
-    productId: string
-    xboxTitleId: number
+    productId?: string
+    xboxTitleId?: number
     supportedInputTypes: any
     catalogDetails: any
     hasEntitlement: boolean
@@ -216,7 +295,6 @@ export class Title {
         this.xboxTitleId = title.details?.xboxTitleId
         this.supportedInputTypes = title.details?.supportedInputTypes
         this.hasEntitlement = Boolean(title.details?.hasEntitlement || title.details?.isFreeInStore)
-        this.supportedInputTypes = title.details.supportedInputTypes
     }
 
     setCatalogDetails(titleInfo:titleInfoArgs){

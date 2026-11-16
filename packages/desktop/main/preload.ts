@@ -1,17 +1,13 @@
 import { contextBridge, ipcRenderer, shell } from 'electron'
 import pkg from '../package.json'
 
+let nextRequestId = 0
+
 export const Preload = {
 
     send(channel:string, action:string, data = {}){
         return new Promise((resolve, reject) => {
-            const requestId = Math.round(Math.random()*1000)
-
-            ipcRenderer.send(channel, {
-                id: requestId,
-                action: action,
-                data: data,
-            })
+            const requestId = ++nextRequestId
 
             // Wait for event back..
             const callbackFunction = (event, args) => {
@@ -32,6 +28,12 @@ export const Preload = {
             }
 
             ipcRenderer.on(channel, callbackFunction)
+
+            ipcRenderer.send(channel, {
+                id: requestId,
+                action: action,
+                data: data,
+            })
 
         })
     },
