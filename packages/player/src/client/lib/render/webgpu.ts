@@ -200,8 +200,14 @@ export default class WebGpuComponent {
                 });
 
                 // Start rendering loop
-                that.processVideoData();
+                that.processVideoData().catch((error) => {
+                    console.error('Error processing video data:', error);
+                });
+            }).catch((error:any) => {
+                console.error('Failed to get WebGPU device:', error);
             });
+        }).catch((error:any) => {
+            console.error('Failed to get GPU adapter:', error);
         });
 
         // console.log('WebGPU adapter:', adapter, navigator.gpu);
@@ -378,7 +384,9 @@ export default class WebGpuComponent {
     }
 
     videoLoop() {
-        this.processVideoData();
+        this.processVideoData().catch((error) => {
+            console.error('Error processing video data:', error);
+        });
     }
 
     resizeCanvas() {

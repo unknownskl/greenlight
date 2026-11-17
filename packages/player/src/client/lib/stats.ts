@@ -40,6 +40,8 @@ export default class Stats {
                     this.readRemoteCandidate(report)
                 }
             })
+        }).catch((error) => {
+            console.error('[Stats] Failed to retrieve the WebRTC statistics:', error)
         })
     }
 

@@ -262,8 +262,16 @@ function StreamComponent({
             if (webRtcStatsInterval) {
                 clearInterval(webRtcStatsInterval)
             }
-            (document.getElementById('component_streamcomponent_debug_webrtc_jitter') !== null) ? document.getElementById('component_streamcomponent_debug_webrtc_jitter').innerHTML = '' : false;
-            (document.getElementById('component_streamcomponent_debug_webrtc_dropped') !== null) ? document.getElementById('component_streamcomponent_debug_webrtc_dropped').innerHTML = '' : false
+
+            const jitterChart = document.getElementById('component_streamcomponent_debug_webrtc_jitter')
+            if (jitterChart !== null) {
+                jitterChart.innerHTML = ''
+            }
+
+            const droppedChart = document.getElementById('component_streamcomponent_debug_webrtc_dropped')
+            if (droppedChart !== null) {
+                droppedChart.innerHTML = ''
+            }
         }
     }, [])
 

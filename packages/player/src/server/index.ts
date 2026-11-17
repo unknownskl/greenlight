@@ -3,6 +3,23 @@ export type { xStreamToken, startStreamResponse, SDPResponse, xCloudStreamConfig
 
 export const ping = () => 'pong';
 
+/**
+ * Error thrown when a request against the streaming API fails.
+ *
+ * The payload of the failure is kept on the `error` property, so consumers
+ * that inspect it keep working, while the rejection itself is a proper
+ * `Error` instance with a meaningful message and stack trace.
+ */
+class HttpRequestError extends Error implements ErrorResponse {
+    error: any
+
+    constructor(error: any) {
+        super('Request to the streaming API failed')
+        this.name = 'HttpRequestError'
+        this.error = error
+    }
+}
+
 export const startStream = async (xStreamToken:xStreamToken, xCloudStreamConfig:xCloudStreamConfig) => {
     return await httpPost<startStreamResponse>(xStreamToken, xCloudStreamConfig, '/v5/sessions/'+xCloudStreamConfig.type+'/play', JSON.stringify({
         clientSessionId: '',
@@ -113,86 +130,82 @@ export const sendKeepalive = async (xStreamToken:xStreamToken, xCloudStreamConfi
     return await httpPost<StatusResponse>(xStreamToken, xCloudStreamConfig, '/'+sessionPath+'/keepalive', JSON.stringify({}))
 }
 
-const httpGet = <T>(xStreamToken:xStreamToken, xCloudStreamConfig:xCloudStreamConfig, url:string, headers = {}) => {
-    return new Promise<T | StatusResponse | ErrorResponse>((resolve, reject) => {
-        const deviceInfo = getDeviceInfo(xCloudStreamConfig)
+const httpGet = async <T>(xStreamToken:xStreamToken, xCloudStreamConfig:xCloudStreamConfig, url:string, headers = {}): Promise<T | StatusResponse | ErrorResponse> => {
+    const deviceInfo = getDeviceInfo(xCloudStreamConfig)
 
+    let response:Response
+    try {
+        response = await fetch(xCloudStreamConfig.host+url, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-Gssv-Client': 'XboxComBrowser',
+                'X-MS-Device-Info': deviceInfo,
+                ...(xStreamToken.token !== '' ? { 'Authorization': 'Bearer '+xStreamToken.token } : {}),
+                ...headers,
+            },
+        })
+    } catch (error) {
+        throw new HttpRequestError(error)
+    }
+
+    if(response.ok === true){
         try {
-            fetch(xCloudStreamConfig.host+url, {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'X-Gssv-Client': 'XboxComBrowser',
-                    'X-MS-Device-Info': deviceInfo,
-                    ...(xStreamToken.token !== '' ? { 'Authorization': 'Bearer '+xStreamToken.token } : {}),
-                    ...headers,
-                }
-            }).then(response => {
-                if(response.ok === true){
-                    response.json().then(data => {
-                        resolve(data)
-                    }).catch((error) => {
-                        if(response.status >= 200 && response.status <= 299){
-                            resolve({ status: response.status })
-                        } else {
-                            reject({ error: error })
-                        }
-                    })
-                } else {
-                    reject({
-                        error: {
-                            satus: response.status,
-                            data: response
-                        }
-                    } as ErrorResponse)
-                }
-            })
+            const data = await response.json()
+            return data as T
         } catch (error) {
-            reject({ error: error } as ErrorResponse)
+            if(response.status >= 200 && response.status <= 299){
+                return { status: response.status } as StatusResponse
+            }
+
+            throw new HttpRequestError(error)
         }
+    }
+
+    throw new HttpRequestError({
+        satus: response.status,
+        data: response
     })
 }
 
-const httpPost = <T>(xStreamToken:xStreamToken, xCloudStreamConfig:xCloudStreamConfig, url:string, body:string, headers = {}) => {
-    return new Promise<T | StatusResponse | ErrorResponse>((resolve, reject) => {
-        const deviceInfo = getDeviceInfo(xCloudStreamConfig)
+const httpPost = async <T>(xStreamToken:xStreamToken, xCloudStreamConfig:xCloudStreamConfig, url:string, body:string, headers = {}): Promise<T | StatusResponse | ErrorResponse> => {
+    const deviceInfo = getDeviceInfo(xCloudStreamConfig)
 
+    let response:Response
+    try {
+        response = await fetch(xCloudStreamConfig.host+url, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-Gssv-Client': 'XboxComBrowser',
+                'X-MS-Device-Info': deviceInfo,
+                ...(xStreamToken.token !== '' ? { 'Authorization': 'Bearer '+xStreamToken.token } : {}),
+                ...headers,
+            },
+            body: body,
+        })
+    } catch (error) {
+        throw new HttpRequestError(error)
+    }
+
+    if(response.ok === true){
         try {
-            fetch(xCloudStreamConfig.host+url, {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'X-Gssv-Client': 'XboxComBrowser',
-                    'X-MS-Device-Info': deviceInfo,
-                    ...(xStreamToken.token !== '' ? { 'Authorization': 'Bearer '+xStreamToken.token } : {}),
-                    ...headers,
-                },
-                body: body,
-            }).then(response => {
-                if(response.ok === true){
-                    response.json().then(data => {
-                        resolve(data)
-                    }).catch((error) => {
-                        if(response.status >= 200 && response.status <= 299){
-                            resolve({ status: response.status })
-                        } else {
-                            reject({ error: error })
-                        }
-                    })
-                } else {
-                    reject({
-                        error: {
-                            satus: response.status,
-                            data: response.body
-                        }
-                    } as ErrorResponse)
-                }
-            })
+            const data = await response.json()
+            return data as T
         } catch (error) {
-            reject({ error: error } as ErrorResponse)
+            if(response.status >= 200 && response.status <= 299){
+                return { status: response.status } as StatusResponse
+            }
+
+            throw new HttpRequestError(error)
         }
+    }
+
+    throw new HttpRequestError({
+        satus: response.status,
+        data: response.body
     })
 }
 

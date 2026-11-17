@@ -38,11 +38,15 @@ export default class Ice {
                     candidate: 'a=candidate:10 1 UDP 1 '+teredo.getIpv4Address()+' 9002 typ host ',
                     sdpMLineIndex: candidates[candidate].sdpMLineIndex,
                     sdpMid: candidates[candidate].sdpMid,
+                }).catch((error) => {
+                    console.error('[Ice] Failed to add the Teredo ICE candidate:', error)
                 })
                 this._peerConnection.addIceCandidate({
                     candidate: 'a=candidate:11 1 UDP 1 '+teredo.getIpv4Address()+' '+teredo.getIpv4Port()+' typ host ',
                     sdpMLineIndex: candidates[candidate].sdpMLineIndex,
                     sdpMid: candidates[candidate].sdpMid,
+                }).catch((error) => {
+                    console.error('[Ice] Failed to add the Teredo ICE candidate:', error)
                 })
             }
 
@@ -50,6 +54,8 @@ export default class Ice {
                 candidate: candidates[candidate].candidate,
                 sdpMid: candidates[candidate].sdpMid,
                 sdpMLineIndex: candidates[candidate].sdpMLineIndex,
+            }).catch((error) => {
+                console.error('[Ice] Failed to add the ICE candidate:', error)
             })
         }
     }
