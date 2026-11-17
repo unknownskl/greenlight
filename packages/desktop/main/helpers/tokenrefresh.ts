@@ -2,11 +2,15 @@ import Application from '../application'
 
 // True when an API call failed because its token was refused (HTTP 401).
 // xCloudApi rejects with { status }, xbox-webapi with an Error whose message contains the indented JSON details ("statuscode": 401).
-export function isUnauthorizedError(error:any):boolean {
-    if(error?.status === 401){
+export function isUnauthorizedError(error:unknown):boolean {
+    if(typeof error !== 'object' || error === null){
+        return false
+    }
+    const { status, message } = error as { status?:unknown, message?:unknown }
+    if(status === 401){
         return true
     }
-    return typeof error?.message === 'string' && /"statuscode":\s*401\b/.test(error.message)
+    return typeof message === 'string' && /"statuscode":\s*401\b/.test(message)
 }
 
 // Runs an API call; if its token was refused, refreshes the tokens and runs it once more.
@@ -18,7 +22,7 @@ export function withTokenRefresh<T>(application:Application, call:() => Promise<
         }
 
         application.log('authenticationV2', __filename+'[withTokenRefresh()] Token refused, refreshing tokens and retrying once')
-        return application._authentication.refreshApiTokens().then(call, (refreshError) => {
+        return application.refreshApiTokens().then(call, (refreshError) => {
             application.log('authenticationV2', __filename+'[withTokenRefresh()] Failed to refresh tokens:', refreshError)
             throw error
         })
