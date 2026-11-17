@@ -91,6 +91,8 @@
         "xCloudStreamingBitrateLabel": "Битрейт трансляции xCloud",
         "xHomeStreamingBitrateLabel": "Битрейт трансляции xHome",
         "showNonEntitledLabel": "Показывать игры, требующие покупки",
+        "streamResolutionLabel": "Разрешение трансляции",
+        "streamResolutionDescription": "В режиме «Авто» консоль или облачный сервис выбирают сами, как раньше: консоль с разрешением 1440p или 4K UHD передаёт 1440p. Для 1440p в xHome установите разрешение экрана консоли 1440p или 4K UHD; для xCloud нужны Game Pass Ultimate и поддерживаемая игра.",
         "unlimitedLabel": "Без ограничений / Выкл.",
         "mbpsLabel": "Мбит/с",
         "setH264ProfileLabel": "Установить профиль H.264",

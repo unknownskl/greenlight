@@ -5,6 +5,7 @@ import StreamManager from '../helpers/streammanager'
 interface startStreamArgs {
     type: string;
     target: string;
+    resolution?: number;
 }
 
 interface sendSdpArgs {
@@ -50,7 +51,7 @@ export default class IpcStreaming extends IpcBase {
             this._application._ipc._channels.xCloud._recentTitlesLastUpdate = 0
         }
 
-        return this._streamManager.startStream(args.type, args.target)
+        return this._streamManager.startStream(args.type, args.target, args.resolution)
     }
 
     stopStream(args:stopStreamArgs){

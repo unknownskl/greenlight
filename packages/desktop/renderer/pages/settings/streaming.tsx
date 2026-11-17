@@ -51,6 +51,13 @@ function SettingsStreaming() {
 
     // video_profiles ([])
 
+    function setStreamResolution(e){
+        setSettings({
+            ...settings,
+            stream_resolution: Number.parseInt(e.target.value),
+        })
+    }
+
     function setPreferredGameLanguage(e){
         setSettings({
             ...settings,
@@ -99,6 +106,17 @@ function SettingsStreaming() {
                     <p>
                         <label>{t('settings.streaming.showNonEntitledLabel')}</label>
                         <input type='checkbox' checked={settings.xcloud_show_non_entitled} onChange={setShowNonEntitled} />
+                    </p>
+
+                    <p>
+                        <label>{t('settings.streaming.streamResolutionLabel')}</label>
+                        <select value={ settings.stream_resolution } onChange={ setStreamResolution }>
+                            <option value={0}>{t('settings.streaming.setH264ProfileValueAuto')}</option>
+                            <option value={720}>720p</option>
+                            <option value={1080}>1080p</option>
+                            <option value={1440}>1440p</option>
+                        </select>
+                        <br /><small>{t('settings.streaming.streamResolutionDescription')}</small>
                     </p>
 
                     <p>

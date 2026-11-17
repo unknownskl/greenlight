@@ -37,9 +37,9 @@ export default class StreamManager {
         return this._sessions[sessionId]
     }
 
-    startStream(type:string|'home'|'cloud', target){
+    startStream(type:string|'home'|'cloud', target, resolution?:number){
         return new Promise((resolve, reject) => {
-            this.getApi(type).startStream(target).then((playResult:playResult) => {
+            this.getApi(type).startStream(target, resolution).then((playResult:playResult) => {
             // this._application._xCloudApi.startStream(type, target).then((playResult) => {
                 console.log('Streammanager - startStream:', playResult)
 
