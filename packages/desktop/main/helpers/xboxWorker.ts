@@ -1,4 +1,5 @@
 import Application from '../application'
+import { withTokenRefresh } from './tokenrefresh'
 
 export default class xboxWorker {
 
@@ -41,7 +42,7 @@ export default class xboxWorker {
 
     updateFriends(){
         return new Promise((resolve, reject) => {
-            this._application._webApi.providers.people.getFriends().then((friends) => {
+            withTokenRefresh(this._application, () => this._application._webApi.providers.people.getFriends()).then((friends) => {
                 for(const friend in friends.data.people){
                     this._friends[friends.data.people[friend].xuid] = friends.data.people[friend]
                 }

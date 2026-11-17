@@ -1,4 +1,5 @@
 import IpcBase from './base'
+import { withTokenRefresh } from '../helpers/tokenrefresh'
 
 export default class IpcConsoles extends IpcBase {
     // _streamingSessions:any = {}
@@ -9,7 +10,7 @@ export default class IpcConsoles extends IpcBase {
     get(){
         return new Promise((resolve, reject) => {
             if(this._consolesLastUpdate < Date.now() - 60*1000){
-                this._application._webApi.providers.smartglass.getConsolesList().then((consoles) => {
+                withTokenRefresh(this._application, () => this._application._webApi.providers.smartglass.getConsolesList()).then((consoles) => {
                     this._consoles = consoles.data.result
                     this._consolesLastUpdate = Date.now()
 

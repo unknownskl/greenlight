@@ -160,19 +160,34 @@ export default class Application {
     _xboxWorker:xboxWorker
 
 
-    authenticationCompleted(streamingTokens, webToken){
-        this.log('electron', __filename+'[authenticationCompleted()] authenticationCompleted called')
-        // const tokens = this._authentication._tokens
-        this._xHomeApi = new xCloudApi(this, streamingTokens.xHomeToken.data.offeringSettings.regions.find(region => region.isDefault).baseUri.substring(8), streamingTokens.xHomeToken.data.gsToken, 'home')
+    // Creates the API clients, or gives new tokens to the existing ones (called again by Authentication.refreshApiTokens()).
+    // The xCloudApi instances are kept because they hold the state of the running stream session.
+    setApiTokens(streamingTokens, webToken){
+        const xHomeHost = streamingTokens.xHomeToken.data.offeringSettings.regions.find(region => region.isDefault).baseUri.substring(8)
+        if(this._xHomeApi === undefined){
+            this._xHomeApi = new xCloudApi(this, xHomeHost, streamingTokens.xHomeToken.data.gsToken, 'home')
+        } else {
+            this._xHomeApi.setToken(xHomeHost, streamingTokens.xHomeToken.data.gsToken)
+        }
 
         if(streamingTokens.xCloudToken !== undefined){
-            this._xCloudApi = new xCloudApi(this, streamingTokens.xCloudToken.data.offeringSettings.regions.find(region => region.isDefault).baseUri.substring(8), streamingTokens.xCloudToken.data.gsToken, 'cloud')
+            const xCloudHost = streamingTokens.xCloudToken.data.offeringSettings.regions.find(region => region.isDefault).baseUri.substring(8)
+            if(this._xCloudApi === undefined){
+                this._xCloudApi = new xCloudApi(this, xCloudHost, streamingTokens.xCloudToken.data.gsToken, 'cloud')
+            } else {
+                this._xCloudApi.setToken(xCloudHost, streamingTokens.xCloudToken.data.gsToken)
+            }
         }
 
         this._webApi = new xboxWebApi({
             token: webToken.data.Token,
             uhs: webToken.data.DisplayClaims.xui[0].uhs,
         })
+    }
+
+    authenticationCompleted(streamingTokens, webToken){
+        this.log('electron', __filename+'[authenticationCompleted()] authenticationCompleted called')
+        this.setApiTokens(streamingTokens, webToken)
 
         this._authentication._isAuthenticating = false
         this._authentication._isAuthenticated = true
