@@ -5,6 +5,9 @@ import { Msal } from 'xal-node'
 import AuthTokenStore from './helpers/tokenstore'
 import i18n from 'i18next';
 
+// After a refresh, tokens refused within this time are not renewed again: the refused call was sent before
+// the refresh, or new tokens do not help (this avoids hitting the authentication servers on every call).
+const REFRESH_COOLDOWN = 30*1000
 
 export default class Authentication {
     _application:Application
@@ -18,6 +21,9 @@ export default class Authentication {
     _isAuthenticating:boolean = false
     _isAuthenticated:boolean = false
     _appLevel:number = 0
+
+    _refreshPromise:Promise<void>|undefined
+    _lastRefresh = 0
 
     private t = i18n.t.bind(i18n);
 
@@ -106,6 +112,33 @@ export default class Authentication {
             // @TODO: If we fail to get streaming tokens, we should probably start the auth flow to let the user re-authenticate and get new tokens.
             this.startAuthflow()
         })
+    }
+
+    // Gets new streaming and web tokens (xal-node renews the expired upstream tokens on its own) and gives them to the API clients.
+    // Callers that arrive while a refresh is running share it.
+    refreshApiTokens():Promise<void> {
+        if(this._refreshPromise !== undefined){
+            return this._refreshPromise
+        }
+
+        if(Date.now() - this._lastRefresh < REFRESH_COOLDOWN){
+            this._application.log('authenticationV2', '[refreshApiTokens()] Tokens were refreshed moments ago, not refreshing again')
+            return Promise.resolve()
+        }
+
+        this._application.log('authenticationV2', '[refreshApiTokens()] Refreshing API tokens...')
+
+        this._refreshPromise = this.getStreamingToken().then((streamingTokens) => {
+            return this._msal.getWebToken().then((webToken) => {
+                this._application.setApiTokens(streamingTokens, webToken, true)
+                this._lastRefresh = Date.now()
+                this._application.log('authenticationV2', '[refreshApiTokens()] API tokens refreshed')
+            })
+        }).finally(() => {
+            this._refreshPromise = undefined
+        })
+
+        return this._refreshPromise
     }
 
     startAuthflow(){
