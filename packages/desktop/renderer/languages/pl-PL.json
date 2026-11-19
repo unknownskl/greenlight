@@ -84,6 +84,11 @@
         "keyboardMappingsTitle": "Mapowanie klawiatury"
       },
 
+      "common": {
+        "resetDefaultsBtn": "Przywróć domyślne",
+        "resetDefaultsConfirm": "Przywrócić ustawienia na tej stronie do wartości domyślnych?",
+        "savedNotice": "Zapisano"
+      },
       "streaming": {
         "pageTitle": "Ustawienia: Strumieniowanie",
         "title": "Ustawienia Strumieniowania",
@@ -97,6 +102,7 @@
         "setH264ProfileValueHigh": "Wysoki",
         "setH264ProfileValueMedium": "Średni",
         "setH264ProfileValueLow": "Niski",
+        "setH264ProfileDescription": "Zaawansowane: wymusza profil wideo H.264. Pozostaw na Auto, chyba że masz problemy z kodowaniem.",
         "forceRegionTitle": "Wymuś region",
         "setRegionLabel": "Ustaw region:",
         "setRegionValueDisabled": "Wył.",
@@ -106,6 +112,7 @@
         "setRegionValueJapan": "Japonia",
         "setRegionValueKorea": "Korea",
         "setRegionValueUS": "Stany Zjednoczone",
+        "setRegionDescription": "Zaawansowane: kieruje strumień przez serwery wybranego regionu. Używaj tylko, jeśli Twój region ma problemy z połączeniem.",
         "preferredGameLanguageLabel": "Preferowany język gier:",
         "preferredGameLanguageValueArabic": "Arabski (Arabia Saudyjska)",
         "preferredGameLanguageValueCzech": "Czeski",
@@ -163,7 +170,8 @@
         "autostartEnabled": "Wł.",
         "autostartDisabled": "Wył.",
         "portLabel": "Port",
-        "portPlaceholder": "przykład: 9003"
+        "portPlaceholder": "przykład: 9003",
+        "portInvalid": "Port musi być liczbą z zakresu od 1024 do 65535."
       },
 
       "debug": {
