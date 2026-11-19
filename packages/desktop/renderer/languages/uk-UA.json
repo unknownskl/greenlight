@@ -139,7 +139,7 @@
 
       "videoAudio": {
         "pageTitle": "Налаштування: Відео та Аудіо",
-        "videoTitle": "Відео",
+        "title": "Відео",
         "disableVideoLabel": "Вимкнути відео",
         "disabledLabel": "Вимкнено",
         "enabledLabel": "Увімкнено",

@@ -45,7 +45,7 @@
         "websiteLinkTitle": "Abrir enlace en un navegador externo"
       },
       "input": {
-        "settingsInputPageTitle": "Configuración: Controles",
+        "pageTitle": "Configuración: Controles",
         "dPadUp": "Cruceta Arriba",
         "dPadDown": "Cruceta Abajo",
         "dPadLeft": "Cruceta Izquierda",
@@ -76,8 +76,7 @@
         "controllerDetectedTitle": "Mandos detectados",
         "controllerDetectedDescription": "Si tienes un mando conectado pero no aparece aquí, intenta pulsar cualquier botón en el mando para que el sistema lo detecte.",
         "noControllerDetected": "No se ha detectado ningún mando",
-        "keyboardMappingsTitle": "Asignación de teclas",
-        "pageTitle": "Título página"
+        "keyboardMappingsTitle": "Asignación de teclas"
       },
       "streaming": {
         "pageTitle": "Configuración: Streaming",
@@ -144,8 +143,7 @@
         "forceLowResLabel": "Forzar video en baja resolución",
         "forceLowResDescription": "(Esta opción es útil en dispositivos como Steam Deck, ya que permite que la aplicación renderice a menor resolución para poder activar el escalado FSR).",
         "audioTitle": "Audio",
-        "disableAudioLabel": "Desactivar audio",
-        "videoTitle": "Título Vídeo"
+        "disableAudioLabel": "Desactivar audio"
       },
       "webUI": {
         "pageTitle": "Configuración: Interfaz Web",

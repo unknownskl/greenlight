@@ -45,7 +45,7 @@
         "websiteLinkTitle": "Öffne Link in externem Browser"
       },
       "input": {
-        "settingsInputPageTitle": "Einstellungen: Eingabe",
+        "pageTitle": "Einstellungen: Eingabe",
         "dPadUp": "D-Pad Hoch",
         "dPadDown": "D-Pad Runter",
         "dPadLeft": "D-Pad Links",
@@ -76,8 +76,7 @@
         "controllerDetectedTitle": "Erkannte Controller",
         "controllerDetectedDescription": "Wenn du einen Controller besitzt, der nicht aufgeführt ist, versuche eine Taste zu drücken, um ihn zu erkennen.",
         "noControllerDetected": "Kein Controller erkannt",
-        "keyboardMappingsTitle": "Tastaturbelegungen",
-        "pageTitle": "pageTitle"
+        "keyboardMappingsTitle": "Tastaturbelegungen"
       },
       "streaming": {
         "pageTitle": "Einstellungen: Streaming",
@@ -144,8 +143,7 @@
         "forceLowResLabel": "Erzwinge niedrige Aulösung",
         "forceLowResDescription": "(Diese Einstellung ist auf dem Steam Deck hilfreich und erlaubt der Anwendung, in einer niedrigen Auflösung dargestellt und mittels FSR skaliert zu werden.)",
         "audioTitle": "Audio",
-        "disableAudioLabel": "Audio deaktivieren",
-        "videoTitle": "videoTitle"
+        "disableAudioLabel": "Audio deaktivieren"
       },
       "webUI": {
         "pageTitle": "Einstellungen: Weboberfläche",
