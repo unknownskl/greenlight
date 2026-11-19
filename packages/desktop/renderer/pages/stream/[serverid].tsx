@@ -7,6 +7,9 @@ import { useSettings } from '../../context/userContext'
 import StreamComponent from '../../components/ui/streamcomponent'
 import StreamPreload from '../../components/ui/streampreload'
 import Ipc from '../../lib/ipc'
+import { setMouseSensitivity } from '../../lib/mousesensitivitypatch'
+import { applyKeyboardSticks } from '../../lib/keyboardsticks'
+import { applyEscapeAsHome, pressHomeButton } from '../../lib/escapekey'
 import { useTranslation } from 'react-i18next'
 
 function Stream() {
@@ -171,6 +174,9 @@ function Stream() {
                             clearInterval(streamStateInterval)
 
                             // Start xPlayer interface
+                            setMouseSensitivity(settings.input_mouse_sensitivity)
+                            applyKeyboardSticks()
+                            applyEscapeAsHome()
                             setxPlayer(new xCloudPlayer('streamComponent', {
                                 ui_systemui: [],
                                 input_touch: settings.input_touch || false,
@@ -233,7 +239,7 @@ function Stream() {
 
     function gamepadSend(button){
         console.log('Pressed button:', button)
-        xPlayer.getChannelProcessor('input').pressButton(0, 'Nexus')
+        pressHomeButton(xPlayer.getChannelProcessor('input'))
     }
 
     function onDisconnect(){

@@ -6,7 +6,14 @@ import Loader from './loader'
 import Card from './card'
 import uPlot from 'uplot'
 import Ipc from '../../lib/ipc'
+import { useSettings } from '../../context/userContext'
+import { getEstimatedPointer } from '../../lib/mousesensitivitypatch'
 import { useTranslation } from 'react-i18next'
+
+// Top centre of the picture where the hint tells how to free the mouse (the bar was there): the middle 40% of the
+// width and the top 12% of the height. The position is an estimate, so this is more forgiving than the tab itself.
+const HINT_ZONE_HALF_WIDTH = 0.2
+const HINT_ZONE_HEIGHT = 0.12
 
 interface StreamComponentProps {
     onDisconnect?: () => void;
@@ -20,6 +27,9 @@ function StreamComponent({
     xPlayer,
 }: StreamComponentProps) {
     const { t } = useTranslation()
+    const { settings } = useSettings()
+    const mouseKeyboard = settings.input_mousekeyboard === true
+    const hintUntil = React.useRef(0)
 
     function performance_now_seconds() {
         return performance.now() / 1000.0
@@ -222,13 +232,18 @@ function StreamComponent({
         window.addEventListener('mousemove', mouseEvent)
         window.addEventListener('mousedown', mouseEvent)
 
+        const hintElement = document.getElementById('component_streamcomponent_mousehint')
         const mouseInterval = setInterval(() => {
             const gamebarElement = document.getElementById('component_streamcomponent_gamebar')
             if (gamebarElement === null) {
                 return
             }
 
-            if ((Date.now() - lastMovement) >= 2000) {
+            // With Mouse & Keyboard the mouse is locked in the video and every movement would show the bar:
+            // there the bar is shown while the mouse is free (the user released it) and hidden when it is locked.
+            const showBar = mouseKeyboard ? document.pointerLockElement === null : (Date.now() - lastMovement) < 2000
+
+            if (!showBar) {
                 if (!gamebarElement.className.includes('hidden')) {
                     gamebarElement.className = 'hidden'
                 }
@@ -238,7 +253,29 @@ function StreamComponent({
                     gamebarElement.className = ''
                 }
             }
+
+            if (hintElement !== null) {
+                // The hint tells how to free the mouse: it is shown after Esc and when the pointer of the console is
+                // (about) in the top centre, where the bar was.
+                const pointer = getEstimatedPointer()
+                const inTopCentre = Math.abs(pointer.x - 0.5) <= HINT_ZONE_HALF_WIDTH && pointer.y <= HINT_ZONE_HEIGHT
+                const showHint = mouseKeyboard && !showBar && (Date.now() < hintUntil.current || inTopCentre)
+
+                hintElement.className = showHint ? '' : 'hidden'
+
+                const debugPointer = document.getElementById('component_streamcomponent_debug_pointer')
+                if (debugPointer !== null) {
+                    debugPointer.innerText = 'Pointer (estimated): x ' + Math.round(pointer.x * 100) + '%, y ' + Math.round(pointer.y * 100) + '%'
+                }
+            }
         }, 100)
+
+        const escapeEvent = (e: KeyboardEvent) => {
+            if (mouseKeyboard && e.key === 'Escape') {
+                hintUntil.current = Date.now() + 3000
+            }
+        }
+        window.addEventListener('keydown', escapeEvent)
 
         // Keyboard events
         const keyboardPressEvent = (e) => {
@@ -255,6 +292,7 @@ function StreamComponent({
             window.removeEventListener('mousemove', mouseEvent)
             window.removeEventListener('mousedown', mouseEvent)
             window.removeEventListener('keypress', keyboardPressEvent)
+            window.removeEventListener('keydown', escapeEvent)
             clearInterval(mouseInterval)
 
             // ipcRenderer.removeAllListeners('xcloud');
@@ -372,6 +410,10 @@ function StreamComponent({
                     </Card>
                 </div>
 
+                <div id="component_streamcomponent_mousehint" className="hidden">
+                    <span>{ navigator.userAgent.includes('Mac') ? t('streamWindow.mouseHint') : t('streamWindow.mouseHintHoldEsc') }</span>
+                </div>
+
                 <div id="component_streamcomponent_gamebar">
                     <div id="component_streamcomponent_gamebar_menu">
                         <div style={{
@@ -422,6 +464,8 @@ function StreamComponent({
 
                 <div id="component_streamcomponent_debug" className='hidden'>
                     <p>{t("streamWindow.debugTitle")}:</p>
+
+                    <div id="component_streamcomponent_debug_pointer"></div>
 
                     <div id="component_streamcomponent_debug_webrtc_jitter"></div>
                     <div id="component_streamcomponent_debug_webrtc_dropped"></div>
