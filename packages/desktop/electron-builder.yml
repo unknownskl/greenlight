@@ -18,6 +18,10 @@ publish:
 # Mac OS configuration
 mac:
   category: public.app-category.games
+  entitlements: resources/entitlements.mac.plist
+  entitlementsInherit: resources/entitlements.mac.plist
+  extendInfo:
+    NSMicrophoneUsageDescription: Greenlight uses the microphone for the voice chat of your stream.
   # icon: "src/app/assets/images/icon.icns"
   target: 
   - target: dmg

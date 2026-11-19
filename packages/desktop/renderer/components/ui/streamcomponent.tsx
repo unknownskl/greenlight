@@ -6,6 +6,7 @@ import Loader from './loader'
 import Card from './card'
 import uPlot from 'uplot'
 import Ipc from '../../lib/ipc'
+import { useSettings } from '../../context/userContext'
 import { useTranslation } from 'react-i18next'
 
 interface StreamComponentProps {
@@ -20,6 +21,7 @@ function StreamComponent({
     xPlayer,
 }: StreamComponentProps) {
     const { t } = useTranslation()
+    const { settings } = useSettings()
 
     function performance_now_seconds() {
         return performance.now() / 1000.0
@@ -269,13 +271,67 @@ function StreamComponent({
 
 
 
-    function toggleMic() {
-        if (xPlayer.getChannelProcessor('chat').isPaused === true) {
+    // On macOS the system gives the microphone to each app: ask for it, or point to the settings if it was refused.
+    // In the browser (Web UI) the browser asks by itself.
+    async function hasMicrophoneAccess(): Promise<boolean> {
+        if (!/Electron/i.test(navigator.userAgent)) return true
+
+        const access = await Ipc.send('app', 'getMicrophoneAccess')
+
+        if (access === 'not-determined') {
+            return (await Ipc.send('app', 'askMicrophoneAccess')) === true
+        }
+
+        if (access === 'denied' || access === 'restricted') {
+            if (confirm(t('streamWindow.micAccessDenied'))) {
+                Ipc.send('app', 'openMicrophoneSettings')
+            }
+
+            return false
+        }
+
+        return true
+    }
+
+    // The player always asks for the system default microphone. When another one is chosen in the settings the request
+    // is changed, for this call only, to prefer it ("ideal": if it is not connected anymore the default is used).
+    function startMic(deviceId: string) {
+        const mediaDevices = navigator.mediaDevices
+        const getUserMedia = mediaDevices.getUserMedia.bind(mediaDevices)
+
+        if (deviceId) {
+            mediaDevices.getUserMedia = (constraints) => getUserMedia({
+                ...constraints,
+                audio: { ...(typeof constraints?.audio === 'object' ? constraints.audio : {}), deviceId: { ideal: deviceId } },
+            })
+        }
+
+        try {
             xPlayer.getChannelProcessor('chat').startMic()
-            setMicStatus(true)
-        } else {
+        } finally {
+            delete (mediaDevices as any).getUserMedia
+        }
+    }
+
+    async function toggleMic() {
+        if (xPlayer.getChannelProcessor('chat').isPaused !== true) {
             xPlayer.getChannelProcessor('chat').stopMic()
             setMicStatus(false)
+
+            return
+        }
+
+        let allowed = true
+
+        try {
+            allowed = await hasMicrophoneAccess()
+        } catch (error) {
+            // The system could not be asked: try anyway, the player reports the problem itself.
+        }
+
+        if (allowed) {
+            startMic(settings.mic_device_id)
+            setMicStatus(true)
         }
     }
 
@@ -393,7 +449,7 @@ function StreamComponent({
                                 e.target.blur(); onMenu()
                             }}></Button> &nbsp;
                             <Button label={(micStatus === false) ? <span><i className="fa-solid fa-microphone-slash"></i> {t("streamWindow.micMuted")}</span> : <span><i className="fa-solid fa-microphone"></i> {t("streamWindow.micActive")}</span>} title={(micStatus === false) ? t("streamWindow.enableMic") : t("streamWindow.disableMic")} className={(micStatus === false) ? 'btn-cancel' : 'btn-primary'} onClick={(e) => {
-                                e.target.blur(); toggleMic()
+                                e.target.blur(); void toggleMic()
                             }}></Button>
                         </div>
 
