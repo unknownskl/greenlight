@@ -3,8 +3,9 @@
 # Updates Greenlight on the Steam Deck (or any Linux with Flatpak) to the latest build from
 # https://github.com/Veter1904/greenlight/releases
 #
-# It replaces the installed io.github.unknownskl.greenlight Flatpak (the same app, no second copy)
-# and keeps your settings and login (they live in ~/.var/app/io.github.unknownskl.greenlight).
+# It replaces every installed copy of io.github.unknownskl.greenlight (any branch, user and system
+# installation) with the new build, so only one Greenlight is left and it is the new one.
+# Your settings and login are kept (they live in ~/.var/app/io.github.unknownskl.greenlight).
 #
 # Run in Konsole (Desktop Mode):
 #   curl -fsSL https://github.com/Veter1904/greenlight/releases/latest/download/update-greenlight.sh | bash
@@ -21,18 +22,29 @@ die() { printf '\n\033[1;31mERROR:\033[0m %s\n' "$*" >&2; exit 1; }
 command -v flatpak >/dev/null 2>&1 || die "flatpak was not found. This script is for SteamOS / Linux with Flatpak."
 command -v curl >/dev/null 2>&1 || die "curl was not found."
 
-# Where is Greenlight installed? (Discover can use either)
-scope=""
-installed="no"
-if flatpak info --user "$APP_ID" >/dev/null 2>&1; then
-    scope="--user"
-    installed="yes"
-elif flatpak info --system "$APP_ID" >/dev/null 2>&1; then
-    scope="--system"
-    installed="yes"
-else
-    scope="--user"
-    say "Greenlight is not installed yet. It will be installed for the current user."
+# Branches of Greenlight that are installed in the given scope (--user or --system)
+installed_branches() {
+    LC_ALL=C flatpak list "$1" --app --columns=application,branch 2>/dev/null | awk -v id="$APP_ID" '$1 == id { print $2 }' || true
+}
+
+show_installed() {
+    local scope found=0 branch
+    for scope in --user --system; do
+        for branch in $(installed_branches "$scope"); do
+            printf '    %s  %s//%s\n' "$scope" "$APP_ID" "$branch"
+            found=1
+        done
+    done
+    [ "$found" = "1" ] || printf '    (not installed)\n'
+}
+
+say "Greenlight installs found on this system:"
+show_installed
+
+# Install where it already is (user is preferred, system only if that is the only place)
+install_scope="--user"
+if [ -z "$(installed_branches --user)" ] && [ -n "$(installed_branches --system)" ]; then
+    install_scope="--system"
 fi
 
 tmp="$(mktemp -d)"
@@ -50,16 +62,17 @@ fi
 # Close Greenlight if it is running
 flatpak kill "$APP_ID" >/dev/null 2>&1 || true
 
-if [ "$installed" = "yes" ]; then
-    say "Removing the old version (your settings are kept)..."
-    # Without --delete-data the data in ~/.var/app/$APP_ID stays untouched.
-    # shellcheck disable=SC2086
-    flatpak uninstall $scope -y --noninteractive "$APP_ID"
-fi
+# Remove every copy, so an old one (other branch or other installation) can not be started instead of the new one.
+# Without --delete-data the data in ~/.var/app/$APP_ID stays untouched.
+for scope in --user --system; do
+    for branch in $(installed_branches "$scope"); do
+        say "Removing the old version $APP_ID//$branch ($scope, your settings are kept)..."
+        flatpak uninstall "$scope" -y --noninteractive "$APP_ID//$branch" || true
+    done
+done
 
-say "Installing the new version..."
-# shellcheck disable=SC2086
-if ! flatpak install $scope -y --noninteractive --bundle "$tmp/greenlight.flatpak"; then
+say "Installing the new version ($install_scope)..."
+if ! flatpak install "$install_scope" -y --noninteractive --bundle "$tmp/greenlight.flatpak"; then
     die "Installation failed. Your settings are still in ~/.var/app/${APP_ID}. You can reinstall Greenlight from Discover and run this script again."
 fi
 
@@ -79,6 +92,8 @@ Categories=Utility;
 DESKTOP
 fi
 
-say "Done! Start Greenlight as usual (the Steam shortcut or the app menu entry did not change)."
-# shellcheck disable=SC2086
-flatpak info $scope "$APP_ID" 2>/dev/null | grep -Ei '^\s*(version|commit|date):' || true
+say "Greenlight installs now:"
+show_installed
+flatpak info "$install_scope" "$APP_ID" 2>/dev/null | grep -Ei '^\s*(version|branch|commit|date):' || true
+
+say "Done! Start Greenlight as usual. If a Steam shortcut says the app was not found, add Greenlight to Steam again."
