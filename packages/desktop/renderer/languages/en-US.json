@@ -78,6 +78,8 @@
         "legacyWarning": "Using the Mouse & Keyboard driver together with the Gamepad keyboard mappings will cause conflicts",
         "enableLegacy": "Enable Keyboard to Gamepad",
         "enableLegacyDescription": "(Disabling this feature will disable the keyboard to gamepad mapping and only allows controls from the gamepad.)",
+        "gamepadNavigation": "Gamepad navigation in menus",
+        "gamepadNavigationDescription": "(Use the d-pad / left stick, A, B and LB / RB to control the Greenlight menus.)",
         "controllerDetectedTitle": "Controllers detected",
         "controllerDetectedDescription": "If you have a controller connected but it is not showing up, try to press a button on the controller to detect it.",
         "noControllerDetected": "No controller detected",
@@ -98,6 +100,10 @@
         "setH264ProfileValueHigh": "High",
         "setH264ProfileValueMedium": "Medium",
         "setH264ProfileValueLow": "Low",
+        "remotePlayTitle": "Remote play (outside your home network)",
+        "remotePlayDescription": "Port on your public IP that your router forwards to the console. The console itself always listens on 9002, so with two consoles you can forward e.g. external 9002 to console 1 and external 9001 to port 9002 of console 2.",
+        "remotePortDefaultLabel": "Default port:",
+        "remotePortConsolesDescription": "Port per console (leave empty to use the default port):",
         "forceRegionTitle": "Force region",
         "setRegionLabel": "Set region:",
         "setRegionValueDisabled": "Disabled",
@@ -229,6 +235,18 @@
 
     "friends": {
       "allFriendsOffline": "All your friends are offline"
+    },
+
+    "gamepad": {
+        "ok": "OK",
+        "yes": "Yes",
+        "no": "No",
+        "hintSelect": "Select",
+        "hintBack": "Back",
+        "hintSections": "Sections",
+        "hintSubSections": "Settings pages",
+        "streamMenuHint": "Hold LB + RB + View + Menu for the Greenlight menu",
+        "streamMenuOpenHint": "Greenlight menu: d-pad / stick to move, A to select, B (or hold LB + RB + View + Menu) to close"
     },
 
     "streamWindow": {

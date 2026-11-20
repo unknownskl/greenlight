@@ -73,6 +73,8 @@
         "legacyWarning": "Maus & Tastatureingabe zusammen mit Gamepad-Tastaturbelegungen zu verwenden verursacht Konflikte",
         "enableLegacy": "Aktiviere Tastatur zu Gamepad",
         "enableLegacyDescription": "(Deaktivierung dieser Funktion hebt die Gamepad-Tastaturbelegung auf und gestattet nur die Steuerung per Gamepad.)",
+        "gamepadNavigation": "Gamepad-Steuerung in Menüs",
+        "gamepadNavigationDescription": "(Steuerkreuz / linker Stick, A, B und LB / RB steuern die Greenlight-Menüs.)",
         "controllerDetectedTitle": "Erkannte Controller",
         "controllerDetectedDescription": "Wenn du einen Controller besitzt, der nicht aufgeführt ist, versuche eine Taste zu drücken, um ihn zu erkennen.",
         "noControllerDetected": "Kein Controller erkannt",
@@ -93,6 +95,10 @@
         "setH264ProfileValueHigh": "Hoch",
         "setH264ProfileValueMedium": "Mittel",
         "setH264ProfileValueLow": "Niedrig",
+        "remotePlayTitle": "Remote Play (außerhalb des Heimnetzwerks)",
+        "remotePlayDescription": "Port auf Ihrer öffentlichen IP-Adresse, den der Router an die Konsole weiterleitet. Die Konsole selbst lauscht immer auf Port 9002. Bei zwei Konsolen können Sie z. B. extern 9002 an Konsole 1 und extern 9001 an Port 9002 von Konsole 2 weiterleiten.",
+        "remotePortDefaultLabel": "Standardport:",
+        "remotePortConsolesDescription": "Port pro Konsole (leer lassen, um den Standardport zu verwenden):",
         "forceRegionTitle": "Erzwinge Region",
         "setRegionLabel": "Lege Region fest:",
         "setRegionValueDisabled": "Deaktiviert",
@@ -216,6 +222,18 @@
     "friends": {
       "allFriendsOffline": "Alle deine Freunde sind offline"
     },
+    "gamepad": {
+        "ok": "OK",
+        "yes": "Ja",
+        "no": "Nein",
+        "hintSelect": "Auswählen",
+        "hintBack": "Zurück",
+        "hintSections": "Bereiche",
+        "hintSubSections": "Einstellungsseiten",
+        "streamMenuHint": "LB + RB + View + Menu gedrückt halten für das Greenlight-Menü",
+        "streamMenuOpenHint": "Greenlight-Menü: Steuerkreuz / Stick zum Bewegen, A zum Auswählen, B (oder LB + RB + View + Menu halten) zum Schließen"
+    },
+
     "streamWindow": {
       "pageTitle": "Streaming",
       "endStreamConfirmMessage": "Bist du sicher, dass du den Stream beenden willst?",

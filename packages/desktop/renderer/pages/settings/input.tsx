@@ -109,6 +109,13 @@ function SettingsInput() {
         })
     }
 
+    function setGamepadNavigation(){
+        setSettings({
+            ...settings,
+            gamepad_navigation: (settings.gamepad_navigation === false),
+        })
+    }
+
     function setTouchInput(){
         setSettings({
             ...settings,
@@ -169,6 +176,14 @@ function SettingsInput() {
                         <label style={{ minWidth: 0 }}>
                             <input type='checkbox' onChange={ setControllerVibration } checked={settings.controller_vibration} />&nbsp; ({ settings.controller_vibration ? t('settings.input.enabledLabel') : t('settings.input.disabledLabel')})
                         </label>
+                    </p>
+
+                    <p>
+                        <label>{t('settings.input.gamepadNavigation')}</label>
+                        <label style={{ minWidth: 0 }}>
+                            <input type='checkbox' onChange={ setGamepadNavigation } checked={settings.gamepad_navigation !== false} />&nbsp; ({ settings.gamepad_navigation !== false ? t('settings.input.enabledLabel') : t('settings.input.disabledLabel')})
+                        </label><br />
+                        <small>{t('settings.input.gamepadNavigationDescription')}</small>
                     </p>
 
                     <p>

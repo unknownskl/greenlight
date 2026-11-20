@@ -1,0 +1,128 @@
+name: Steam Deck build
+
+# Builds the Flatpak bundle (same app id as the Flathub version, so it replaces it) and publishes it
+# together with the update script as a GitHub release. Run on every push to the `deck` branch.
+on:
+  push:
+    branches:
+      - deck
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  node_version: 24
+
+jobs:
+  cachedeps:
+    name: "Generate cached sources"
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          repository: 'flatpak/flatpak-builder-tools'
+
+      - name: Install Python deps
+        run: pip3 install aiohttp toml
+
+      - name: Install flatpak-builder-tools
+        run: pipx install ./node/
+
+      - name: Checkout Git repository
+        uses: actions/checkout@v7
+        with:
+          submodules: recursive
+
+      - name: Prep artifacts dir
+        run: mkdir ./deps-dist/
+
+      - name: Install Node.js, NPM and Yarn
+        uses: actions/setup-node@v7.0.0
+        with:
+          node-version: ${{ env.node_version }}
+
+      - name: Install yarn dependencies
+        run: yarn
+
+      - name: Build yarn cache
+        run: flatpak-node-generator yarn yarn.lock -o ./deps-dist/yarn-sources.json
+
+      - uses: actions/upload-artifact@master
+        with:
+          name: flatpak-sources
+          path: ./deps-dist/
+
+  flatpak:
+    name: "Flatpak build"
+    runs-on: ubuntu-latest
+    needs: [cachedeps]
+
+    container:
+      image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-48
+      options: --privileged
+
+    steps:
+      - name: Checkout Git repository
+        uses: actions/checkout@v7
+        with:
+          submodules: recursive
+
+      - uses: actions/download-artifact@master
+        with:
+          name: flatpak-sources
+          path: packages/desktop/flatpak/
+
+      - name: Install Node.js, NPM and Yarn
+        uses: actions/setup-node@v7.0.0
+        with:
+          node-version: ${{ env.node_version }}
+
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: true
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          swap-storage: true
+
+      - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
+        with:
+          bundle: greenlight.flatpak
+          manifest-path: packages/desktop/flatpak/io.github.unknownskl.greenlight.yml
+          cache-key: flatpak-builder-${{ github.sha }}
+
+      - name: Prepare release files
+        run: |
+          sha256sum greenlight.flatpak > greenlight.flatpak.sha256
+          cp packages/desktop/flatpak/update-greenlight.sh update-greenlight.sh
+
+      - uses: actions/upload-artifact@master
+        with:
+          name: greenlight-flatpak
+          path: |
+            greenlight.flatpak
+            greenlight.flatpak.sha256
+            update-greenlight.sh
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: deck-${{ github.run_number }}
+          name: Steam Deck build ${{ github.run_number }}
+          make_latest: true
+          body: |
+            Greenlight for Steam Deck (Flatpak, app id `io.github.unknownskl.greenlight`).
+
+            Update an existing install (settings and login are kept) - run in Konsole on the Steam Deck:
+
+            ```
+            curl -fsSL https://github.com/${{ github.repository }}/releases/latest/download/update-greenlight.sh | bash
+            ```
+          files: |
+            greenlight.flatpak
+            greenlight.flatpak.sha256
+            update-greenlight.sh

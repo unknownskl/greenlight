@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import Header from '../components/header'
 import Footer from '../components/footer'
 import Auth from '../components/auth'
+import GamepadNav from '../components/gamepadnav'
 import SidebarFriends from '../components/sidebar/friends'
 import '../lib/i18n'
 
@@ -150,6 +151,7 @@ export default function MyApp({ Component, pageProps }) {
                     <LanguageProvider>
                         <UserProvider>
                             {appBody}
+                            <GamepadNav />
                         </UserProvider>
                     </LanguageProvider>
                 </QueryClientProvider>

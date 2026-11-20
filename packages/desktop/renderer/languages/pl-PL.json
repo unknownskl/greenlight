@@ -78,6 +78,8 @@
         "legacyWarning": "Używanie sterownika Klawiatury i Myszy razem z mapowaniem klawiatury do kontrolera będzie wywoływać konflikty",
         "enableLegacy": "Włącz Klawiatura jako Kontroler",
         "enableLegacyDescription": "(Wyłączenie tej funkcji wyłączy mapowanie klawiatury do kontrolera i zezwala wyłącznie na sterowanie kontrolerem.)",
+        "gamepadNavigation": "Nawigacja kontrolerem w menu",
+        "gamepadNavigationDescription": "(Krzyżak / lewy drążek, A, B oraz LB / RB sterują menu Greenlight.)",
         "controllerDetectedTitle": "Wykryte kontrolery",
         "controllerDetectedDescription": "Jeśli masz kontroler, ale się nie pokazuje spróbuj wcisnąć przycisk na kontrolerze, aby go wykryć.",
         "noControllerDetected": "Nie wykryto kontrolera",
@@ -97,6 +99,10 @@
         "setH264ProfileValueHigh": "Wysoki",
         "setH264ProfileValueMedium": "Średni",
         "setH264ProfileValueLow": "Niski",
+        "remotePlayTitle": "Zdalna gra (poza siecią domową)",
+        "remotePlayDescription": "Port na Twoim publicznym adresie IP, który router przekierowuje do konsoli. Sama konsola zawsze nasłuchuje na porcie 9002, więc przy dwóch konsolach możesz np. przekierować zewnętrzny 9002 do konsoli 1, a zewnętrzny 9001 na port 9002 konsoli 2.",
+        "remotePortDefaultLabel": "Port domyślny:",
+        "remotePortConsolesDescription": "Port dla każdej konsoli (zostaw puste, aby użyć portu domyślnego):",
         "forceRegionTitle": "Wymuś region",
         "setRegionLabel": "Ustaw region:",
         "setRegionValueDisabled": "Wył.",
@@ -225,6 +231,18 @@
 
     "friends": {
       "allFriendsOffline": "Wszyscy twoi znajomi są offline"
+    },
+
+    "gamepad": {
+        "ok": "OK",
+        "yes": "Tak",
+        "no": "Nie",
+        "hintSelect": "Wybierz",
+        "hintBack": "Wstecz",
+        "hintSections": "Sekcje",
+        "hintSubSections": "Strony ustawień",
+        "streamMenuHint": "Przytrzymaj LB + RB + View + Menu, aby otworzyć menu Greenlight",
+        "streamMenuOpenHint": "Menu Greenlight: krzyżak / drążek — ruch, A — wybór, B (lub przytrzymaj LB + RB + View + Menu) — zamknij"
     },
 
     "streamWindow": {

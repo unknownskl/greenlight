@@ -7,6 +7,7 @@ import { useSettings } from '../../context/userContext'
 import StreamComponent from '../../components/ui/streamcomponent'
 import StreamPreload from '../../components/ui/streampreload'
 import Ipc from '../../lib/ipc'
+import GreenlightGamepadDriver from '../../lib/gamepad/driver'
 import { useTranslation } from 'react-i18next'
 
 function Stream() {
@@ -171,8 +172,16 @@ function Stream() {
                             clearInterval(streamStateInterval)
 
                             // Start xPlayer interface
+                            // Custom gamepad driver: merges all connected controllers into one stable gamepad
+                            // and lets the user open the Greenlight menu with LB + RB + View + Menu (hold).
+                            const gamepadDriver = new GreenlightGamepadDriver()
+                            gamepadDriver.onChord = () => {
+                                window.dispatchEvent(new Event('greenlight-gamepad-menu'))
+                            }
+
                             setxPlayer(new xCloudPlayer('streamComponent', {
                                 ui_systemui: [],
+                                input_driver: gamepadDriver,
                                 input_touch: settings.input_touch || false,
                                 input_mousekeyboard: settings.input_mousekeyboard || false,
                                 input_legacykeyboard: (settings.input_newgamepad) ? false : true,

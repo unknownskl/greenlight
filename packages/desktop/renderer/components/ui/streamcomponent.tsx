@@ -6,6 +6,8 @@ import Loader from './loader'
 import Card from './card'
 import uPlot from 'uplot'
 import Ipc from '../../lib/ipc'
+import { gamepadState, pushBackHandler } from '../../lib/gamepad/state'
+import { confirmDialog } from '../../lib/gamepad/dialog'
 import { useTranslation } from 'react-i18next'
 
 interface StreamComponentProps {
@@ -32,6 +34,20 @@ function StreamComponent({
 
     const [micStatus, setMicStatus] = React.useState(false)
     const [waitingSeconds, setWaitingSeconds] = React.useState(0)
+
+    // Greenlight menu controlled with the gamepad (opened with LB + RB + View + Menu, held).
+    // While it is open the game receives no input and the game bar is navigated with the pad.
+    const padMenuRef = React.useRef(false)
+    const [padMenuOpen, setPadMenuOpen] = React.useState(false)
+
+    function setPadMenu(open: boolean) {
+        const driver = (xPlayer as any)._inputDriver
+
+        padMenuRef.current = open
+        setPadMenuOpen(open)
+        gamepadState.streamMenuOpen = open
+        driver?.setSuspended?.(open)
+    }
 
 
 
@@ -228,7 +244,7 @@ function StreamComponent({
                 return
             }
 
-            if ((Date.now() - lastMovement) >= 2000) {
+            if (padMenuRef.current === false && (Date.now() - lastMovement) >= 2000) {
                 if (!gamebarElement.className.includes('hidden')) {
                     gamebarElement.className = 'hidden'
                 }
@@ -250,8 +266,24 @@ function StreamComponent({
         }
         window.addEventListener('keypress', keyboardPressEvent)
 
+        // Gamepad menu: toggled by the driver chord, closed with B
+        const padMenuEvent = () => setPadMenu(!padMenuRef.current)
+        window.addEventListener('greenlight-gamepad-menu', padMenuEvent)
+        const removeBackHandler = pushBackHandler(() => {
+            if (padMenuRef.current) {
+                setPadMenu(false)
+                return true
+            }
+            return false
+        })
+
         // cleanup this component
         return () => {
+            window.removeEventListener('greenlight-gamepad-menu', padMenuEvent)
+            removeBackHandler()
+            gamepadState.streamMenuOpen = false
+            xPlayer._inputDriver?.setSuspended?.(false)
+
             window.removeEventListener('mousemove', mouseEvent)
             window.removeEventListener('mousedown', mouseEvent)
             window.removeEventListener('keypress', keyboardPressEvent)
@@ -286,11 +318,19 @@ function StreamComponent({
     }
 
     function endStream() {
-        if (confirm(t("streamWindow.endStreamConfirmMessage"))) {
-            document.getElementById('streamComponentHolder').innerHTML = ''
-            onDisconnect()
-            xPlayer.close()
-        }
+        // The game must not receive the A / B presses that answer the question
+        const driver = (xPlayer as any)._inputDriver
+        driver?.setSuspended?.(true)
+
+        confirmDialog(t("streamWindow.endStreamConfirmMessage"), t("gamepad.yes"), t("gamepad.no")).then((confirmed) => {
+            if (confirmed) {
+                document.getElementById('streamComponentHolder').innerHTML = ''
+                onDisconnect()
+                xPlayer.close()
+            } else if (padMenuRef.current === false) {
+                driver?.setSuspended?.(false)
+            }
+        })
     }
 
     function toggleDebug() {
@@ -417,6 +457,10 @@ function StreamComponent({
                                 e.target.blur(); toggleDebug()
                             }}></Button>
                         </div>
+                    </div>
+
+                    <div className="gp-stream-hint">
+                        { padMenuOpen ? t("gamepad.streamMenuOpenHint") : t("gamepad.streamMenuHint") }
                     </div>
                 </div>
 

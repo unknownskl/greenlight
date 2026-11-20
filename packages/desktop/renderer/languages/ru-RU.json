@@ -78,6 +78,8 @@
         "legacyWarning": "Использование драйвера мыши и клавиатуры вместе с назначениями клавиш геймпада вызовет конфликты",
         "enableLegacy": "Включить клавиатуру как геймпад",
         "enableLegacyDescription": "(Отключение этой функции отключит сопоставление клавиатуры с геймпадом и позволит управлять только с геймпада.)",
+        "gamepadNavigation": "Управление меню геймпадом",
+        "gamepadNavigationDescription": "(Крестовина / левый стик, A, B и LB / RB управляют меню Greenlight.)",
         "controllerDetectedTitle": "Обнаружены контроллеры",
         "controllerDetectedDescription": "Если у вас подключен контроллер, но он не отображается, попробуйте нажать кнопку на контроллере для обнаружения.",
         "noControllerDetected": "Контроллер не обнаружен",
@@ -98,6 +100,10 @@
         "setH264ProfileValueHigh": "Высокий",
         "setH264ProfileValueMedium": "Средний",
         "setH264ProfileValueLow": "Низкий",
+        "remotePlayTitle": "Удалённая игра (вне домашней сети)",
+        "remotePlayDescription": "Порт на вашем публичном IP, который роутер перенаправляет на консоль. Сама консоль всегда слушает порт 9002, поэтому для двух консолей можно, например, перенаправить внешний 9002 на консоль 1, а внешний 9001 на порт 9002 консоли 2.",
+        "remotePortDefaultLabel": "Порт по умолчанию:",
+        "remotePortConsolesDescription": "Порт для каждой консоли (оставьте пустым, чтобы использовать порт по умолчанию):",
         "forceRegionTitle": "Принудительный регион",
         "setRegionLabel": "Установить регион:",
         "setRegionValueDisabled": "Отключено",
@@ -229,6 +235,18 @@
 
     "friends": {
       "allFriendsOffline": "Все ваши друзья оффлайн"
+    },
+
+    "gamepad": {
+        "ok": "OK",
+        "yes": "Да",
+        "no": "Нет",
+        "hintSelect": "Выбрать",
+        "hintBack": "Назад",
+        "hintSections": "Разделы",
+        "hintSubSections": "Страницы настроек",
+        "streamMenuHint": "Удерживайте LB + RB + View + Menu, чтобы открыть меню Greenlight",
+        "streamMenuOpenHint": "Меню Greenlight: крестовина / стик — перемещение, A — выбор, B (или удерживайте LB + RB + View + Menu) — закрыть"
     },
 
     "streamWindow": {

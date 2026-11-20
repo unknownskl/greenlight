@@ -73,6 +73,8 @@
         "legacyWarning": "Usar el controlador de ratón y teclado junto con las asignaciones de teclado para mando provocará conflictos",
         "enableLegacy": "Activar emulación de Teclado a Mando",
         "enableLegacyDescription": "(Desactivar esta función deshabilitará la asignación de teclado a mando y solo permitirá controlar el juego directamente con un mando).",
+        "gamepadNavigation": "Navegación con mando en los menús",
+        "gamepadNavigationDescription": "(Usa la cruceta / stick izquierdo, A, B y LB / RB para controlar los menús de Greenlight.)",
         "controllerDetectedTitle": "Mandos detectados",
         "controllerDetectedDescription": "Si tienes un mando conectado pero no aparece aquí, intenta pulsar cualquier botón en el mando para que el sistema lo detecte.",
         "noControllerDetected": "No se ha detectado ningún mando",
@@ -93,6 +95,10 @@
         "setH264ProfileValueHigh": "Alto",
         "setH264ProfileValueMedium": "Medio",
         "setH264ProfileValueLow": "Bajo",
+        "remotePlayTitle": "Juego remoto (fuera de tu red doméstica)",
+        "remotePlayDescription": "Puerto de tu IP pública que el router redirige a la consola. La consola siempre escucha en el puerto 9002, así que con dos consolas puedes, por ejemplo, redirigir el 9002 externo a la consola 1 y el 9001 externo al puerto 9002 de la consola 2.",
+        "remotePortDefaultLabel": "Puerto predeterminado:",
+        "remotePortConsolesDescription": "Puerto por consola (déjalo vacío para usar el puerto predeterminado):",
         "forceRegionTitle": "Forzar región",
         "setRegionLabel": "Establecer región:",
         "setRegionValueDisabled": "Desactivado",
@@ -216,6 +222,18 @@
     "friends": {
       "allFriendsOffline": "Todos tus amigos están desconectados"
     },
+    "gamepad": {
+        "ok": "OK",
+        "yes": "Sí",
+        "no": "No",
+        "hintSelect": "Seleccionar",
+        "hintBack": "Atrás",
+        "hintSections": "Secciones",
+        "hintSubSections": "Páginas de ajustes",
+        "streamMenuHint": "Mantén LB + RB + View + Menu para abrir el menú de Greenlight",
+        "streamMenuOpenHint": "Menú de Greenlight: cruceta / stick para moverte, A para seleccionar, B (o mantén LB + RB + View + Menu) para cerrar"
+    },
+
     "streamWindow": {
       "pageTitle": "Streaming",
       "endStreamConfirmMessage": "¿Seguro que quieres finalizar el streaming?",

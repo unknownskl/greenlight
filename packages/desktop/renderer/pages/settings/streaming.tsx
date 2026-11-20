@@ -6,6 +6,7 @@ import Card from '../../components/ui/card'
 import Ipc from '../../lib/ipc'
 
 import { useTranslation } from 'react-i18next'
+import { useQuery } from 'react-query'
 
 import { useSettings } from '../../context/userContext'
 
@@ -73,6 +74,48 @@ function SettingsStreaming() {
         })
     }
 
+    // Remote play ports. Inputs keep a local draft so the field can be emptied/typed freely;
+    // only valid ports (1-65535) are stored in the settings.
+    const consoles = useQuery('consoles', () => Ipc.send('consoles', 'get'), { staleTime: 60*1000 })
+    const [defaultPortDraft, setDefaultPortDraft] = React.useState<string|null>(null)
+    const [consolePortDrafts, setConsolePortDrafts] = React.useState<Record<string, string>>({})
+
+    function parsePort(value:string):number|undefined {
+        const port = Number(value)
+        return (/^\d+$/.test(value) && port >= 1 && port <= 65535) ? port : undefined
+    }
+
+    function setRemotePort(value:string){
+        setDefaultPortDraft(value)
+
+        const port = parsePort(value)
+        if(port !== undefined){
+            setSettings({
+                ...settings,
+                remote_port: port,
+            })
+        }
+    }
+
+    function setConsoleRemotePort(consoleId:string, value:string){
+        setConsolePortDrafts({ ...consolePortDrafts, [consoleId]: value })
+
+        const ports = { ...settings.remote_port_consoles }
+        const port = parsePort(value)
+        if(port !== undefined){
+            ports[consoleId] = port
+        } else if(value === ''){
+            delete ports[consoleId] // Empty = use the default port
+        } else {
+            return
+        }
+
+        setSettings({
+            ...settings,
+            remote_port_consoles: ports,
+        })
+    }
+
     return (
         <React.Fragment>
             <Head>
@@ -111,6 +154,34 @@ function SettingsStreaming() {
                         </select>
                     </p>
 
+                </Card>
+
+                <Card>
+                    <h1>{t('settings.streaming.remotePlayTitle')}</h1>
+
+                    <p>{t('settings.streaming.remotePlayDescription')}</p>
+                    <p>
+                        <label>{t('settings.streaming.remotePortDefaultLabel')}</label>
+                        <label style={{ minWidth: 0 }}>
+                            <input type="text" inputMode="numeric" className="text" placeholder="9002"
+                                value={ defaultPortDraft ?? String(settings.remote_port || 9002) }
+                                onChange={ (e) => setRemotePort(e.target.value) } />
+                        </label>
+                    </p>
+
+                    { (consoles.isFetched === true && Array.isArray(consoles.data) && consoles.data.length > 0) ? <React.Fragment>
+                        <p>{t('settings.streaming.remotePortConsolesDescription')}</p>
+                        { consoles.data.map((item) => (
+                            <p key={item.id}>
+                                <label>{item.name}</label>
+                                <label style={{ minWidth: 0 }}>
+                                    <input type="text" inputMode="numeric" className="text" placeholder={ String(settings.remote_port || 9002) }
+                                        value={ consolePortDrafts[item.id] ?? String(settings.remote_port_consoles?.[item.id] ?? '') }
+                                        onChange={ (e) => setConsoleRemotePort(item.id, e.target.value) } />
+                                </label>
+                            </p>
+                        )) }
+                    </React.Fragment> : '' }
                 </Card>
 
                 <Card>
