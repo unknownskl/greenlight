@@ -12,7 +12,7 @@ export const defaultSettings = {
     // The port on your public IP that is forwarded to the console (the console itself always listens on 9002).
     // `remote_port` is the default, `remote_port_consoles` overrides it per console id: { [consoleId]: port }
     remote_port: 9002,
-    remote_port_consoles: {} as Record<string, number>,
+    remote_port_consoles: {},
 
     // Control the Greenlight menus with a gamepad (d-pad / stick, A, B, LB / RB)
     gamepad_navigation: true,
