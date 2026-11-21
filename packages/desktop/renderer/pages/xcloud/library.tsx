@@ -75,7 +75,7 @@ function xCloudLibrary() {
                 {t('page.xCloudLibrary.title')}
 
                 <div style={{ float: 'right', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <label style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '13px', cursor: 'pointer', userSelect: 'none', fontWeight: 300, minWidth: 0, paddingRight: '4px' }}>
+                    <label className="toggle-label" style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', fontSize: '14px', cursor: 'pointer', userSelect: 'none', fontWeight: 400, minWidth: 0, paddingRight: '4px' }}>
                         <input
                             type="checkbox"
                             checked={gamePassOnly}

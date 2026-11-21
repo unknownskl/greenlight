@@ -198,7 +198,11 @@
         "managementWarning": "Remote-Verwaltung nicht aktiviert",
         "streamingWarning": "Konsolen-Streaming nicht aktiviert",
         "startStreamBtn": "Starte Stream",
-        "noConsoles": "Es wurden keine Konsolen im Account gefunden. Wenn du eine Xbox-Konsole hast, stelle sicher, dass PlayTo aktiviert ist und die Konsole in der offiziellen Xbox App sichtbar ist."
+        "noConsoles": "Es wurden keine Konsolen im Account gefunden. Wenn du eine Xbox-Konsole hast, stelle sicher, dass PlayTo aktiviert ist und die Konsole in der offiziellen Xbox App sichtbar ist.",
+        "wakeAndPlay": "Aufwecken & spielen",
+        "poweredOff": "Aus",
+        "remotePort": "Remote-Port",
+        "subtitle": "Wähle eine Konsole, um zu spielen"
       },
       "titleInfo": {
         "pageTitle": "Titelinformationen anzeigen:",
@@ -220,7 +224,8 @@
       }
     },
     "friends": {
-      "allFriendsOffline": "Alle deine Freunde sind offline"
+      "allFriendsOffline": "Alle deine Freunde sind offline",
+      "title": "Freunde online"
     },
     "gamepad": {
         "ok": "OK",

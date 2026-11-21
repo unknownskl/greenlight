@@ -1,5 +1,5 @@
 #app_body_container .component_breadcrumbbar_push {
-  height: 32px;
+    height: 40px;
 }
 
 #app_body_container .component_breadcrumbbar {
@@ -7,31 +7,29 @@
     flex-direction: row;
     align-items: center;
     justify-content: flex-start;
-    padding: 0 0 0 0;
-    margin: 0 0 0 0;
-    height: 32px;
-    width: 70vw;
-    background-color: rgba(0, 0, 0, 0.3);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+    height: 40px;
+    width: 100vw;
     box-sizing: border-box;
     overflow: hidden;
     font-size: 14px;
     color: #ffffff;
     position: fixed;
     z-index: 11;
+    padding-left: 28px;
+    background: rgba(10, 12, 15, 0.55);
+    backdrop-filter: blur(10px);
 }
 
 #app_body_container .component_breadcrumbbar a {
     color: #ffffff;
     text-decoration: none;
-
     margin-left: 10px;
 }
 
 #app_body_container .component_breadcrumbbar a:after {
-    content: ">";
+    content: "\203A";
     margin-left: 10px;
-    margin-right: 0px;
+    opacity: 0.5;
 }
 
 #app_body_container .component_breadcrumbbar a:last-child:after {
@@ -39,6 +37,6 @@
 }
 
 #app_body_container .component_breadcrumbbar a:first-child {
-  margin-left: 20px;
-  color: rgba(255, 255, 255, 0.6);
+    margin-left: 0;
+    color: var(--text-dim);
 }

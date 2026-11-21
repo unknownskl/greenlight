@@ -1,54 +1,78 @@
 div#component_settings_sidebar{
     position: absolute;
-    top: 70px;
+    top: var(--header-h);
     bottom: 0px;
     left: 0px;
-    right: 30vw;
+    right: 0px;
 }
 
+/* Left rail with the settings pages */
 div#component_settings_sidebar_menu {
     position: absolute;
-    width: 200px;
+    width: 250px;
     top: 0px;
     left: 0px;
     bottom: 0px;
-    background: rgba(0,0,0, 0.2);
+    padding: 14px 12px;
+    background: rgba(0, 0, 0, 0.25);
+    border-right: 1px solid var(--border);
 }
 
 div#component_settings_sidebar_menu ul {
     list-style: none;
     margin: 0px;
     padding: 0px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
 div#component_settings_sidebar_menu ul li {
-    border-bottom: 1px solid rgba(0,0,0, 0.2);
     cursor: pointer;
-    font-size: 14px;
+    font-size: 16px;
 }
 
 div#component_settings_sidebar_menu ul li a {
-    padding: 15px;
+    padding: 13px 16px;
     display: block;
-    color: rgba(255,255,255, 0.6);
+    border-radius: 12px;
+    font-weight: 600;
+    color: var(--text-dim);
     text-decoration: none;
+    transition: background 0.15s ease, color 0.15s ease;
 }
 
 div#component_settings_sidebar_menu ul li.active a {
-    background: rgba(0,0,0, 0.2);
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.14);
+    box-shadow: inset 4px 0 0 var(--accent-hi);
 }
 
 div#component_settings_sidebar_menu ul li:hover a {
-    background: rgba(0,128,0, 0.5);
+    color: #ffffff;
+    background: var(--surface-hover);
 }
 
+div#component_settings_sidebar_menu ul li a.gp-focus {
+    outline: none !important;
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: inset 0 0 0 2px var(--focus), 0 0 18px var(--focus-glow);
+}
 
 div#component_settings_sidebar_content {
     position: absolute;
     top: 0px;
-    left: 200px;
+    left: 250px;
     right: 0px;
     bottom: 0px;
-    padding-top: 20px;
+    padding-top: 22px;
+    padding-bottom: calc(var(--hints-h) + 24px);
     overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+div#component_settings_sidebar_content > div.component_card {
+    max-width: 980px;
 }

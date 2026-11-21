@@ -208,7 +208,11 @@
         "managementWarning": "Remote management not enabled",
         "streamingWarning": "Console streaming not enabled",
         "startStreamBtn": "Start Stream",
-        "noConsoles": "No consoles found on your account. If you do have an Xbox console then make sure that remote playing is enabled and that the console is visible in the official Xbox App."
+        "noConsoles": "No consoles found on your account. If you do have an Xbox console then make sure that remote playing is enabled and that the console is visible in the official Xbox App.",
+        "wakeAndPlay": "Wake & Play",
+        "poweredOff": "Off",
+        "remotePort": "Remote port",
+        "subtitle": "Pick a console to start playing"
       },
 
       "titleInfo": {
@@ -234,7 +238,8 @@
     },
 
     "friends": {
-      "allFriendsOffline": "All your friends are offline"
+      "allFriendsOffline": "All your friends are offline",
+      "title": "Friends online"
     },
 
     "gamepad": {

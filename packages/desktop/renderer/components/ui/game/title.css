@@ -1,6 +1,19 @@
+/* Game tile: cover art with the name on hover / focus */
 div.component_gametitle {
     position: relative;
     width: 140px;
+}
+
+div.component_gametitle > a {
+    display: block;
+    border-radius: 12px;
+    transition: transform 0.2s var(--ease), box-shadow 0.2s ease;
+}
+
+div.component_gametitle img {
+    display: block;
+    border-radius: 12px !important;
+    background: rgba(255, 255, 255, 0.07);
 }
 
 div.component_gametitle_unentitled img {
@@ -13,52 +26,58 @@ div.component_gametitle_unentitled:hover img {
     opacity: 0.65;
 }
 
+div.component_gametitle > a:hover,
+div.component_gametitle > a.gp-focus {
+    transform: scale(1.06);
+    z-index: 60;
+    position: relative;
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.55), 0 0 26px var(--focus-glow);
+}
+
+div.component_gametitle > a.gp-focus {
+    outline: 3px solid var(--focus) !important;
+    outline-offset: 0;
+    border-radius: 12px;
+}
+
 div.component_gametitle div.component_gametitle_title {
-    background: #000000;
-    background: linear-gradient(0deg, rgba(0,135,70,0.5) 50%, rgba(0,0,0,0) 100%);
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0.88) 10%, rgba(0, 0, 0, 0) 100%);
     position: absolute;
     left: 0px;
     right: 0px;
-    bottom: 3px;
+    bottom: 0px;
     z-index: 50;
-    opacity: 1;
-    min-height: 100px;
-    vertical-align: bottom;
-    border-radius: 4px;
-    opacity: 0
+    min-height: 70px;
+    border-radius: 0 0 12px 12px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease-in-out;
 }
 
-div.component_gametitle:hover div.component_gametitle_title {
+div.component_gametitle > a:hover div.component_gametitle_title,
+div.component_gametitle > a.gp-focus div.component_gametitle_title {
     opacity: 1;
 }
 
 div.component_gametitle div.component_gametitle_title p {
-    font-size: 13px;
+    font-size: 12px;
     text-align: center;
-    vertical-align: bottom;
-    text-transform: uppercase;
-    font-weight: bold;
-    position: absolute;
-    bottom: 5px;
-    left: 5px;
-    right: 5px;
-}
-
-div.component_gametitle:hover div.component_gametitle_title p {
+    font-weight: 700;
     color: #ffffff;
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    right: 8px;
 }
 
+/* Info badge: always visible so it can be reached with a gamepad */
 div.component_gametitle div.component_gametitle_infopage {
     position: absolute;
-    top: 5px;
-    right: 5px;
+    top: 6px;
+    right: 6px;
     z-index: 100;
-    color: #ffffff;
-    text-align: center;
-    vertical-align: middle;
-    font-size: 12px;
-    opacity: 0;
-    /* z-index: 10; */
+    font-size: 11px;
+    opacity: 0.85;
     transition: opacity 0.2s ease-in-out;
 }
 
@@ -68,9 +87,19 @@ div.component_gametitle:hover div.component_gametitle_infopage {
 
 div.component_gametitle div.component_gametitle_infopage a {
     color: #ffffff;
-    display: block;
-    border-radius: 10px;
-    width: 18px;
-    height: 18px;
-    border: 1px solid #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+div.component_gametitle div.component_gametitle_infopage a.gp-focus {
+    outline: none !important;
+    background: #ffffff;
+    color: #000000;
+    transform: scale(1.2);
 }

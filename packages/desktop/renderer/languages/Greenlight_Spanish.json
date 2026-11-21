@@ -198,7 +198,11 @@
         "managementWarning": "La gestión remota no está activada",
         "streamingWarning": "El streaming de la consola no está activado",
         "startStreamBtn": "Iniciar streaming",
-        "noConsoles": "No se han encontrado consolas en tu cuenta. Si tienes una consola Xbox, asegúrate de que el juego remoto esté activado y de que la consola aparezca en la aplicación oficial de Xbox."
+        "noConsoles": "No se han encontrado consolas en tu cuenta. Si tienes una consola Xbox, asegúrate de que el juego remoto esté activado y de que la consola aparezca en la aplicación oficial de Xbox.",
+        "wakeAndPlay": "Encender y jugar",
+        "poweredOff": "Apagada",
+        "remotePort": "Puerto remoto",
+        "subtitle": "Elige una consola para empezar a jugar"
       },
       "titleInfo": {
         "pageTitle": "Viendo información del título:",
@@ -220,7 +224,8 @@
       }
     },
     "friends": {
-      "allFriendsOffline": "Todos tus amigos están desconectados"
+      "allFriendsOffline": "Todos tus amigos están desconectados",
+      "title": "Amigos conectados"
     },
     "gamepad": {
         "ok": "OK",

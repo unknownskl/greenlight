@@ -1,0 +1,282 @@
+/* Home: big console tiles like on a console dashboard */
+div.home-page {
+    padding: 8px 0 28px 0;
+}
+
+div.page-hero {
+    padding: 26px 40px 4px 40px;
+}
+
+div.page-hero h1 {
+    font-size: 34px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+}
+
+div.page-hero p {
+    margin-top: 6px;
+    font-size: 16px;
+    color: var(--text-dim);
+}
+
+div.page-section {
+    padding: 8px 40px 0 40px;
+}
+
+div.page-section h2 {
+    font-size: 18px;
+    font-weight: 600;
+    padding: 18px 0 12px 0;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    font-size: 13px;
+}
+
+div.console-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 28px;
+    padding: 28px 40px 28px 40px;
+}
+
+/* One console */
+.console-tile {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 330px;
+    padding: 26px 24px 22px 24px;
+    border-radius: 22px;
+    color: var(--text);
+    text-decoration: none;
+    cursor: pointer;
+    overflow: hidden;
+
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.03) 100%);
+    border: 1px solid var(--border);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+    transition: transform 0.22s var(--ease), box-shadow 0.22s var(--ease), border-color 0.22s ease, background 0.22s ease;
+}
+
+/* Soft color wash that shows the power state */
+.console-tile::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 190px;
+    pointer-events: none;
+    opacity: 0.9;
+    background: radial-gradient(260px 150px at 50% 0%, rgba(85, 90, 96, 0.28), transparent 75%);
+}
+
+.console-tile-on::before {
+    background: radial-gradient(260px 160px at 50% 0%, rgba(47, 209, 47, 0.38), transparent 75%);
+}
+
+.console-tile-standby::before {
+    background: radial-gradient(260px 150px at 50% 0%, rgba(245, 165, 36, 0.28), transparent 75%);
+}
+
+.console-tile:hover,
+.console-tile.gp-focus {
+    transform: translateY(-6px) scale(1.04);
+    border-color: rgba(255, 255, 255, 0.85);
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.06) 100%);
+    box-shadow: 0 22px 46px rgba(0, 0, 0, 0.5), 0 0 34px var(--focus-glow);
+}
+
+/* The tile itself scales and glows, so the generic ring is not needed on it */
+.console-tile.gp-focus {
+    outline: none !important;
+    border-radius: 22px;
+}
+
+.console-tile.is-disabled {
+    cursor: default;
+    opacity: 0.75;
+}
+
+.console-tile.is-disabled:hover {
+    transform: none;
+    border-color: var(--border);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.03) 100%);
+}
+
+.console-tile-art {
+    position: relative;
+    width: 100%;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.console-tile-art svg.console-art {
+    height: 100%;
+    width: auto;
+    filter: drop-shadow(0 14px 18px rgba(0, 0, 0, 0.5));
+    transition: transform 0.3s var(--ease);
+}
+
+.console-tile:hover .console-art,
+.console-tile.gp-focus .console-art {
+    transform: scale(1.06);
+}
+
+.console-tile-info {
+    width: 100%;
+    margin-top: 10px;
+    margin-bottom: 18px;
+    text-align: center;
+}
+
+.console-tile-name {
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 1.2;
+    word-break: break-word;
+}
+
+.console-tile-meta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    margin-top: 8px;
+    font-size: 14px;
+    color: var(--text-dim);
+}
+
+.console-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-weight: 600;
+}
+
+.console-status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #6b7178;
+}
+
+.console-status-on { color: var(--accent-hi); }
+.console-status-on .console-status-dot {
+    background: var(--accent-hi);
+    box-shadow: 0 0 10px var(--accent-glow);
+    animation: console-pulse 2.4s ease-in-out infinite;
+}
+
+.console-status-standby { color: var(--warn); }
+.console-status-standby .console-status-dot { background: var(--warn); }
+
+@keyframes console-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.45; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .console-status-on .console-status-dot { animation: none; }
+}
+
+.console-chips {
+    margin-top: 10px;
+}
+
+.console-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-dim);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+/* The "play" button of the tile */
+.console-tile-play {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    margin-top: auto;
+    padding: 14px 18px;
+    border-radius: 999px;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    color: #ffffff;
+    background: linear-gradient(180deg, #1c9a1c 0%, var(--accent) 100%);
+    box-shadow: 0 6px 16px rgba(16, 124, 16, 0.45);
+    transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.console-tile:hover .console-tile-play,
+.console-tile.gp-focus .console-tile-play {
+    background: linear-gradient(180deg, #34d634 0%, #139c13 100%);
+    box-shadow: 0 8px 22px var(--accent-glow);
+}
+
+.console-tile-warnings {
+    width: 100%;
+    margin-top: auto;
+    font-size: 13px;
+    color: var(--warn);
+    text-align: center;
+}
+
+.console-tile-warnings p {
+    padding: 2px 0;
+}
+
+/* Loading placeholder */
+.console-tile-skeleton {
+    height: 420px;
+    cursor: default;
+    animation: console-shimmer 1.4s ease-in-out infinite;
+}
+
+.console-tile-skeleton::before {
+    display: none;
+}
+
+@keyframes console-shimmer {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+.console-empty {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    max-width: 720px;
+    padding: 22px 26px;
+    border-radius: var(--radius);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+}
+
+.console-empty i {
+    font-size: 26px;
+    color: var(--accent-hi);
+}
+
+.console-empty p {
+    line-height: 1.45;
+}
+
+@media (max-width: 760px) {
+    .console-tile { width: 100%; }
+    div.console-row, div.page-hero, div.page-section { padding-left: 20px; padding-right: 20px; }
+}

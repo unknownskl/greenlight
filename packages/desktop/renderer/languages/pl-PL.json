@@ -205,7 +205,11 @@
         "managementWarning": "Zdalne zarządzanie nie jest włączone",
         "streamingWarning": "Strumieniowanie z konsoli nie jest włączone",
         "startStreamBtn": "Uruchom Strumień",
-        "noConsoles": "Nie znaleziono konsol na twoim koncie. Jeśli masz konsolę Xbox, upewnij się że granie zdalne jest włączone i że konsola jest widoczna w oficjalnej Aplikacji Xbox."
+        "noConsoles": "Nie znaleziono konsol na twoim koncie. Jeśli masz konsolę Xbox, upewnij się że granie zdalne jest włączone i że konsola jest widoczna w oficjalnej Aplikacji Xbox.",
+        "wakeAndPlay": "Włącz i graj",
+        "poweredOff": "Wyłączona",
+        "remotePort": "Port zdalny",
+        "subtitle": "Wybierz konsolę, aby zacząć grać"
       },
 
       "titleInfo": {
@@ -230,7 +234,8 @@
     },
 
     "friends": {
-      "allFriendsOffline": "Wszyscy twoi znajomi są offline"
+      "allFriendsOffline": "Wszyscy twoi znajomi są offline",
+      "title": "Znajomi online"
     },
 
     "gamepad": {

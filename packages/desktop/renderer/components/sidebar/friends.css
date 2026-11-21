@@ -1,5 +1,7 @@
+/* Friends online: a grid of small cards on the home page */
 div#components_sidebarfriends {
-    padding-top: 10px;
-    padding-bottom: 10px;
-    padding-left: 10px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 12px;
+    padding-bottom: 8px;
 }

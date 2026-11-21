@@ -91,10 +91,10 @@ function GamepadNav() {
     return (
         <React.Fragment>
             { (padActive && enabledRef.current && !isStreamPage()) ? <div id="gp_hints" data-gp-ignore>
-                <span><b>A</b> {t('gamepad.hintSelect')}</span>
-                <span><b>B</b> {t('gamepad.hintBack')}</span>
-                <span><b>LB</b><b>RB</b> {t('gamepad.hintSections')}</span>
-                <span><b>LT</b><b>RT</b> {t('gamepad.hintSubSections')}</span>
+                <span className="gp-hint"><b className="pad-a">A</b> {t('gamepad.hintSelect')}</span>
+                <span className="gp-hint"><b className="pad-b">B</b> {t('gamepad.hintBack')}</span>
+                <span className="gp-hint"><b className="pad-bumper">LB</b><b className="pad-bumper">RB</b> {t('gamepad.hintSections')}</span>
+                <span className="gp-hint"><b className="pad-bumper">LT</b><b className="pad-bumper">RT</b> {t('gamepad.hintSubSections')}</span>
             </div> : '' }
 
             { (dialog !== null) ? <div id="gp_dialog_backdrop">

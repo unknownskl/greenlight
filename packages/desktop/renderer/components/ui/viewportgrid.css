@@ -1,9 +1,19 @@
 div#component_viewportgrid_pagination {
-    text-align: center;
-    padding-bottom: 7px;
-    margin-top: -7px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 4px 0 12px 0;
 }
 
 div#component_viewportgrid_pagination button {
-    margin-right: 5px;
+    margin-right: 0;
+}
+
+/* Side margins (not padding: the grid measures its own width to know how many tiles fit) */
+div[id^="component_viewportgrid_"]:not(#component_viewportgrid_pagination) {
+    margin-left: 28px;
+    margin-right: 28px;
+    align-content: flex-start;
 }

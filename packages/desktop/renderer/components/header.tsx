@@ -8,15 +8,32 @@ import { useTranslation } from 'react-i18next'
 interface HeaderProps {
   hidden?: boolean;
   gamertag: string;
+  gamerpic?: string;
+  gamerscore?: string | number;
   level: number;
+}
+
+function formatClock(): string {
+    return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 }
 
 function Header({
     hidden = false,
     gamertag,
+    gamerpic,
+    gamerscore,
     level = 0,
 }: HeaderProps) {
     const { t } = useTranslation()
+
+    // Clock in the corner, like on a console dashboard
+    const [clock, setClock] = React.useState('')
+    React.useEffect(() => {
+        setClock(formatClock())
+        const clockInterval = setInterval(() => setClock(formatClock()), 15*1000)
+
+        return () => clearInterval(clockInterval)
+    }, [])
 
     // console.log('level:', level)
     const [activeIndex, setActiveIndex] = React.useState(0);
@@ -28,11 +45,13 @@ function Header({
                 name: t('header.myConsoles'),
                 title: t('header.viewConsoles'),
                 url: '/home',
+                icon: 'fa-gamepad',
                 active: false,
             }, {
                 name: t('header.xCloudLibrary'),
                 title: t('header.browseXCloudLibrary'),
                 url: '/xcloud/home',
+                icon: 'fa-cloud',
                 active: false,
                 // },{
                 //   name: 'Debug',
@@ -42,11 +61,13 @@ function Header({
                 name: t('header.settings'),
                 title: t('header.changeSettings'),
                 url: '/settings/home',
+                icon: 'fa-gear',
                 active: false,
             }, {
                 name: gamertag,
                 title: t('header.viewProfile'),
                 url: '/profile',
+                profile: true,
                 active: false,
             },
         ] : [
@@ -54,16 +75,19 @@ function Header({
                 name: t('header.myConsoles'),
                 title: t('header.viewConsoles'),
                 url: '/home',
+                icon: 'fa-gamepad',
                 active: false,
             }, {
                 name: t('header.settings'),
                 title: t('header.changeSettings'),
                 url: '/settings/home',
+                icon: 'fa-gear',
                 active: false,
             }, {
                 name: gamertag,
                 title: t('header.viewProfile'),
                 url: '/profile',
+                profile: true,
                 active: false,
             },
         ]
@@ -75,9 +99,12 @@ function Header({
 
     function drawMenu() {
         return headerLinks.map((link, idx) => (
-            <li key={idx}>
+            <li key={idx} className={link.profile ? 'header-profile' : ''}>
                 <Link legacyBehavior href={link.url} key={link.url}>
-                    <a title={link.title} onClick={() => setMenuActive(idx)} className={idx === activeIndex ? 'active' : ''}>{link.name}</a>
+                    <a title={link.title} onClick={() => setMenuActive(idx)} className={idx === activeIndex ? 'active' : ''}>
+                        { link.profile ? (gamerpic ? <img className="header-gamerpic" src={gamerpic} alt="" /> : <i className="fa-solid fa-user"></i>) : <i className={'fa-solid ' + link.icon}></i> }
+                        <span>{link.name}</span>
+                    </a>
                 </Link>
             </li>
         ));
@@ -109,6 +136,11 @@ function Header({
                 <ul className="menu">
                     { drawMenu() }
                 </ul>
+
+                <div className="header-status">
+                    { (gamerscore !== undefined && gamerscore !== '') ? <span className="header-gamerscore"><b>G</b>{ gamerscore }</span> : '' }
+                    <span className="header-clock">{ clock }</span>
+                </div>
             </div>
         </React.Fragment>
     )
