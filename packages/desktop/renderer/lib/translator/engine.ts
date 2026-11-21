@@ -78,6 +78,21 @@ const MIN_CONFIDENCE = 45
 // A box that moved by less than this (fraction of the stream area) is the same box: the picture only shakes
 const MOVE_TOLERANCE = 0.012
 
+// The camera is moving and the interface swings with it (text that is part of the game world): after this many
+// unsettled ticks in a row the translation is hidden, and nothing is read until the picture calms down
+// (or until it has been moving for MOTION_PATIENCE_MS, then it is read anyway)
+const MOTION_TICKS_BEFORE_HIDE = 2
+const MOTION_PATIENCE_MS = 6000
+
+// New text that is seen right after a movement (or is very short) must be read twice before it is translated:
+// a swinging, blurred interface gives different garbage on every read
+const RECENT_MOTION_MS = 2000
+const SHORT_TEXT = 6
+const PENDING_MS = 6000
+
+// A line that was not found by the reader this many times in a row is dropped from the screen
+const MAX_MISSED_READS = 2
+
 // Built from strings: the unicode flag is not allowed by the TypeScript target of the project
 const NOT_TEXT = new RegExp('[^\\p{L}\\p{N}\\s.,!?\'"’:;()\\-–—…/%&+]', 'gu')
 const ALNUM = new RegExp('[\\p{L}\\p{N}]', 'gu')
@@ -85,6 +100,11 @@ const LETTER = new RegExp('\\p{L}', 'gu')
 const NOT_ALNUM = new RegExp('[^\\p{L}\\p{N}]', 'gu')
 const LOWER_START = new RegExp('^[^\\p{L}]*\\p{Ll}', 'u')
 const NUMBER = /\d+(?:[.,:]\d+)*/g
+
+// Do two boxes (fractions of the stream area) cover a common part of the picture?
+function rectsOverlap(a: Region, b: Region): boolean {
+    return a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h
+}
 
 function luminance(data: Uint8ClampedArray, offset: number): number {
     return (data[offset] * 299 + data[offset + 1] * 587 + data[offset + 2] * 114) / 1000
@@ -202,18 +222,52 @@ function maskDifference(a: Uint8Array, b: Uint8Array): number {
     return unmatched / Math.max(1, ink)
 }
 
+// A single letter that is not a word of its own ("a", "I") is an icon or a speck, not text
+function isStrayLetter(token: string): boolean {
+    return token.length === 1 && /[A-Za-z]/.test(token) && token !== 'a' && token !== 'A' && token !== 'I'
+}
+
+/**
+ * Text in capital letters is translated badly ("BUY THE UNIT" comes back half in English),
+ * so it is turned into normal sentence case before it is sent.
+ */
+export function toTranslatable(text: string): string {
+    const letters: string[] = text.match(LETTER) || []
+    if(letters.length < 4){
+        return text
+    }
+
+    const upper = letters.filter(letter => letter !== letter.toLowerCase()).length
+    if(upper / letters.length < 0.8){
+        return text
+    }
+
+    const lower = text.toLowerCase()
+    return lower.charAt(0).toUpperCase() + lower.slice(1)
+}
+
 /** Cleans what the text reader found and returns '' when it does not look like real text. */
 export function cleanOcrText(raw: string): string {
     const lines = raw.replace(/\|/g, ' ').split(/\r?\n/)
     const kept: string[] = []
 
     for(const line of lines){
-        const cleaned = line.replace(NOT_TEXT, '').replace(/\s+/g, ' ').trim()
+        let cleaned = line.replace(NOT_TEXT, '').replace(/\s+/g, ' ').trim()
         const alnum = (cleaned.match(ALNUM) || []).length
 
         if(alnum < 2 || alnum / cleaned.length < 0.6){
             continue
         }
+
+        // A button icon in front of (or behind) a line is read as a stray letter ("S BUY THE UNIT")
+        const tokens = cleaned.split(' ')
+        while(tokens.length >= 2 && isStrayLetter(tokens[0])){
+            tokens.shift()
+        }
+        while(tokens.length >= 2 && isStrayLetter(tokens[tokens.length - 1])){
+            tokens.pop()
+        }
+        cleaned = tokens.join(' ')
 
         kept.push(cleaned)
     }
@@ -270,6 +324,60 @@ export function isSameText(a: string, b: string): boolean {
     return 1 - levenshtein(a, b) / longest >= 0.88
 }
 
+// The smallest number of changes that turn `needle` into some part of `hay`
+function substringDistance(needle: string, hay: string): number {
+    let previous = new Array(hay.length + 1)
+    let current = new Array(hay.length + 1)
+
+    for(let j = 0; j <= hay.length; j++){
+        previous[j] = 0
+    }
+
+    for(let i = 1; i <= needle.length; i++){
+        current[0] = i
+        for(let j = 1; j <= hay.length; j++){
+            const cost = needle[i - 1] === hay[j - 1] ? 0 : 1
+            current[j] = Math.min(previous[j] + 1, current[j - 1] + 1, previous[j - 1] + cost)
+        }
+        const swap = previous
+        previous = current
+        current = swap
+    }
+
+    let best = needle.length
+    for(let j = 0; j <= hay.length; j++){
+        best = Math.min(best, previous[j])
+    }
+    return best
+}
+
+/**
+ * True when `next` is another (worse) reading of the line `old`: letters mixed up (a swinging or blurred interface
+ * gives "DODGE", "DOOGE", "D0DGE"), or a part of the line was not read at all. Both are normalised texts.
+ * A text that is clearly longer than the old one is new text (a subtitle that is still being typed), not a reading.
+ */
+export function isSameReading(next: string, old: string): boolean {
+    if(isSameText(next, old)){
+        return true
+    }
+
+    const longest = Math.max(next.length, old.length)
+    if(Math.min(next.length, old.length) < 8 || longest > 400){
+        return false
+    }
+
+    if(Math.abs(next.length - old.length) <= longest * 0.3 && next.length <= old.length * 1.15 && 1 - levenshtein(next, old) / longest >= 0.78){
+        return true
+    }
+
+    // Part of the old line was not read
+    if(next.length < old.length && next.length >= old.length * 0.6){
+        return 1 - substringDistance(next, old) / next.length >= 0.85
+    }
+
+    return false
+}
+
 /**
  * Puts the new numbers of a text into the translation of the old one, so a counter or a timer that only changes
  * its digits does not need a new translation. Returns null when that is not possible.
@@ -309,6 +417,15 @@ interface ReadResult {
 
 interface ShownSegment extends TranslatedSegment {
     template: string;
+    // In how many reads in a row this line was not found (it stays on screen for a couple of reads, see MAX_MISSED_READS)
+    missed: number;
+}
+
+// New text that waits for a second reading before it is translated
+interface PendingText {
+    key: string;
+    seen: number;
+    at: number;
 }
 
 /**
@@ -339,6 +456,12 @@ export default class TranslatorEngine {
     _retryAt = 0
     _sameCount = 0
     _shown: ShownSegment[] = []
+    // What was on screen when it was hidden because the camera moves (used to recognise the same text afterwards)
+    _held: ShownSegment[] = []
+    _pending: PendingText[] = []
+    _unstableTicks = 0
+    _unstableSince = 0
+    _lastUnstableAt = 0
     _regionKey = ''
 
     // Translations by the text, and by the text without its numbers
@@ -394,6 +517,10 @@ export default class TranslatorEngine {
         this._failedReads = 0
         this._sameCount = 0
         this._retryAt = 0
+        this._pending = []
+        this._unstableTicks = 0
+        this._unstableSince = 0
+        this._lastUnstableAt = 0
         this._clearShown()
     }
 
@@ -418,6 +545,7 @@ export default class TranslatorEngine {
     }
 
     _clearShown() {
+        this._held = []
         if(this._shown.length > 0){
             this._shown = []
             this._options.onResult(null)
@@ -495,12 +623,17 @@ export default class TranslatorEngine {
 
         // 2. Has the text changed, and has it settled?
         let stable = true
+        // Unlike "stable", this is only true when the picture has really moved (not when there is nothing to compare with yet)
+        let moving = false
         let changed = !this._hasReadMask
 
         for(const candidate of present){
             const previous = this._prevMask[candidate.polarity]
-            if(previous === undefined || previous.length !== candidate.mask.length || maskDifference(previous, candidate.mask) > 0.35){
+            if(previous === undefined || previous.length !== candidate.mask.length){
                 stable = false
+            } else if(maskDifference(previous, candidate.mask) > 0.35){
+                stable = false
+                moving = true
             }
 
             const read = this._readMask[candidate.polarity]
@@ -515,6 +648,36 @@ export default class TranslatorEngine {
         }
 
         const now = Date.now()
+
+        // The picture is moving: the camera turns and the interface that belongs to the game world swings with it.
+        // A translation that stays where the text was would hang in the air, and the blurred text is read differently
+        // every time, so the translation is hidden and nothing is read until the picture calms down.
+        if(!moving){
+            this._unstableTicks = 0
+            this._unstableSince = 0
+        } else {
+            this._unstableTicks++
+            this._lastUnstableAt = now
+            if(this._unstableSince === 0){
+                this._unstableSince = now
+            }
+        }
+
+        if(moving && (this._shown.length > 0 || this._held.length > 0)){
+            if(this._unstableTicks >= MOTION_TICKS_BEFORE_HIDE && this._shown.length > 0){
+                this._held = this._shown
+                this._shown = []
+                this._options.onResult(null)
+                // Read as soon as the picture is steady again
+                this._sameCount = 0
+                this._hasReadMask = false
+            }
+
+            if(now - this._unstableSince < MOTION_PATIENCE_MS){
+                return
+            }
+        }
+
         const minGap = Math.min(3500, 700 + this._sameCount * 500)
 
         // Read again now and then even when the picture looks the same: it may be a different line in the same place.
@@ -565,10 +728,27 @@ export default class TranslatorEngine {
         const shown = this._shown
         const matches = this._matchShown(best.segments)
 
+        // Text that was not on screen before: right after a movement (or when it is very short) it has to be read
+        // twice before it is believed
+        const accepted: Array<{ raw: RawSegment; previous: ShownSegment | null }> = []
+        best.segments.forEach((raw, index) => {
+            const previous = matches[index]
+            if(previous !== null || this._confirm(raw, now)){
+                accepted.push({ raw, previous })
+            }
+        })
+
+        if(accepted.length === 0){
+            // Nothing believable yet: look again soon
+            this._sameCount = 0
+            this._hasReadMask = false
+            return
+        }
+
         // 5. Translate what is new
         let segments: ShownSegment[]
         try {
-            segments = await Promise.all(best.segments.map((raw, index) => this._translateSegment(raw, matches[index], config, video, box)))
+            segments = await Promise.all(accepted.map(item => this._translateSegment(item.raw, item.previous, config, video, box)))
         } catch(error) {
             console.warn('Translator: translation failed:', error)
             if(generation === this._generation){
@@ -584,6 +764,22 @@ export default class TranslatorEngine {
             return
         }
 
+        // A line that the reader missed this time stays on screen for a couple of reads (a reading may fail now and then),
+        // unless something new is shown where it was
+        const used = new Set<ShownSegment>()
+        accepted.forEach((item) => {
+            if(item.previous !== null){
+                used.add(item.previous)
+            }
+        })
+        shown.concat(this._held).forEach((old) => {
+            if(!used.has(old) && old.missed < MAX_MISSED_READS && !segments.some(segment => rectsOverlap(segment.rect, old.rect))){
+                segments.push({ ...old, missed: old.missed + 1 })
+            }
+        })
+        segments.sort((a, b) => a.rect.y - b.rect.y || a.rect.x - b.rect.x)
+        this._held = []
+
         const unchanged = shown.length === segments.length && segments.every((segment, index) => {
             const old = shown[index]
             return old.translated === segment.translated
@@ -594,6 +790,7 @@ export default class TranslatorEngine {
 
         if(unchanged){
             this._sameCount++
+            this._shown = segments
             return
         }
 
@@ -610,18 +807,32 @@ export default class TranslatorEngine {
         })
     }
 
-    /** For every new piece of text: the piece that was shown before with the same text (apart from numbers), if any. */
+    /**
+     * For every new piece of text: the piece that was shown before with the same text (apart from numbers
+     * and reading errors), if any. Lines that were hidden while the camera moved count too.
+     */
     _matchShown(segments: RawSegment[]): Array<ShownSegment | null> {
         const used = new Set<ShownSegment>()
+        const known = this._shown.concat(this._held)
 
         return segments.map((segment) => {
             const template = templateKey(segment.text)
             let best: ShownSegment | null = null
 
-            for(const candidate of this._shown){
-                if(!used.has(candidate) && isSameText(template, candidate.template)){
+            // The same text first, then the one that looks most like it
+            for(const candidate of known){
+                if(!used.has(candidate) && candidate.template === template){
                     best = candidate
                     break
+                }
+            }
+
+            if(best === null){
+                for(const candidate of known){
+                    if(!used.has(candidate) && isSameReading(template, candidate.template)){
+                        best = candidate
+                        break
+                    }
                 }
             }
 
@@ -632,6 +843,36 @@ export default class TranslatorEngine {
         })
     }
 
+    /** Is this new text believable already? Text that shows up while the picture moves, or very short text, has to be read twice. */
+    _confirm(segment: RawSegment, now: number): boolean {
+        const key = templateKey(segment.text)
+        const strict = now - this._lastUnstableAt < RECENT_MOTION_MS || key.length < SHORT_TEXT
+
+        if(!strict){
+            return true
+        }
+
+        this._pending = this._pending.filter(entry => now - entry.at < PENDING_MS)
+
+        const entry = this._pending.find(item => isSameReading(key, item.key) || isSameReading(item.key, key))
+        if(entry === undefined){
+            this._pending.push({ key, seen: 1, at: now })
+            return false
+        }
+
+        entry.seen++
+        entry.at = now
+        if(key.length > entry.key.length){
+            entry.key = key
+        }
+
+        if(entry.seen >= 2){
+            this._pending = this._pending.filter(item => item !== entry)
+            return true
+        }
+        return false
+    }
+
     async _translateSegment(raw: RawSegment, previous: ShownSegment | null, config: TranslatorConfig, video: HTMLVideoElement, box: { width: number; height: number }): Promise<ShownSegment> {
         const target = config.target
         const template = templateKey(raw.text)
@@ -639,11 +880,21 @@ export default class TranslatorEngine {
 
         let translated = this._cache.get(fullKey)
 
-        if(translated === undefined && previous !== null){
-            // The same text with other numbers (or the same text)
-            translated = previous.original === raw.text
-                ? previous.translated
-                : (substituteNumbers(previous.original, raw.text, previous.translated) ?? undefined)
+        // The line that was already on screen, read a little differently (another reading of the same text is not new text)
+        let keep: ShownSegment | null = null
+
+        if(previous !== null){
+            const sameNumbers = (previous.original.match(NUMBER) || []).join('|') === (raw.text.match(NUMBER) || []).join('|')
+
+            if(previous.original === raw.text){
+                translated = previous.translated
+            } else if(sameNumbers && template.length <= previous.template.length + 3){
+                translated = previous.translated
+                keep = previous
+            } else if(translated === undefined){
+                // The same text with other numbers
+                translated = substituteNumbers(previous.original, raw.text, previous.translated) ?? undefined
+            }
         }
 
         if(translated === undefined){
@@ -654,7 +905,7 @@ export default class TranslatorEngine {
         }
 
         if(translated === undefined){
-            translated = await this._options.translate(raw.text, target)
+            translated = await this._options.translate(toTranslatable(raw.text), target)
 
             if(translated === ''){
                 translated = raw.text
@@ -674,14 +925,16 @@ export default class TranslatorEngine {
             || Math.abs(previous.rect.w - screen.w) >= MOVE_TOLERANCE * 2
 
         return {
-            original: raw.text,
+            // A line that was only read differently keeps the text it was first matched with
+            original: keep !== null ? keep.original : raw.text,
             translated,
             rect: moved ? screen : previous.rect,
             lineHeight: moved ? lineHeight : previous.lineHeight,
             background: raw.background,
             foreground: raw.foreground,
             centered: raw.centered,
-            template,
+            template: keep !== null ? keep.template : template,
+            missed: 0,
         }
     }
 

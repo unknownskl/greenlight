@@ -33,21 +33,33 @@ function textWidth(text: string, size: number): number {
 /** Position, size and colours of the translation of one piece of text, so it looks like the interface it replaces. */
 export function segmentStyle(segment: TranslatedSegment, viewport: { width: number; height: number }, autoFont: boolean, fixedSize: number, opacity: number): React.CSSProperties {
     const originalWidth = segment.rect.w * viewport.width
-    const maxWidth = Math.max(originalWidth * 1.35, 140)
+    const left = segment.rect.x * viewport.width
+    const centerX = left + originalWidth / 2
 
-    // The size of the original text; shrunk a little when the translation is much longer than the original
+    // One line of the original stays one line: the translation may grow sideways (as far as the picture goes),
+    // so it does not wrap onto the line below, which is another piece of text
+    const lines = Math.max(1, Math.round(segment.rect.h / Math.max(0.001, segment.lineHeight)))
+    const room = segment.centered
+        ? 2 * Math.min(centerX, viewport.width - centerX) - 16
+        : viewport.width - left - 8
+    const maxWidth = Math.max(140, Math.min(room, originalWidth * (lines === 1 ? 2.1 : 1.35)))
+
+    // The size of the original text; shrunk when the translation is much longer than the original
     let size = autoFont ? Math.min(56, Math.max(12, segment.lineHeight * viewport.height * 1.02)) : fixedSize
+    let singleLine = false
     if(autoFont){
         const wanted = textWidth(segment.translated, size)
-        if(wanted > maxWidth){
-            size = Math.max(size * 0.72, size * maxWidth / wanted)
+        if(wanted > maxWidth * lines){
+            size = Math.max(size * 0.62, size * maxWidth * lines / wanted)
         }
+        singleLine = lines === 1 && textWidth(segment.translated, size) <= maxWidth - 16
     }
 
     const [r, g, b] = segment.background
     // The box covers the original text completely (with a small margin around it)
     const style: React.CSSProperties = {
         top: 'calc(' + (segment.rect.y * 100) + '% - 4px)',
+        whiteSpace: singleLine ? 'nowrap' : 'normal',
         maxWidth: maxWidth + 'px',
         minWidth: (Math.min(originalWidth, maxWidth) + 16) + 'px',
         minHeight: (segment.rect.h * viewport.height + 8) + 'px',
