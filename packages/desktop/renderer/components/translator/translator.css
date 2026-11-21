@@ -80,14 +80,30 @@ div.region-frame {
 
 div.region-handle {
     position: absolute;
-    right: 0;
-    bottom: 0;
-    width: 26px;
-    height: 26px;
+    width: 24px;
+    height: 24px;
     background: var(--accent-hi);
-    border-top-left-radius: 10px;
-    cursor: nwse-resize;
     touch-action: none;
+}
+
+div.region-handle-tl { left: 0; top: 0; border-bottom-right-radius: 10px; cursor: nwse-resize; }
+div.region-handle-tr { right: 0; top: 0; border-bottom-left-radius: 10px; cursor: nesw-resize; }
+div.region-handle-bl { left: 0; bottom: 0; border-top-right-radius: 10px; cursor: nesw-resize; }
+div.region-handle-br { right: 0; bottom: 0; border-top-left-radius: 10px; cursor: nwse-resize; }
+
+/* The frame is driven with the gamepad sticks */
+div.region-frame.pad-active {
+    border-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(47, 209, 47, 0.8), 0 0 28px var(--focus-glow);
+}
+
+p.translator-pad-hint {
+    padding: 10px 14px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    background: rgba(47, 209, 47, 0.14);
+    border: 1px solid rgba(47, 209, 47, 0.5);
+    font-size: 14px;
 }
 
 div.translator-edit-hint {

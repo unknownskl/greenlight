@@ -3,10 +3,10 @@ import { useTranslation } from 'react-i18next'
 
 import { useSettings } from '../../context/userContext'
 import Ipc from '../../lib/ipc'
-import { getUsablePads, mergeFrames, readPad } from '../../lib/gamepad/pads'
 import { Region, clampRegion, FitMode } from '../../lib/translator/geometry'
 import TranslatorEngine, { EngineStatus, TranslatorResult, TextColor } from '../../lib/translator/engine'
 import { terminateOcr } from '../../lib/translator/ocr'
+import usePadRegion from '../../lib/translator/usepadregion'
 import RegionEditor from './regioneditor'
 
 export const TRANSLATOR_EDIT_EVENT = 'greenlight-translator-edit'
@@ -14,8 +14,6 @@ export const TRANSLATOR_EDIT_EVENT = 'greenlight-translator-edit'
 interface TranslatorOverlayProps {
     xPlayer: any;
 }
-
-const STICK_SPEED = 0.012
 
 /**
  * Shown on top of the stream: reads the text in the translation window and shows its translation.
@@ -113,52 +111,8 @@ function TranslatorOverlay({
         xPlayer?._inputDriver?.setSuspended?.(false)
     }, [])
 
-    // Edit mode with the gamepad: left stick / d-pad moves, right stick resizes, A / B / Menu finishes
-    React.useEffect(() => {
-        if(!editing){
-            return
-        }
-
-        let frameId = 0
-        let previousDone = true
-
-        const loop = () => {
-            const frame = mergeFrames(getUsablePads().map(pad => readPad(pad)))
-            const current = draftRef.current
-
-            const moveX = frame.LeftThumbXAxis + frame.DPadRight - frame.DPadLeft
-            const moveY = frame.LeftThumbYAxis + frame.DPadDown - frame.DPadUp
-            const sizeX = frame.RightThumbXAxis
-            const sizeY = frame.RightThumbYAxis
-
-            if(moveX !== 0 || moveY !== 0 || sizeX !== 0 || sizeY !== 0){
-                const width = Math.min(1, Math.max(0.05, current.w + sizeX * STICK_SPEED))
-                const height = Math.min(1, Math.max(0.05, current.h + sizeY * STICK_SPEED))
-
-                setDraft(clampRegion({
-                    x: current.x + moveX * STICK_SPEED,
-                    y: current.y + moveY * STICK_SPEED,
-                    w: width,
-                    h: height,
-                }))
-            }
-
-            const done = frame.A > 0.5 || frame.B > 0.5 || frame.Menu > 0.5
-            if(done && !previousDone){
-                finishEditing()
-                return
-            }
-            previousDone = done
-
-            frameId = requestAnimationFrame(loop)
-        }
-
-        frameId = requestAnimationFrame(loop)
-
-        return () => {
-            cancelAnimationFrame(frameId)
-        }
-    }, [editing])
+    // Edit mode with the gamepad: sticks move / resize, A / B / Menu finishes
+    usePadRegion(editing, () => draftRef.current, setDraft, finishEditing)
 
     // Make sure the game gets its input back when the stream is closed while editing
     React.useEffect(() => {

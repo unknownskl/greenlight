@@ -291,7 +291,9 @@
         "statusLoading": "Cargando el lector de texto...",
         "statusError": "La traducción no está disponible ahora",
         "editHint": "Arrastra la ventana para moverla, arrastra la esquina para cambiar el tamaño",
-        "editHintPad": "Palanca izquierda: mover  |  Palanca derecha: tamaño  |  A: listo",
+        "editHintPad": "Palanca izquierda: mover  |  Palanca derecha: ancho / alto  |  LT lento, RT rápido  |  A: listo",
+        "padEditBtn": "Colocar con el mando",
+        "padEditActive": "Palanca izquierda / cruceta: mover  |  Palanca derecha: ancho y alto  |  LT: lento, RT: rápido  |  A o B: listo",
         "editDone": "Listo"
     },
     "updater": {

@@ -303,7 +303,9 @@
         "statusLoading": "Ładowanie czytnika tekstu...",
         "statusError": "Tłumaczenie jest teraz niedostępne",
         "editHint": "Przeciągnij okno, aby je przesunąć, przeciągnij róg, aby zmienić rozmiar",
-        "editHintPad": "Lewy drążek: ruch  |  Prawy drążek: rozmiar  |  A: gotowe",
+        "editHintPad": "Lewy drążek: ruch  |  Prawy drążek: szerokość / wysokość  |  LT wolno, RT szybko  |  A: gotowe",
+        "padEditBtn": "Ustaw padem",
+        "padEditActive": "Lewy drążek / krzyżak: ruch  |  Prawy drążek: szerokość i wysokość  |  LT: wolno, RT: szybko  |  A lub B: gotowe",
         "editDone": "Gotowe"
     },
     "updater": {

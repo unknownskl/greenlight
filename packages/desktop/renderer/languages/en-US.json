@@ -307,7 +307,9 @@
         "statusLoading": "Loading the text reader...",
         "statusError": "Translation is unavailable right now",
         "editHint": "Drag the window to move it, drag the corner to resize it",
-        "editHintPad": "Left stick: move  |  Right stick: resize  |  A: done",
+        "editHintPad": "Left stick: move  |  Right stick: width / height  |  LT slow, RT fast  |  A: done",
+        "padEditBtn": "Place with the gamepad",
+        "padEditActive": "Left stick / d-pad: move  |  Right stick: width and height  |  LT: slow, RT: fast  |  A or B: done",
         "editDone": "Done"
     },
     "updater": {

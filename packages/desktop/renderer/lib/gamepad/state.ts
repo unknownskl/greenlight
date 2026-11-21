@@ -3,6 +3,9 @@
 export const gamepadState = {
     // True while the in-stream Greenlight menu (game bar) is controlled with the gamepad.
     streamMenuOpen: false,
+
+    // True while a screen takes over the pad completely (for example placing the translation window with the sticks).
+    captured: false,
 }
 
 // Handlers for the "back" (B) button. The most recently added handler runs first;

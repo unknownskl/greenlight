@@ -8,8 +8,11 @@ interface RegionEditorProps {
     className?: string;
 }
 
+// Which edges a handle drags. 'move' drags the whole frame.
+type DragMode = 'move' | 'tl' | 'tr' | 'bl' | 'br'
+
 interface DragState {
-    mode: 'move' | 'resize';
+    mode: DragMode;
     startX: number;
     startY: number;
     start: Region;
@@ -17,9 +20,12 @@ interface DragState {
     height: number;
 }
 
+const HANDLES: DragMode[] = ['tl', 'tr', 'bl', 'br']
+
 /**
- * A frame that can be dragged around (and resized with the corner handle) inside its positioned parent.
- * The region is stored as fractions of the parent, so it works for the real stream and for the small preview.
+ * A frame that can be dragged around inside its positioned parent and resized from every corner,
+ * so it can get any shape. The region is stored as fractions of the parent, so it works for the real
+ * stream and for the small preview.
  */
 function RegionEditor({
     region,
@@ -30,7 +36,7 @@ function RegionEditor({
     const frameRef = React.useRef<HTMLDivElement>(null)
     const dragRef = React.useRef<DragState | null>(null)
 
-    function begin(mode: DragState['mode'], event: React.PointerEvent) {
+    function begin(mode: DragMode, event: React.PointerEvent) {
         const parent = frameRef.current?.parentElement
         if(!parent){
             return
@@ -64,16 +70,32 @@ function RegionEditor({
 
         const dx = (event.clientX - drag.startX) / drag.width
         const dy = (event.clientY - drag.startY) / drag.height
+        const start = drag.start
 
         if(drag.mode === 'move'){
-            onChange(clampRegion({ ...drag.start, x: drag.start.x + dx, y: drag.start.y + dy }))
-        } else {
-            onChange(clampRegion({
-                ...drag.start,
-                w: Math.min(1 - drag.start.x, Math.max(MIN_REGION_SIZE, drag.start.w + dx)),
-                h: Math.min(1 - drag.start.y, Math.max(MIN_REGION_SIZE, drag.start.h + dy)),
-            }))
+            onChange(clampRegion({ ...start, x: start.x + dx, y: start.y + dy }))
+            return
         }
+
+        // Move the edges that belong to the dragged corner, keep the opposite ones in place
+        let left = start.x
+        let top = start.y
+        let right = start.x + start.w
+        let bottom = start.y + start.h
+
+        if(drag.mode === 'tl' || drag.mode === 'bl'){
+            left = Math.min(Math.max(0, left + dx), right - MIN_REGION_SIZE)
+        } else {
+            right = Math.max(Math.min(1, right + dx), left + MIN_REGION_SIZE)
+        }
+
+        if(drag.mode === 'tl' || drag.mode === 'tr'){
+            top = Math.min(Math.max(0, top + dy), bottom - MIN_REGION_SIZE)
+        } else {
+            bottom = Math.max(Math.min(1, bottom + dy), top + MIN_REGION_SIZE)
+        }
+
+        onChange(clampRegion({ x: left, y: top, w: right - left, h: bottom - top }))
     }
 
     function end() {
@@ -93,7 +115,9 @@ function RegionEditor({
             onPointerUp={end}
             onPointerCancel={end}>
             {children}
-            <div className="region-handle" onPointerDown={(event) => begin('resize', event)}></div>
+            { HANDLES.map((handle) => (
+                <div key={handle} className={'region-handle region-handle-' + handle} onPointerDown={(event) => begin(handle, event)}></div>
+            )) }
         </div>
     )
 }

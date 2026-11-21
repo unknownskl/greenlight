@@ -4,7 +4,9 @@ import SettingsSidebar from '../../components/settings/sidebar'
 import Card from '../../components/ui/card'
 import RegionEditor from '../../components/translator/regioneditor'
 import { useSettings } from '../../context/userContext'
+import Button from '../../components/ui/button'
 import { Region, clampRegion } from '../../lib/translator/geometry'
+import usePadRegion from '../../lib/translator/usepadregion'
 import { useTranslation } from 'react-i18next'
 
 // Languages the translation can be made into (codes of the translation service)
@@ -23,7 +25,29 @@ function SettingsTranslator() {
     const { settings, setSettings } = useSettings()
     const { t } = useTranslation()
 
-    const region = clampRegion(settings.translator_region)
+    const saved = clampRegion(settings.translator_region)
+
+    // While the window is placed with the gamepad the changes stay in a draft and are saved when done
+    const [padEditing, setPadEditing] = React.useState(false)
+    const [draft, setDraft] = React.useState<Region>(saved)
+    const draftRef = React.useRef(draft)
+    draftRef.current = draft
+    const settingsRef = React.useRef(settings)
+    settingsRef.current = settings
+
+    const region = padEditing ? draft : saved
+
+    const finishPadEditing = React.useCallback(() => {
+        setSettings({ ...settingsRef.current, translator_region: clampRegion(draftRef.current) })
+        setPadEditing(false)
+    }, [])
+
+    usePadRegion(padEditing, () => draftRef.current, setDraft, finishPadEditing)
+
+    function startPadEditing() {
+        setDraft(clampRegion(settingsRef.current.translator_region))
+        setPadEditing(true)
+    }
 
     function update(values: object) {
         setSettings({ ...settings, ...values })
@@ -107,8 +131,12 @@ function SettingsTranslator() {
                     <h1>{t('translator.regionTitle')}</h1>
                     <p>{t('translator.regionDescription')}</p>
 
+                    { padEditing ? <p className="translator-pad-hint">{t('translator.padEditActive')}</p> : <p>
+                        <Button label={<span><i className="fa-solid fa-gamepad"></i> {t('translator.padEditBtn')}</span>} className="btn-primary" onClick={startPadEditing}></Button>
+                    </p> }
+
                     <div className="translator-preview" data-gp-ignore>
-                        <RegionEditor region={region} onChange={setRegion}>
+                        <RegionEditor region={region} onChange={padEditing ? setDraft : setRegion} className={padEditing ? 'pad-active' : ''}>
                             <span>{t('translator.previewText')}</span>
                         </RegionEditor>
                     </div>

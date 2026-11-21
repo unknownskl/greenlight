@@ -72,7 +72,7 @@ function GamepadNav() {
                 return document
             },
             isEnabled: () => {
-                if(enabledRef.current === false){
+                if(enabledRef.current === false || gamepadState.captured){
                     return false
                 }
 
