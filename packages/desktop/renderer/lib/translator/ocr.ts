@@ -46,14 +46,38 @@ export interface OcrResult {
     confidence: number;
 }
 
+// Words the reader is not sure about are left out (noise in the picture shows up as low-confidence "words")
+const MIN_WORD_CONFIDENCE = 50
+
 export async function recognizeCanvas(canvas: HTMLCanvasElement): Promise<OcrResult> {
     const worker = await getOcrWorker()
-    const result = await worker.recognize(canvas)
+    const result = await worker.recognize(canvas, {}, { text: true, blocks: true })
 
-    return {
-        text: result.data.text || '',
-        confidence: result.data.confidence || 0,
+    const lines: string[] = []
+    let total = 0
+    let count = 0
+
+    for(const block of result.data.blocks || []){
+        for(const paragraph of block.paragraphs || []){
+            for(const line of paragraph.lines || []){
+                const words = (line.words || []).filter(word => word.confidence >= MIN_WORD_CONFIDENCE && word.text.trim() !== '')
+
+                if(words.length > 0){
+                    lines.push(words.map(word => word.text.trim()).join(' '))
+                    words.forEach((word) => {
+                        total += word.confidence
+                        count++
+                    })
+                }
+            }
+        }
     }
+
+    if(count === 0){
+        return { text: '', confidence: 0 }
+    }
+
+    return { text: lines.join('\n'), confidence: total / count }
 }
 
 export async function terminateOcr(): Promise<void> {

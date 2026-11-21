@@ -28,9 +28,12 @@ export interface EngineOptions {
     onStatus: (status: EngineStatus) => void;
 }
 
-// Brightness (0..255) above / below which a pixel counts as "text"
-const LIGHT_MIN = 185
-const DARK_MAX = 70
+// A pixel counts as "text" when it stands out from its surroundings: brighter (light text) or darker (dark text)
+// than the average of the area around it by at least this much. This works on bright, dark and shaded
+// backgrounds alike, which a fixed brightness limit does not.
+const CONTRAST_MIN = 38
+const LIGHT_FLOOR = 105
+const DARK_CEIL = 150
 
 // Size of the picture that is compared between ticks: it is looked at in detail (up to this width)
 // and then reduced to a coarse grid of this many cells across
@@ -38,12 +41,23 @@ const SIGNATURE_SOURCE_WIDTH = 640
 const SIGNATURE_GRID_WIDTH = 96
 
 // Share of the window that has to look like text before the text reader is started
-const MIN_COVERAGE = 0.003
-const MAX_COVERAGE = 0.4
+const MIN_COVERAGE = 0.002
+const MAX_COVERAGE = 0.5
 
 const TICK_MS = 450
-const FORCE_OCR_MS = 5000
-const EMPTY_TICKS_BEFORE_HIDE = 3
+const FORCE_OCR_MS = 3000
+
+// Mask differences below this are shaking / noise. Different text with a similar layout can look almost the same
+// on a coarse mask, so the text is also read again from time to time while it is on screen (see RECHECK below).
+const CHANGE_THRESHOLD = 0.05
+
+// The translation stays on screen through short gaps (video noise, a flickering interface):
+// it is only hidden when no text has been seen for this many ticks in a row
+const EMPTY_TICKS_BEFORE_HIDE = 9
+const FAILED_READS_BEFORE_HIDE = 6
+
+// Words the text reader is less sure about than this are dropped
+const MIN_CONFIDENCE = 45
 
 // Built from strings: the unicode flag is not allowed by the TypeScript target of the project
 const NOT_TEXT = new RegExp('[^\\p{L}\\p{N}\\s.,!?\'"’:;()\\-–—…/%&+]', 'gu')
@@ -55,19 +69,49 @@ function luminance(data: Uint8ClampedArray, offset: number): number {
     return (data[offset] * 299 + data[offset + 1] * 587 + data[offset + 2] * 114) / 1000
 }
 
-function isInk(lum: number, polarity: Polarity): boolean {
-    return polarity === 'light' ? lum >= LIGHT_MIN : lum <= DARK_MAX
-}
+/** Marks the pixels that stand out from their surroundings (see CONTRAST_MIN). */
+function inkMask(data: Uint8ClampedArray, width: number, height: number, polarity: Polarity): { mask: Uint8Array; count: number } {
+    const pixels = width * height
+    const luma = new Uint8Array(pixels)
+    for(let i = 0; i < pixels; i++){
+        luma[i] = luminance(data, i * 4)
+    }
 
-function buildMask(data: Uint8ClampedArray, polarity: Polarity): { mask: Uint8Array; count: number } {
-    const pixels = data.length / 4
+    // Integral image: the average of any window is then four lookups
+    const stride = width + 1
+    const integral = new Uint32Array(stride * (height + 1))
+    for(let y = 0; y < height; y++){
+        let row = 0
+        for(let x = 0; x < width; x++){
+            row += luma[y * width + x]
+            integral[(y + 1) * stride + x + 1] = integral[y * stride + x + 1] + row
+        }
+    }
+
+    const radius = Math.max(4, Math.round(width * 0.014))
     const mask = new Uint8Array(pixels)
     let count = 0
 
-    for(let i = 0; i < pixels; i++){
-        if(isInk(luminance(data, i * 4), polarity)){
-            mask[i] = 1
-            count++
+    for(let y = 0; y < height; y++){
+        const y0 = Math.max(0, y - radius)
+        const y1 = Math.min(height - 1, y + radius)
+
+        for(let x = 0; x < width; x++){
+            const x0 = Math.max(0, x - radius)
+            const x1 = Math.min(width - 1, x + radius)
+            const area = (x1 - x0 + 1) * (y1 - y0 + 1)
+            const sum = integral[(y1 + 1) * stride + x1 + 1] - integral[y0 * stride + x1 + 1] - integral[(y1 + 1) * stride + x0] + integral[y0 * stride + x0]
+            const mean = sum / area
+            const value = luma[y * width + x]
+
+            const ink = polarity === 'light'
+                ? (value - mean >= CONTRAST_MIN && value >= LIGHT_FLOOR)
+                : (mean - value >= CONTRAST_MIN && value <= DARK_CEIL)
+
+            if(ink){
+                mask[y * width + x] = 1
+                count++
+            }
         }
     }
 
@@ -97,26 +141,49 @@ function poolMask(mask: Uint8Array, width: number, height: number): Uint8Array {
     return pooled
 }
 
-// Share of pixels that differ between two masks (relative to how much "ink" there is)
+// How different two masks are, from 0 (same) to 1 (nothing in common). Ink that has moved by a cell or so
+// (the picture shakes a little because of video compression) still counts as the same.
 function maskDifference(a: Uint8Array, b: Uint8Array): number {
-    let diff = 0
+    const columns = SIGNATURE_GRID_WIDTH
+    const rows = a.length / columns
+
+    const near = (mask: Uint8Array, x: number, y: number): boolean => {
+        for(let dy = -1; dy <= 1; dy++){
+            const yy = y + dy
+            if(yy < 0 || yy >= rows){ continue }
+            for(let dx = -1; dx <= 1; dx++){
+                const xx = x + dx
+                if(xx >= 0 && xx < columns && mask[yy * columns + xx] === 1){
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
+    let unmatched = 0
     let ink = 0
 
-    for(let i = 0; i < a.length; i++){
-        if(a[i] !== b[i]){
-            diff++
-        }
-        if(a[i] === 1 || b[i] === 1){
-            ink++
+    for(let y = 0; y < rows; y++){
+        for(let x = 0; x < columns; x++){
+            const i = y * columns + x
+            if(a[i] === 1){
+                ink++
+                if(!near(b, x, y)){ unmatched++ }
+            }
+            if(b[i] === 1){
+                ink++
+                if(!near(a, x, y)){ unmatched++ }
+            }
         }
     }
 
-    return diff / Math.max(1, ink)
+    return unmatched / Math.max(1, ink)
 }
 
 /** Cleans what the text reader found and returns '' when it does not look like real text. */
 export function cleanOcrText(raw: string): string {
-    const lines = raw.replace(/\|/g, 'I').split(/\r?\n/)
+    const lines = raw.replace(/\|/g, ' ').split(/\r?\n/)
     const kept: string[] = []
 
     for(const line of lines){
@@ -330,14 +397,20 @@ export default class TranslatorEngine {
         const polarities: Polarity[] = config.color === 'auto' ? ['light', 'dark'] : [config.color]
         const candidates = polarities
             .map((polarity) => {
-                const fine = buildMask(pixels, polarity)
+                const fine = inkMask(pixels, width, height, polarity)
                 return { polarity, mask: poolMask(fine.mask, width, height), coverage: fine.count / (width * height) }
             })
-            .filter(candidate => candidate.coverage >= MIN_COVERAGE && candidate.coverage <= MAX_COVERAGE)
+        const present = candidates.filter(candidate => candidate.coverage >= MIN_COVERAGE && candidate.coverage <= MAX_COVERAGE)
 
-        if(candidates.length === 0){
-            // Nothing that looks like text: hide the translation after a moment
+        if(present.length === 0){
             this._prevMask = {}
+
+            // Too much "ink" means a busy picture, not an empty one: neither hide nor read
+            if(candidates.some(candidate => candidate.coverage > MAX_COVERAGE)){
+                return
+            }
+
+            // Nothing that looks like text: hide the translation, but only after a longer gap
             this._emptyTicks++
             if(this._emptyTicks >= EMPTY_TICKS_BEFORE_HIDE){
                 this._readMask = {}
@@ -353,27 +426,31 @@ export default class TranslatorEngine {
         let stable = true
         let changed = !this._hasReadMask
 
-        for(const candidate of candidates){
+        for(const candidate of present){
             const previous = this._prevMask[candidate.polarity]
             if(previous === undefined || previous.length !== candidate.mask.length || maskDifference(previous, candidate.mask) > 0.35){
                 stable = false
             }
 
             const read = this._readMask[candidate.polarity]
-            if(read === undefined || read.length !== candidate.mask.length || maskDifference(read, candidate.mask) >= 0.12){
+            if(read === undefined || read.length !== candidate.mask.length || maskDifference(read, candidate.mask) >= CHANGE_THRESHOLD){
                 changed = true
             }
         }
 
         this._prevMask = {}
-        for(const candidate of candidates){
+        for(const candidate of present){
             this._prevMask[candidate.polarity] = candidate.mask
         }
 
         const now = Date.now()
         const minGap = Math.min(3500, 700 + this._sameCount * 500)
 
-        if(!changed || now < this._retryAt || now - this._lastReadAt < minGap){
+        // Read again now and then even when the picture looks the same: it may be a different line in the same place.
+        // Reading the same text again costs nothing visible (see step 4), and it happens less often the longer the text stays.
+        const recheck = now - this._lastReadAt >= Math.min(3500, 1200 + this._sameCount * 600)
+
+        if((!changed && !recheck) || now < this._retryAt || now - this._lastReadAt < minGap){
             return
         }
 
@@ -385,7 +462,7 @@ export default class TranslatorEngine {
         // 3. Read the text
         this._lastReadAt = now
         this._readMask = {}
-        for(const candidate of candidates){
+        for(const candidate of present){
             this._readMask[candidate.polarity] = candidate.mask
         }
         this._hasReadMask = true
@@ -393,7 +470,7 @@ export default class TranslatorEngine {
         const generation = this._generation
         let best = { text: '', score: 0 }
 
-        for(const candidate of candidates){
+        for(const candidate of present){
             const prepared = this._prepareForReading(video, source, candidate.polarity)
             if(prepared === null){
                 continue
@@ -401,7 +478,7 @@ export default class TranslatorEngine {
 
             const result = await recognizeCanvas(prepared)
             const text = cleanOcrText(result.text)
-            const score = result.confidence >= 60 ? result.confidence * Math.min(text.length, 60) : 0
+            const score = result.confidence >= MIN_CONFIDENCE ? result.confidence * Math.min(text.length, 60) : 0
 
             if(text !== '' && score > best.score){
                 best = { text, score }
@@ -414,7 +491,7 @@ export default class TranslatorEngine {
 
         if(best.text === ''){
             this._failedReads++
-            if(this._failedReads >= 2){
+            if(this._failedReads >= FAILED_READS_BEFORE_HIDE){
                 this._clearShown()
             }
             return
@@ -466,9 +543,10 @@ export default class TranslatorEngine {
 
     /** Crops the window from the video and turns it into black text on white, which is what the text reader likes. */
     _prepareForReading(video: HTMLVideoElement, source: SourceRect, polarity: Polarity): HTMLCanvasElement | null {
-        const scale = Math.min(3, Math.max(1.5, 1100 / source.sw))
-        const width = Math.min(1800, Math.round(source.sw * scale))
-        const height = Math.min(900, Math.round(source.sh * scale))
+        // Small interface text needs to be enlarged a lot to be read reliably
+        const scale = Math.min(3, Math.max(2, 1300 / source.sw))
+        const width = Math.min(2400, Math.round(source.sw * scale))
+        const height = Math.min(1200, Math.round(source.sh * scale))
         const padding = 16
 
         const work = document.createElement('canvas')
@@ -483,12 +561,13 @@ export default class TranslatorEngine {
         const image = workContext.getImageData(0, 0, width, height)
         const data = image.data
 
-        for(let i = 0; i < data.length; i += 4){
-            const value = isInk(luminance(data, i), polarity) ? 0 : 255
-            data[i] = value
-            data[i + 1] = value
-            data[i + 2] = value
-            data[i + 3] = 255
+        const ink = inkMask(data, width, height, polarity).mask
+        for(let i = 0; i < ink.length; i++){
+            const value = ink[i] === 1 ? 0 : 255
+            data[i * 4] = value
+            data[i * 4 + 1] = value
+            data[i * 4 + 2] = value
+            data[i * 4 + 3] = 255
         }
 
         const output = this._readCanvas
