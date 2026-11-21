@@ -1,0 +1,137 @@
+/* Layer on top of the stream */
+div#translator_layer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 97;
+    pointer-events: none;
+}
+
+div#translator_layer.editing {
+    z-index: 99;
+    background: rgba(0, 0, 0, 0.35);
+}
+
+div.translator-box {
+    position: absolute;
+    box-sizing: border-box;
+    padding: 10px 18px;
+    border-radius: 14px;
+    text-align: center;
+    line-height: 1.3;
+    font-weight: 600;
+    color: #ffffff;
+    text-shadow: none;
+    max-height: 60vh;
+    overflow: hidden;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+    animation: translator-pop 0.2s ease-out;
+}
+
+@keyframes translator-pop {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+div.translator-hint-frame {
+    position: absolute;
+    box-sizing: border-box;
+    border: 2px dashed rgba(47, 209, 47, 0.8);
+    border-radius: 12px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    animation: translator-pop 0.2s ease-out;
+}
+
+span.translator-status {
+    margin-top: -14px;
+    padding: 3px 12px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    background: rgba(16, 124, 16, 0.95);
+    color: #ffffff;
+    text-shadow: none;
+}
+
+span.translator-status-error {
+    background: rgba(216, 59, 59, 0.95);
+}
+
+/* Draggable frame (stream edit mode and the settings preview) */
+div.region-frame {
+    position: absolute;
+    box-sizing: border-box;
+    border: 3px solid var(--accent-hi);
+    border-radius: 10px;
+    background: rgba(47, 209, 47, 0.12);
+    cursor: move;
+    pointer-events: auto;
+    touch-action: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    overflow: hidden;
+}
+
+div.region-handle {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 26px;
+    height: 26px;
+    background: var(--accent-hi);
+    border-top-left-radius: 10px;
+    cursor: nwse-resize;
+    touch-action: none;
+}
+
+div.translator-edit-hint {
+    position: absolute;
+    top: 90px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+    padding: 16px 24px;
+    border-radius: 16px;
+    text-align: center;
+    pointer-events: auto;
+    background: rgba(10, 12, 15, 0.92);
+    border: 1px solid var(--border);
+}
+
+div.translator-edit-hint p {
+    padding-bottom: 8px;
+    font-size: 15px;
+}
+
+div.translator-edit-hint p.translator-edit-hint-pad {
+    color: var(--text-dim);
+    font-size: 13px;
+}
+
+/* Settings preview */
+div.translator-preview {
+    position: relative;
+    width: 100%;
+    max-width: 640px;
+    aspect-ratio: 16 / 9;
+    margin: 14px 0 6px 0;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background:
+        radial-gradient(420px 220px at 30% 20%, rgba(47, 209, 47, 0.25), transparent 70%),
+        linear-gradient(135deg, #1a2430 0%, #0b0e12 100%);
+}
+
+div.translator-preview .region-frame span {
+    padding: 0 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #ffffff;
+}

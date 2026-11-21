@@ -37,6 +37,7 @@
     "ip-address": "^10.7.0",
     "react-i18next": "^18.0.1",
     "react-query": "^3.39.3",
+    "tesseract.js": "^6",
     "typescript-eslint": "^8.67.0",
     "uplot": "^1.6.30",
     "xal-node": "^1.1.6-beta2",

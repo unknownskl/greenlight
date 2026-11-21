@@ -50,6 +50,14 @@ export const defaultSettings = {
     video_enabled: true,
     audio_enabled: true,
 
+    // On-screen translator (reads text from a region of the stream and shows a translation)
+    translator_enabled: false,
+    translator_target_lang: 'uk',
+    translator_text_color: 'light',
+    translator_font_size: 26,
+    translator_opacity: 0.85,
+    translator_region: { x: 0.2, y: 0.78, w: 0.6, h: 0.16 },
+
     // WebUI
     webui_autostart: false,
     webui_port: 9003,

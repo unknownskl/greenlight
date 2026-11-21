@@ -9,6 +9,8 @@ import Ipc from '../../lib/ipc'
 import { gamepadState, pushBackHandler } from '../../lib/gamepad/state'
 import { confirmDialog } from '../../lib/gamepad/dialog'
 import { useTranslation } from 'react-i18next'
+import { useSettings } from '../../context/userContext'
+import TranslatorOverlay, { TRANSLATOR_EDIT_EVENT } from '../translator/translatoroverlay'
 
 interface StreamComponentProps {
     onDisconnect?: () => void;
@@ -22,6 +24,7 @@ function StreamComponent({
     xPlayer,
 }: StreamComponentProps) {
     const { t } = useTranslation()
+    const { settings, setSettings } = useSettings()
 
     function performance_now_seconds() {
         return performance.now() / 1000.0
@@ -333,6 +336,16 @@ function StreamComponent({
         })
     }
 
+    function toggleTranslator() {
+        setSettings({ ...settings, translator_enabled: !settings.translator_enabled })
+    }
+
+    function editTranslatorArea() {
+        // The game must not receive input while the window is placed
+        setPadMenu(false)
+        window.dispatchEvent(new Event(TRANSLATOR_EDIT_EVENT))
+    }
+
     function toggleDebug() {
         if (debugElement === null) {
             debugElement = document.getElementById('component_streamcomponent_debug')
@@ -432,6 +445,12 @@ function StreamComponent({
                             <Button label={<span><i className="fa-brands fa-xbox"></i> {t("streamWindow.menuBtn")}</span>} title={t("streamWindow.menuTitle")} onClick={(e) => {
                                 e.target.blur(); onMenu()
                             }}></Button> &nbsp;
+                            <Button label={<span><i className="fa-solid fa-language"></i> {settings.translator_enabled ? t("translator.btnOn") : t("translator.btnOff")}</span>} title={t("translator.btnTitle")} className={settings.translator_enabled ? 'btn-primary' : ''} onClick={(e) => {
+                                e.target.blur(); toggleTranslator()
+                            }}></Button> &nbsp;
+                            { settings.translator_enabled ? <React.Fragment><Button label={<span><i className="fa-solid fa-crop-simple"></i> {t("translator.btnArea")}</span>} title={t("translator.btnAreaTitle")} onClick={(e) => {
+                                e.target.blur(); editTranslatorArea()
+                            }}></Button> &nbsp;</React.Fragment> : '' }
                             <Button label={(micStatus === false) ? <span><i className="fa-solid fa-microphone-slash"></i> {t("streamWindow.micMuted")}</span> : <span><i className="fa-solid fa-microphone"></i> {t("streamWindow.micActive")}</span>} title={(micStatus === false) ? t("streamWindow.enableMic") : t("streamWindow.disableMic")} className={(micStatus === false) ? 'btn-cancel' : 'btn-primary'} onClick={(e) => {
                                 e.target.blur(); toggleMic()
                             }}></Button>
@@ -463,6 +482,8 @@ function StreamComponent({
                         { padMenuOpen ? t("gamepad.streamMenuOpenHint") : t("gamepad.streamMenuHint") }
                     </div>
                 </div>
+
+                <TranslatorOverlay xPlayer={xPlayer} />
 
                 <div id="component_streamcomponent_debug" className='hidden'>
                     <p>{t("streamWindow.debugTitle")}:</p>
