@@ -71,6 +71,9 @@
         "enableTouch": "Toucheingabe aktivieren",
         "enableMouseKeyboard": "Maus & Tastatur aktivieren",
         "legacyWarning": "Maus & Tastatureingabe zusammen mit Gamepad-Tastaturbelegungen zu verwenden verursacht Konflikte",
+        "kbmEmulation": "Tastatur und Maus als Gamepad",
+        "kbmEmulationDescription": "W A S D = linker Stick, Maus = rechter Stick (auf das Bild klicken, um die Maus zu fangen, Esc gibt sie frei), linke / rechte Maustaste = RT / LT, Leertaste = A, Backspace = B, R = X, F = Y, Q / E = LB / RB, Shift = L3, C = R3, Tab = View, M = Menu, N = Xbox-Taste, Pfeiltasten = Steuerkreuz, I J K L = rechter Stick. Ersetzt die Tastenbelegung unten.",
+        "kbmSensitivity": "Mausempfindlichkeit",
         "enableLegacy": "Aktiviere Tastatur zu Gamepad",
         "enableLegacyDescription": "(Deaktivierung dieser Funktion hebt die Gamepad-Tastaturbelegung auf und gestattet nur die Steuerung per Gamepad.)",
         "gamepadNavigation": "Gamepad-Steuerung in Menüs",
@@ -294,7 +297,9 @@
         "editHintPad": "Linker Stick: bewegen  |  Rechter Stick: Breite / Höhe  |  LT langsam, RT schnell  |  A: fertig",
         "padEditBtn": "Mit dem Gamepad platzieren",
         "padEditActive": "Linker Stick / Steuerkreuz: bewegen  |  Rechter Stick: Breite und Höhe  |  LT: langsam, RT: schnell  |  A oder B: fertig",
-        "editDone": "Fertig"
+        "editDone": "Fertig",
+        "fontAutoLabel": "Textgröße wie im Original",
+        "padShortcuts": "Beim Spielen: LB + RB + Y halten, um den Übersetzer ein- oder auszuschalten, LB + RB + X halten, um sein Fenster zu verschieben. Jede Textzeile wird einzeln übersetzt und über das Original gelegt; Zahlen, die sich nur ändern (Zähler, Timer), brauchen keine neue Übersetzung."
     },
     "updater": {
       "unableToCheckForUpdates": "Nach Aktualisierungen kann derzeit nicht gesucht werden. Versuche es erneut.",

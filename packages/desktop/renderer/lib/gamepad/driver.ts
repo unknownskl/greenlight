@@ -1,4 +1,5 @@
 import { BUTTON_NAMES, PadFrame, emptyFrame, getUsablePads, mergeFrames, readPad } from './pads'
+import KeyboardMouseEmulation from './kbm'
 
 /**
  * Gamepad driver for xbox-xcloud-player (passed in as `input_driver`).
@@ -22,16 +23,30 @@ export default class GreenlightGamepadDriver {
 
     _application: any = null
 
+    // Opens the Greenlight menu (LB + RB + View + Menu, held)
     onChord?: () => void
     chordHoldMs = 1000
+
+    // Screen translator shortcuts: LB + RB + Y turns it on / off, LB + RB + X moves its window (held a moment)
+    onTranslatorToggle?: () => void
+    onTranslatorArea?: () => void
+    shortcutHoldMs = 600
 
     _suspended = false
     _running = false
     _nexusOverrideN = false
 
-    _chordSince = 0
-    _chordFired = false
-    _chordHeld = false
+    _chords: Record<string, { since: number; fired: boolean; held: boolean }> = {}
+
+    // Keyboard and mouse acting as a gamepad (see kbm.ts)
+    _kbm: KeyboardMouseEmulation | null = null
+
+    constructor(options: { keyboardMouse?: boolean; sensitivity?: number } = {}) {
+        if(options.keyboardMouse === true){
+            this._kbm = new KeyboardMouseEmulation(options.sensitivity ?? 1)
+            this._kbm.canLock = () => !this._suspended
+        }
+    }
 
     // Buttons pressed by the UI (pressButton) for a short time
     _shadow: Partial<Record<typeof BUTTON_NAMES[number], number>> = {}
@@ -45,6 +60,7 @@ export default class GreenlightGamepadDriver {
     }
 
     start() {
+        this._kbm?.start()
         this._running = true
         window.removeEventListener('keydown', this._downFunc)
         window.removeEventListener('keyup', this._upFunc)
@@ -53,6 +69,7 @@ export default class GreenlightGamepadDriver {
     }
 
     stop() {
+        this._kbm?.stop()
         this._running = false
         window.removeEventListener('keydown', this._downFunc)
         window.removeEventListener('keyup', this._upFunc)
@@ -60,9 +77,15 @@ export default class GreenlightGamepadDriver {
 
     setSuspended(suspended: boolean) {
         this._suspended = suspended
-        this._chordSince = 0
-        // If the chord is still held, wait until it is released before it can fire again
-        this._chordFired = this._chordHeld
+        if(suspended){
+            // A menu needs the mouse
+            this._kbm?.release()
+        }
+        // If a chord is still held, wait until it is released before it can fire again
+        for(const name of Object.keys(this._chords)){
+            this._chords[name].since = 0
+            this._chords[name].fired = this._chords[name].held
+        }
     }
 
     isSuspended() {
@@ -129,24 +152,23 @@ export default class GreenlightGamepadDriver {
             merged[name] = Math.max(merged[name], this._shadow[name] ?? 0)
         }
 
-        // The Greenlight menu chord. While it is held (or the menu is open) the console gets neutral input.
-        const chordDown = merged.LeftShoulder > 0.5 && merged.RightShoulder > 0.5 && merged.View > 0.5 && merged.Menu > 0.5
-        const now = Date.now()
-        this._chordHeld = chordDown
-
-        if(chordDown){
-            if(this._chordSince === 0){
-                this._chordSince = now
-            } else if(this._chordFired === false && now - this._chordSince >= this.chordHoldMs){
-                this._chordFired = true
-                this.onChord?.()
-            }
-        } else {
-            this._chordSince = 0
-            this._chordFired = false
+        // Keyboard and mouse (when they act as a gamepad) are added to the controllers
+        if(this._kbm !== null){
+            this._kbm.apply(merged)
         }
 
-        if(chordDown || this._suspended){
+        // Shortcuts. While one is held (or the menu is open) the console gets neutral input.
+        const bumpers = merged.LeftShoulder > 0.5 && merged.RightShoulder > 0.5
+        const menuChord = bumpers && merged.View > 0.5 && merged.Menu > 0.5
+        const toggleChord = bumpers && merged.Y > 0.5 && !menuChord
+        const areaChord = bumpers && merged.X > 0.5 && !menuChord
+        const now = Date.now()
+
+        this._trackChord('menu', menuChord, now, this.chordHoldMs, this.onChord)
+        this._trackChord('translator-toggle', toggleChord, now, this.shortcutHoldMs, this.onTranslatorToggle)
+        this._trackChord('translator-area', areaChord, now, this.shortcutHoldMs, this.onTranslatorArea)
+
+        if(menuChord || toggleChord || areaChord || this._suspended){
             return [emptyFrame()]
         }
 
@@ -156,6 +178,27 @@ export default class GreenlightGamepadDriver {
         }
 
         return [merged]
+    }
+
+    _trackChord(name: string, down: boolean, now: number, holdMs: number, callback?: () => void) {
+        if(this._chords[name] === undefined){
+            this._chords[name] = { since: 0, fired: false, held: false }
+        }
+
+        const chord = this._chords[name]
+        chord.held = down
+
+        if(down){
+            if(chord.since === 0){
+                chord.since = now
+            } else if(chord.fired === false && now - chord.since >= holdMs){
+                chord.fired = true
+                callback?.()
+            }
+        } else {
+            chord.since = 0
+            chord.fired = false
+        }
     }
 
     _trackActivity(pads: Gamepad[]) {

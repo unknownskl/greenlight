@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { useSettings } from '../../context/userContext'
 import Ipc from '../../lib/ipc'
 import { Region, clampRegion, FitMode } from '../../lib/translator/geometry'
-import TranslatorEngine, { EngineStatus, TranslatorResult, TextColor } from '../../lib/translator/engine'
+import TranslatorEngine, { EngineStatus, TranslatorResult, TranslatedSegment, TextColor } from '../../lib/translator/engine'
 import { terminateOcr } from '../../lib/translator/ocr'
 import usePadRegion from '../../lib/translator/usepadregion'
 import RegionEditor from './regioneditor'
@@ -13,6 +13,61 @@ export const TRANSLATOR_EDIT_EVENT = 'greenlight-translator-edit'
 
 interface TranslatorOverlayProps {
     xPlayer: any;
+}
+
+let measureContext: CanvasRenderingContext2D | null | undefined
+
+function textWidth(text: string, size: number): number {
+    if(measureContext === undefined){
+        measureContext = document.createElement('canvas').getContext('2d')
+    }
+
+    if(measureContext === null){
+        return text.length * size * 0.55
+    }
+
+    measureContext.font = '600 ' + size + 'px "Segoe UI", Helvetica, Arial, sans-serif'
+    return measureContext.measureText(text).width
+}
+
+/** Position, size and colours of the translation of one piece of text, so it looks like the interface it replaces. */
+export function segmentStyle(segment: TranslatedSegment, viewport: { width: number; height: number }, autoFont: boolean, fixedSize: number, opacity: number): React.CSSProperties {
+    const originalWidth = segment.rect.w * viewport.width
+    const maxWidth = Math.max(originalWidth * 1.35, 140)
+
+    // The size of the original text; shrunk a little when the translation is much longer than the original
+    let size = autoFont ? Math.min(56, Math.max(12, segment.lineHeight * viewport.height * 1.02)) : fixedSize
+    if(autoFont){
+        const wanted = textWidth(segment.translated, size)
+        if(wanted > maxWidth){
+            size = Math.max(size * 0.72, size * maxWidth / wanted)
+        }
+    }
+
+    const [r, g, b] = segment.background
+    // The box covers the original text completely (with a small margin around it)
+    const style: React.CSSProperties = {
+        top: 'calc(' + (segment.rect.y * 100) + '% - 4px)',
+        maxWidth: maxWidth + 'px',
+        minWidth: (Math.min(originalWidth, maxWidth) + 16) + 'px',
+        minHeight: (segment.rect.h * viewport.height + 8) + 'px',
+        fontSize: size + 'px',
+        color: segment.foreground,
+        background: 'rgba(' + r + ', ' + g + ', ' + b + ', ' + opacity + ')',
+    }
+
+    if(segment.centered){
+        style.left = ((segment.rect.x + segment.rect.w / 2) * 100) + '%'
+        style.transform = 'translateX(-50%)'
+        style.textAlign = 'center'
+        style.justifyContent = 'center'
+    } else {
+        style.left = 'calc(' + (segment.rect.x * 100) + '% - 8px)'
+        style.textAlign = 'left'
+        style.justifyContent = 'flex-start'
+    }
+
+    return style
 }
 
 /**
@@ -32,6 +87,7 @@ function TranslatorOverlay({
     const [status, setStatus] = React.useState<EngineStatus>('ready')
     const [flash, setFlash] = React.useState(false)
     const [editing, setEditing] = React.useState(false)
+    const [toast, setToast] = React.useState('')
     const [draft, setDraft] = React.useState<Region>(clampRegion(settings.translator_region))
     const draftRef = React.useRef(draft)
     draftRef.current = draft
@@ -79,16 +135,28 @@ function TranslatorOverlay({
         }
     }, [])
 
-    // Show the window for a moment after the translator is turned on
+    // Show the window for a moment after the translator is turned on, and say whether it is on or off
+    const firstRun = React.useRef(true)
     React.useEffect(() => {
-        if(!enabled){
-            return
+        const wasFirst = firstRun.current
+        firstRun.current = false
+
+        let hideToast: ReturnType<typeof setTimeout> | undefined
+        if(!wasFirst){
+            setToast(enabled ? t('translator.btnOn') : t('translator.btnOff'))
+            hideToast = setTimeout(() => setToast(''), 1800)
         }
 
-        setFlash(true)
-        const timer = setTimeout(() => setFlash(false), 3500)
+        let timer: ReturnType<typeof setTimeout> | undefined
+        if(enabled){
+            setFlash(true)
+            timer = setTimeout(() => setFlash(false), 3500)
+        }
 
-        return () => clearTimeout(timer)
+        return () => {
+            if(timer !== undefined){ clearTimeout(timer) }
+            if(hideToast !== undefined){ clearTimeout(hideToast) }
+        }
     }, [enabled])
 
     // Edit mode: started from the game bar
@@ -121,22 +189,17 @@ function TranslatorOverlay({
         }
     }, [])
 
-    if(!enabled && !editing){
+    if(!enabled && !editing && toast === ''){
         return null
     }
 
-    const anchorBottom = region.y + region.h / 2 > 0.5
     const opacity = typeof settings.translator_opacity === 'number' ? settings.translator_opacity : 0.85
 
     return (
         <div id="translator_layer" className={editing ? 'editing' : ''} data-gp-ignore>
-            { (enabled && !editing && result !== null) ? <div className="translator-box" style={{
-                left: (region.x * 100) + '%',
-                width: (region.w * 100) + '%',
-                ...(anchorBottom ? { bottom: ((1 - region.y - region.h) * 100) + '%' } : { top: (region.y * 100) + '%' }),
-                fontSize: (settings.translator_font_size || 26) + 'px',
-                background: 'rgba(10, 12, 15, ' + opacity + ')',
-            }}>{result.translated}</div> : '' }
+            { (enabled && !editing && result !== null) ? result.segments.map((segment, index) => (
+                <div key={index} className="translator-segment" style={segmentStyle(segment, { width: window.innerWidth, height: window.innerHeight }, settings.translator_font_auto !== false, settings.translator_font_size || 26, opacity)}>{segment.translated}</div>
+            )) : '' }
 
             { (enabled && !editing && (flash || status !== 'ready')) ? <div className="translator-hint-frame" style={{
                 left: (region.x * 100) + '%',
@@ -147,6 +210,8 @@ function TranslatorOverlay({
                 { status === 'loading' ? <span className="translator-status">{t('translator.statusLoading')}</span> : '' }
                 { status === 'error' ? <span className="translator-status translator-status-error">{t('translator.statusError')}</span> : '' }
             </div> : '' }
+
+            { toast !== '' ? <div className="translator-toast"><i className="fa-solid fa-language"></i> {toast}</div> : '' }
 
             { editing ? <React.Fragment>
                 <div className="translator-edit-hint">

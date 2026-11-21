@@ -34,15 +34,15 @@ export interface SourceRect {
     sh: number;
 }
 
-/**
- * Converts the region (fractions of the stream area on screen) to pixels of the video frame,
- * taking the way the video is fitted into the area (letterbox / stretch / zoom) into account.
- */
-export function regionToSource(videoWidth: number, videoHeight: number, boxWidth: number, boxHeight: number, fit: FitMode, region: Region): SourceRect | null {
-    if(videoWidth <= 0 || videoHeight <= 0 || boxWidth <= 0 || boxHeight <= 0){
-        return null
-    }
+interface FitInfo {
+    scaleX: number;
+    scaleY: number;
+    offsetX: number;
+    offsetY: number;
+}
 
+// How the video frame is placed inside the area it is shown in (letterbox / stretch / zoom)
+function getFit(videoWidth: number, videoHeight: number, boxWidth: number, boxHeight: number, fit: FitMode): FitInfo {
     let scaleX = boxWidth / videoWidth
     let scaleY = boxHeight / videoHeight
 
@@ -52,8 +52,24 @@ export function regionToSource(videoWidth: number, videoHeight: number, boxWidth
         scaleX = scaleY = Math.max(scaleX, scaleY)
     }
 
-    const offsetX = (boxWidth - videoWidth * scaleX) / 2
-    const offsetY = (boxHeight - videoHeight * scaleY) / 2
+    return {
+        scaleX,
+        scaleY,
+        offsetX: (boxWidth - videoWidth * scaleX) / 2,
+        offsetY: (boxHeight - videoHeight * scaleY) / 2,
+    }
+}
+
+/**
+ * Converts the region (fractions of the stream area on screen) to pixels of the video frame,
+ * taking the way the video is fitted into the area (letterbox / stretch / zoom) into account.
+ */
+export function regionToSource(videoWidth: number, videoHeight: number, boxWidth: number, boxHeight: number, fit: FitMode, region: Region): SourceRect | null {
+    if(videoWidth <= 0 || videoHeight <= 0 || boxWidth <= 0 || boxHeight <= 0){
+        return null
+    }
+
+    const { scaleX, scaleY, offsetX, offsetY } = getFit(videoWidth, videoHeight, boxWidth, boxHeight, fit)
 
     const left = Math.max(0, (region.x * boxWidth - offsetX) / scaleX)
     const top = Math.max(0, (region.y * boxHeight - offsetY) / scaleY)
@@ -65,4 +81,16 @@ export function regionToSource(videoWidth: number, videoHeight: number, boxWidth
     }
 
     return { sx: left, sy: top, sw: right - left, sh: bottom - top }
+}
+
+/** The other way round: a rectangle in video pixels becomes a rectangle in fractions of the stream area. */
+export function videoRectToScreen(videoWidth: number, videoHeight: number, boxWidth: number, boxHeight: number, fit: FitMode, rect: { x: number; y: number; w: number; h: number }): Region {
+    const { scaleX, scaleY, offsetX, offsetY } = getFit(videoWidth, videoHeight, boxWidth, boxHeight, fit)
+
+    return {
+        x: (rect.x * scaleX + offsetX) / boxWidth,
+        y: (rect.y * scaleY + offsetY) / boxHeight,
+        w: (rect.w * scaleX) / boxWidth,
+        h: (rect.h * scaleY) / boxHeight,
+    }
 }

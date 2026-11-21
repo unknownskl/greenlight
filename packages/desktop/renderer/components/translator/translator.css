@@ -151,3 +151,34 @@ div.translator-preview .region-frame span {
     font-weight: 600;
     color: #ffffff;
 }
+
+/* Translation of one line / piece of text, placed over the original and styled like it */
+div.translator-segment {
+    position: absolute;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 5px;
+    line-height: 1.2;
+    font-weight: 600;
+    text-shadow: none;
+    overflow-wrap: break-word;
+    animation: translator-pop 0.15s ease-out;
+}
+
+div.translator-toast {
+    position: absolute;
+    top: 86px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 8px 18px;
+    border-radius: 999px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #ffffff;
+    text-shadow: none;
+    background: rgba(10, 12, 15, 0.9);
+    border: 1px solid rgba(47, 209, 47, 0.7);
+    animation: translator-pop 0.15s ease-out;
+}

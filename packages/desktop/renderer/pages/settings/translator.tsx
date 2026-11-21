@@ -111,11 +111,20 @@ function SettingsTranslator() {
                     </p>
 
                     <p>
-                        <label>{t('translator.fontSizeLabel')}</label>
-                        <input type="range" min={16} max={48} step={1} value={settings.translator_font_size} onChange={(e) => {
-                            update({ translator_font_size: parseInt(e.target.value) })
-                        }} /> {settings.translator_font_size}px
+                        <label>{t('translator.fontAutoLabel')}</label>
+                        <label style={{ minWidth: 0 }} className="toggle-label">
+                            <input type='checkbox' checked={settings.translator_font_auto !== false} onChange={(e) => {
+                                update({ translator_font_auto: e.target.checked })
+                            }} />
+                        </label>
                     </p>
+
+                    { settings.translator_font_auto === false ? <p>
+                        <label>{t('translator.fontSizeLabel')}</label>
+                        <input type="range" min={12} max={56} step={1} value={settings.translator_font_size || 26} onChange={(e) => {
+                            update({ translator_font_size: parseInt(e.target.value) })
+                        }} /> {settings.translator_font_size || 26}px
+                    </p> : '' }
 
                     <p>
                         <label>{t('translator.opacityLabel')}</label>
@@ -125,6 +134,7 @@ function SettingsTranslator() {
                     </p>
 
                     <p><small>{t('translator.note')}</small></p>
+                    <p><small><i className="fa-solid fa-gamepad"></i> {t('translator.padShortcuts')}</small></p>
                 </Card>
 
                 <Card>

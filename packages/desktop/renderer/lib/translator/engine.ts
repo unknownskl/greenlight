@@ -1,5 +1,5 @@
-import { Region, FitMode, clampRegion, regionToSource, SourceRect } from './geometry'
-import { getOcrWorker, recognizeCanvas } from './ocr'
+import { Region, FitMode, clampRegion, regionToSource, videoRectToScreen, SourceRect } from './geometry'
+import { getOcrWorker, recognizeCanvas, OcrLine } from './ocr'
 
 export type TextColor = 'light' | 'dark' | 'auto'
 type Polarity = 'light' | 'dark'
@@ -13,9 +13,25 @@ export interface TranslatorConfig {
     fit: FitMode;
 }
 
+/** One piece of text of the interface (a line, or a few lines that belong together) with its translation. */
+export interface TranslatedSegment {
+    original: string;
+    translated: string;
+    // Where the original text is, in fractions of the stream area
+    rect: Region;
+    // Height of one line of the original text, as a fraction of the height of the stream area
+    lineHeight: number;
+    // Colour of the interface behind the original text and a text colour that reads well on it
+    background: [number, number, number];
+    foreground: string;
+    // True when the text is centred in the window (a subtitle), false when it starts at the left edge of the window
+    centered: boolean;
+}
+
 export interface TranslatorResult {
     original: string;
     translated: string;
+    segments: TranslatedSegment[];
 }
 
 export interface EngineOptions {
@@ -48,7 +64,7 @@ const TICK_MS = 450
 const FORCE_OCR_MS = 3000
 
 // Mask differences below this are shaking / noise. Different text with a similar layout can look almost the same
-// on a coarse mask, so the text is also read again from time to time while it is on screen (see RECHECK below).
+// on a coarse mask, so the text is also read again from time to time while it is on screen (see "recheck").
 const CHANGE_THRESHOLD = 0.05
 
 // The translation stays on screen through short gaps (video noise, a flickering interface):
@@ -59,11 +75,16 @@ const FAILED_READS_BEFORE_HIDE = 6
 // Words the text reader is less sure about than this are dropped
 const MIN_CONFIDENCE = 45
 
+// A box that moved by less than this (fraction of the stream area) is the same box: the picture only shakes
+const MOVE_TOLERANCE = 0.012
+
 // Built from strings: the unicode flag is not allowed by the TypeScript target of the project
 const NOT_TEXT = new RegExp('[^\\p{L}\\p{N}\\s.,!?\'"’:;()\\-–—…/%&+]', 'gu')
 const ALNUM = new RegExp('[\\p{L}\\p{N}]', 'gu')
 const LETTER = new RegExp('\\p{L}', 'gu')
 const NOT_ALNUM = new RegExp('[^\\p{L}\\p{N}]', 'gu')
+const LOWER_START = new RegExp('^[^\\p{L}]*\\p{Ll}', 'u')
+const NUMBER = /\d+(?:[.,:]\d+)*/g
 
 function luminance(data: Uint8ClampedArray, offset: number): number {
     return (data[offset] * 299 + data[offset + 1] * 587 + data[offset + 2] * 114) / 1000
@@ -208,6 +229,11 @@ export function normalizeText(text: string): string {
     return text.toLowerCase().replace(NOT_ALNUM, '')
 }
 
+/** The text without its numbers: "Enemies left: 5" and "Enemies left: 4" have the same template. */
+export function templateKey(text: string): string {
+    return normalizeText(text.replace(NUMBER, '#'))
+}
+
 function levenshtein(a: string, b: string): number {
     const previous = new Array(b.length + 1)
     const current = new Array(b.length + 1)
@@ -245,12 +271,54 @@ export function isSameText(a: string, b: string): boolean {
 }
 
 /**
- * Looks at a window of the video, reads the text in it and translates it.
+ * Puts the new numbers of a text into the translation of the old one, so a counter or a timer that only changes
+ * its digits does not need a new translation. Returns null when that is not possible.
+ */
+export function substituteNumbers(oldOriginal: string, newOriginal: string, oldTranslated: string): string | null {
+    const before = oldOriginal.match(NUMBER) || []
+    const after = newOriginal.match(NUMBER) || []
+    const inTranslation = oldTranslated.match(NUMBER) || []
+
+    if(before.length === 0 || before.length !== after.length || before.length !== inTranslation.length){
+        return null
+    }
+
+    if(!before.every((value, index) => value === inTranslation[index])){
+        return null
+    }
+
+    let index = 0
+    return oldTranslated.replace(NUMBER, () => after[index++])
+}
+
+interface RawSegment {
+    text: string;
+    // In pixels of the video frame
+    rect: { x: number; y: number; w: number; h: number };
+    lineHeight: number;
+    background: [number, number, number];
+    foreground: string;
+    centered: boolean;
+}
+
+interface ReadResult {
+    segments: RawSegment[];
+    text: string;
+    score: number;
+}
+
+interface ShownSegment extends TranslatedSegment {
+    template: string;
+}
+
+/**
+ * Looks at a window of the video, reads the text in it and translates it, line by line.
  *
  * The same text is never read or translated twice:
  *  - a cheap picture of the "text pixels" is compared between ticks, so a changing background does not start the reader,
- *  - the reader only runs when that picture has really changed and has settled,
+ *  - the reader only runs when that picture has really changed and has settled (or now and then, see "recheck"),
  *  - when the reader finds the same text again (small reading errors are ignored) nothing is updated,
+ *  - when only numbers change (a counter, a timer) the new numbers are put into the old translation,
  *  - translations are cached.
  */
 export default class TranslatorEngine {
@@ -270,10 +338,13 @@ export default class TranslatorEngine {
     _lastReadAt = 0
     _retryAt = 0
     _sameCount = 0
-    _shown = ''
+    _shown: ShownSegment[] = []
     _regionKey = ''
 
+    // Translations by the text, and by the text without its numbers
     _cache: Map<string, string> = new Map()
+    _templates: Map<string, { original: string; translated: string }> = new Map()
+
     _signatureCanvas = document.createElement('canvas')
     _readCanvas = document.createElement('canvas')
 
@@ -347,8 +418,8 @@ export default class TranslatorEngine {
     }
 
     _clearShown() {
-        if(this._shown !== ''){
-            this._shown = ''
+        if(this._shown.length > 0){
+            this._shown = []
             this._options.onResult(null)
         }
     }
@@ -468,20 +539,12 @@ export default class TranslatorEngine {
         this._hasReadMask = true
 
         const generation = this._generation
-        let best = { text: '', score: 0 }
+        let best: ReadResult = { segments: [], text: '', score: 0 }
 
         for(const candidate of present){
-            const prepared = this._prepareForReading(video, source, candidate.polarity)
-            if(prepared === null){
-                continue
-            }
-
-            const result = await recognizeCanvas(prepared)
-            const text = cleanOcrText(result.text)
-            const score = result.confidence >= MIN_CONFIDENCE ? result.confidence * Math.min(text.length, 60) : 0
-
-            if(text !== '' && score > best.score){
-                best = { text, score }
+            const result = await this._read(video, source, candidate.polarity)
+            if(result !== null && result.score > best.score){
+                best = result
             }
         }
 
@@ -489,7 +552,7 @@ export default class TranslatorEngine {
             return
         }
 
-        if(best.text === ''){
+        if(best.segments.length === 0){
             this._failedReads++
             if(this._failedReads >= FAILED_READS_BEFORE_HIDE){
                 this._clearShown()
@@ -498,51 +561,255 @@ export default class TranslatorEngine {
         }
         this._failedReads = 0
 
-        // 4. Same text as before: nothing to do
-        const normalized = normalizeText(best.text)
-        if(this._shown !== '' && isSameText(normalized, this._shown)){
+        // 4. Same text as before? Then nothing needs to be translated; only changed numbers are put in
+        const shown = this._shown
+        const matches = this._matchShown(best.segments)
+
+        // 5. Translate what is new
+        let segments: ShownSegment[]
+        try {
+            segments = await Promise.all(best.segments.map((raw, index) => this._translateSegment(raw, matches[index], config, video, box)))
+        } catch(error) {
+            console.warn('Translator: translation failed:', error)
+            if(generation === this._generation){
+                this._options.onStatus('error')
+                // Try again in a few seconds
+                this._hasReadMask = false
+                this._retryAt = Date.now() + 3000
+            }
+            return
+        }
+
+        if(generation !== this._generation || !this._running){
+            return
+        }
+
+        const unchanged = shown.length === segments.length && segments.every((segment, index) => {
+            const old = shown[index]
+            return old.translated === segment.translated
+                && Math.abs(old.rect.x - segment.rect.x) < MOVE_TOLERANCE
+                && Math.abs(old.rect.y - segment.rect.y) < MOVE_TOLERANCE
+                && Math.abs(old.rect.w - segment.rect.w) < MOVE_TOLERANCE * 2
+        })
+
+        if(unchanged){
             this._sameCount++
             return
         }
-        this._sameCount = 0
 
-        // 5. Translate
-        const cacheKey = config.target + '|' + normalized
-        let translated = this._cache.get(cacheKey)
-
-        if(translated === undefined){
-            try {
-                translated = await this._options.translate(best.text, config.target)
-            } catch(error) {
-                console.warn('Translator: translation failed:', error)
-                if(generation === this._generation){
-                    this._options.onStatus('error')
-                    // Try again in a few seconds
-                    this._hasReadMask = false
-                    this._retryAt = Date.now() + 3000
-                }
-                return
-            }
-
-            if(translated !== ''){
-                if(this._cache.size > 300){
-                    this._cache.delete(this._cache.keys().next().value as string)
-                }
-                this._cache.set(cacheKey, translated)
-            }
-        }
-
-        if(generation !== this._generation || !this._running || translated === ''){
-            return
-        }
+        // Only the shape moved a little: keep the old boxes, so the translation does not twitch
+        const sameTexts = shown.length === segments.length && segments.every((segment, index) => shown[index].translated === segment.translated)
+        this._sameCount = sameTexts ? this._sameCount + 1 : 0
 
         this._options.onStatus('ready')
-        this._shown = normalized
-        this._options.onResult({ original: best.text, translated })
+        this._shown = segments
+        this._options.onResult({
+            original: segments.map(segment => segment.original).join(' '),
+            translated: segments.map(segment => segment.translated).join('\n'),
+            segments,
+        })
+    }
+
+    /** For every new piece of text: the piece that was shown before with the same text (apart from numbers), if any. */
+    _matchShown(segments: RawSegment[]): Array<ShownSegment | null> {
+        const used = new Set<ShownSegment>()
+
+        return segments.map((segment) => {
+            const template = templateKey(segment.text)
+            let best: ShownSegment | null = null
+
+            for(const candidate of this._shown){
+                if(!used.has(candidate) && isSameText(template, candidate.template)){
+                    best = candidate
+                    break
+                }
+            }
+
+            if(best !== null){
+                used.add(best)
+            }
+            return best
+        })
+    }
+
+    async _translateSegment(raw: RawSegment, previous: ShownSegment | null, config: TranslatorConfig, video: HTMLVideoElement, box: { width: number; height: number }): Promise<ShownSegment> {
+        const target = config.target
+        const template = templateKey(raw.text)
+        const fullKey = target + '|' + normalizeText(raw.text)
+
+        let translated = this._cache.get(fullKey)
+
+        if(translated === undefined && previous !== null){
+            // The same text with other numbers (or the same text)
+            translated = previous.original === raw.text
+                ? previous.translated
+                : (substituteNumbers(previous.original, raw.text, previous.translated) ?? undefined)
+        }
+
+        if(translated === undefined){
+            const known = this._templates.get(target + '|' + template)
+            if(known !== undefined){
+                translated = substituteNumbers(known.original, raw.text, known.translated) ?? undefined
+            }
+        }
+
+        if(translated === undefined){
+            translated = await this._options.translate(raw.text, target)
+
+            if(translated === ''){
+                translated = raw.text
+            }
+
+            this._remember(fullKey, translated)
+            this._templates.set(target + '|' + template, { original: raw.text, translated })
+        }
+
+        // Keep the old box when the picture only shook a little (the translation would twitch otherwise)
+        const screen = videoRectToScreen(video.videoWidth, video.videoHeight, box.width, box.height, config.fit, raw.rect)
+        const lineHeight = videoRectToScreen(video.videoWidth, video.videoHeight, box.width, box.height, config.fit, { x: 0, y: 0, w: 0, h: raw.lineHeight }).h
+
+        const moved = previous === null
+            || Math.abs(previous.rect.x - screen.x) >= MOVE_TOLERANCE
+            || Math.abs(previous.rect.y - screen.y) >= MOVE_TOLERANCE
+            || Math.abs(previous.rect.w - screen.w) >= MOVE_TOLERANCE * 2
+
+        return {
+            original: raw.text,
+            translated,
+            rect: moved ? screen : previous.rect,
+            lineHeight: moved ? lineHeight : previous.lineHeight,
+            background: raw.background,
+            foreground: raw.foreground,
+            centered: raw.centered,
+            template,
+        }
+    }
+
+    _remember(key: string, translated: string) {
+        if(this._cache.size > 300){
+            this._cache.delete(this._cache.keys().next().value as string)
+        }
+        this._cache.set(key, translated)
+    }
+
+    /** Reads the window with one text colour and turns the result into pieces of text with their position and colours. */
+    async _read(video: HTMLVideoElement, source: SourceRect, polarity: Polarity): Promise<ReadResult | null> {
+        const prepared = this._prepareForReading(video, source, polarity)
+        if(prepared === null){
+            return null
+        }
+
+        const result = await recognizeCanvas(prepared.canvas)
+        if(result.confidence < MIN_CONFIDENCE){
+            return null
+        }
+
+        // Clean the lines and drop what is not text
+        const lines: Array<{ line: OcrLine; text: string }> = []
+        for(const line of result.lines){
+            const text = cleanOcrText(line.text)
+            if(text !== ''){
+                lines.push({ line, text })
+            }
+        }
+
+        // Lines that continue the same sentence (a subtitle that wraps) are translated together, other lines on their own
+        const groups: Array<Array<{ line: OcrLine; text: string }>> = []
+        for(const item of lines.sort((a, b) => a.line.bbox.y0 - b.line.bbox.y0 || a.line.bbox.x0 - b.line.bbox.x0)){
+            const group = groups[groups.length - 1]
+            const last = group === undefined ? undefined : group[group.length - 1]
+
+            if(last !== undefined && this._continues(last, item)){
+                group.push(item)
+            } else {
+                groups.push([item])
+            }
+        }
+
+        const segments: RawSegment[] = groups.map((group) => {
+            const x0 = Math.min(...group.map(item => item.line.bbox.x0))
+            const y0 = Math.min(...group.map(item => item.line.bbox.y0))
+            const x1 = Math.max(...group.map(item => item.line.bbox.x1))
+            const y1 = Math.max(...group.map(item => item.line.bbox.y1))
+            const heights = group.map(item => item.line.bbox.y1 - item.line.bbox.y0).sort((a, b) => a - b)
+            const lineHeight = heights[Math.floor(heights.length / 2)]
+
+            const background = this._sampleBackground(prepared, x0, y0, x1, y1)
+            const brightness = (background[0] * 299 + background[1] * 587 + background[2] * 114) / 1000
+
+            // Position in pixels of the video frame
+            const toVideoX = (x: number) => source.sx + (x - prepared.padding) / prepared.scaleX
+            const toVideoY = (y: number) => source.sy + (y - prepared.padding) / prepared.scaleY
+
+            const left = toVideoX(x0)
+            const right = toVideoX(x1)
+            const windowCenter = source.sx + source.sw / 2
+            const centered = Math.abs((left + right) / 2 - windowCenter) < source.sw * 0.12 && left - source.sx > source.sw * 0.08
+
+            return {
+                text: group.map(item => item.text).join(' '),
+                rect: { x: left, y: toVideoY(y0), w: right - left, h: toVideoY(y1) - toVideoY(y0) },
+                lineHeight: lineHeight / prepared.scaleY,
+                background,
+                foreground: brightness > 150 ? '#111111' : '#ffffff',
+                centered,
+            }
+        })
+
+        const characters = segments.reduce((sum, segment) => sum + segment.text.length, 0)
+
+        return {
+            segments,
+            text: segments.map(segment => segment.text).join(' '),
+            score: segments.length === 0 ? 0 : result.confidence * Math.min(characters, 60),
+        }
+    }
+
+    /** Does `next` continue the sentence that `last` is part of (the line below it, and `last` did not end the sentence)? */
+    _continues(last: { line: OcrLine; text: string }, next: { line: OcrLine; text: string }): boolean {
+        const lastHeight = last.line.bbox.y1 - last.line.bbox.y0
+        const gap = next.line.bbox.y0 - last.line.bbox.y1
+        const overlapsInX = next.line.bbox.x0 < last.line.bbox.x1 && next.line.bbox.x1 > last.line.bbox.x0
+
+        return gap < lastHeight * 0.7
+            && overlapsInX
+            && !/[.!?:…»"”]$/.test(last.text)
+            && LOWER_START.test(next.text)
+    }
+
+    /** The colour of the interface behind a piece of text: the average of the pixels in its box that are not text. */
+    _sampleBackground(prepared: PreparedImage, x0: number, y0: number, x1: number, y1: number): [number, number, number] {
+        const left = Math.max(0, Math.floor(x0 - prepared.padding))
+        const top = Math.max(0, Math.floor(y0 - prepared.padding))
+        const right = Math.min(prepared.width - 1, Math.ceil(x1 - prepared.padding))
+        const bottom = Math.min(prepared.height - 1, Math.ceil(y1 - prepared.padding))
+
+        let r = 0
+        let g = 0
+        let b = 0
+        let count = 0
+
+        for(let y = top; y <= bottom; y += 2){
+            for(let x = left; x <= right; x += 2){
+                const index = y * prepared.width + x
+                if(prepared.ink[index] === 0){
+                    r += prepared.colors[index * 4]
+                    g += prepared.colors[index * 4 + 1]
+                    b += prepared.colors[index * 4 + 2]
+                    count++
+                }
+            }
+        }
+
+        if(count === 0){
+            return [20, 20, 24]
+        }
+
+        return [Math.round(r / count), Math.round(g / count), Math.round(b / count)]
     }
 
     /** Crops the window from the video and turns it into black text on white, which is what the text reader likes. */
-    _prepareForReading(video: HTMLVideoElement, source: SourceRect, polarity: Polarity): HTMLCanvasElement | null {
+    _prepareForReading(video: HTMLVideoElement, source: SourceRect, polarity: Polarity): PreparedImage | null {
         // Small interface text needs to be enlarged a lot to be read reliably
         const scale = Math.min(3, Math.max(2, 1300 / source.sw))
         const width = Math.min(2400, Math.round(source.sw * scale))
@@ -561,7 +828,10 @@ export default class TranslatorEngine {
         const image = workContext.getImageData(0, 0, width, height)
         const data = image.data
 
+        // Keep the original colours (to find the colour of the interface behind the text) before the picture is turned black and white
+        const colors = new Uint8ClampedArray(data)
         const ink = inkMask(data, width, height, polarity).mask
+
         for(let i = 0; i < ink.length; i++){
             const value = ink[i] === 1 ? 0 : 255
             data[i * 4] = value
@@ -583,6 +853,27 @@ export default class TranslatorEngine {
         outputContext.fillRect(0, 0, output.width, output.height)
         outputContext.putImageData(image, padding, padding)
 
-        return output
+        return {
+            canvas: output,
+            width,
+            height,
+            padding,
+            scaleX: width / source.sw,
+            scaleY: height / source.sh,
+            colors,
+            ink,
+        }
     }
+}
+
+interface PreparedImage {
+    canvas: HTMLCanvasElement;
+    // Size of the picture without the white border, the width of the border and the enlargement
+    width: number;
+    height: number;
+    padding: number;
+    scaleX: number;
+    scaleY: number;
+    colors: Uint8ClampedArray;
+    ink: Uint8Array;
 }

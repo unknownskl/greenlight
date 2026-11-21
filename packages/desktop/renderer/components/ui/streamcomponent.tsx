@@ -26,6 +26,10 @@ function StreamComponent({
     const { t } = useTranslation()
     const { settings, setSettings } = useSettings()
 
+    // The shortcuts of the gamepad driver are registered once, so they use the newest settings through a ref
+    const translatorRef = React.useRef({ settings, setSettings })
+    translatorRef.current = { settings, setSettings }
+
     function performance_now_seconds() {
         return performance.now() / 1000.0
     }
@@ -280,8 +284,24 @@ function StreamComponent({
             return false
         })
 
+        // Translator shortcuts of the gamepad (LB + RB + Y / X)
+        const translatorToggleEvent = () => {
+            const current = translatorRef.current
+            current.setSettings({ ...current.settings, translator_enabled: !current.settings.translator_enabled })
+        }
+        const translatorAreaEvent = () => {
+            if(translatorRef.current.settings.translator_enabled){
+                setPadMenu(false)
+                window.dispatchEvent(new Event(TRANSLATOR_EDIT_EVENT))
+            }
+        }
+        window.addEventListener('greenlight-translator-toggle', translatorToggleEvent)
+        window.addEventListener('greenlight-translator-area', translatorAreaEvent)
+
         // cleanup this component
         return () => {
+            window.removeEventListener('greenlight-translator-toggle', translatorToggleEvent)
+            window.removeEventListener('greenlight-translator-area', translatorAreaEvent)
             window.removeEventListener('greenlight-gamepad-menu', padMenuEvent)
             removeBackHandler()
             gamepadState.streamMenuOpen = false

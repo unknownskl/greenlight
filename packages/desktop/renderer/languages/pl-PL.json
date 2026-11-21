@@ -76,6 +76,9 @@
         "enableTouch": "Włącz wejście Dotyku",
         "enableMouseKeyboard": "Włącz Klawiaturę i Mysz",
         "legacyWarning": "Używanie sterownika Klawiatury i Myszy razem z mapowaniem klawiatury do kontrolera będzie wywoływać konflikty",
+        "kbmEmulation": "Klawiatura i mysz jako gamepad",
+        "kbmEmulationDescription": "W A S D = lewy drążek, mysz = prawy drążek (kliknij obraz, aby przechwycić mysz, Esc ją zwalnia), lewy / prawy przycisk myszy = RT / LT, Spacja = A, Backspace = B, R = X, F = Y, Q / E = LB / RB, Shift = L3, C = R3, Tab = View, M = Menu, N = przycisk Xbox, strzałki = krzyżak, I J K L = prawy drążek. Zastępuje ustawienia klawiszy poniżej.",
+        "kbmSensitivity": "Czułość myszy",
         "enableLegacy": "Włącz Klawiatura jako Kontroler",
         "enableLegacyDescription": "(Wyłączenie tej funkcji wyłączy mapowanie klawiatury do kontrolera i zezwala wyłącznie na sterowanie kontrolerem.)",
         "gamepadNavigation": "Nawigacja kontrolerem w menu",
@@ -306,7 +309,9 @@
         "editHintPad": "Lewy drążek: ruch  |  Prawy drążek: szerokość / wysokość  |  LT wolno, RT szybko  |  A: gotowe",
         "padEditBtn": "Ustaw padem",
         "padEditActive": "Lewy drążek / krzyżak: ruch  |  Prawy drążek: szerokość i wysokość  |  LT: wolno, RT: szybko  |  A lub B: gotowe",
-        "editDone": "Gotowe"
+        "editDone": "Gotowe",
+        "fontAutoLabel": "Rozmiar tekstu jak w oryginale",
+        "padShortcuts": "Podczas gry: przytrzymaj LB + RB + Y, aby włączyć lub wyłączyć tłumacza, i LB + RB + X, aby przesunąć jego okno. Każda linia tekstu jest tłumaczona osobno i pokazywana nad oryginałem; cyfry, które tylko się zmieniają (liczniki, zegary), nie wymagają nowego tłumaczenia."
     },
     "updater": {
       "unableToCheckForUpdates": "Nie udało się sprawdzić czy jest dostępna aktualizacja w tej chwili. Spróbuj ponownie.",

@@ -76,6 +76,9 @@
         "enableTouch": "Enable Touch input",
         "enableMouseKeyboard": "Enable Mouse & Keyboard",
         "legacyWarning": "Using the Mouse & Keyboard driver together with the Gamepad keyboard mappings will cause conflicts",
+        "kbmEmulation": "Keyboard and mouse as a gamepad",
+        "kbmEmulationDescription": "W A S D = left stick, mouse = right stick (click the picture to capture the mouse, Esc releases it), left / right mouse button = RT / LT, Space = A, Backspace = B, R = X, F = Y, Q / E = LB / RB, Shift = L3, C = R3, Tab = View, M = Menu, N = Xbox button, arrow keys = d-pad, I J K L = right stick. Takes the place of the key mappings below.",
+        "kbmSensitivity": "Mouse sensitivity",
         "enableLegacy": "Enable Keyboard to Gamepad",
         "enableLegacyDescription": "(Disabling this feature will disable the keyboard to gamepad mapping and only allows controls from the gamepad.)",
         "gamepadNavigation": "Gamepad navigation in menus",
@@ -310,7 +313,9 @@
         "editHintPad": "Left stick: move  |  Right stick: width / height  |  LT slow, RT fast  |  A: done",
         "padEditBtn": "Place with the gamepad",
         "padEditActive": "Left stick / d-pad: move  |  Right stick: width and height  |  LT: slow, RT: fast  |  A or B: done",
-        "editDone": "Done"
+        "editDone": "Done",
+        "fontAutoLabel": "Text size follows the original",
+        "padShortcuts": "While playing: hold LB + RB + Y to turn the translator on or off, hold LB + RB + X to move its window. Every line of text is translated on its own and placed over the original; numbers that only change (counters, timers) do not need a new translation."
     },
     "updater": {
       "unableToCheckForUpdates": "Unable to check for updates at this moment. Try again.",

@@ -45,6 +45,10 @@ export const defaultSettings = {
         n: 'Nexus',
     },
     input_newgamepad: false,
+
+    // Keyboard and mouse that act as a gamepad (WASD = left stick, mouse = right stick, ...)
+    input_kbm_emulation: false,
+    input_kbm_sensitivity: 1,
     app_lowresolution: false,
 
     video_enabled: true,
@@ -54,6 +58,8 @@ export const defaultSettings = {
     translator_enabled: false,
     translator_target_lang: 'uk',
     translator_text_color: 'light',
+    // Size of the translated text follows the size of the original text (translator_font_size is used when this is off)
+    translator_font_auto: true,
     translator_font_size: 26,
     translator_opacity: 0.85,
     translator_region: { x: 0.2, y: 0.78, w: 0.6, h: 0.16 },

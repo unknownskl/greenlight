@@ -202,6 +202,23 @@ function SettingsInput() {
                     </p>
 
                     <p>
+                        <label>{t('settings.input.kbmEmulation')}</label>
+                        <label style={{ minWidth: 0 }} className="toggle-label">
+                            <input type='checkbox' onChange={(e) => {
+                                setSettings({ ...settings, input_kbm_emulation: e.target.checked })
+                            }} checked={settings.input_kbm_emulation === true} />
+                        </label><br />
+                        <small>{t('settings.input.kbmEmulationDescription')}</small>
+                    </p>
+
+                    { settings.input_kbm_emulation === true ? <p>
+                        <label>{t('settings.input.kbmSensitivity')}</label>
+                        <input type="range" min={20} max={300} step={10} value={Math.round((settings.input_kbm_sensitivity || 1) * 100)} onChange={(e) => {
+                            setSettings({ ...settings, input_kbm_sensitivity: parseInt(e.target.value) / 100 })
+                        }} /> {Math.round((settings.input_kbm_sensitivity || 1) * 100)}%
+                    </p> : '' }
+
+                    <p>
                         <label>{t('settings.input.enableLegacy')}</label>
                         <label style={{ minWidth: 0 }}>
                             <input type='checkbox' onChange={ setLegacyInput } checked={!settings.input_newgamepad} />&nbsp; ({ !settings.input_newgamepad ? t('settings.input.enabledLabel') : t('settings.input.disabledLabel')})
