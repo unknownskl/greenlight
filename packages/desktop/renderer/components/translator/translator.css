@@ -222,3 +222,31 @@ div.region-frame.region-frame-other {
 div.translator-preview .region-frame {
     overflow: visible;
 }
+
+/* Adaptive translator, debug view: what the scout sees */
+div.translator-auto-frame {
+    position: absolute;
+    box-sizing: border-box;
+    border: 2px solid rgba(160, 160, 160, 0.9);
+    border-radius: 6px;
+}
+
+div.translator-auto-frame span {
+    position: absolute;
+    top: -20px;
+    left: 0;
+    padding: 1px 8px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    background: rgba(10, 12, 15, 0.85);
+    color: #ffffff;
+    text-shadow: none;
+}
+
+div.translator-auto-candidate { border-color: rgba(86, 190, 255, 0.95); border-style: dashed; }
+div.translator-auto-reading { border-color: rgba(255, 205, 60, 0.95); }
+div.translator-auto-text { border-color: rgba(47, 209, 47, 0.95); }
+div.translator-auto-idle { border-color: rgba(47, 209, 47, 0.5); border-style: dashed; }
+div.translator-auto-rejected { border-color: rgba(216, 59, 59, 0.8); border-style: dotted; }

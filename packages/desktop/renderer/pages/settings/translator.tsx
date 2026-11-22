@@ -126,6 +126,26 @@ function SettingsTranslator() {
                     </p>
 
                     <p>
+                        <label>{t('translator.autoLabel')}</label>
+                        <label style={{ minWidth: 0 }} className="toggle-label">
+                            <input type='checkbox' checked={settings.translator_auto === true} onChange={(e) => {
+                                update({ translator_auto: e.target.checked })
+                            }} />
+                        </label>
+                        <small style={{ display: 'block', opacity: 0.7 }}>{t('translator.autoHint')}</small>
+                    </p>
+
+                    { settings.translator_auto === true ? <p>
+                        <label>{t('translator.autoDebugLabel')}</label>
+                        <label style={{ minWidth: 0 }} className="toggle-label">
+                            <input type='checkbox' checked={settings.translator_auto_debug === true} onChange={(e) => {
+                                update({ translator_auto_debug: e.target.checked })
+                            }} />
+                        </label>
+                        <small style={{ display: 'block', opacity: 0.7 }}>{t('translator.autoDebugHint')}</small>
+                    </p> : '' }
+
+                    <p>
                         <label>{t('translator.sourceLabel')}</label>
                         <select value={settings.translator_source_lang || 'en'} onChange={(e) => {
                             update({ translator_source_lang: e.target.value })

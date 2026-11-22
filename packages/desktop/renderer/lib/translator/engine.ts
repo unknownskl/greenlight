@@ -2,7 +2,7 @@ import { Region, FitMode, clampRegion, regionToSource, videoRectToScreen, Source
 import { getOcrWorker, recognizeCanvas, OcrLine } from './ocr'
 
 export type TextColor = 'light' | 'dark' | 'auto'
-type Polarity = 'light' | 'dark'
+export type Polarity = 'light' | 'dark'
 
 export type EngineStatus = 'loading' | 'ready' | 'error'
 
@@ -181,8 +181,8 @@ function luminance(data: Uint8ClampedArray, offset: number): number {
     return (data[offset] * 299 + data[offset + 1] * 587 + data[offset + 2] * 114) / 1000
 }
 
-/** Marks the pixels that stand out from their surroundings (see CONTRAST_MIN). */
-function inkMask(data: Uint8ClampedArray, width: number, height: number, polarity: Polarity): { mask: Uint8Array; count: number } {
+/** Marks the pixels that stand out from their surroundings (see CONTRAST_MIN), for one or both kinds of text at once. */
+export function inkMasks(data: Uint8ClampedArray, width: number, height: number, polarities: Polarity[]): Array<{ mask: Uint8Array; count: number }> {
     const pixels = width * height
     const luma = new Uint8Array(pixels)
     for(let i = 0; i < pixels; i++){
@@ -201,8 +201,7 @@ function inkMask(data: Uint8ClampedArray, width: number, height: number, polarit
     }
 
     const radius = Math.max(4, Math.round(width * 0.014))
-    const mask = new Uint8Array(pixels)
-    let count = 0
+    const results = polarities.map(() => ({ mask: new Uint8Array(pixels), count: 0 }))
 
     for(let y = 0; y < height; y++){
         const y0 = Math.max(0, y - radius)
@@ -216,18 +215,24 @@ function inkMask(data: Uint8ClampedArray, width: number, height: number, polarit
             const mean = sum / area
             const value = luma[y * width + x]
 
-            const ink = polarity === 'light'
-                ? (value - mean >= CONTRAST_MIN && value >= LIGHT_FLOOR)
-                : (mean - value >= CONTRAST_MIN && value <= DARK_CEIL)
+            for(let k = 0; k < polarities.length; k++){
+                const ink = polarities[k] === 'light'
+                    ? (value - mean >= CONTRAST_MIN && value >= LIGHT_FLOOR)
+                    : (mean - value >= CONTRAST_MIN && value <= DARK_CEIL)
 
-            if(ink){
-                mask[y * width + x] = 1
-                count++
+                if(ink){
+                    results[k].mask[y * width + x] = 1
+                    results[k].count++
+                }
             }
         }
     }
 
-    return { mask, count }
+    return results
+}
+
+function inkMask(data: Uint8ClampedArray, width: number, height: number, polarity: Polarity): { mask: Uint8Array; count: number } {
+    return inkMasks(data, width, height, [polarity])[0]
 }
 
 // Reduces a mask to a coarse grid: a cell is on when it holds some ink

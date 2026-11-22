@@ -68,6 +68,9 @@ export const defaultSettings = {
     translator_source_lang: 'en',
     translator_target_lang: 'uk',
     translator_text_color: 'light',
+    // Adaptive translator: finds the text on the whole screen by itself (and shows what it found, for testing)
+    translator_auto: false,
+    translator_auto_debug: false,
     // Size of the translated text follows the size of the original text (translator_font_size is used when this is off)
     translator_font_auto: true,
     translator_font_size: 26,

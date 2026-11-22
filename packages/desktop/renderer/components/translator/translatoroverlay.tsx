@@ -6,6 +6,7 @@ import Ipc from '../../lib/ipc'
 import { Region, FitMode, DEFAULT_REGION, MAX_REGIONS, getRegions, regionsToSettings, constrainRegion, findFreeRegion, windowMode } from '../../lib/translator/geometry'
 import TranslatorEngine, { EngineStatus, TranslatorResult, TranslatedSegment, TextColor } from '../../lib/translator/engine'
 import { terminateOcr } from '../../lib/translator/ocr'
+import AutoWindows, { AutoFrame, MAX_AUTO_WINDOWS } from '../../lib/translator/autowindows'
 import usePadRegion from '../../lib/translator/usepadregion'
 import RegionEditor from './regioneditor'
 
@@ -98,6 +99,9 @@ function TranslatorOverlay({
 
     const [results, setResults] = React.useState<(TranslatorResult | null)[]>([])
     const [statuses, setStatuses] = React.useState<EngineStatus[]>([])
+    // The adaptive translator: translations in the windows it found, and (for the debug view) what it sees
+    const [autoResults, setAutoResults] = React.useState<(TranslatorResult | null)[]>([])
+    const [autoFrames, setAutoFrames] = React.useState<AutoFrame[]>([])
     const [flash, setFlash] = React.useState(false)
     const [editing, setEditing] = React.useState(false)
     const [toast, setToast] = React.useState('')
@@ -109,6 +113,7 @@ function TranslatorOverlay({
     activeRef.current = active
 
     const enabled = settings.translator_enabled === true
+    const autoOn = enabled && settings.translator_auto === true
     // The reader is restarted when the language of the game text is changed
     const sourceLang = settings.translator_source_lang || 'en'
     const regions = getRegions(settings)
@@ -176,6 +181,51 @@ function TranslatorOverlay({
             engines.forEach(engine => engine.stop())
         }
     }, [enabled, sourceLang, count])
+
+    // The adaptive translator: finds the text on the whole screen by itself
+    React.useEffect(() => {
+        setAutoResults([])
+        setAutoFrames([])
+
+        if(!autoOn){
+            return
+        }
+
+        let lastFrames = ''
+        const auto = new AutoWindows({
+            getVideo: () => (xPlayer?._videoComponent?._videoRender ?? document.querySelector('#streamComponent video')) as HTMLVideoElement | null,
+            getBox: () => {
+                const rect = document.getElementById('streamComponent')?.getBoundingClientRect()
+                return { width: rect?.width || window.innerWidth, height: rect?.height || window.innerHeight }
+            },
+            getSettings: () => ({
+                fit: (settingsRef.current.video_size || 'default') as FitMode,
+                source: settingsRef.current.translator_source_lang || 'en',
+                target: settingsRef.current.translator_target_lang || 'uk',
+                color: (settingsRef.current.translator_text_color || 'light') as TextColor,
+            }),
+            getManualRegions: () => getRegions(settingsRef.current),
+            translate: (text, target, source) => Ipc.send('app', 'translateText', { text, from: source, to: target }) as Promise<string>,
+            onResult: (slot, result) => setAutoResults(previous => {
+                const next = previous.slice()
+                next[slot] = result
+                return next
+            }),
+            onFrames: (frames) => {
+                const wanted = settingsRef.current.translator_auto_debug === true ? frames : []
+                const key = JSON.stringify(wanted.map(frame => [frame.state, frame.slot, Math.round(frame.rect.x * 500), Math.round(frame.rect.y * 500), Math.round(frame.rect.w * 500), Math.round(frame.rect.h * 500)]))
+                if(key !== lastFrames){
+                    lastFrames = key
+                    setAutoFrames(wanted)
+                }
+            },
+        })
+
+        auto.start()
+        return () => {
+            auto.stop()
+        }
+    }, [autoOn, sourceLang])
 
     // Free the memory of the text reader when the stream is closed
     React.useEffect(() => {
@@ -324,6 +374,21 @@ function TranslatorOverlay({
             { (enabled && !editing) ? results.slice(0, count).map((result, windowIndex) => (result === null || result === undefined) ? null : result.segments.map((segment, index) => (
                 <div key={windowIndex + '-' + index} className="translator-segment" style={segmentStyle(segment, viewport, autoFont, fixedSize, opacity)}>{segment.translated}</div>
             ))) : '' }
+
+            { (autoOn && !editing) ? autoResults.slice(0, MAX_AUTO_WINDOWS).map((result, slot) => (result === null || result === undefined) ? null : result.segments.map((segment, index) => (
+                <div key={'auto-' + slot + '-' + index} className="translator-segment" style={segmentStyle(segment, viewport, autoFont, fixedSize, opacity)}>{segment.translated}</div>
+            ))) : '' }
+
+            { (autoOn && !editing && settings.translator_auto_debug === true) ? autoFrames.map((frame, index) => (
+                <div key={'frame-' + index} className={'translator-auto-frame translator-auto-' + frame.state} style={{
+                    left: (frame.rect.x * 100) + '%',
+                    top: (frame.rect.y * 100) + '%',
+                    width: (frame.rect.w * 100) + '%',
+                    height: (frame.rect.h * 100) + '%',
+                }}>
+                    <span>{t('translator.autoState_' + frame.state)} · {t('translator.autoRole_' + frame.role)}</span>
+                </div>
+            )) : '' }
 
             { (enabled && !editing && (flash || status !== 'ready')) ? regions.map((frame, index) => frame.enabled === false ? null : (
                 <div key={index} className="translator-hint-frame" style={{
