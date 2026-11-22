@@ -1,6 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
 import Ipc from '../lib/ipc'
+import { confirmDialog } from '../lib/gamepad/dialog'
 import { useTranslation } from 'react-i18next'
 
 // import { ipcRenderer } from 'electron'
@@ -114,9 +115,11 @@ function Header({
         if(window.Greenlight.isWebUI() === true)
             return
 
-        if(confirm(t('header.quitQuestion'))){
-            Ipc.send('app', 'quit')
-        }
+        confirmDialog(t('header.quitQuestion'), t('gamepad.yes'), t('gamepad.no')).then((confirmed) => {
+            if(confirmed){
+                Ipc.send('app', 'quit')
+            }
+        })
     }
 
     React.useEffect(() => {

@@ -71,6 +71,8 @@
         "enableTouch": "Activar control táctil",
         "enableMouseKeyboard": "Activar ratón y teclado",
         "legacyWarning": "Usar el controlador de ratón y teclado junto con las asignaciones de teclado para mando provocará conflictos",
+        "altMenu": "Alt abre la barra de menú",
+        "altMenuHint": "Para el escritorio. Desactivado por defecto, para que Alt no abra el menú File / Edit / View al jugar. Los atajos de ese menú (Ctrl+R, F11) siguen funcionando.",
         "kbmEmulation": "Teclado y ratón como mando",
         "kbmEmulationDescription": "W A S D = palanca izquierda, ratón = palanca derecha (haz clic en la imagen para capturar el ratón, Esc lo libera), botón izquierdo / derecho del ratón = RT / LT, Espacio = A, Retroceso = B, R = X, F = Y, Q / E = LB / RB, Mayús = L3, C = R3, Tab = View, M = Menu, N = botón Xbox, flechas = cruceta, I J K L = palanca derecha. Sustituye la asignación de teclas de abajo.",
         "mouseSensitivity": "Velocidad del ratón",

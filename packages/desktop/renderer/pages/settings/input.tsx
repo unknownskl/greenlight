@@ -210,6 +210,16 @@ function SettingsInput() {
                     </p> : '' }
 
                     <p>
+                        <label>{t('settings.input.altMenu')}</label>
+                        <label style={{ minWidth: 0 }} className="toggle-label">
+                            <input type='checkbox' onChange={(e) => {
+                                setSettings({ ...settings, app_menubar_alt: e.target.checked })
+                            }} checked={settings.app_menubar_alt === true} />
+                        </label><br />
+                        <small>{t('settings.input.altMenuHint')}</small>
+                    </p>
+
+                    <p>
                         <label>{t('settings.input.kbmEmulation')}</label>
                         <label style={{ minWidth: 0 }} className="toggle-label">
                             <input type='checkbox' onChange={(e) => {

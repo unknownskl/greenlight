@@ -52,6 +52,8 @@ export const defaultSettings = {
     input_kbm_emulation: false,
     input_kbm_sensitivity: 1,
     app_lowresolution: false,
+    // The Alt key shows the menu bar (File / Edit / View / Window): for desktop use, it gets in the way while playing
+    app_menubar_alt: false,
 
     video_enabled: true,
     audio_enabled: true,

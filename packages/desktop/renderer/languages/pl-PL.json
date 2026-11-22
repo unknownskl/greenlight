@@ -76,6 +76,8 @@
         "enableTouch": "Włącz wejście Dotyku",
         "enableMouseKeyboard": "Włącz Klawiaturę i Mysz",
         "legacyWarning": "Używanie sterownika Klawiatury i Myszy razem z mapowaniem klawiatury do kontrolera będzie wywoływać konflikty",
+        "altMenu": "Alt otwiera pasek menu",
+        "altMenuHint": "Dla komputerów stacjonarnych. Domyślnie wyłączone, aby Alt nie otwierał menu File / Edit / View podczas gry. Skróty tego menu (Ctrl+R, F11) nadal działają.",
         "kbmEmulation": "Klawiatura i mysz jako gamepad",
         "kbmEmulationDescription": "W A S D = lewy drążek, mysz = prawy drążek (kliknij obraz, aby przechwycić mysz, Esc ją zwalnia), lewy / prawy przycisk myszy = RT / LT, Spacja = A, Backspace = B, R = X, F = Y, Q / E = LB / RB, Shift = L3, C = R3, Tab = View, M = Menu, N = przycisk Xbox, strzałki = krzyżak, I J K L = prawy drążek. Zastępuje ustawienia klawiszy poniżej.",
         "mouseSensitivity": "Szybkość myszy",

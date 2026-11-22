@@ -227,6 +227,17 @@ export default class Application {
             this.log('electron', __filename+'[openMainWindow()] Showing Main window.')
         })
 
+        // Alt alone would show the menu bar (File / Edit / View / Window), which only gets in the way while playing.
+        // The shortcuts of the menu (Ctrl+R, F11, ...) keep working; the setting brings the Alt key back for desktop use.
+        this._mainWindow.webContents.on('before-input-event', (event, input) => {
+            if(input.key === 'Alt' && !input.control && !input.shift && !input.meta){
+                const settings = this._store.get('settings', {}) as any
+                if(settings.app_menubar_alt !== true){
+                    event.preventDefault()
+                }
+            }
+        })
+
         this._mainWindow.on('close', (event) => {
             if(this._isMac === true && this._isQuitting === false){
                 event.preventDefault()

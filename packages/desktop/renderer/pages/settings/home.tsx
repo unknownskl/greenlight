@@ -10,6 +10,7 @@ import Image from 'next/image'
 import GreenlightLogo from '../../public/images/logo.png'
 import Card from '../../components/ui/card'
 import Button from '../../components/ui/button'
+import { confirmDialog } from '../../lib/gamepad/dialog'
 
 interface userData {
   gamerpic?: string;
@@ -34,9 +35,11 @@ function SettingsHome() {
     }, [user])
 
     function logout(){
-        if(confirm(t('settings.about.logoutQuestion'))){
-            Ipc.send('app', 'clearData')
-        }
+        confirmDialog(t('settings.about.logoutQuestion'), t('gamepad.yes'), t('gamepad.no')).then((confirmed) => {
+            if(confirmed){
+                Ipc.send('app', 'clearData')
+            }
+        })
     }
 
     return (

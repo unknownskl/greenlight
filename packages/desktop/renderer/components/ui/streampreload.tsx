@@ -3,6 +3,7 @@ import Loader from './loader'
 import Card from './card'
 import Button from './button'
 import { useTranslation } from 'react-i18next'
+import { confirmDialog } from '../../lib/gamepad/dialog'
 
 interface StreamPreloadProps {
   onDisconnect?: () => void;
@@ -60,10 +61,12 @@ function StreamPreload({
     }
 
     function endStream(){
-        if(confirm(t('streamWindow.endStreamConfirmMessage'))){
-            onDisconnect()
-            window.history.back()
-        }
+        confirmDialog(t('streamWindow.endStreamConfirmMessage'), t('gamepad.yes'), t('gamepad.no')).then((confirmed) => {
+            if(confirmed){
+                onDisconnect()
+                window.history.back()
+            }
+        })
     }
 
     function formatWaitingTime(rawSeconds: number): string {
