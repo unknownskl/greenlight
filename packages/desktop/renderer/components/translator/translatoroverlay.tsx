@@ -18,6 +18,24 @@ interface TranslatorOverlayProps {
 
 let measureContext: CanvasRenderingContext2D | null | undefined
 
+// How many rows a text takes when it is wrapped at `width` (a word is never cut)
+function wrapRows(text: string, size: number, width: number): number {
+    let rows = 1
+    let line = 0
+    const space = textWidth(' ', size)
+
+    for(const word of text.split(/\s+/)){
+        const length = textWidth(word, size)
+        if(line > 0 && line + space + length > width){
+            rows++
+            line = length
+        } else {
+            line = line === 0 ? length : line + space + length
+        }
+    }
+    return rows
+}
+
 function textWidth(text: string, size: number): number {
     if(measureContext === undefined){
         measureContext = document.createElement('canvas').getContext('2d')
@@ -56,30 +74,32 @@ export function segmentStyle(segment: TranslatedSegment, viewport: { width: numb
     const room = segment.centered
         ? 2 * Math.min(centerX, viewport.width - centerX) - 16
         : viewport.width - left - 8
-    const maxWidth = Math.max(140, Math.min(room, originalWidth * (lines === 1 ? 2.1 : 1.35)))
+    // A paragraph keeps the width of the original (the translation is made to fit into it); one line may grow sideways
+    const maxWidth = Math.max(140, Math.min(room, originalWidth * (lines === 1 ? 2.1 : 1.1)))
+    const originalHeight = segment.rect.h * viewport.height + 8
+    // How tall the box may get: a paragraph stays inside the box of the original, a single line may take one more row
+    const roomHeight = lines === 1 ? originalHeight * 2 : originalHeight * 1.12
+    const allowed = Math.max(originalHeight, below === undefined ? roomHeight : Math.min(roomHeight * 1.5, (below - segment.rect.y) * viewport.height - 6))
 
-    // The size of the original text; shrunk when the translation is much longer than the original
+    // The size of the original text; shrunk when the translation is longer than the original and would not fit
     let size = autoFont ? Math.min(56, Math.max(12, segment.lineHeight * viewport.height * 1.02)) : fixedSize
     let singleLine = false
     if(autoFont){
-        const wanted = textWidth(segment.translated, size)
-        if(wanted > maxWidth * lines){
-            size = Math.max(size * 0.62, size * maxWidth * lines / wanted)
-        }
-        singleLine = lines === 1 && textWidth(segment.translated, size) <= maxWidth - 16
-
-        // The translation must not grow over the text that is below it: it gets smaller until it fits
-        if(below !== undefined && !singleLine){
-            const available = Math.max(segment.rect.h * viewport.height + 8, (below - segment.rect.y) * viewport.height - 6)
-            for(let attempt = 0; attempt < 4; attempt++){
-                const rows = Math.max(1, Math.ceil(textWidth(segment.translated, size) / Math.max(40, maxWidth - 36)))
-                const needed = rows * size * 1.3 + 20
-                if(needed <= available || size <= 11){
-                    break
-                }
-                size = Math.max(11, size * Math.max(0.6, Math.sqrt(available / needed)))
+        const base = size
+        if(lines === 1){
+            const wanted = textWidth(segment.translated, size)
+            if(wanted > maxWidth){
+                size = Math.max(size * 0.62, size * maxWidth / wanted)
             }
-            singleLine = lines === 1 && textWidth(segment.translated, size) <= maxWidth - 16
+            singleLine = textWidth(segment.translated, size) <= maxWidth - 16
+        }
+
+        // The biggest size at which the translation fits into the box of the original
+        if(!singleLine){
+            const floor = Math.max(11, base * 0.5)
+            while(size > floor && wrapRows(segment.translated, size, maxWidth - 20) * size * 1.22 + 12 > allowed){
+                size = Math.max(floor, size * 0.94)
+            }
         }
     }
 
@@ -90,8 +110,8 @@ export function segmentStyle(segment: TranslatedSegment, viewport: { width: numb
         whiteSpace: singleLine ? 'nowrap' : 'normal',
         maxWidth: maxWidth + 'px',
         minWidth: (Math.min(originalWidth, maxWidth) + 16) + 'px',
-        minHeight: (segment.rect.h * viewport.height + 8) + 'px',
-        maxHeight: below === undefined ? undefined : Math.max(segment.rect.h * viewport.height + 8, (below - segment.rect.y) * viewport.height - 6) + 'px',
+        minHeight: originalHeight + 'px',
+        maxHeight: autoFont ? allowed + 'px' : undefined,
         overflow: 'hidden',
         fontSize: size + 'px',
         color: segment.foreground,
@@ -242,7 +262,7 @@ function TranslatorOverlay({
             }),
             onFrames: (frames) => {
                 const wanted = settingsRef.current.translator_auto_debug === true ? frames : []
-                const key = JSON.stringify(wanted.map(frame => [frame.state, frame.slot, frame.plate, frame.steady, Math.round(frame.rect.x * 500), Math.round(frame.rect.y * 500), Math.round(frame.rect.w * 500), Math.round(frame.rect.h * 500)]))
+                const key = JSON.stringify(wanted.map(frame => [frame.state, frame.slot, frame.plate, frame.steady, frame.floating, Math.round(frame.rect.x * 500), Math.round(frame.rect.y * 500), Math.round(frame.rect.w * 500), Math.round(frame.rect.h * 500)]))
                 if(key !== lastFrames){
                     lastFrames = key
                     setAutoFrames(wanted)
@@ -415,7 +435,7 @@ function TranslatorOverlay({
                     width: (frame.rect.w * 100) + '%',
                     height: (frame.rect.h * 100) + '%',
                 }}>
-                    <span>{t('translator.autoState_' + frame.state)} · {t('translator.autoRole_' + frame.role)}{frame.plate ? ' · ' + t('translator.autoPlate') : ''}{frame.steady ? ' · ' + t('translator.autoSteady') : ''}</span>
+                    <span>{t('translator.autoState_' + frame.state)} · {t('translator.autoRole_' + frame.role)}{frame.plate ? ' · ' + t('translator.autoPlate') : ''}{frame.floating ? ' · ' + t('translator.autoFloating') : (frame.steady ? ' · ' + t('translator.autoSteady') : '')}</span>
                 </div>
             )) : '' }
 

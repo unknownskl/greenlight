@@ -352,6 +352,7 @@
         "autoRole_other": "текст",
         "autoPlate": "панель",
         "autoSteady": "стабильный",
+        "autoFloating": "движущийся",
         "btnAreaTitle": "Переместить и изменить размер окна перевода",
         "statusLoading": "Загрузка распознавания текста...",
         "statusError": "Перевод сейчас недоступен",

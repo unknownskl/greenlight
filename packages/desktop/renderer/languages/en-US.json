@@ -352,6 +352,7 @@
         "autoRole_other": "text",
         "autoPlate": "plate",
         "autoSteady": "steady",
+        "autoFloating": "floating",
         "btnAreaTitle": "Move and resize the translation window",
         "statusLoading": "Loading the text reader...",
         "statusError": "Translation is unavailable right now",

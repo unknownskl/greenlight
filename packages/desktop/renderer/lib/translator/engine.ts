@@ -156,6 +156,9 @@ function readingTime(segment: { translated: string }, waiting: number): number {
 // Text pixels that are the same as at the last reading (up to this share of them) are the same text: it is not read again
 // just in case, only now and then (see EXACT_RECHECK_MS)
 const FINE_SAME = 0.04
+// A steady text that is shown (a task, a description) is read again only when this much of its pixels is different:
+// a glowing or shaking panel changes the picture a little all the time, but not the text
+const STEADY_FINE_CHANGE = 0.1
 const EXACT_RECHECK_MS = 20000
 
 // A row of letters is at most this many times as tall as the (taller) words in it
@@ -388,12 +391,13 @@ export function cleanOcrText(raw: string): string {
             const letters: string[] = rest.join('').match(LETTER) || []
             return letters.length >= 3 && letters.filter(letter => letter !== letter.toLowerCase()).length / letters.length >= 0.9
         }
+        const isBracketJunk = (token: string): boolean => token.length <= 4 && /^[^()]*\)$|^\([^()]*$/.test(token) && tokens.length >= 3
         const isSmallJunk = (token: string, rest: string[]): boolean => token.length <= 2 && token === token.toLowerCase() && ONLY_LETTERS.test(token) && restIsCapitals(rest)
 
-        while(tokens.length >= 2 && (isStrayLetter(tokens[0]) || isSmallJunk(tokens[0], tokens.slice(1)))){
+        while(tokens.length >= 2 && (isStrayLetter(tokens[0]) || isBracketJunk(tokens[0]) || isSmallJunk(tokens[0], tokens.slice(1)))){
             tokens.shift()
         }
-        while(tokens.length >= 2 && (isStrayLetter(tokens[tokens.length - 1]) || isSmallJunk(tokens[tokens.length - 1], tokens.slice(0, -1)))){
+        while(tokens.length >= 2 && (isStrayLetter(tokens[tokens.length - 1]) || isBracketJunk(tokens[tokens.length - 1]) || isSmallJunk(tokens[tokens.length - 1], tokens.slice(0, -1)))){
             tokens.pop()
         }
         cleaned = tokens.join(' ')
@@ -616,6 +620,8 @@ interface Snapshot {
     // How much the text pixels differed from the snapshot before (coarse mask, and the columns of ink)
     changeAmount: number;
     profileAmount: number;
+    // How far the window had been carried along with its text (see _shiftBy) when the snapshot was taken
+    shift: { x: number; y: number };
 }
 
 // Are two snapshots the same picture (the second one is only a better moment of the same line)?
@@ -670,6 +676,9 @@ export default class TranslatorEngine {
     // The text pixels (fine) at the last reading: if they are still the same, the text is the same
     _readFine: Partial<Record<Polarity, { mask: Uint8Array; width: number; height: number }>> = {}
     _identity = ''
+    // The window as it was at the last look, and how far it has been carried along with its text since the start
+    _region: Region | null = null
+    _shift = { x: 0, y: 0 }
     // Snapshots that wait for the reader, and whether the reader is busy
     _jobs: Snapshot[] = []
     _working = false
@@ -744,6 +753,7 @@ export default class TranslatorEngine {
         this._readMask = {}
         this._readProfile = {}
         this._readFine = {}
+        this._shift = { x: 0, y: 0 }
         this._hasReadMask = false
         this._emptySince = 0
         this._activeUntil = 0
@@ -902,16 +912,26 @@ export default class TranslatorEngine {
         if(identity !== this._identity || (regionKey !== this._regionKey && config.soft !== true)){
             this._identity = identity
             this._regionKey = regionKey
+            this._region = region
             this.reset()
         } else if(regionKey !== this._regionKey){
-            // The window only grew: what is shown stays, but the pictures of the old size cannot be compared
+            const before = this._region
             this._regionKey = regionKey
-            this._prevMask = {}
-            this._readMask = {}
-            this._readProfile = {}
-            this._readFine = {}
-            this._hasReadMask = false
-            this._sameCount = 0
+            this._region = region
+
+            if(before !== null && Math.abs(before.w - region.w) < 1e-4 && Math.abs(before.h - region.h) < 1e-4){
+                // The window moved with its text (a floating text): the pictures are still comparable, and what is
+                // shown moves along, so nothing has to be read again
+                this._shiftBy(region.x - before.x, region.y - before.y)
+            } else {
+                // The window only grew: what is shown stays, but the pictures of the old size cannot be compared
+                this._prevMask = {}
+                this._readMask = {}
+                this._readProfile = {}
+                this._readFine = {}
+                this._hasReadMask = false
+                this._sameCount = 0
+            }
         }
 
         const box = this._options.getBox()
@@ -1016,6 +1036,12 @@ export default class TranslatorEngine {
         }
 
         const now = Date.now()
+
+        // A steady text that is on screen and whose pixels are almost the same as at the last reading is the same text,
+        // whatever the coarse picture says: it is not read (and not translated) again
+        if(taskMode && changed && !appearing && this._hasReadMask && this._shown.length > 0 && this._pixelsSame(present, width, height, STEADY_FINE_CHANGE)){
+            changed = false
+        }
 
         // A steady interface that sways with the camera is not "moving text": it keeps its translation, and the
         // readings (which differ a little every time) are voted on instead (see _confirm)
@@ -1145,11 +1171,25 @@ export default class TranslatorEngine {
         this._enqueue(snapshot)
     }
 
+    /** The window moves with its text: the translation that is shown (and the ones that wait) move along. */
+    _shiftBy(dx: number, dy: number) {
+        this._shift.x += dx
+        this._shift.y += dy
+
+        const move = (list: ShownSegment[]): ShownSegment[] => list.map(segment => ({ ...segment, rect: { ...segment.rect, x: segment.rect.x + dx, y: segment.rect.y + dy } }))
+        this._held = move(this._held)
+        this._queue = move(this._queue)
+        if(this._shown.length > 0){
+            this._shown = move(this._shown)
+            this._emit(this._shown)
+        }
+    }
+
     /** Are the text pixels of the window the same as at the last reading? */
-    _pixelsSame(present: Array<{ polarity: Polarity; fine: Uint8Array }>, width: number, height: number): boolean {
+    _pixelsSame(present: Array<{ polarity: Polarity; fine: Uint8Array }>, width: number, height: number, limit = FINE_SAME): boolean {
         for(const candidate of present){
             const read = this._readFine[candidate.polarity]
-            if(read === undefined || read.width !== width || read.height !== height || fineDifference(read.mask, candidate.fine, width, height) > FINE_SAME){
+            if(read === undefined || read.width !== width || read.height !== height || fineDifference(read.mask, candidate.fine, width, height) > limit){
                 return false
             }
         }
@@ -1187,6 +1227,7 @@ export default class TranslatorEngine {
             profiles,
             changeAmount,
             profileAmount,
+            shift: { x: this._shift.x, y: this._shift.y },
         }
     }
 
@@ -1264,6 +1305,8 @@ export default class TranslatorEngine {
         }
 
         const { config, box, changeAmount, profileAmount } = job
+        // The window may have been carried along with its text since the snapshot was taken
+        const offset = { x: this._shift.x - job.shift.x, y: this._shift.y - job.shift.y }
         const now = job.at
         const generation = job.generation
         let best: ReadResult = { segments: [], text: '', score: 0 }
@@ -1309,6 +1352,8 @@ export default class TranslatorEngine {
             if(previous === null && changeAmount < IN_PLACE_CHANGE && profileAmount < IN_PLACE_PROFILE && known.length > 0){
                 // Different text where a line is already shown, although the picture hardly changed: probably a misread
                 const screen = videoRectToScreen(video.videoWidth, video.videoHeight, box.width, box.height, config.fit, raw.rect)
+                screen.x += offset.x
+                screen.y += offset.y
                 inPlace = known.some(old => overlapShare(screen, old.rect) > 0.5)
             }
 
@@ -1327,7 +1372,7 @@ export default class TranslatorEngine {
         // 5. Translate what is new
         let segments: ShownSegment[]
         try {
-            segments = await Promise.all(accepted.map(item => this._translateSegment(item.raw, item.previous, config, video, box)))
+            segments = await Promise.all(accepted.map(item => this._translateSegment(item.raw, item.previous, config, video, box, offset)))
         } catch(error) {
             console.warn('Translator: translation failed:', error)
             if(generation === this._generation){
@@ -1489,7 +1534,7 @@ export default class TranslatorEngine {
         return false
     }
 
-    async _translateSegment(raw: RawSegment, previous: ShownSegment | null, config: TranslatorConfig, video: HTMLVideoElement, box: { width: number; height: number }): Promise<ShownSegment> {
+    async _translateSegment(raw: RawSegment, previous: ShownSegment | null, config: TranslatorConfig, video: HTMLVideoElement, box: { width: number; height: number }, offset = { x: 0, y: 0 }): Promise<ShownSegment> {
         const target = config.target
         const template = templateKey(raw.text)
         const fullKey = target + '|' + normalizeText(raw.text)
@@ -1536,6 +1581,8 @@ export default class TranslatorEngine {
 
         // Keep the old box when the picture only shook a little (the translation would twitch otherwise)
         const screen = videoRectToScreen(video.videoWidth, video.videoHeight, box.width, box.height, config.fit, raw.rect)
+        screen.x += offset.x
+        screen.y += offset.y
         const lineHeight = videoRectToScreen(video.videoWidth, video.videoHeight, box.width, box.height, config.fit, { x: 0, y: 0, w: 0, h: raw.lineHeight }).h
 
         const moved = previous === null
@@ -1656,11 +1703,13 @@ export default class TranslatorEngine {
         const gap = next.line.bbox.y0 - last.line.bbox.y1
         const overlapsInX = next.line.bbox.x0 < last.line.bbox.x1 && next.line.bbox.x1 > last.line.bbox.x0
 
-        if(!(gap < lastHeight * 0.7 && overlapsInX) || /[.!?:…»"”]$/.test(last.text)){
+        if(!(gap < lastHeight * 0.7 && overlapsInX)){
             return false
         }
 
-        if(LOWER_START.test(next.text)){
+        // A sentence that ends at the end of a line may still be followed by more of the same paragraph: that is
+        // only believed when the lines are wrapped (below), not because the next one starts with a small letter
+        if(!/[.!?:…»"”]$/.test(last.text) && LOWER_START.test(next.text)){
             return true
         }
 

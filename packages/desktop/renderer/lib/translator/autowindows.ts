@@ -21,6 +21,8 @@ export interface AutoFrame {
     // On a plate (a panel of the interface), and a window that holds a steady text (a task list)
     plate?: boolean;
     steady?: boolean;
+    // A floating text: the window follows it
+    floating?: boolean;
 }
 
 export interface AutoOptions {
@@ -51,6 +53,14 @@ const NEED_OTHER = 4
 // A block that has more than this share of its area inside a window of the player (grown by the margin) belongs to that window
 const MANUAL_MARGIN = 0.01
 const MANUAL_TOUCH = 0.02
+
+// A text that floats (it belongs to an object of the game world, and moves when the player looks around): the window
+// follows it. A text counts as the same one when it is about as big as before and not further away than this.
+const FOLLOW_RADIUS = 0.12
+const FOLLOW_MIN = 0.004
+// While a window is being carried along, the picture is looked at more often, and for this long afterwards
+const FOLLOW_SCAN_MS = 350
+const FOLLOW_KEEP_MS = 3000
 
 // A window that has not seen its text for this long is given away (a translation that is still shown is never taken away)
 const HOLD_MS = 8000
@@ -99,6 +109,9 @@ interface Slot {
     lastText: string;
     changes: number[];
     plate: boolean;
+    // Where the text was at the last look (the window is carried along when the text moves) and when it last moved
+    anchor: Region | null;
+    movedAt: number;
 }
 
 // How much of the first box lies inside the second one (0..1)
@@ -114,6 +127,21 @@ function inside(inner: Region, outer: Region): number {
 // A window of the player, a little bigger: the picture is looked at coarsely, so the edge of a text is not exact
 function grow(region: Region, margin: number): Region {
     return { x: region.x - margin, y: region.y - margin, w: region.w + 2 * margin, h: region.h + 2 * margin }
+}
+
+function center(region: Region): { x: number; y: number } {
+    return { x: region.x + region.w / 2, y: region.y + region.h / 2 }
+}
+
+function distance(a: Region, b: Region): number {
+    const first = center(a)
+    const second = center(b)
+    return Math.hypot(first.x - second.x, first.y - second.y)
+}
+
+// About as big as each other (the same text a little nearer or further away is still the same text)
+function similarSize(a: Region, b: Region): boolean {
+    return a.w > b.w * 0.75 && a.w < b.w * 1.33 && a.h > b.h * 0.65 && a.h < b.h * 1.5
 }
 
 function union(a: Region, b: Region): Region {
@@ -147,7 +175,7 @@ export default class AutoWindows {
         for(let index = 0; index < MAX_AUTO_WINDOWS; index++){
             this._slots.push({
                 region: null, polarity: 'light', role: 'other', mode: 'dialog', epoch: 0, since: 0, lastSeen: 0, grownAt: 0, outside: 0,
-                shown: false, shownSince: 0, everShown: false, lastText: '', changes: [], plate: false,
+                shown: false, shownSince: 0, everShown: false, lastText: '', changes: [], plate: false, anchor: null, movedAt: 0,
             })
         }
     }
@@ -287,8 +315,9 @@ export default class AutoWindows {
 
         if(this._running){
             const quiet = this._tracks.length === 0 && this._slots.every(slot => slot.region === null)
+            const following = this._slots.some(slot => slot.region !== null && Date.now() - slot.movedAt < FOLLOW_KEEP_MS)
             // A slow look is repeated less often
-            this._timer = setTimeout(() => this._scan(), Math.max(quiet ? IDLE_SCAN_MS : SCAN_MS, this._scanTook * 10))
+            this._timer = setTimeout(() => this._scan(), Math.max(quiet ? IDLE_SCAN_MS : (following ? FOLLOW_SCAN_MS : SCAN_MS), this._scanTook * 10))
         }
     }
 
@@ -344,7 +373,7 @@ export default class AutoWindows {
                 continue
             }
 
-            const previous = this._tracks.find(track => track.polarity === block.polarity && inside(rect, track.rect) > 0.6 && inside(track.rect, rect) > 0.4)
+            const previous = this._tracks.find(track => track.polarity === block.polarity && ((inside(rect, track.rect) > 0.6 && inside(track.rect, rect) > 0.4) || (similarSize(rect, track.rect) && distance(rect, track.rect) <= 0.08)))
             found.push({ rect, role: block.role, polarity: block.polarity, plate: block.plate, streak: (previous?.streak ?? 0) + 1, score: block.score })
         }
         this._tracks = found
@@ -389,10 +418,44 @@ export default class AutoWindows {
                 return
             }
 
+            // A floating text: the window goes where the text went
+            if(slot.role !== 'subtitle' && slot.anchor !== null && slot.shown){
+                const anchor = slot.anchor
+                let target: Track | null = null
+                for(const track of found){
+                    if(!claimed.has(track) && track.polarity === slot.polarity && similarSize(track.rect, anchor) && distance(track.rect, anchor) <= FOLLOW_RADIUS && (target === null || distance(track.rect, anchor) < distance(target.rect, anchor))){
+                        target = track
+                    }
+                }
+
+                if(target !== null){
+                    const dx = center(target.rect).x - center(anchor).x
+                    const dy = center(target.rect).y - center(anchor).y
+                    claimed.add(target)
+                    slot.lastSeen = now
+
+                    if(Math.abs(dx) >= FOLLOW_MIN || Math.abs(dy) >= FOLLOW_MIN){
+                        const carried = clampRegion({ ...slot.region, x: slot.region.x + dx, y: slot.region.y + dy })
+                        const others = manual.filter(region => region.enabled !== false).concat(this._slots.filter(other => other !== slot && other.region !== null).map(other => other.region as Region))
+                        if(!others.some(other => regionsOverlap(carried, other))){
+                            slot.region = carried
+                            slot.anchor = target.rect
+                            slot.movedAt = now
+                        }
+                    }
+                    slot.outside = 0
+                    return
+                }
+            }
+
             let sticking = false
             for(const track of found){
                 if(inside(track.rect, slot.region) < 0.5){
                     continue
+                }
+
+                if(slot.anchor === null || inside(track.rect, slot.region) >= 0.85){
+                    slot.anchor = track.rect
                 }
 
                 claimed.add(track)
@@ -407,6 +470,7 @@ export default class AutoWindows {
                             slot.region = grown
                             slot.grownAt = now
                             slot.outside = 0
+                            slot.anchor = track.rect
                         }
                     }
                 }
@@ -423,7 +487,9 @@ export default class AutoWindows {
             // A steady text (nothing has changed in it for a while) is kept calmly, lines that come and go are watched closely
             slot.changes = slot.changes.filter(time => now - time < BUSY_WINDOW_MS)
             if(slot.role !== 'subtitle'){
-                if(slot.mode === 'dialog' && slot.shown && now - slot.shownSince >= STEADY_MS && slot.changes.length === 0){
+                if(now - slot.movedAt < FOLLOW_KEEP_MS){
+                    slot.mode = 'task'
+                } else if(slot.mode === 'dialog' && slot.shown && now - slot.shownSince >= STEADY_MS && slot.changes.length === 0){
                     slot.mode = 'task'
                 } else if(slot.mode === 'task' && slot.changes.length >= BUSY_CHANGES){
                     slot.mode = 'dialog'
@@ -494,6 +560,8 @@ export default class AutoWindows {
             slot.lastText = ''
             slot.changes = []
             slot.plate = track.plate
+            slot.anchor = track.rect
+            slot.movedAt = 0
         }
     }
 
@@ -566,7 +634,7 @@ export default class AutoWindows {
 
         this._slots.forEach((slot, index) => {
             if(slot.region !== null){
-                frames.push({ rect: slot.region, role: slot.role, slot: index, plate: slot.plate, steady: slot.mode === 'task', state: slot.shown ? 'text' : (slot.everShown ? 'idle' : 'reading') })
+                frames.push({ rect: slot.region, role: slot.role, slot: index, plate: slot.plate, steady: slot.mode === 'task', floating: now - slot.movedAt < FOLLOW_KEEP_MS, state: slot.shown ? 'text' : (slot.everShown ? 'idle' : 'reading') })
             }
         })
 
