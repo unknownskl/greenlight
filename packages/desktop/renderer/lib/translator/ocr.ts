@@ -1,26 +1,57 @@
 import type { Worker } from 'tesseract.js'
 
 // The OCR engine (Tesseract compiled to WebAssembly) and the English language data are bundled with the app
-// (renderer/public/tesseract), so the text reader works offline and never downloads anything.
+// (renderer/public/tesseract), so reading English works offline. The language data of any other language
+// (a few MB) is downloaded once from the public Tesseract data server and kept in the browser cache.
 
 let workerPromise: Promise<Worker> | null = null
+let workerLanguage = 'en'
+
+// Languages the text can be read in: the code used in the settings -> the name of the Tesseract language data
+export const SOURCE_LANGUAGES: Record<string, string> = {
+    en: 'eng',
+    de: 'deu',
+    fr: 'fra',
+    es: 'spa',
+    it: 'ita',
+    pt: 'por',
+    pl: 'pol',
+    cs: 'ces',
+    nl: 'nld',
+    sv: 'swe',
+    tr: 'tur',
+    uk: 'ukr',
+    ru: 'rus',
+}
+
+const REMOTE_LANG_PATH = 'https://tessdata.projectnaptha.com/4.0.0_fast'
 
 function assetUrl(path: string): string {
     return new URL('/tesseract/' + path, window.location.href).href
 }
 
-export function getOcrWorker(): Promise<Worker> {
+export function getOcrWorker(language = 'en'): Promise<Worker> {
+    const code = SOURCE_LANGUAGES[language] ? language : 'en'
+
+    if(workerPromise !== null && workerLanguage !== code){
+        // The reading language was changed: the old reader is not needed any more
+        void terminateOcr()
+    }
+
     if(workerPromise === null){
+        workerLanguage = code
+        const bundled = code === 'en'
+
         workerPromise = (async () => {
             const { createWorker } = await import('tesseract.js')
 
-            const worker = await createWorker('eng', 1, {
+            const worker = await createWorker(SOURCE_LANGUAGES[code], 1, {
                 workerPath: assetUrl('worker.min.js'),
                 corePath: assetUrl('core'),
-                langPath: assetUrl('lang'),
+                langPath: bundled ? assetUrl('lang') : REMOTE_LANG_PATH,
                 workerBlobURL: false,
-                gzip: false,
-                cacheMethod: 'none',
+                gzip: !bundled,
+                cacheMethod: bundled ? 'none' : 'write',
             })
 
             // One uniform block of text (a subtitle or a few lines of a task)
@@ -67,8 +98,8 @@ const MIN_WORD_CONFIDENCE = 50
 // Two words further apart than this (in line heights) are separate pieces of text (two interface elements on one row)
 const MAX_WORD_GAP = 2.5
 
-export async function recognizeCanvas(canvas: HTMLCanvasElement): Promise<OcrResult> {
-    const worker = await getOcrWorker()
+export async function recognizeCanvas(canvas: HTMLCanvasElement, language = 'en'): Promise<OcrResult> {
+    const worker = await getOcrWorker(language)
     const result = await worker.recognize(canvas, {}, { text: true, blocks: true })
 
     const lines: OcrLine[] = []

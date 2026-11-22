@@ -56,6 +56,7 @@ export const defaultSettings = {
 
     // On-screen translator (reads text from a region of the stream and shows a translation)
     translator_enabled: false,
+    translator_source_lang: 'en',
     translator_target_lang: 'uk',
     translator_text_color: 'light',
     // Size of the translated text follows the size of the original text (translator_font_size is used when this is off)

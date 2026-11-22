@@ -44,7 +44,7 @@ Every push to the `deck` branch runs the workflow in `.github/workflows/deck-bui
 
 ## Known limits
 
-- The text reader knows English (the language of the game); the target language is any language of the translation service.
+- The language of the game text is chosen in Settings → Translator ("Game text language": English, German, French, Spanish, Italian, Portuguese, Polish, Czech, Dutch, Swedish, Turkish, Ukrainian, Russian). English is built in; for any other language the reader's data (1–2 MB, from the public Tesseract data server, no personal data sent) is downloaded once and then works offline. Chinese, Japanese and Korean are not supported yet. The target language is any language of the translation service.
 - Text on a very busy or moving background can be read badly. The translator holds back (it needs two matching readings) instead of showing garbage.
 - Developed and used by the author on a Steam Deck with Xbox consoles over remote play; other setups are less tested. Bug reports are welcome in the issues of this fork.
 
@@ -94,6 +94,6 @@ curl -fsSL --proto '=https' --tlsv1.2 https://github.com/Veter1904/greenlight/re
 
 ## Відомі обмеження
 
-- Розпізнавання знає англійську (мову гри); мова перекладу будь-яка з тих, що підтримує сервіс перекладу.
+- Мову тексту в грі обирають у Налаштування → Перекладач («Мова тексту в грі»): англійська, німецька, французька, іспанська, італійська, португальська, польська, чеська, нідерландська, шведська, турецька, українська, російська. Англійська вбудована; для будь-якої іншої дані розпізнавання (1–2 МБ, із публічного сервера даних Tesseract, жодних особистих даних не надсилається) завантажуються один раз, далі працюють без інтернету. Китайська, японська й корейська поки не підтримуються. Мова перекладу — будь-яка з тих, що підтримує сервіс перекладу.
 - Текст на дуже строкатому чи рухомому фоні може читатись погано. Перекладач утримується (потрібні два однакові читання), а не показує сміття.
 - Автор розробляє й користується на Steam Deck з консолями Xbox через віддалений доступ; інші конфігурації перевірені менше. Повідомлення про помилки вітаються в issues цього форка.

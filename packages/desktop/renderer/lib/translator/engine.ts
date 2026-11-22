@@ -9,6 +9,8 @@ export type EngineStatus = 'loading' | 'ready' | 'error'
 export interface TranslatorConfig {
     region: Region;
     color: TextColor;
+    // Language of the text in the game (what the text reader reads) and the language to translate it into
+    source: string;
     target: string;
     fit: FitMode;
 }
@@ -39,7 +41,7 @@ export interface EngineOptions {
     // Size of the area the video is shown in (the window)
     getBox: () => { width: number; height: number };
     getConfig: () => TranslatorConfig;
-    translate: (text: string, target: string) => Promise<string>;
+    translate: (text: string, target: string, source: string) => Promise<string>;
     onResult: (result: TranslatorResult | null) => void;
     onStatus: (status: EngineStatus) => void;
 }
@@ -483,7 +485,7 @@ export default class TranslatorEngine {
         this._running = true
         this._options.onStatus('loading')
 
-        getOcrWorker().then(() => {
+        getOcrWorker(this._options.getConfig().source).then(() => {
             if(this._running){
                 this._ready = true
                 this._options.onStatus('ready')
@@ -905,7 +907,7 @@ export default class TranslatorEngine {
         }
 
         if(translated === undefined){
-            translated = await this._options.translate(toTranslatable(raw.text), target)
+            translated = await this._options.translate(toTranslatable(raw.text), target, config.source)
 
             if(translated === ''){
                 translated = raw.text
@@ -952,7 +954,7 @@ export default class TranslatorEngine {
             return null
         }
 
-        const result = await recognizeCanvas(prepared.canvas)
+        const result = await recognizeCanvas(prepared.canvas, this._options.getConfig().source)
         if(result.confidence < MIN_CONFIDENCE){
             return null
         }

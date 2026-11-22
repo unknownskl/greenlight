@@ -8,6 +8,7 @@ import Button from '../../components/ui/button'
 import { Region, clampRegion } from '../../lib/translator/geometry'
 import usePadRegion from '../../lib/translator/usepadregion'
 import { useTranslation } from 'react-i18next'
+import { SOURCE_LANGUAGES } from '../../lib/translator/ocr'
 
 // Languages the translation can be made into (codes of the translation service)
 const TARGET_LANGUAGES = ['uk', 'ru', 'pl', 'de', 'es', 'fr', 'it', 'pt', 'tr', 'cs', 'nl', 'sv', 'ja', 'ko', 'zh-CN', 'ar', 'en']
@@ -86,6 +87,18 @@ function SettingsTranslator() {
                                 update({ translator_enabled: e.target.checked })
                             }} />
                         </label>
+                    </p>
+
+                    <p>
+                        <label>{t('translator.sourceLabel')}</label>
+                        <select value={settings.translator_source_lang || 'en'} onChange={(e) => {
+                            update({ translator_source_lang: e.target.value })
+                        }}>
+                            { Object.keys(SOURCE_LANGUAGES).map((code) => (
+                                <option key={code} value={code}>{languageName(code, settings.language || 'en-US')}</option>
+                            )) }
+                        </select>
+                        <small style={{ display: 'block', opacity: 0.7 }}>{t('translator.sourceHint')}</small>
                     </p>
 
                     <p>

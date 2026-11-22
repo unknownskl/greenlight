@@ -105,6 +105,8 @@ function TranslatorOverlay({
     draftRef.current = draft
 
     const enabled = settings.translator_enabled === true
+    // The reader is restarted when the language of the game text is changed
+    const sourceLang = settings.translator_source_lang || 'en'
     const saved = clampRegion(settings.translator_region)
     const region = editing ? draft : saved
 
@@ -125,10 +127,11 @@ function TranslatorOverlay({
             getConfig: () => ({
                 region: settingsRef.current.translator_region,
                 color: (settingsRef.current.translator_text_color || 'light') as TextColor,
+                source: settingsRef.current.translator_source_lang || 'en',
                 target: settingsRef.current.translator_target_lang || 'uk',
                 fit: (settingsRef.current.video_size || 'default') as FitMode,
             }),
-            translate: (text, target) => Ipc.send('app', 'translateText', { text, from: 'en', to: target }) as Promise<string>,
+            translate: (text, target, source) => Ipc.send('app', 'translateText', { text, from: source, to: target }) as Promise<string>,
             onResult: setResult,
             onStatus: setStatus,
         })
@@ -138,7 +141,7 @@ function TranslatorOverlay({
         return () => {
             engine.stop()
         }
-    }, [enabled])
+    }, [enabled, sourceLang])
 
     // Free the memory of the text reader when the stream is closed
     React.useEffect(() => {
