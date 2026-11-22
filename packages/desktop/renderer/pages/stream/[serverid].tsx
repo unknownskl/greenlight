@@ -190,6 +190,7 @@ function Stream() {
                             const gamepadDriver = new GreenlightGamepadDriver({
                                 keyboardMouse: emulateKeyboardMouse,
                                 sensitivity: settings.input_kbm_sensitivity,
+                                rumbleStrength: settings.input_rumble_strength,
                             })
                             gamepadDriver.onChord = () => {
                                 window.dispatchEvent(new Event('greenlight-gamepad-menu'))

@@ -5,6 +5,8 @@ export const defaultSettings = {
     video_profiles: [],
     preferred_game_language: 'en-US',
     controller_vibration: true,
+    // How strong the vibration is (1 = as the game asks for it)
+    input_rumble_strength: 1,
     video_size: 'default',
     force_region_ip: '',
 
@@ -52,6 +54,9 @@ export const defaultSettings = {
     input_kbm_emulation: false,
     input_kbm_sensitivity: 1,
     app_lowresolution: false,
+    // Fullscreen: 'auto' = fullscreen in the game mode of the Steam Deck (the picture then fills the whole screen,
+    // the built-in 1280x800 one or a docked 1920x1080 one), 'on' = always, 'off' = in a window
+    app_fullscreen: 'auto',
     // The Alt key shows the menu bar (File / Edit / View / Window): for desktop use, it gets in the way while playing
     app_menubar_alt: false,
 

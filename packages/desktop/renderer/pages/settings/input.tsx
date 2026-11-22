@@ -178,6 +178,14 @@ function SettingsInput() {
                         </label>
                     </p>
 
+                    { settings.controller_vibration ? <p>
+                        <label>{t('settings.input.vibrationStrength')}</label>
+                        <input type="range" min={10} max={100} step={5} value={Math.round((settings.input_rumble_strength ?? 1) * 100)} onChange={(e) => {
+                            setSettings({ ...settings, input_rumble_strength: parseInt(e.target.value) / 100 })
+                        }} /> {Math.round((settings.input_rumble_strength ?? 1) * 100)}%
+                        <br /><small>{t('settings.input.vibrationStrengthHint')}</small>
+                    </p> : '' }
+
                     <p>
                         <label>{t('settings.input.gamepadNavigation')}</label>
                         <label style={{ minWidth: 0 }}>

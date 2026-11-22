@@ -41,7 +41,14 @@ export default class GreenlightGamepadDriver {
     // Keyboard and mouse acting as a gamepad (see kbm.ts)
     _kbm: KeyboardMouseEmulation | null = null
 
-    constructor(options: { keyboardMouse?: boolean; sensitivity?: number } = {}) {
+    // How strong the vibration is (1 = as the game asks for it)
+    _rumbleStrength = 1
+
+    constructor(options: { keyboardMouse?: boolean; sensitivity?: number; rumbleStrength?: number } = {}) {
+        if(typeof options.rumbleStrength === 'number' && Number.isFinite(options.rumbleStrength)){
+            this._rumbleStrength = Math.max(0, Math.min(1, options.rumbleStrength))
+        }
+
         if(options.keyboardMouse === true){
             this._kbm = new KeyboardMouseEmulation(options.sensitivity ?? 1)
             this._kbm.canLock = () => !this._suspended
@@ -231,6 +238,37 @@ export default class GreenlightGamepadDriver {
         }
     }
 
+    /** The controller as the player sees it when it makes it vibrate: with the vibration scaled to the setting. */
+    _weakenRumble(pad: Gamepad | null): Gamepad | null {
+        const actuator: any = pad === null ? undefined : (pad as any).vibrationActuator
+        if(pad === null || actuator === undefined || actuator === null || this._rumbleStrength >= 0.999){
+            return pad
+        }
+
+        const factor = this._rumbleStrength
+        const scaled = {
+            type: actuator.type,
+            playEffect: (type: string, params: any) => actuator.playEffect(type, {
+                ...params,
+                weakMagnitude: (params.weakMagnitude ?? 0) * factor,
+                strongMagnitude: (params.strongMagnitude ?? 0) * factor,
+                leftTrigger: (params.leftTrigger ?? 0) * factor,
+                rightTrigger: (params.rightTrigger ?? 0) * factor,
+            }),
+            reset: () => actuator.reset?.(),
+        }
+
+        return new Proxy(pad, {
+            get(target: any, name: string | symbol) {
+                if(name === 'vibrationActuator'){
+                    return scaled
+                }
+                const value = target[name]
+                return typeof value === 'function' ? value.bind(target) : value
+            },
+        })
+    }
+
     /**
      * The console sends rumble for gamepad 0 and the player looks that up in navigator.getGamepads()[0].
      * Make index 0 point at the controller that was used last while the rumble message is processed.
@@ -256,7 +294,7 @@ export default class GreenlightGamepadDriver {
             try {
                 (navigator as any).getGamepads = () => {
                     const list = Array.from(real())
-                    list[0] = real()[active.index]
+                    list[0] = this._weakenRumble(real()[active.index])
                     return list
                 }
                 return original(event)

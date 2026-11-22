@@ -1,4 +1,4 @@
-import { app as ElectronApp, BrowserWindow, dialog } from 'electron'
+import { app as ElectronApp, BrowserWindow, dialog, screen } from 'electron'
 import serve from 'electron-serve'
 import Store from 'electron-store'
 import Debug from 'debug'
@@ -213,7 +213,7 @@ export default class Application {
             title: 'Greenlight',
             backgroundColor: 'rgb(26, 27, 30)',
         }
-        if(this._startupFlags.fullscreen === true){
+        if(this.wantsFullscreen()){
             windowOptions.fullscreen = true
         }
 
@@ -226,6 +226,31 @@ export default class Application {
         this._mainWindow.on('show', () => {
             this.log('electron', __filename+'[openMainWindow()] Showing Main window.')
         })
+
+        // The screen can change while the app runs (the Steam Deck is docked or taken out of the dock):
+        // the window then takes the size of the new screen
+        const screenKey = () => {
+            const size = screen.getPrimaryDisplay().size
+            return size.width + 'x' + size.height + ' on ' + screen.getAllDisplays().length
+        }
+        let lastScreen = screenKey()
+        let refitTimer: ReturnType<typeof setTimeout> | undefined
+        const refit = () => {
+            if(refitTimer !== undefined){
+                clearTimeout(refitTimer)
+            }
+            // Only a real change of the screen counts (not the changes that the window makes itself)
+            refitTimer = setTimeout(() => {
+                if(screenKey() !== lastScreen){
+                    lastScreen = screenKey()
+                    this.log('electron', __filename+'[openMainWindow()] The screen changed: '+lastScreen)
+                    this.applyWindowMode(true)
+                }
+            }, 600)
+        }
+        screen.on('display-metrics-changed', refit)
+        screen.on('display-added', refit)
+        screen.on('display-removed', refit)
 
         // Alt alone would show the menu bar (File / Edit / View / Window), which only gets in the way while playing.
         // The shortcuts of the menu (Ctrl+R, F11, ...) keep working; the setting brings the Alt key back for desktop use.
@@ -258,6 +283,52 @@ export default class Application {
             if(this._isCi !== true){
                 this._mainWindow.webContents.openDevTools()
                 this.openGPUWindow()
+            }
+        }
+    }
+
+    /** Is this the game mode of the Steam Deck (gamescope)? */
+    isGameMode(): boolean {
+        const env = process.env
+        return env.SteamGamepadUI === '1' || env.GAMESCOPE_WAYLAND_DISPLAY !== undefined || env.XDG_CURRENT_DESKTOP === 'gamescope' || env.XDG_SESSION_DESKTOP === 'gamescope'
+    }
+
+    /** Should the window fill the whole screen? (Setting "fullscreen": auto = in the game mode of the Steam Deck.) */
+    wantsFullscreen(): boolean {
+        if(this._startupFlags.fullscreen === true){
+            return true
+        }
+
+        const settings = this._store.get('settings', {}) as any
+        const mode = settings.app_fullscreen ?? 'auto'
+
+        if(mode === 'on'){
+            return true
+        }
+        return mode === 'auto' && this.isGameMode()
+    }
+
+    /** Applies the fullscreen setting; with `refit` a fullscreen window also takes the size of a changed screen. */
+    applyWindowMode(refit = false){
+        const win = this._mainWindow
+        if(win === undefined || win.isDestroyed()){
+            return
+        }
+
+        const wanted = this.wantsFullscreen()
+        if(wanted && refit && win.isFullScreen()){
+            win.setFullScreen(false)
+            win.setFullScreen(true)
+        } else if(win.isFullScreen() !== wanted){
+            win.setFullScreen(wanted)
+        }
+
+        if(!wanted && !win.isFullScreen()){
+            // A window that is bigger than the screen it is on is made to fit
+            const area = screen.getDisplayMatching(win.getBounds()).workArea
+            const [width, height] = win.getSize()
+            if(width > area.width || height > area.height){
+                win.setSize(Math.min(width, area.width), Math.min(height, area.height))
             }
         }
     }
