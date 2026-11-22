@@ -47,6 +47,8 @@ export const defaultSettings = {
     input_newgamepad: false,
 
     // Keyboard and mouse that act as a gamepad (WASD = left stick, mouse = right stick, ...)
+    // Speed of the mouse in the Mouse & Keyboard mode (1 = the speed of the player)
+    input_mouse_sensitivity: 1,
     input_kbm_emulation: false,
     input_kbm_sensitivity: 1,
     app_lowresolution: false,

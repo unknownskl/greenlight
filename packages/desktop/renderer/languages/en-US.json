@@ -78,6 +78,8 @@
         "legacyWarning": "Using the Mouse & Keyboard driver together with the Gamepad keyboard mappings will cause conflicts",
         "kbmEmulation": "Keyboard and mouse as a gamepad",
         "kbmEmulationDescription": "W A S D = left stick, mouse = right stick (click the picture to capture the mouse, Esc releases it), left / right mouse button = RT / LT, Space = A, Backspace = B, R = X, F = Y, Q / E = LB / RB, Shift = L3, C = R3, Tab = View, M = Menu, N = Xbox button, arrow keys = d-pad, I J K L = right stick. Takes the place of the key mappings below.",
+        "mouseSensitivity": "Mouse speed",
+        "mouseSensitivityHint": "Lower it if the mouse moves too fast. Applies to the mouse of the Mouse & Keyboard mode and is used when the stream starts.",
         "kbmSensitivity": "Mouse sensitivity",
         "enableLegacy": "Enable Keyboard to Gamepad",
         "enableLegacyDescription": "(Disabling this feature will disable the keyboard to gamepad mapping and only allows controls from the gamepad.)",

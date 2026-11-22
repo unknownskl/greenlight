@@ -201,6 +201,14 @@ function SettingsInput() {
                         { (!settings.input_newgamepad && settings.input_mousekeyboard) ? <small style={{ color: 'orange' }}>{t('settings.input.legacyWarning')}</small> : '' }
                     </p>
 
+                    { settings.input_mousekeyboard === true ? <p>
+                        <label>{t('settings.input.mouseSensitivity')}</label>
+                        <input type="range" min={10} max={200} step={5} value={Math.round((settings.input_mouse_sensitivity ?? 1) * 100)} onChange={(e) => {
+                            setSettings({ ...settings, input_mouse_sensitivity: parseInt(e.target.value) / 100 })
+                        }} /> {Math.round((settings.input_mouse_sensitivity ?? 1) * 100)}%
+                        <br /><small>{t('settings.input.mouseSensitivityHint')}</small>
+                    </p> : '' }
+
                     <p>
                         <label>{t('settings.input.kbmEmulation')}</label>
                         <label style={{ minWidth: 0 }} className="toggle-label">

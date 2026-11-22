@@ -8,6 +8,7 @@ import StreamComponent from '../../components/ui/streamcomponent'
 import StreamPreload from '../../components/ui/streampreload'
 import Ipc from '../../lib/ipc'
 import GreenlightGamepadDriver from '../../lib/gamepad/driver'
+import applyMouseSensitivity from '../../lib/mousesensitivity'
 import { useTranslation } from 'react-i18next'
 
 function Stream() {
@@ -200,7 +201,7 @@ function Stream() {
                                 window.dispatchEvent(new Event('greenlight-translator-area'))
                             }
 
-                            setxPlayer(new xCloudPlayer('streamComponent', {
+                            const player = new xCloudPlayer('streamComponent', {
                                 ui_systemui: [],
                                 input_driver: gamepadDriver,
                                 input_touch: settings.input_touch || false,
@@ -212,7 +213,10 @@ function Stream() {
                                 } as any : (settings.input_mousekeyboard_config !== undefined ? {
                                     _keymapping: settings.input_mousekeyboard_config,
                                 } : undefined as any),
-                            }))
+                            })
+                            // Speed of the mouse in the Mouse & Keyboard mode
+                            applyMouseSensitivity(player, settings.input_mouse_sensitivity)
+                            setxPlayer(player)
                             break
 
                         case 'failed':

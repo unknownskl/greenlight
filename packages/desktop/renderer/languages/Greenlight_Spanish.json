@@ -73,6 +73,8 @@
         "legacyWarning": "Usar el controlador de ratón y teclado junto con las asignaciones de teclado para mando provocará conflictos",
         "kbmEmulation": "Teclado y ratón como mando",
         "kbmEmulationDescription": "W A S D = palanca izquierda, ratón = palanca derecha (haz clic en la imagen para capturar el ratón, Esc lo libera), botón izquierdo / derecho del ratón = RT / LT, Espacio = A, Retroceso = B, R = X, F = Y, Q / E = LB / RB, Mayús = L3, C = R3, Tab = View, M = Menu, N = botón Xbox, flechas = cruceta, I J K L = palanca derecha. Sustituye la asignación de teclas de abajo.",
+        "mouseSensitivity": "Velocidad del ratón",
+        "mouseSensitivityHint": "Redúcela si el ratón se mueve demasiado rápido. Se aplica al ratón del modo Ratón y teclado y se usa al iniciar el stream.",
         "kbmSensitivity": "Sensibilidad del ratón",
         "enableLegacy": "Activar emulación de Teclado a Mando",
         "enableLegacyDescription": "(Desactivar esta función deshabilitará la asignación de teclado a mando y solo permitirá controlar el juego directamente con un mando).",

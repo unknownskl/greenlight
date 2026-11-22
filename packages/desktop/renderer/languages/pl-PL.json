@@ -78,6 +78,8 @@
         "legacyWarning": "Używanie sterownika Klawiatury i Myszy razem z mapowaniem klawiatury do kontrolera będzie wywoływać konflikty",
         "kbmEmulation": "Klawiatura i mysz jako gamepad",
         "kbmEmulationDescription": "W A S D = lewy drążek, mysz = prawy drążek (kliknij obraz, aby przechwycić mysz, Esc ją zwalnia), lewy / prawy przycisk myszy = RT / LT, Spacja = A, Backspace = B, R = X, F = Y, Q / E = LB / RB, Shift = L3, C = R3, Tab = View, M = Menu, N = przycisk Xbox, strzałki = krzyżak, I J K L = prawy drążek. Zastępuje ustawienia klawiszy poniżej.",
+        "mouseSensitivity": "Szybkość myszy",
+        "mouseSensitivityHint": "Zmniejsz, jeśli mysz porusza się zbyt szybko. Dotyczy myszy w trybie Mysz i klawiatura i jest stosowana przy starcie streamu.",
         "kbmSensitivity": "Czułość myszy",
         "enableLegacy": "Włącz Klawiatura jako Kontroler",
         "enableLegacyDescription": "(Wyłączenie tej funkcji wyłączy mapowanie klawiatury do kontrolera i zezwala wyłącznie na sterowanie kontrolerem.)",
