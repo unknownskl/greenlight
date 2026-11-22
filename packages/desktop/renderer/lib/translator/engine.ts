@@ -96,6 +96,21 @@ const PENDING_MS = 6000
 // read, must be read twice before it replaces the shown text (a living background makes the reader misread)
 const IN_PLACE_CHANGE = 0.22
 
+// Every translated line stays on screen for a reading time (this much plus a bit per character), even when the
+// original is already gone, and a line that replaces it waits its turn: when subtitles come faster than they can
+// be read, they are shown one after another (a few at most) instead of losing some of them
+const MIN_SHOW_MS = 1600
+const SHOW_PER_CHAR_MS = 45
+const MAX_SHOW_MS = 6000
+const MAX_QUEUED = 3
+const QUEUE_STALE_MS = 15000
+
+// The more lines wait, the shorter each one stays (the reader catches up with the conversation)
+function readingTime(segment: { translated: string }, waiting: number): number {
+    const base = Math.min(MAX_SHOW_MS, MIN_SHOW_MS + segment.translated.length * SHOW_PER_CHAR_MS)
+    return base * (waiting >= 2 ? 0.6 : (waiting === 1 ? 0.8 : 1))
+}
+
 // A line that was not found by the reader this many times in a row is dropped from the screen
 const MAX_MISSED_READS = 2
 
@@ -435,6 +450,8 @@ interface ShownSegment extends TranslatedSegment {
     template: string;
     // In how many reads in a row this line was not found (it stays on screen for a couple of reads, see MAX_MISSED_READS)
     missed: number;
+    // When it was put on screen (or into the queue)
+    shownAt: number;
 }
 
 // New text that waits for a second reading before it is translated
@@ -478,6 +495,8 @@ export default class TranslatorEngine {
     _unstableTicks = 0
     _unstableSince = 0
     _lastUnstableAt = 0
+    // Translated lines that wait until the line they replace has been on screen long enough
+    _queue: ShownSegment[] = []
     _regionKey = ''
 
     // Translations by the text, and by the text without its numbers
@@ -550,6 +569,7 @@ export default class TranslatorEngine {
         }
 
         try {
+            this._flushQueue()
             await this._step()
         } catch(error) {
             console.warn('Translator: step failed:', error)
@@ -560,12 +580,62 @@ export default class TranslatorEngine {
         }
     }
 
-    _clearShown() {
+    /** Hides the translation. Unless `force` is set, lines that have not been on screen long enough to be read stay. */
+    _clearShown(force = true) {
         this._held = []
+
+        if(force){
+            this._queue = []
+        } else if(this._shown.length > 0) {
+            const now = Date.now()
+            const young = this._shown.filter(segment => now - segment.shownAt < readingTime(segment, this._queue.length))
+            if(young.length > 0){
+                if(young.length < this._shown.length){
+                    this._shown = young
+                    this._emit(young)
+                }
+                return
+            }
+        }
+
         if(this._shown.length > 0){
             this._shown = []
             this._options.onResult(null)
         }
+    }
+
+    _emit(segments: ShownSegment[]) {
+        this._options.onStatus('ready')
+        this._options.onResult({
+            original: segments.map(segment => segment.original).join(' '),
+            translated: segments.map(segment => segment.translated).join('\n'),
+            segments,
+        })
+    }
+
+    /** Puts the next waiting line on screen when the line it replaces has been read. */
+    _flushQueue() {
+        if(this._queue.length === 0){
+            return
+        }
+
+        const now = Date.now()
+        this._queue = this._queue.filter(item => now - item.shownAt < QUEUE_STALE_MS)
+        const next = this._queue[0]
+        if(next === undefined){
+            return
+        }
+
+        const old = this._shown.find(segment => overlapShare(segment.rect, next.rect) > 0.5)
+        if(old !== undefined && now - old.shownAt < readingTime(old, this._queue.length)){
+            return
+        }
+
+        this._queue.shift()
+        const segments = this._shown.filter(segment => segment !== old).concat({ ...next, shownAt: now, missed: 0 })
+        segments.sort((a, b) => a.rect.y - b.rect.y || a.rect.x - b.rect.x)
+        this._shown = segments
+        this._emit(segments)
     }
 
     async _step() {
@@ -631,7 +701,7 @@ export default class TranslatorEngine {
                 this._readMask = {}
                 this._hasReadMask = false
                 this._sameCount = 0
-                this._clearShown()
+                this._clearShown(false)
             }
             return
         }
@@ -673,7 +743,10 @@ export default class TranslatorEngine {
             this._unstableSince = 0
         } else {
             this._unstableTicks++
-            this._lastUnstableAt = now
+            // One changed picture is a new line of text; only a picture that keeps changing is a moving camera
+            if(this._unstableTicks >= MOTION_TICKS_BEFORE_HIDE){
+                this._lastUnstableAt = now
+            }
             if(this._unstableSince === 0){
                 this._unstableSince = now
             }
@@ -694,7 +767,8 @@ export default class TranslatorEngine {
             }
         }
 
-        const minGap = Math.min(3000, 400 + this._sameCount * 400)
+        // The longer the text stays the same, the less often it is read again; changed text is read without that delay
+        const minGap = changed ? 350 : Math.min(3000, 400 + this._sameCount * 400)
 
         // Read again now and then even when the picture looks the same: it may be a different line in the same place.
         // Reading the same text again costs nothing visible (see step 4), and it happens less often the longer the text stays.
@@ -744,7 +818,7 @@ export default class TranslatorEngine {
         if(best.segments.length === 0){
             this._failedReads++
             if(this._failedReads >= FAILED_READS_BEFORE_HIDE){
-                this._clearShown()
+                this._clearShown(false)
             }
             return
         }
@@ -760,6 +834,13 @@ export default class TranslatorEngine {
         const known = this._shown.concat(this._held)
         best.segments.forEach((raw, index) => {
             const previous = matches[index]
+            if(previous === null){
+                const key = templateKey(raw.text)
+                if(this._queue.some(waiting => waiting.template === key || isSameReading(key, waiting.template))){
+                    return
+                }
+            }
+
             let inPlace = false
             if(previous === null && changeAmount < IN_PLACE_CHANGE && known.length > 0){
                 // Different text where a line is already shown, although the picture hardly changed: probably a misread
@@ -798,12 +879,41 @@ export default class TranslatorEngine {
             return
         }
 
+        // New text where a line is still being read waits in the queue
+        const held: ShownSegment[] = []
+        const ready: ShownSegment[] = []
+        const stamp = Date.now()
+        segments.forEach((segment, index) => {
+            const old = accepted[index].previous === null
+                ? shown.find(other => overlapShare(segment.rect, other.rect) > 0.5 && stamp - other.shownAt < readingTime(other, this._queue.length))
+                : undefined
+
+            if(old === undefined){
+                ready.push(segment)
+            } else {
+                if(held.indexOf(old) < 0){
+                    held.push(old)
+                }
+                this._queue.push({ ...segment, shownAt: stamp })
+                if(this._queue.length > MAX_QUEUED){
+                    this._queue.shift()
+                }
+            }
+        })
+        segments = ready
+
         // A line that the reader missed this time stays on screen for a couple of reads (a reading may fail now and then),
         // unless something new is shown where it was
         const used = new Set<ShownSegment>()
         accepted.forEach((item) => {
             if(item.previous !== null){
                 used.add(item.previous)
+            }
+        })
+        held.forEach((old) => {
+            used.add(old)
+            if(!segments.some(segment => rectsOverlap(segment.rect, old.rect))){
+                segments.push(old)
             }
         })
         shown.concat(this._held).forEach((old) => {
@@ -969,6 +1079,7 @@ export default class TranslatorEngine {
             centered: raw.centered,
             template: keep !== null ? keep.template : template,
             missed: 0,
+            shownAt: previous !== null ? previous.shownAt : Date.now(),
         }
     }
 
