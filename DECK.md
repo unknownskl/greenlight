@@ -16,6 +16,7 @@ _Not affiliated with Microsoft, Xbox or the Greenlight author. All rights and tr
   - Every line is translated on its own and drawn over the original with the same size, position and background colour.
   - It does not translate the same text twice: shaking video, a moving background, a counter that only changes its digits, or the same line read a little differently by the text reader do not cause new requests.
   - Text that is part of the game world (it swings when the camera turns) is hidden while the camera moves and shown again when the picture is steady.
+  - Up to 3 translation windows that never overlap, for example one for subtitles, one for tasks and one for reading text on demand. Each can be turned on and off from the game menu. A window of the "Tasks" kind keeps a steady translation while the camera sways the interface (a different reading has to be seen twice before it replaces what is shown), and fast subtitles are shown one after another instead of losing lines.
 - **Keyboard and mouse as a gamepad** (Settings → Input), for docked play: W A S D = left stick, mouse = right stick, mouse buttons = triggers, and more.
 - **One port per console.** If you stream from outside your home network and have several consoles, each one can use its own remote port (Settings → Streaming).
 - **Fixes.** Changing a setting during a stream no longer closes the stream.
@@ -66,6 +67,7 @@ _Не пов'язана з Microsoft, Xbox чи автором Greenlight. Ус�
   - Кожен рядок перекладається окремо й малюється поверх оригіналу того самого розміру, на тому самому місці й на фоні того самого кольору.
   - Один і той самий текст двічі не перекладається: тремтіння відео, рухомий фон, лічильник, у якому змінюються лише цифри, чи той самий рядок, прочитаний трохи інакше, не створюють нових запитів.
   - Текст, що є частиною ігрового світу (гойдається, коли повертаєш камеру), ховається, поки камера рухається, і повертається, коли картинка заспокоїлась.
+  - До 3 вікон перекладу, що ніколи не перетинаються: наприклад одне для субтитрів, одне для завдань і одне, щоб прочитати текст за потреби. Кожне можна вмикати й вимикати з ігрового меню. Вікно типу «Завдання» тримає стабільний переклад, поки камера гойдає інтерфейс (інше зчитування має повторитися двічі, перш ніж замінить показане), а швидкі субтитри показуються одне за одним, а не губляться.
 - **Клавіатура й миша як геймпад** (Налаштування → Керування), для гри з док-станції: W A S D = лівий стік, миша = правий стік, кнопки миші = тригери тощо.
 - **Окремий порт для кожної консолі.** Якщо граєш не з домашньої мережі й маєш кілька консолей, кожна може мати свій віддалений порт (Налаштування → Стрімінг).
 - **Виправлення.** Зміна налаштування під час стріму більше не закриває стрім.

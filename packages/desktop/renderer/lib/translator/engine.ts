@@ -8,6 +8,11 @@ export type EngineStatus = 'loading' | 'ready' | 'error'
 
 export interface TranslatorConfig {
     region: Region;
+    // A window that is turned off reads nothing and shows nothing
+    enabled?: boolean;
+    // 'task': a steady interface that sways with the camera (tasks): it is not hidden while the picture moves and a
+    // different reading must be seen twice before it replaces what is shown. 'dialog': lines that come and go.
+    mode?: 'dialog' | 'task';
     color: TextColor;
     // Language of the text in the game (what the text reader reads) and the language to translate it into
     source: string;
@@ -255,7 +260,9 @@ function maskDifference(a: Uint8Array, b: Uint8Array): number {
 
 // A single letter that is not a word of its own ("a", "I") is an icon or a speck, not text
 function isStrayLetter(token: string): boolean {
-    return token.length === 1 && /[A-Za-z]/.test(token) && token !== 'a' && token !== 'A' && token !== 'I'
+    // A letter that is not a word of its own, or "OO" / "QO" (an icon read as letters)
+    return (token.length === 1 && /[A-Za-z]/.test(token) && token !== 'a' && token !== 'A' && token !== 'I')
+        || /^[OQ0][OQ0]$/.test(token)
 }
 
 /**
@@ -651,6 +658,17 @@ export default class TranslatorEngine {
         const config = this._options.getConfig()
         const region = clampRegion(config.region)
 
+        if(config.enabled === false){
+            if(this._shown.length > 0 || this._held.length > 0 || this._queue.length > 0){
+                this._clearShown(true)
+            }
+            // Start over when it is turned on again
+            this._regionKey = ''
+            this._hasReadMask = false
+            return
+        }
+        const taskMode = config.mode === 'task'
+
         // The window was moved: start over
         const regionKey = [region.x, region.y, region.w, region.h, config.fit, config.color].map(v => typeof v === 'number' ? v.toFixed(4) : v).join('|')
         if(regionKey !== this._regionKey){
@@ -735,6 +753,13 @@ export default class TranslatorEngine {
 
         const now = Date.now()
 
+        // A steady interface that sways with the camera is not "moving text": it keeps its translation, and the
+        // readings (which differ a little every time) are voted on instead (see _confirm)
+        if(taskMode){
+            moving = false
+            stable = true
+        }
+
         // The picture is moving: the camera turns and the interface that belongs to the game world swings with it.
         // A translation that stays where the text was would hang in the air, and the blurred text is read differently
         // every time, so the translation is hidden and nothing is read until the picture calms down.
@@ -768,7 +793,7 @@ export default class TranslatorEngine {
         }
 
         // The longer the text stays the same, the less often it is read again; changed text is read without that delay
-        const minGap = changed ? 350 : Math.min(3000, 400 + this._sameCount * 400)
+        const minGap = taskMode ? 1200 : (changed ? 350 : Math.min(3000, 400 + this._sameCount * 400))
 
         // Read again now and then even when the picture looks the same: it may be a different line in the same place.
         // Reading the same text again costs nothing visible (see step 4), and it happens less often the longer the text stays.
@@ -848,7 +873,7 @@ export default class TranslatorEngine {
                 inPlace = known.some(old => overlapShare(screen, old.rect) > 0.5)
             }
 
-            if(previous !== null || this._confirm(raw, now, inPlace)){
+            if(previous !== null || this._confirm(raw, now, inPlace || taskMode)){
                 accepted.push({ raw, previous })
             }
         })

@@ -5,7 +5,7 @@ import Card from '../../components/ui/card'
 import RegionEditor from '../../components/translator/regioneditor'
 import { useSettings } from '../../context/userContext'
 import Button from '../../components/ui/button'
-import { Region, clampRegion } from '../../lib/translator/geometry'
+import { Region, clampRegion, MAX_REGIONS, getRegions, regionsToSettings, constrainRegion, findFreeRegion, windowMode } from '../../lib/translator/geometry'
 import usePadRegion from '../../lib/translator/usepadregion'
 import { useTranslation } from 'react-i18next'
 import { SOURCE_LANGUAGES } from '../../lib/translator/ocr'
@@ -26,7 +26,13 @@ function SettingsTranslator() {
     const { settings, setSettings } = useSettings()
     const { t } = useTranslation()
 
-    const saved = clampRegion(settings.translator_region)
+    const regions = getRegions(settings)
+    const [selected, setSelected] = React.useState(0)
+    const selectedIndex = Math.min(selected, regions.length - 1)
+    const selectedRef = React.useRef(selectedIndex)
+    selectedRef.current = selectedIndex
+    const saved = regions[selectedIndex]
+    const others = regions.filter((_, i) => i !== selectedIndex)
 
     // While the window is placed with the gamepad the changes stay in a draft and are saved when done
     const [padEditing, setPadEditing] = React.useState(false)
@@ -39,14 +45,22 @@ function SettingsTranslator() {
     const region = padEditing ? draft : saved
 
     const finishPadEditing = React.useCallback(() => {
-        setSettings({ ...settingsRef.current, translator_region: clampRegion(draftRef.current) })
+        const list = getRegions(settingsRef.current)
+        list[Math.min(selectedRef.current, list.length - 1)] = clampRegion(draftRef.current)
+        setSettings({ ...settingsRef.current, ...regionsToSettings(list) })
         setPadEditing(false)
     }, [])
 
-    usePadRegion(padEditing, () => draftRef.current, setDraft, finishPadEditing)
+    const constrain = React.useCallback((next: Region, previous: Region) => {
+        const list = getRegions(settingsRef.current)
+        const index = Math.min(selectedRef.current, list.length - 1)
+        return constrainRegion(next, previous, list.filter((_, i) => i !== index))
+    }, [])
+
+    usePadRegion(padEditing, () => draftRef.current, setDraft, finishPadEditing, { constrain })
 
     function startPadEditing() {
-        setDraft(clampRegion(settingsRef.current.translator_region))
+        setDraft(getRegions(settingsRef.current)[selectedRef.current])
         setPadEditing(true)
     }
 
@@ -55,10 +69,32 @@ function SettingsTranslator() {
     }
 
     function setRegion(next: Region) {
-        update({ translator_region: clampRegion(next) })
+        const list = regions.slice()
+        list[selectedIndex] = constrainRegion(next, saved, others)
+        update(regionsToSettings(list))
     }
 
-    function regionSlider(label: string, key: keyof Region) {
+    function addWindow() {
+        const free = findFreeRegion(regions)
+        if(free === null){
+            return
+        }
+
+        update(regionsToSettings([...regions, free]))
+        setSelected(regions.length)
+    }
+
+    function removeWindow() {
+        if(regions.length <= 1){
+            return
+        }
+
+        const list = regions.filter((_, i) => i !== selectedIndex)
+        update(regionsToSettings(list))
+        setSelected(Math.max(0, selectedIndex - 1))
+    }
+
+    function regionSlider(label: string, key: 'x' | 'y' | 'w' | 'h') {
         return (
             <p>
                 <label>{label}</label>
@@ -154,13 +190,53 @@ function SettingsTranslator() {
                     <h1>{t('translator.regionTitle')}</h1>
                     <p>{t('translator.regionDescription')}</p>
 
+                    <p>
+                        { regions.map((_, index) => (
+                            <Button key={index} label={t('translator.windowName', { n: index + 1 })} className={index === selectedIndex ? 'btn-primary' : ''} onClick={() => {
+                                if(!padEditing){ setSelected(index) }
+                            }}></Button>
+                        )) }
+                        { (regions.length < MAX_REGIONS && !padEditing) ? <Button label={<span><i className="fa-solid fa-plus"></i> {t('translator.addWindow')}</span>} onClick={addWindow}></Button> : '' }
+                        { (regions.length > 1 && !padEditing) ? <Button label={<span><i className="fa-solid fa-trash"></i> {t('translator.removeWindow')}</span>} onClick={removeWindow}></Button> : '' }
+                    </p>
+
                     { padEditing ? <p className="translator-pad-hint">{t('translator.padEditActive')}</p> : <p>
                         <Button label={<span><i className="fa-solid fa-gamepad"></i> {t('translator.padEditBtn')}</span>} className="btn-primary" onClick={startPadEditing}></Button>
                     </p> }
 
+                    <p>
+                        <label>{t('translator.windowEnabled')}</label>
+                        <label style={{ minWidth: 0 }} className="toggle-label">
+                            <input type='checkbox' checked={saved.enabled !== false} onChange={(e) => {
+                                setRegion({ ...region, enabled: e.target.checked })
+                            }} />
+                        </label>
+                    </p>
+
+                    <p>
+                        <label>{t('translator.windowType')}</label>
+                        <select value={windowMode(saved, selectedIndex)} onChange={(e) => {
+                            setRegion({ ...region, mode: e.target.value as any })
+                        }}>
+                            <option value="dialog">{t('translator.typeDialog')}</option>
+                            <option value="task">{t('translator.typeTask')}</option>
+                        </select>
+                        <small style={{ display: 'block', opacity: 0.7 }}>{t('translator.typeHint')}</small>
+                    </p>
+
                     <div className="translator-preview" data-gp-ignore>
-                        <RegionEditor region={region} onChange={padEditing ? setDraft : setRegion} className={padEditing ? 'pad-active' : ''}>
-                            <span>{t('translator.previewText')}</span>
+                        { regions.map((frame, index) => index === selectedIndex ? null : (
+                            <div key={index} className="region-frame region-frame-other" style={{
+                                left: (frame.x * 100) + '%',
+                                top: (frame.y * 100) + '%',
+                                width: (frame.w * 100) + '%',
+                                height: (frame.h * 100) + '%',
+                            }} onPointerDown={() => { if(!padEditing){ setSelected(index) } }}>
+                                <span>{index + 1}</span>
+                            </div>
+                        )) }
+                        <RegionEditor region={region} onChange={padEditing ? setDraft : setRegion} constrain={padEditing ? constrain : undefined} className={padEditing ? 'pad-active' : ''}>
+                            <span>{regions.length > 1 ? (selectedIndex + 1) + ' - ' : ''}{t('translator.previewText')}</span>
                         </RegionEditor>
                     </div>
 

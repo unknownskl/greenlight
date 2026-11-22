@@ -4,6 +4,8 @@ import { Region, clampRegion, MIN_REGION_SIZE } from '../../lib/translator/geome
 interface RegionEditorProps {
     region: Region;
     onChange: (region: Region) => void;
+    // Called with every new region (and the previous one) to keep it out of the way of other windows
+    constrain?: (next: Region, previous: Region) => Region;
     children?: React.ReactNode;
     className?: string;
 }
@@ -30,9 +32,12 @@ const HANDLES: DragMode[] = ['tl', 'tr', 'bl', 'br']
 function RegionEditor({
     region,
     onChange,
+    constrain,
     children,
     className,
 }: RegionEditorProps) {
+    const change = (next: Region) => onChange(constrain ? constrain(next, region) : next)
+
     const frameRef = React.useRef<HTMLDivElement>(null)
     const dragRef = React.useRef<DragState | null>(null)
 
@@ -73,7 +78,7 @@ function RegionEditor({
         const start = drag.start
 
         if(drag.mode === 'move'){
-            onChange(clampRegion({ ...start, x: start.x + dx, y: start.y + dy }))
+            change(clampRegion({ ...start, x: start.x + dx, y: start.y + dy }))
             return
         }
 
@@ -95,7 +100,7 @@ function RegionEditor({
             bottom = Math.max(Math.min(1, bottom + dy), top + MIN_REGION_SIZE)
         }
 
-        onChange(clampRegion({ x: left, y: top, w: right - left, h: bottom - top }))
+        change(clampRegion({ ...start, x: left, y: top, w: right - left, h: bottom - top }))
     }
 
     function end() {

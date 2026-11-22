@@ -11,6 +11,7 @@ import { confirmDialog } from '../../lib/gamepad/dialog'
 import { useTranslation } from 'react-i18next'
 import { useSettings } from '../../context/userContext'
 import TranslatorOverlay, { TRANSLATOR_EDIT_EVENT } from '../translator/translatoroverlay'
+import { getRegions, regionsToSettings } from '../../lib/translator/geometry'
 
 interface StreamComponentProps {
     onDisconnect?: () => void;
@@ -438,6 +439,16 @@ function StreamComponent({
         setSettings({ ...settings, translator_enabled: !settings.translator_enabled })
     }
 
+    function toggleTranslatorWindow(index: number) {
+        const list = getRegions(settings)
+        if(list[index] === undefined){
+            return
+        }
+
+        list[index] = { ...list[index], enabled: list[index].enabled === false }
+        setSettings({ ...settings, ...regionsToSettings(list) })
+    }
+
     function editTranslatorArea() {
         // The game must not receive input while the window is placed
         setPadMenu(false)
@@ -546,6 +557,11 @@ function StreamComponent({
                             <Button label={<span><i className="fa-solid fa-language"></i> {settings.translator_enabled ? t("translator.btnOn") : t("translator.btnOff")}</span>} title={t("translator.btnTitle")} className={settings.translator_enabled ? 'btn-primary' : ''} onClick={(e) => {
                                 e.target.blur(); toggleTranslator()
                             }}></Button> &nbsp;
+                            { (settings.translator_enabled && getRegions(settings).length > 1) ? getRegions(settings).map((win, index) => (
+                                <Button key={index} label={<span>{index + 1}</span>} title={t("translator.windowToggleTitle", { n: index + 1 })} className={win.enabled !== false ? 'btn-primary' : ''} onClick={(e) => {
+                                    e.target.blur(); toggleTranslatorWindow(index)
+                                }}></Button>
+                            )) : '' }
                             { settings.translator_enabled ? <React.Fragment><Button label={<span><i className="fa-solid fa-crop-simple"></i> {t("translator.btnArea")}</span>} title={t("translator.btnAreaTitle")} onClick={(e) => {
                                 e.target.blur(); editTranslatorArea()
                             }}></Button> &nbsp;</React.Fragment> : '' }

@@ -33,10 +33,16 @@ export default function usePadRegion(
     getRegion: () => Region,
     onChange: (region: Region) => void,
     onDone: () => void,
+    options: {
+        // Keeps the window out of the way of other windows
+        constrain?: (next: Region, previous: Region) => Region;
+        // X / Y / View pressed (one call per press)
+        onButton?: (button: 'X' | 'Y' | 'View') => void;
+    } = {},
 ) {
     // Always call the newest callbacks without restarting the loop
-    const latest = React.useRef({ getRegion, onChange, onDone })
-    latest.current = { getRegion, onChange, onDone }
+    const latest = React.useRef({ getRegion, onChange, onDone, options })
+    latest.current = { getRegion, onChange, onDone, options }
 
     React.useEffect(() => {
         if(!active){
@@ -47,6 +53,7 @@ export default function usePadRegion(
 
         // A is probably still down from the press that started the mode: wait until it is released
         let previousDone = true
+        const previousButtons = { X: true, Y: true, View: true }
 
         // The region is tracked here, because the screen updates more slowly than the timer ticks
         let working = clampRegion(latest.current.getRegion())
@@ -62,13 +69,29 @@ export default function usePadRegion(
             const moveY = leftY + frame.DPadDown - frame.DPadUp
 
             if(moveX !== 0 || moveY !== 0 || rightX !== 0 || rightY !== 0){
-                working = clampRegion({
+                const moved = clampRegion({
+                    ...current,
                     x: current.x + moveX * speed,
                     y: current.y + moveY * speed,
                     w: current.w + rightX * speed,
                     h: current.h + rightY * speed,
                 })
+                const constrain = latest.current.options.constrain
+                working = constrain ? constrain(moved, current) : moved
                 latest.current.onChange(working)
+            }
+
+            for(const button of ['X', 'Y', 'View'] as const){
+                const pressed = frame[button] > 0.5
+                if(pressed && !previousButtons[button]){
+                    const onButton = latest.current.options.onButton
+                    if(onButton){
+                        onButton(button)
+                        // The window may have changed: continue from the new one
+                        working = clampRegion(latest.current.getRegion())
+                    }
+                }
+                previousButtons[button] = pressed
             }
 
             const done = frame.A > 0.5 || frame.B > 0.5 || frame.Menu > 0.5

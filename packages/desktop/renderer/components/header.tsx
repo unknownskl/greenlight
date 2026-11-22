@@ -14,8 +14,10 @@ interface HeaderProps {
   level: number;
 }
 
+// 24 hour clock (00:00 - 23:59)
 function formatClock(): string {
-    return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    const now = new Date()
+    return String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0')
 }
 
 function Header({
@@ -132,7 +134,7 @@ function Header({
     return (
         <React.Fragment>
             <div id="component_header" className={hidden === true ? 'disabled' : ''}>
-                <a onClick={ confirmQuit } id="actionBarLogo" title={t('header.home')}>
+                <a onClick={ confirmQuit } onKeyDown={(e) => { if(e.key === 'Enter' || e.key === ' '){ confirmQuit() } }} id="actionBarLogo" role="button" tabIndex={0} data-gp-focusable title={t('header.quit')}>
                     <i className="fa-brands fa-xbox"></i>
                 </a>
 

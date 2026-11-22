@@ -182,3 +182,43 @@ div.translator-toast {
     border: 1px solid rgba(47, 209, 47, 0.7);
     animation: translator-pop 0.15s ease-out;
 }
+
+/* Several translation windows */
+span.translator-window-number {
+    position: absolute;
+    top: -12px;
+    left: -12px;
+    min-width: 24px;
+    height: 24px;
+    line-height: 24px;
+    padding: 0 6px;
+    border-radius: 12px;
+    background: var(--accent-hi);
+    color: #0b0e12;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+    pointer-events: none;
+}
+
+div.translator-other-window {
+    border-style: dotted;
+    opacity: 0.7;
+}
+
+div.translator-edit-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+div.region-frame.region-frame-other {
+    border-style: dotted;
+    opacity: 0.6;
+    background: rgba(255, 255, 255, 0.06);
+}
+
+div.translator-preview .region-frame {
+    overflow: visible;
+}
