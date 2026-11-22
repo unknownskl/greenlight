@@ -18,6 +18,63 @@ interface StreamComponentProps {
     xPlayer: xPlayer;
 }
 
+function escapeHtml(text: string): string {
+    return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+}
+
+// A value of the statistics as text (some of them are objects, which would show up as "[object Object]")
+function formatStat(value: any): string {
+    if(value !== null && typeof value === 'object'){
+        try {
+            return JSON.stringify(value)
+        } catch(error) {
+            return '?'
+        }
+    }
+
+    if(typeof value === 'number' && !Number.isInteger(value)){
+        return String(Math.round(value * 1000) / 1000)
+    }
+
+    return String(value)
+}
+
+/** The text of the debug panel: the numbers that matter first, then every statistic of the video stream. */
+function describeStats(report: any, previous: { bytes: number; at: number } | null): string {
+    const lines: string[] = []
+
+    if(report.frameWidth && report.frameHeight){
+        lines.push('Resolution: ' + report.frameWidth + 'x' + report.frameHeight)
+    }
+    if(typeof report.framesPerSecond === 'number'){
+        lines.push('Frames per second: ' + report.framesPerSecond)
+    }
+    if(previous !== null && typeof report.bytesReceived === 'number' && report.timestamp > previous.at){
+        const mbit = (report.bytesReceived - previous.bytes) * 8 / ((report.timestamp - previous.at) / 1000) / 1000000
+        lines.push('Bit rate: ' + mbit.toFixed(1) + ' Mbit/s')
+    }
+    if(typeof report.jitter === 'number'){
+        lines.push('Jitter: ' + (report.jitter * 1000).toFixed(1) + ' ms')
+    }
+    if(typeof report.packetsLost === 'number'){
+        lines.push('Packets lost: ' + report.packetsLost)
+    }
+    if(typeof report.framesDropped === 'number'){
+        lines.push('Frames dropped: ' + report.framesDropped)
+    }
+
+    let output = lines.map(line => '<strong>' + escapeHtml(line) + '</strong><br>').join('\n')
+    if(output !== ''){
+        output += '<hr>\n'
+    }
+
+    Object.keys(report).sort().forEach((name) => {
+        output += '<strong>' + escapeHtml(name) + ':</strong> ' + escapeHtml(formatStat(report[name])) + '<br>\n'
+    })
+
+    return output
+}
+
 function StreamComponent({
     onDisconnect,
     onMenu,
@@ -35,6 +92,8 @@ function StreamComponent({
     }
 
     let lastMovement = 0
+    // Bytes received at the previous update of the debug panel (the bit rate is the difference)
+    let lastStats: { bytes: number; at: number } | null = null
     // let gamebarElement = document.getElementById('component_streamcomponent_gamebar')
     let debugElement = document.getElementById('component_streamcomponent_debug')
     let webRtcStatsInterval
@@ -222,9 +281,8 @@ function StreamComponent({
                             droppedUplot.setData(droppedData)
 
                             if (frameCountDomUpdate >= 15) {
-                                Object.keys(report).forEach((statName) => {
-                                    statsOutput += `<strong>${statName}:</strong> ${report[statName]}<br>\n`
-                                })
+                                statsOutput = describeStats(report, lastStats)
+                                lastStats = { bytes: report['bytesReceived'], at: report['timestamp'] }
                                 document.querySelector('div#component_streamcomponent_debug_text').innerHTML = statsOutput
                                 frameCountDomUpdate = 0
                             } else {

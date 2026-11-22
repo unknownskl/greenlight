@@ -31,8 +31,8 @@ div#component_streamcomponent_debug {
     position: fixed;
     right: 0;
     bottom: 0;
-    width: 60vw;
-    height: 620px;
+    width: min(95vw, 940px);
+    height: min(620px, 100vh);
     overflow-y: auto;
 }
 
@@ -43,7 +43,9 @@ div#component_streamcomponent_debug p {
 
 div#component_streamcomponent_debug_text {
     height: 500px;
-    width: 20vw;
+    width: 300px;
+    font-size: 13px;
+    word-break: break-all;
     overflow-y: auto;
     overflow-x: none;
     margin-top: 5px;
