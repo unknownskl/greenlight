@@ -5,6 +5,21 @@ import { Region, clampRegion } from './geometry'
 
 const BASE_SPEED = 0.012
 
+// A resting stick is never exactly in the middle: everything inside this circle counts as "not touched",
+// and the rest of the travel is stretched over 0..1 (with a soft start for fine placement)
+const STICK_DEADZONE = 0.22
+
+function stick(x: number, y: number): [number, number] {
+    const length = Math.hypot(x, y)
+    if(length <= STICK_DEADZONE){
+        return [0, 0]
+    }
+
+    const strength = Math.min(1, (length - STICK_DEADZONE) / (1 - STICK_DEADZONE))
+    const scale = (strength * strength) / length
+    return [x * scale, y * scale]
+}
+
 /**
  * Lets the user place the translation window with a gamepad while `active` is true:
  *  - left stick / d-pad moves it,
@@ -41,15 +56,17 @@ export default function usePadRegion(
             const current = working
 
             const speed = BASE_SPEED * (frame.LeftTrigger > 0.3 ? 0.3 : frame.RightTrigger > 0.3 ? 2.5 : 1)
-            const moveX = frame.LeftThumbXAxis + frame.DPadRight - frame.DPadLeft
-            const moveY = frame.LeftThumbYAxis + frame.DPadDown - frame.DPadUp
+            const [leftX, leftY] = stick(frame.LeftThumbXAxis, frame.LeftThumbYAxis)
+            const [rightX, rightY] = stick(frame.RightThumbXAxis, frame.RightThumbYAxis)
+            const moveX = leftX + frame.DPadRight - frame.DPadLeft
+            const moveY = leftY + frame.DPadDown - frame.DPadUp
 
-            if(moveX !== 0 || moveY !== 0 || frame.RightThumbXAxis !== 0 || frame.RightThumbYAxis !== 0){
+            if(moveX !== 0 || moveY !== 0 || rightX !== 0 || rightY !== 0){
                 working = clampRegion({
                     x: current.x + moveX * speed,
                     y: current.y + moveY * speed,
-                    w: current.w + frame.RightThumbXAxis * speed,
-                    h: current.h + frame.RightThumbYAxis * speed,
+                    w: current.w + rightX * speed,
+                    h: current.h + rightY * speed,
                 })
                 latest.current.onChange(working)
             }
