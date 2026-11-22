@@ -350,6 +350,8 @@
         "autoRole_subtitle": "субтитри",
         "autoRole_notice": "повідомлення",
         "autoRole_other": "текст",
+        "autoPlate": "панель",
+        "autoSteady": "стабільний",
         "btnAreaTitle": "Перемістити та змінити розмір вікна перекладу",
         "statusLoading": "Завантаження розпізнавання тексту...",
         "statusError": "Переклад зараз недоступний",

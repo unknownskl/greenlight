@@ -18,6 +18,9 @@ export interface TranslatorConfig {
     source: string;
     target: string;
     fit: FitMode;
+    // A window that is made bigger (not moved) keeps what it shows when `soft` is set; another `epoch` is another window
+    soft?: boolean;
+    epoch?: number;
 }
 
 /** One piece of text of the interface (a line, or a few lines that belong together) with its translation. */
@@ -148,6 +151,11 @@ function readingTime(segment: { translated: string }, waiting: number): number {
     return Math.max(MIN_SHOW_FLOOR_MS, base * factor)
 }
 
+// Text pixels that are the same as at the last reading (up to this share of them) are the same text: it is not read again
+// just in case, only now and then (see EXACT_RECHECK_MS)
+const FINE_SAME = 0.04
+const EXACT_RECHECK_MS = 20000
+
 // A row of letters is at most this many times as tall as the (taller) words in it
 const WORD_HEIGHT_CAP = 1.3
 
@@ -158,6 +166,7 @@ const MAX_MISSED_READS = 2
 const NOT_TEXT = new RegExp('[^\\p{L}\\p{N}\\s.,!?\'"’:;()\\-–—…/%&+]', 'gu')
 const ALNUM = new RegExp('[\\p{L}\\p{N}]', 'gu')
 const LETTER = new RegExp('\\p{L}', 'gu')
+const ONLY_LETTERS = new RegExp('^\\p{L}+$', 'u')
 const NOT_ALNUM = new RegExp('[^\\p{L}\\p{N}]', 'gu')
 const LOWER_START = new RegExp('^[^\\p{L}]*\\p{Ll}', 'u')
 const NUMBER = /\d+(?:[.,:]\d+)*/g
@@ -371,10 +380,18 @@ export function cleanOcrText(raw: string): string {
 
         // A button icon in front of (or behind) a line is read as a stray letter ("S BUY THE UNIT")
         const tokens = cleaned.split(' ')
-        while(tokens.length >= 2 && isStrayLetter(tokens[0])){
+
+        // A short word in small letters in front of (or behind) a line in capitals ("ss LIZ RETURNS") is an icon
+        const restIsCapitals = (rest: string[]): boolean => {
+            const letters: string[] = rest.join('').match(LETTER) || []
+            return letters.length >= 3 && letters.filter(letter => letter !== letter.toLowerCase()).length / letters.length >= 0.9
+        }
+        const isSmallJunk = (token: string, rest: string[]): boolean => token.length <= 2 && token === token.toLowerCase() && ONLY_LETTERS.test(token) && restIsCapitals(rest)
+
+        while(tokens.length >= 2 && (isStrayLetter(tokens[0]) || isSmallJunk(tokens[0], tokens.slice(1)))){
             tokens.shift()
         }
-        while(tokens.length >= 2 && isStrayLetter(tokens[tokens.length - 1])){
+        while(tokens.length >= 2 && (isStrayLetter(tokens[tokens.length - 1]) || isSmallJunk(tokens[tokens.length - 1], tokens.slice(0, -1)))){
             tokens.pop()
         }
         cleaned = tokens.join(' ')
@@ -489,6 +506,55 @@ export function isSameReading(next: string, old: string): boolean {
 }
 
 /**
+ * True when `next` is the line `old` with more text (a subtitle that was caught while it was still being typed, or
+ * while one more line was fading in): the old line is then only a part of the new one and must not be shown on its own.
+ */
+export function extendsText(old: string, next: string): boolean {
+    if(old.length < 6 || next.length < old.length * 1.2 + 2 || next.length > 400){
+        return false
+    }
+    return substringDistance(old, next) <= old.length * 0.15
+}
+
+/** The share of the text pixels of two pictures that has no counterpart (within one pixel) in the other picture. */
+function fineDifference(a: Uint8Array, b: Uint8Array, width: number, height: number): number {
+    const grow = (mask: Uint8Array): Uint8Array => {
+        const wide = new Uint8Array(mask.length)
+        for(let y = 0; y < height; y++){
+            for(let x = 0; x < width; x++){
+                if(mask[y * width + x] === 1){
+                    for(let dy = -1; dy <= 1; dy++){
+                        const yy = y + dy
+                        if(yy < 0 || yy >= height){ continue }
+                        for(let dx = -1; dx <= 1; dx++){
+                            const xx = x + dx
+                            if(xx >= 0 && xx < width){ wide[yy * width + xx] = 1 }
+                        }
+                    }
+                }
+            }
+        }
+        return wide
+    }
+
+    const wideA = grow(a)
+    const wideB = grow(b)
+    let total = 0
+    let lost = 0
+    for(let i = 0; i < a.length; i++){
+        if(a[i] === 1){
+            total++
+            if(wideB[i] === 0){ lost++ }
+        }
+        if(b[i] === 1){
+            total++
+            if(wideA[i] === 0){ lost++ }
+        }
+    }
+    return total === 0 ? 0 : lost / total
+}
+
+/**
  * Puts the new numbers of a text into the translation of the old one, so a counter or a timer that only changes
  * its digits does not need a new translation. Returns null when that is not possible.
  */
@@ -599,6 +665,9 @@ export default class TranslatorEngine {
     _prevMask: Partial<Record<Polarity, Uint8Array>> = {}
     _readMask: Partial<Record<Polarity, Uint8Array>> = {}
     _readProfile: Partial<Record<Polarity, Float32Array>> = {}
+    // The text pixels (fine) at the last reading: if they are still the same, the text is the same
+    _readFine: Partial<Record<Polarity, { mask: Uint8Array; width: number; height: number }>> = {}
+    _identity = ''
     // Snapshots that wait for the reader, and whether the reader is busy
     _jobs: Snapshot[] = []
     _working = false
@@ -672,6 +741,7 @@ export default class TranslatorEngine {
         this._prevMask = {}
         this._readMask = {}
         this._readProfile = {}
+        this._readFine = {}
         this._hasReadMask = false
         this._emptySince = 0
         this._activeUntil = 0
@@ -817,6 +887,7 @@ export default class TranslatorEngine {
             }
             // Start over when it is turned on again
             this._regionKey = ''
+            this._identity = ''
             this._hasReadMask = false
             return
         }
@@ -824,10 +895,21 @@ export default class TranslatorEngine {
         this._taskMode = taskMode
 
         // The window was moved: start over
-        const regionKey = [region.x, region.y, region.w, region.h, config.fit, config.color].map(v => typeof v === 'number' ? v.toFixed(4) : v).join('|')
-        if(regionKey !== this._regionKey){
+        const identity = [config.fit, config.color, config.epoch ?? 0].join('|')
+        const regionKey = [region.x, region.y, region.w, region.h].map(v => v.toFixed(4)).join('|')
+        if(identity !== this._identity || (regionKey !== this._regionKey && config.soft !== true)){
+            this._identity = identity
             this._regionKey = regionKey
             this.reset()
+        } else if(regionKey !== this._regionKey){
+            // The window only grew: what is shown stays, but the pictures of the old size cannot be compared
+            this._regionKey = regionKey
+            this._prevMask = {}
+            this._readMask = {}
+            this._readProfile = {}
+            this._readFine = {}
+            this._hasReadMask = false
+            this._sameCount = 0
         }
 
         const box = this._options.getBox()
@@ -858,6 +940,7 @@ export default class TranslatorEngine {
                 const fine = inkMask(pixels, width, height, polarity)
                 return {
                     polarity,
+                    fine: fine.mask,
                     mask: poolMask(fine.mask, width, height),
                     profile: columnProfile(fine.mask, width, height),
                     coverage: fine.count / (width * height),
@@ -1004,7 +1087,13 @@ export default class TranslatorEngine {
 
         // Read again now and then even when the picture looks the same: it may be a different line in the same place.
         // Reading the same text again costs nothing visible (see _process), and it happens less often the longer the text stays.
-        const recheck = idle && now - this._lastReadAt >= Math.min(6000, 1000 + this._sameCount * 700)
+        let recheck = idle && now - this._lastReadAt >= Math.min(6000, 1000 + this._sameCount * 700)
+
+        // The same pixels as at the last reading: the text is the same and is translated already, so it is not read
+        // again (only now and then, in case the picture has changed in a way the pixels do not show)
+        if(recheck && !changed && this._shown.length > 0 && now - this._lastReadAt < EXACT_RECHECK_MS && this._pixelsSame(present, width, height)){
+            recheck = false
+        }
 
         if((!changed && !recheck) || now < this._retryAt || now - this._lastReadAt < minGap){
             return
@@ -1043,13 +1132,26 @@ export default class TranslatorEngine {
         this._lastReadAt = now
         this._readMask = {}
         this._readProfile = {}
+        this._readFine = {}
         for(const candidate of present){
             this._readMask[candidate.polarity] = candidate.mask
             this._readProfile[candidate.polarity] = candidate.profile
+            this._readFine[candidate.polarity] = { mask: candidate.fine, width, height }
         }
         this._hasReadMask = true
 
         this._enqueue(snapshot)
+    }
+
+    /** Are the text pixels of the window the same as at the last reading? */
+    _pixelsSame(present: Array<{ polarity: Polarity; fine: Uint8Array }>, width: number, height: number): boolean {
+        for(const candidate of present){
+            const read = this._readFine[candidate.polarity]
+            if(read === undefined || read.width !== width || read.height !== height || fineDifference(read.mask, candidate.fine, width, height) > FINE_SAME){
+                return false
+            }
+        }
+        return true
     }
 
     /** A copy of the window as it is right now (the reader may get to it a second later). */
@@ -1244,8 +1346,11 @@ export default class TranslatorEngine {
         const ready: ShownSegment[] = []
         const stamp = Date.now()
         segments.forEach((segment, index) => {
+            // The same line with more text (it was caught while it was still being typed): it replaces the part at once
+            this._queue = this._queue.filter(other => !(overlapShare(segment.rect, other.rect) > 0.5 && extendsText(other.template, segment.template)))
+
             const old = accepted[index].previous === null
-                ? shown.find(other => overlapShare(segment.rect, other.rect) > 0.5 && stamp - other.shownAt < readingTime(other, this._queue.length))
+                ? shown.find(other => overlapShare(segment.rect, other.rect) > 0.5 && stamp - other.shownAt < readingTime(other, this._queue.length) && !extendsText(other.template, segment.template))
                 : undefined
 
             // Lines are shown in the order they were read: a line also waits behind the ones that are already waiting

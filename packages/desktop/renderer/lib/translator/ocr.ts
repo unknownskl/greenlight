@@ -99,7 +99,7 @@ export interface OcrResult {
 const MIN_WORD_CONFIDENCE = 50
 
 // Two words further apart than this (in line heights) are separate pieces of text (two interface elements on one row)
-const MAX_WORD_GAP = 2.5
+const MAX_WORD_GAP = 2
 
 export async function recognizeCanvas(canvas: HTMLCanvasElement, language = 'en'): Promise<OcrResult> {
     const worker = await getOcrWorker(language)
@@ -115,8 +115,11 @@ export async function recognizeCanvas(canvas: HTMLCanvasElement, language = 'en'
                     continue
                 }
 
-                // Split the line where there is a wide gap between two words
-                const height = Math.max(1, line.bbox.y1 - line.bbox.y0)
+                // Split the line where there is a wide gap between two words. The gap is measured in heights of a word,
+                // not of the line: a tall icon on the row (a button symbol between two choices) makes the line tall
+                // and would hide the gap
+                const wordHeights = words.map(word => word.bbox.y1 - word.bbox.y0).sort((a, b) => a - b)
+                const height = Math.max(1, wordHeights[Math.floor((wordHeights.length - 1) / 2)])
                 let chunk: typeof words = []
 
                 const flush = () => {

@@ -32,7 +32,20 @@ function textWidth(text: string, size: number): number {
 }
 
 /** Position, size and colours of the translation of one piece of text, so it looks like the interface it replaces. */
-export function segmentStyle(segment: TranslatedSegment, viewport: { width: number; height: number }, autoFont: boolean, fixedSize: number, opacity: number): React.CSSProperties {
+/** Where the next piece of text below this one starts (fraction of the height), so the translation does not run over it. */
+export function nextBelow(segments: TranslatedSegment[], index: number): number | undefined {
+    const segment = segments[index]
+    let best: number | undefined
+    segments.forEach((other, i) => {
+        const overlapsInX = other.rect.x < segment.rect.x + segment.rect.w + 0.1 && other.rect.x + other.rect.w > segment.rect.x - 0.1
+        if(i !== index && overlapsInX && other.rect.y > segment.rect.y + segment.rect.h * 0.4 && (best === undefined || other.rect.y < best)){
+            best = other.rect.y
+        }
+    })
+    return best
+}
+
+export function segmentStyle(segment: TranslatedSegment, viewport: { width: number; height: number }, autoFont: boolean, fixedSize: number, opacity: number, below?: number): React.CSSProperties {
     const originalWidth = segment.rect.w * viewport.width
     const left = segment.rect.x * viewport.width
     const centerX = left + originalWidth / 2
@@ -54,6 +67,20 @@ export function segmentStyle(segment: TranslatedSegment, viewport: { width: numb
             size = Math.max(size * 0.62, size * maxWidth * lines / wanted)
         }
         singleLine = lines === 1 && textWidth(segment.translated, size) <= maxWidth - 16
+
+        // The translation must not grow over the text that is below it: it gets smaller until it fits
+        if(below !== undefined && !singleLine){
+            const available = Math.max(segment.rect.h * viewport.height + 8, (below - segment.rect.y) * viewport.height - 6)
+            for(let attempt = 0; attempt < 4; attempt++){
+                const rows = Math.max(1, Math.ceil(textWidth(segment.translated, size) / Math.max(40, maxWidth - 36)))
+                const needed = rows * size * 1.3 + 20
+                if(needed <= available || size <= 11){
+                    break
+                }
+                size = Math.max(11, size * Math.max(0.6, Math.sqrt(available / needed)))
+            }
+            singleLine = lines === 1 && textWidth(segment.translated, size) <= maxWidth - 16
+        }
     }
 
     const [r, g, b] = segment.background
@@ -64,6 +91,8 @@ export function segmentStyle(segment: TranslatedSegment, viewport: { width: numb
         maxWidth: maxWidth + 'px',
         minWidth: (Math.min(originalWidth, maxWidth) + 16) + 'px',
         minHeight: (segment.rect.h * viewport.height + 8) + 'px',
+        maxHeight: below === undefined ? undefined : Math.max(segment.rect.h * viewport.height + 8, (below - segment.rect.y) * viewport.height - 6) + 'px',
+        overflow: 'hidden',
         fontSize: size + 'px',
         color: segment.foreground,
         background: 'rgba(' + r + ', ' + g + ', ' + b + ', ' + opacity + ')',
@@ -213,7 +242,7 @@ function TranslatorOverlay({
             }),
             onFrames: (frames) => {
                 const wanted = settingsRef.current.translator_auto_debug === true ? frames : []
-                const key = JSON.stringify(wanted.map(frame => [frame.state, frame.slot, Math.round(frame.rect.x * 500), Math.round(frame.rect.y * 500), Math.round(frame.rect.w * 500), Math.round(frame.rect.h * 500)]))
+                const key = JSON.stringify(wanted.map(frame => [frame.state, frame.slot, frame.plate, frame.steady, Math.round(frame.rect.x * 500), Math.round(frame.rect.y * 500), Math.round(frame.rect.w * 500), Math.round(frame.rect.h * 500)]))
                 if(key !== lastFrames){
                     lastFrames = key
                     setAutoFrames(wanted)
@@ -372,11 +401,11 @@ function TranslatorOverlay({
     return (
         <div id="translator_layer" className={editing ? 'editing' : ''} data-gp-ignore>
             { (enabled && !editing) ? results.slice(0, count).map((result, windowIndex) => (result === null || result === undefined) ? null : result.segments.map((segment, index) => (
-                <div key={windowIndex + '-' + index} className="translator-segment" style={segmentStyle(segment, viewport, autoFont, fixedSize, opacity)}>{segment.translated}</div>
+                <div key={windowIndex + '-' + index} className="translator-segment" style={segmentStyle(segment, viewport, autoFont, fixedSize, opacity, nextBelow(result.segments, index))}>{segment.translated}</div>
             ))) : '' }
 
             { (autoOn && !editing) ? autoResults.slice(0, MAX_AUTO_WINDOWS).map((result, slot) => (result === null || result === undefined) ? null : result.segments.map((segment, index) => (
-                <div key={'auto-' + slot + '-' + index} className="translator-segment" style={segmentStyle(segment, viewport, autoFont, fixedSize, opacity)}>{segment.translated}</div>
+                <div key={'auto-' + slot + '-' + index} className="translator-segment" style={segmentStyle(segment, viewport, autoFont, fixedSize, opacity, nextBelow(result.segments, index))}>{segment.translated}</div>
             ))) : '' }
 
             { (autoOn && !editing && settings.translator_auto_debug === true) ? autoFrames.map((frame, index) => (
@@ -386,7 +415,7 @@ function TranslatorOverlay({
                     width: (frame.rect.w * 100) + '%',
                     height: (frame.rect.h * 100) + '%',
                 }}>
-                    <span>{t('translator.autoState_' + frame.state)} · {t('translator.autoRole_' + frame.role)}</span>
+                    <span>{t('translator.autoState_' + frame.state)} · {t('translator.autoRole_' + frame.role)}{frame.plate ? ' · ' + t('translator.autoPlate') : ''}{frame.steady ? ' · ' + t('translator.autoSteady') : ''}</span>
                 </div>
             )) : '' }
 

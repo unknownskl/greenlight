@@ -350,6 +350,8 @@
         "autoRole_subtitle": "subtitle",
         "autoRole_notice": "message",
         "autoRole_other": "text",
+        "autoPlate": "plate",
+        "autoSteady": "steady",
         "btnAreaTitle": "Move and resize the translation window",
         "statusLoading": "Loading the text reader...",
         "statusError": "Translation is unavailable right now",

@@ -350,6 +350,8 @@
         "autoRole_subtitle": "субтитры",
         "autoRole_notice": "уведомление",
         "autoRole_other": "текст",
+        "autoPlate": "панель",
+        "autoSteady": "стабильный",
         "btnAreaTitle": "Переместить и изменить размер окна перевода",
         "statusLoading": "Загрузка распознавания текста...",
         "statusError": "Перевод сейчас недоступен",

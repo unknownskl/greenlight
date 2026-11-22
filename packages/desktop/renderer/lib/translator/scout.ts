@@ -20,6 +20,8 @@ export interface TextBlock {
     role: BlockRole;
     // How sure it is that this is text (bigger is better)
     score: number;
+    // The text sits on a "plate": a panel of the interface with a flat background that has edges (a message box, a task list)
+    plate: boolean;
     stats?: { fill: number; ratio: number; onShare: number };
 }
 
@@ -47,6 +49,9 @@ const SMALL_WIDTH_CELLS = 16
 const SMALL_RING_RATIO = 6
 const MIN_ON_SHARE_ROW = 0.3
 const MIN_ON_SHARE_BLOCK = 0.2
+// A plate: the background around the text is this flat (the spread of the brightness) and differs from what lies beyond it
+const PLATE_FLAT = 20
+const PLATE_EDGE = 12
 // A block as wide as the picture is a horizon or a bar, not text
 const MAX_BLOCK_WIDTH = 0.88
 // Rows of text one under another (lines of one subtitle, one message) are one block when they are this close
@@ -61,6 +66,62 @@ interface Part {
     ink: number;
     on: number;
     polarity: Polarity;
+}
+
+interface RingStats {
+    mean: number;
+    spread: number;
+    count: number;
+}
+
+// The brightness of the background (the pixels that are not text) in the frame between two rectangles
+function ringStats(data: Uint8ClampedArray, mask: Uint8Array, width: number, height: number, inner: number[], outer: number[]): RingStats {
+    let sum = 0
+    let sumSquares = 0
+    let count = 0
+
+    const y0 = Math.max(0, outer[1])
+    const y1 = Math.min(height, outer[3])
+    const x0 = Math.max(0, outer[0])
+    const x1 = Math.min(width, outer[2])
+
+    for(let y = y0; y < y1; y += 2){
+        for(let x = x0; x < x1; x += 2){
+            if(x >= inner[0] && x < inner[2] && y >= inner[1] && y < inner[3]){
+                continue
+            }
+            const index = y * width + x
+            if(mask[index] === 1){
+                continue
+            }
+            const luma = (data[index * 4] * 299 + data[index * 4 + 1] * 587 + data[index * 4 + 2] * 114) / 1000
+            sum += luma
+            sumSquares += luma * luma
+            count++
+        }
+    }
+
+    if(count === 0){
+        return { mean: 0, spread: 255, count: 0 }
+    }
+    const mean = sum / count
+    return { mean, spread: Math.sqrt(Math.max(0, sumSquares / count - mean * mean)), count }
+}
+
+/** Is the text on a plate? The background right around it is flat, and a little further away it is different. */
+function hasPlate(data: Uint8ClampedArray, mask: Uint8Array, width: number, height: number, box: { x0: number; y0: number; x1: number; y1: number }): boolean {
+    const pad = Math.min(14, Math.max(4, Math.round((box.y1 - box.y0) * 0.35)))
+    const text = [box.x0, box.y0, box.x1, box.y1]
+    const near = [box.x0 - pad, box.y0 - pad, box.x1 + pad, box.y1 + pad]
+    const far = [box.x0 - 2 * pad, box.y0 - 2 * pad, box.x1 + 2 * pad, box.y1 + 2 * pad]
+
+    const inside = ringStats(data, mask, width, height, text, near)
+    const outside = ringStats(data, mask, width, height, near, far)
+    if(inside.count < 30 || outside.count < 30){
+        return false
+    }
+
+    return inside.spread <= PLATE_FLAT && (Math.abs(inside.mean - outside.mean) >= PLATE_EDGE || outside.spread >= inside.spread * 1.8 + 6)
 }
 
 function overlapShare(a: { x: number; y: number; w: number; h: number }, b: { x: number; y: number; w: number; h: number }): number {
@@ -307,7 +368,8 @@ export function findTextBlocks(data: Uint8ClampedArray, width: number, height: n
                 w: w * CELL / width,
                 h: h * CELL / height,
             }
-            blocks.push({ ...block, polarity: part.polarity, role: classify(block), score: Math.min(ratio, 12) * Math.sqrt(part.ink), stats: { fill, ratio, onShare } })
+            const plate = hasPlate(data, fine.mask, width, height, { x0: part.x0 * CELL, y0: part.y0 * CELL, x1: part.x1 * CELL, y1: part.y1 * CELL })
+            blocks.push({ ...block, polarity: part.polarity, role: classify(block), plate, score: Math.min(ratio, 12) * Math.sqrt(part.ink) * (plate ? 1.5 : 1), stats: { fill, ratio, onShare } })
         }
     })
 
