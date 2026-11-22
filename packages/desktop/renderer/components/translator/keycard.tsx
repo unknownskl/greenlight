@@ -125,7 +125,7 @@ function TranslatorKeyCard() {
                 </p>
 
                 <p>
-                    <Button label={<span><i className="fa-solid fa-vial"></i> {testing ? t('translator.keyTesting') : t('translator.keyTest')}</span>} className="btn-primary" onClick={() => { if(!testing && active){ testKey() } }}></Button>
+                    <Button label={<span><i className="fa-solid fa-vial"></i> {testing ? t('translator.keyTesting') : t('translator.keyTest')}</span>} className="btn-primary" onClick={() => { if(!testing && active){ void testKey() } }}></Button>
                     {' '}{testResult}
                 </p>
 
