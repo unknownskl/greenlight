@@ -39,7 +39,10 @@ function gap(aStart: number, aEnd: number, bStart: number, bEnd: number): number
 export default class GamepadNavigator {
 
     _options: NavigatorOptions
-    _interval: ReturnType<typeof setInterval> | undefined
+    _interval: ReturnType<typeof setTimeout> | undefined
+    // The pad is looked at 60 times a second while it is used and 25 times a second while it rests (battery)
+    _delay = 16
+    _lastUsed = 0
 
     _current: HTMLElement | null = null
     _previous: Record<string, boolean> = {}
@@ -57,14 +60,14 @@ export default class GamepadNavigator {
             return
         }
 
-        this._interval = setInterval(() => this.tick(), 16)
+        this._interval = setTimeout(this._loop, 16)
         window.addEventListener('pointerdown', this._onPointer, true)
         window.addEventListener('keydown', this._onKey, true)
     }
 
     stop() {
         if(this._interval !== undefined){
-            clearInterval(this._interval)
+            clearTimeout(this._interval)
             this._interval = undefined
         }
 
@@ -109,11 +112,26 @@ export default class GamepadNavigator {
         }
     }
 
+    _loop = () => {
+        this.tick()
+        if(this._interval !== undefined){
+            this._interval = setTimeout(this._loop, this._delay)
+        }
+    }
+
     tick() {
         const pads = getUsablePads()
         const now = performance.now()
 
         const frame = mergeFrames(pads.map(pad => readPad(pad)))
+
+        const busy = BUTTON_NAMES.some(name => frame[name] > 0.3)
+            || Math.abs(frame.LeftThumbXAxis) > 0.3 || Math.abs(frame.LeftThumbYAxis) > 0.3
+            || Math.abs(frame.RightThumbXAxis) > 0.3 || Math.abs(frame.RightThumbYAxis) > 0.3
+        if(busy){
+            this._lastUsed = now
+        }
+        this._delay = (busy || now - this._lastUsed < 1500) ? 16 : 40
 
         // Edge detection for every button, also while disabled so a held button does not fire when enabled again
         const pressed: Record<string, boolean> = {}

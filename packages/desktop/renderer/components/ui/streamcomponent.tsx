@@ -162,6 +162,8 @@ function StreamComponent({
     let framesDroppedBaseline = 0
     let packetsDroppedBaseline = 0
     let frameCountDomUpdate = 0
+    // The statistics are only collected while the debug panel is open (they are expensive and drain the battery)
+    let statsPaused = true
 
 
     function sliceData(data, start, end) {
@@ -275,12 +277,25 @@ function StreamComponent({
         }, droppedData, document.getElementById('component_streamcomponent_debug_webrtc_dropped'))
 
         webRtcStatsInterval = setInterval(() => {
+            const panel = document.getElementById('component_streamcomponent_debug')
+            if (panel === null || panel.className.includes('hidden')) {
+                statsPaused = true
+                return
+            }
+
             if (xPlayer._webrtcClient !== undefined) {
                 xPlayer._webrtcClient.getStats().then((stats) => {
                     let statsOutput = ''
 
                     stats.forEach((report) => {
                         if (report.type === 'inbound-rtp' && report.kind === 'video') {
+
+                            if (statsPaused) {
+                                // The panel was just opened: count the losses from now on
+                                packetsDroppedBaseline = report['packetsLost']
+                                framesDroppedBaseline = report['framesDropped']
+                                statsPaused = false
+                            }
 
                             if (jitterData[0].length > 1200) {
                                 jitterData = sliceData(jitterData, jitterData[0].length - 1200, jitterData[0].length)
@@ -301,7 +316,7 @@ function StreamComponent({
                             jitterUplot.setData(jitterData)
                             droppedUplot.setData(droppedData)
 
-                            if (frameCountDomUpdate >= 15) {
+                            if (frameCountDomUpdate >= 1) {
                                 statsOutput = describeStats(report, lastStats)
                                 lastStats = { bytes: report['bytesReceived'], at: report['timestamp'] }
                                 document.querySelector('div#component_streamcomponent_debug_text').innerHTML = statsOutput
@@ -315,7 +330,7 @@ function StreamComponent({
                     // document.querySelector('div#component_streamcomponent_debug_text').innerHTML = statsOutput;
                 })
             }
-        }, 33)
+        }, 250)
 
         // Gamebar menu mouse events
         const mouseEvent = () => {

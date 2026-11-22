@@ -67,6 +67,9 @@ const SIGNATURE_GRID_WIDTH = 96
 const MIN_COVERAGE = 0.002
 const MAX_COVERAGE = 0.5
 
+// The picture that is given to the text reader has at most this many pixels (it heats the processor)
+const MAX_OCR_PIXELS = 1300000
+
 const TICK_MS = 300
 const FORCE_OCR_MS = 2000
 
@@ -502,6 +505,7 @@ export default class TranslatorEngine {
     _unstableTicks = 0
     _unstableSince = 0
     _lastUnstableAt = 0
+    _enabled = true
     // Translated lines that wait until the line they replace has been on screen long enough
     _queue: ShownSegment[] = []
     _regionKey = ''
@@ -583,8 +587,25 @@ export default class TranslatorEngine {
         }
 
         if(this._running){
-            this._schedule(TICK_MS)
+            this._schedule(this._nextDelay())
         }
+    }
+
+    /** How long to wait before the next look at the picture: short while something happens, longer while nothing does. */
+    _nextDelay(): number {
+        if(!this._enabled){
+            return 1000
+        }
+        if(this._emptyTicks >= 40){
+            return 800
+        }
+        if(this._emptyTicks >= 8){
+            return 500
+        }
+        if(this._sameCount >= 4){
+            return 450
+        }
+        return TICK_MS
     }
 
     /** Hides the translation. Unless `force` is set, lines that have not been on screen long enough to be read stay. */
@@ -658,6 +679,7 @@ export default class TranslatorEngine {
         const config = this._options.getConfig()
         const region = clampRegion(config.region)
 
+        this._enabled = config.enabled !== false
         if(config.enabled === false){
             if(this._shown.length > 0 || this._held.length > 0 || this._queue.length > 0){
                 this._clearShown(true)
@@ -797,7 +819,7 @@ export default class TranslatorEngine {
 
         // Read again now and then even when the picture looks the same: it may be a different line in the same place.
         // Reading the same text again costs nothing visible (see step 4), and it happens less often the longer the text stays.
-        const recheck = now - this._lastReadAt >= Math.min(3500, 1000 + this._sameCount * 500)
+        const recheck = now - this._lastReadAt >= Math.min(6000, 1000 + this._sameCount * 700)
 
         if((!changed && !recheck) || now < this._retryAt || now - this._lastReadAt < minGap){
             return
@@ -913,10 +935,13 @@ export default class TranslatorEngine {
                 ? shown.find(other => overlapShare(segment.rect, other.rect) > 0.5 && stamp - other.shownAt < readingTime(other, this._queue.length))
                 : undefined
 
-            if(old === undefined){
+            // Lines are shown in the order they were read: a line also waits behind the ones that are already waiting
+            const waiting = accepted[index].previous === null && this._queue.some(other => overlapShare(segment.rect, other.rect) > 0.5)
+
+            if(old === undefined && !waiting){
                 ready.push(segment)
             } else {
-                if(held.indexOf(old) < 0){
+                if(old !== undefined && held.indexOf(old) < 0){
                     held.push(old)
                 }
                 this._queue.push({ ...segment, shownAt: stamp })
@@ -1309,7 +1334,11 @@ export default class TranslatorEngine {
     /** Crops the window from the video and turns it into black text on white, which is what the text reader likes. */
     _prepareForReading(video: HTMLVideoElement, source: SourceRect, polarity: Polarity): PreparedImage | null {
         // Small interface text needs to be enlarged a lot to be read reliably
-        const scale = Math.min(3, Math.max(2, 1300 / source.sw))
+        let scale = Math.min(3, Math.max(2, 1300 / source.sw))
+        // A big window (the whole screen) is not enlarged as much: the time of the reader grows with the number of pixels
+        if(source.sw * source.sh * scale * scale > MAX_OCR_PIXELS){
+            scale = Math.max(1, Math.sqrt(MAX_OCR_PIXELS / (source.sw * source.sh)))
+        }
         const width = Math.min(2400, Math.round(source.sw * scale))
         const height = Math.min(1200, Math.round(source.sh * scale))
         const padding = 16
