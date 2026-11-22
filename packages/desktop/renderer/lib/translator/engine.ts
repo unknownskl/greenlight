@@ -1129,7 +1129,7 @@ export default class TranslatorEngine {
             const y0 = Math.min(...group.map(item => item.line.bbox.y0))
             const x1 = Math.max(...group.map(item => item.line.bbox.x1))
             const y1 = Math.max(...group.map(item => item.line.bbox.y1))
-            const heights = group.map(item => item.line.bbox.y1 - item.line.bbox.y0).sort((a, b) => a - b)
+            const heights = group.map(item => this._textHeight(prepared, item.line.bbox)).sort((a, b) => a - b)
             const lineHeight = heights[Math.floor(heights.length / 2)]
 
             const background = this._sampleBackground(prepared, x0, y0, x1, y1)
@@ -1196,6 +1196,58 @@ export default class TranslatorEngine {
         }
 
         return sameSize && sameLeft && wrapped && last.line.bbox.x1 >= right - lastHeight * 2.5
+    }
+
+    /**
+     * The height of one row of letters in the box of a line. The reader sometimes joins two rows of text (and the
+     * decoration between them) into one "line"; the translation would then get twice the size of the original.
+     * The rows are found from the text pixels: a row is a run of pixel rows that carry text.
+     */
+    _textHeight(prepared: PreparedImage, box: { x0: number; y0: number; x1: number; y1: number }): number {
+        const full = box.y1 - box.y0
+        const left = Math.max(0, Math.floor(box.x0 - prepared.padding))
+        const right = Math.min(prepared.width - 1, Math.ceil(box.x1 - prepared.padding))
+        const top = Math.max(0, Math.floor(box.y0 - prepared.padding))
+        const bottom = Math.min(prepared.height - 1, Math.ceil(box.y1 - prepared.padding))
+        if(right <= left || bottom <= top || full <= 0){
+            return full
+        }
+
+        const needed = Math.max(2, ((right - left) / 2) * 0.04)
+        const runs: number[] = []
+        let run = 0
+        let gap = 0
+
+        for(let y = top; y <= bottom; y++){
+            let count = 0
+            for(let x = left; x <= right; x += 2){
+                if(prepared.ink[y * prepared.width + x] !== 0){
+                    count++
+                }
+            }
+
+            if(count >= needed){
+                run += gap + 1
+                gap = 0
+            } else if(run > 0){
+                gap++
+                if(gap > 2){
+                    runs.push(run)
+                    run = 0
+                    gap = 0
+                }
+            }
+        }
+        if(run > 0){
+            runs.push(run)
+        }
+
+        if(runs.length === 0){
+            return full
+        }
+
+        // Never taller than the box, and not unreasonably small (a thin row of stray pixels)
+        return Math.max(full * 0.4, Math.min(full, Math.max(...runs) * 1.1))
     }
 
     /** The colour of the interface behind a piece of text: the average of the pixels in its box that are not text. */
