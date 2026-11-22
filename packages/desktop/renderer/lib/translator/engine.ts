@@ -62,8 +62,8 @@ const SIGNATURE_GRID_WIDTH = 96
 const MIN_COVERAGE = 0.002
 const MAX_COVERAGE = 0.5
 
-const TICK_MS = 450
-const FORCE_OCR_MS = 3000
+const TICK_MS = 300
+const FORCE_OCR_MS = 2000
 
 // Mask differences below this are shaking / noise. Different text with a similar layout can look almost the same
 // on a coarse mask, so the text is also read again from time to time while it is on screen (see "recheck").
@@ -92,6 +92,10 @@ const RECENT_MOTION_MS = 2000
 const SHORT_TEXT = 6
 const PENDING_MS = 6000
 
+// Text that differs from what is shown in the same place, while the text pixels changed less than this since the last
+// read, must be read twice before it replaces the shown text (a living background makes the reader misread)
+const IN_PLACE_CHANGE = 0.22
+
 // A line that was not found by the reader this many times in a row is dropped from the screen
 const MAX_MISSED_READS = 2
 
@@ -102,6 +106,16 @@ const LETTER = new RegExp('\\p{L}', 'gu')
 const NOT_ALNUM = new RegExp('[^\\p{L}\\p{N}]', 'gu')
 const LOWER_START = new RegExp('^[^\\p{L}]*\\p{Ll}', 'u')
 const NUMBER = /\d+(?:[.,:]\d+)*/g
+
+// How much of the smaller box lies inside the other one (0..1)
+function overlapShare(a: Region, b: Region): number {
+    const width = Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x)
+    const height = Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y)
+    if(width <= 0 || height <= 0){
+        return 0
+    }
+    return (width * height) / Math.max(1e-9, Math.min(a.w * a.h, b.w * b.h))
+}
 
 // Do two boxes (fractions of the stream area) cover a common part of the picture?
 function rectsOverlap(a: Region, b: Region): boolean {
@@ -680,11 +694,11 @@ export default class TranslatorEngine {
             }
         }
 
-        const minGap = Math.min(3500, 700 + this._sameCount * 500)
+        const minGap = Math.min(3000, 400 + this._sameCount * 400)
 
         // Read again now and then even when the picture looks the same: it may be a different line in the same place.
         // Reading the same text again costs nothing visible (see step 4), and it happens less often the longer the text stays.
-        const recheck = now - this._lastReadAt >= Math.min(3500, 1200 + this._sameCount * 600)
+        const recheck = now - this._lastReadAt >= Math.min(3500, 1000 + this._sameCount * 500)
 
         if((!changed && !recheck) || now < this._retryAt || now - this._lastReadAt < minGap){
             return
@@ -696,6 +710,16 @@ export default class TranslatorEngine {
         }
 
         // 3. Read the text
+        // How much the text pixels differ from the last read: a small difference is a living background, not new text
+        let changeAmount = 1
+        if(this._hasReadMask){
+            changeAmount = 0
+            for(const candidate of present){
+                const read = this._readMask[candidate.polarity]
+                changeAmount = (read === undefined || read.length !== candidate.mask.length) ? 1 : Math.max(changeAmount, maskDifference(read, candidate.mask))
+            }
+        }
+
         this._lastReadAt = now
         this._readMask = {}
         for(const candidate of present){
@@ -733,9 +757,17 @@ export default class TranslatorEngine {
         // Text that was not on screen before: right after a movement (or when it is very short) it has to be read
         // twice before it is believed
         const accepted: Array<{ raw: RawSegment; previous: ShownSegment | null }> = []
+        const known = this._shown.concat(this._held)
         best.segments.forEach((raw, index) => {
             const previous = matches[index]
-            if(previous !== null || this._confirm(raw, now)){
+            let inPlace = false
+            if(previous === null && changeAmount < IN_PLACE_CHANGE && known.length > 0){
+                // Different text where a line is already shown, although the picture hardly changed: probably a misread
+                const screen = videoRectToScreen(video.videoWidth, video.videoHeight, box.width, box.height, config.fit, raw.rect)
+                inPlace = known.some(old => overlapShare(screen, old.rect) > 0.5)
+            }
+
+            if(previous !== null || this._confirm(raw, now, inPlace)){
                 accepted.push({ raw, previous })
             }
         })
@@ -846,9 +878,9 @@ export default class TranslatorEngine {
     }
 
     /** Is this new text believable already? Text that shows up while the picture moves, or very short text, has to be read twice. */
-    _confirm(segment: RawSegment, now: number): boolean {
+    _confirm(segment: RawSegment, now: number, inPlace = false): boolean {
         const key = templateKey(segment.text)
-        const strict = now - this._lastUnstableAt < RECENT_MOTION_MS || key.length < SHORT_TEXT
+        const strict = inPlace || now - this._lastUnstableAt < RECENT_MOTION_MS || key.length < SHORT_TEXT
 
         if(!strict){
             return true
@@ -974,7 +1006,7 @@ export default class TranslatorEngine {
             const group = groups[groups.length - 1]
             const last = group === undefined ? undefined : group[group.length - 1]
 
-            if(last !== undefined && this._continues(last, item)){
+            if(last !== undefined && this._continues(last, item, lines)){
                 group.push(item)
             } else {
                 groups.push([item])
@@ -1020,16 +1052,39 @@ export default class TranslatorEngine {
         }
     }
 
-    /** Does `next` continue the sentence that `last` is part of (the line below it, and `last` did not end the sentence)? */
-    _continues(last: { line: OcrLine; text: string }, next: { line: OcrLine; text: string }): boolean {
+    /**
+     * Does `next` continue the text that `last` is part of (the line right below it)? Either the sentence goes on
+     * (no full stop, lower-case start), or it is a wrapped paragraph: same size, same left edge, and the line above
+     * runs up to the right margin of the paragraph (a paragraph is translated as a whole, not in pieces).
+     */
+    _continues(last: { line: OcrLine; text: string }, next: { line: OcrLine; text: string }, all: Array<{ line: OcrLine; text: string }>): boolean {
         const lastHeight = last.line.bbox.y1 - last.line.bbox.y0
+        const nextHeight = next.line.bbox.y1 - next.line.bbox.y0
         const gap = next.line.bbox.y0 - last.line.bbox.y1
         const overlapsInX = next.line.bbox.x0 < last.line.bbox.x1 && next.line.bbox.x1 > last.line.bbox.x0
 
-        return gap < lastHeight * 0.7
-            && overlapsInX
-            && !/[.!?:…»"”]$/.test(last.text)
-            && LOWER_START.test(next.text)
+        if(!(gap < lastHeight * 0.7 && overlapsInX) || /[.!?:…»"”]$/.test(last.text)){
+            return false
+        }
+
+        if(LOWER_START.test(next.text)){
+            return true
+        }
+
+        const sameSize = nextHeight > lastHeight * 0.75 && nextHeight < lastHeight * 1.33
+        const sameLeft = Math.abs(next.line.bbox.x0 - last.line.bbox.x0) < lastHeight * 1.2
+        const wrapped = last.text.split(/\s+/).length >= 3
+
+        // The right margin of the paragraph: the furthest right edge of the lines of the same size and left edge
+        let right = last.line.bbox.x1
+        for(const other of all){
+            const height = other.line.bbox.y1 - other.line.bbox.y0
+            if(height > lastHeight * 0.75 && height < lastHeight * 1.33 && Math.abs(other.line.bbox.x0 - last.line.bbox.x0) < lastHeight * 1.2){
+                right = Math.max(right, other.line.bbox.x1)
+            }
+        }
+
+        return sameSize && sameLeft && wrapped && last.line.bbox.x1 >= right - lastHeight * 2.5
     }
 
     /** The colour of the interface behind a piece of text: the average of the pixels in its box that are not text. */
