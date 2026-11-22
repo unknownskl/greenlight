@@ -24,7 +24,6 @@ div.page-section {
 }
 
 div.page-section h2 {
-    font-size: 18px;
     font-weight: 600;
     padding: 18px 0 12px 0;
     color: var(--text-dim);

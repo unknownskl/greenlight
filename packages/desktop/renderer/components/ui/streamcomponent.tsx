@@ -353,7 +353,7 @@ function StreamComponent({
             } else if (padMenuRef.current === false) {
                 driver?.setSuspended?.(false)
             }
-        })
+        }).catch(() => driver?.setSuspended?.(false))
     }
 
     function toggleTranslator() {

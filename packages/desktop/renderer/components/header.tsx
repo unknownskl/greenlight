@@ -101,7 +101,7 @@ function Header({
         return headerLinks.map((link, idx) => (
             <li key={idx} className={link.profile ? 'header-profile' : ''}>
                 <Link legacyBehavior href={link.url} key={link.url}>
-                    <a title={link.title} onClick={() => setMenuActive(idx)} className={idx === activeIndex ? 'active' : ''}>
+                    <a title={link.title} onClick={() => setMenuActive(idx)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { setMenuActive(idx) } }} className={idx === activeIndex ? 'active' : ''}>
                         { link.profile ? (gamerpic ? <img className="header-gamerpic" src={gamerpic} alt="" /> : <i className="fa-solid fa-user"></i>) : <i className={'fa-solid ' + link.icon}></i> }
                         <span>{link.name}</span>
                     </a>

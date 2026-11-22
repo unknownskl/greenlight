@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 env:
   node_version: 24
@@ -58,6 +58,9 @@ jobs:
     name: "Flatpak build"
     runs-on: ubuntu-latest
     needs: [cachedeps]
+    # Only this job publishes the release
+    permissions:
+      contents: write
 
     container:
       image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-48
