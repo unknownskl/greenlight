@@ -84,6 +84,9 @@ export interface OcrLine {
     confidence: number;
     // Position in the picture that was read (pixels)
     bbox: OcrBox;
+    // Height of the words of the line (pixels). Unlike the box of the line it does not grow when the reader joins
+    // two rows of text into one line.
+    wordHeight?: number;
 }
 
 export interface OcrResult {
@@ -121,7 +124,12 @@ export async function recognizeCanvas(canvas: HTMLCanvasElement, language = 'en'
                         return
                     }
 
+                    // A tall word (with letters that go up or down) shows the real height of a row; short words
+                    // ("was", "on") are only as tall as the small letters, so the upper quarter is taken
+                    const heights = chunk.map(word => word.bbox.y1 - word.bbox.y0).sort((a, b) => a - b)
+
                     lines.push({
+                        wordHeight: heights[Math.floor((heights.length - 1) * 0.75)],
                         text: chunk.map(word => word.text.trim()).join(' '),
                         confidence: chunk.reduce((sum, word) => sum + word.confidence, 0) / chunk.length,
                         bbox: {
