@@ -20,18 +20,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: 'flatpak/flatpak-builder-tools'
 
       - name: Install Python deps
-        run: pip3 install aiohttp toml
+        run: pip3 install --only-binary :all: aiohttp==3.14.5 toml==0.10.2
 
       - name: Install flatpak-builder-tools
         run: pipx install ./node/
 
       - name: Checkout Git repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           submodules: recursive
 
@@ -39,17 +39,17 @@ jobs:
         run: mkdir ./deps-dist/
 
       - name: Install Node.js, NPM and Yarn
-        uses: actions/setup-node@v7.0.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: ${{ env.node_version }}
 
       - name: Install yarn dependencies
-        run: yarn
+        run: yarn install --ignore-scripts
 
       - name: Build yarn cache
         run: flatpak-node-generator yarn yarn.lock -o ./deps-dist/yarn-sources.json
 
-      - uses: actions/upload-artifact@master
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: flatpak-sources
           path: ./deps-dist/
@@ -65,22 +65,22 @@ jobs:
 
     steps:
       - name: Checkout Git repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           submodules: recursive
 
-      - uses: actions/download-artifact@master
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: flatpak-sources
           path: packages/desktop/flatpak/
 
       - name: Install Node.js, NPM and Yarn
-        uses: actions/setup-node@v7.0.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: ${{ env.node_version }}
 
       - name: Free Disk Space (Ubuntu)
-        uses: jlumbroso/free-disk-space@main
+        uses: jlumbroso/free-disk-space@ceedf095f4ec1a097402bc6bd80831f2e1a6fde6 # v2.0.0
         with:
           tool-cache: true
           android: true
@@ -89,7 +89,7 @@ jobs:
           large-packages: true
           swap-storage: true
 
-      - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
+      - uses: flatpak/flatpak-github-actions/flatpak-builder@79327416609af08178ad73b352877e51450790b3 # v6.8
         with:
           bundle: greenlight.flatpak
           manifest-path: packages/desktop/flatpak/io.github.unknownskl.greenlight.yml
@@ -100,7 +100,7 @@ jobs:
           sha256sum greenlight.flatpak > greenlight.flatpak.sha256
           cp packages/desktop/flatpak/update-greenlight.sh update-greenlight.sh
 
-      - uses: actions/upload-artifact@master
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: greenlight-flatpak
           path: |
@@ -109,7 +109,7 @@ jobs:
             update-greenlight.sh
 
       - name: Publish release
-        uses: softprops/action-gh-release@v3
+        uses: softprops/action-gh-release@8a0cd651e5b2365bd640854a3fa5dfc70e4875f3 # v3.0.4
         with:
           tag_name: deck-${{ github.run_number }}
           name: Steam Deck build ${{ github.run_number }}
@@ -120,8 +120,10 @@ jobs:
             Update an existing install (settings and login are kept) - run in Konsole on the Steam Deck:
 
             ```
-            curl -fsSL https://github.com/${{ github.repository }}/releases/latest/download/update-greenlight.sh | bash
+            curl -fsSL --proto '=https' --tlsv1.2 https://github.com/${{ github.repository }}/releases/latest/download/update-greenlight.sh | bash
             ```
+
+            What is different and how it works: https://github.com/${{ github.repository }}/blob/deck/DECK.md
           files: |
             greenlight.flatpak
             greenlight.flatpak.sha256

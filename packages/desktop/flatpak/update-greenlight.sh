@@ -8,13 +8,16 @@
 # Your settings and login are kept (they live in ~/.var/app/io.github.unknownskl.greenlight).
 #
 # Run in Konsole (Desktop Mode):
-#   curl -fsSL https://github.com/Veter1904/greenlight/releases/latest/download/update-greenlight.sh | bash
+#   curl -fsSL --proto '=https' --tlsv1.2 https://github.com/Veter1904/greenlight/releases/latest/download/update-greenlight.sh | bash
 #
 set -euo pipefail
 
 REPO="${GREENLIGHT_REPO:-Veter1904/greenlight}"
 APP_ID="io.github.unknownskl.greenlight"
 BASE="https://github.com/${REPO}/releases/latest/download"
+
+# Only HTTPS (also after redirects) and TLS 1.2 or newer for every download
+CURL_SAFE=(--proto "=https" --proto-redir "=https" --tlsv1.2)
 
 say() { printf '\n\033[1;32m==>\033[0m %s\n' "$*"; }
 die() { printf '\n\033[1;31mERROR:\033[0m %s\n' "$*" >&2; exit 1; }
@@ -51,10 +54,10 @@ tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
 
 say "Downloading the latest Greenlight build..."
-curl -fL --retry 3 --progress-bar -o "$tmp/greenlight.flatpak" "${BASE}/greenlight.flatpak" \
+curl "${CURL_SAFE[@]}" -fL --retry 3 --progress-bar -o "$tmp/greenlight.flatpak" "${BASE}/greenlight.flatpak" \
     || die "Download failed. Check the internet connection and that a release exists at https://github.com/${REPO}/releases"
 
-if curl -fsL --retry 3 -o "$tmp/greenlight.flatpak.sha256" "${BASE}/greenlight.flatpak.sha256"; then
+if curl "${CURL_SAFE[@]}" -fsL --retry 3 -o "$tmp/greenlight.flatpak.sha256" "${BASE}/greenlight.flatpak.sha256"; then
     say "Verifying the download..."
     (cd "$tmp" && sha256sum -c greenlight.flatpak.sha256) || die "The checksum does not match, the download is corrupted. Run the script again."
 fi
@@ -78,7 +81,7 @@ fi
 
 # Handy launcher for the next update: "Update Greenlight" in the application menu (and it can be added to Steam)
 if mkdir -p "$HOME/.local/bin" "$HOME/.local/share/applications" 2>/dev/null \
-    && curl -fsL --retry 3 -o "$HOME/.local/bin/update-greenlight" "${BASE}/update-greenlight.sh"; then
+    && curl "${CURL_SAFE[@]}" -fsL --retry 3 -o "$HOME/.local/bin/update-greenlight" "${BASE}/update-greenlight.sh"; then
     chmod +x "$HOME/.local/bin/update-greenlight"
     cat > "$HOME/.local/share/applications/update-greenlight.desktop" <<DESKTOP
 [Desktop Entry]

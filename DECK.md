@@ -1,0 +1,99 @@
+# Greenlight – Steam Deck edition
+
+*[Українською нижче](#greenlight--збірка-для-steam-deck)*
+
+An unofficial build of [Greenlight](https://github.com/unknownskl/greenlight) v2 made for playing Xbox remote play on a Steam Deck (it works on any Linux with Flatpak). It uses the same app id as the Flathub version, so it simply replaces it, and your settings and login are kept.
+
+_Not affiliated with Microsoft, Xbox or the Greenlight author. All rights and trademarks belong to their respective owners._
+
+## What is different
+
+- **Console-style interface.** A new look made for a handheld, with realistic Xbox Series X / Series S pictures and power-state glow.
+- **Full gamepad navigation.** The whole app (console list, settings, menus) can be used with the Deck's controls only. Hold **LB + RB + View + Menu** for one second during a stream to open the Greenlight menu.
+- **Screen text translator.** Translates the text of the game (quest, subtitles, menus) on top of the picture, line by line, in the language you choose.
+  - Free, **no API keys**. The text reader (Tesseract OCR) is built into the app and works offline.
+  - You place the translation window yourself: with the mouse / touch, or with the gamepad (**LB + RB + X** during a stream: left stick moves, right stick resizes, A / B finishes). **LB + RB + Y** turns the translator on and off.
+  - Every line is translated on its own and drawn over the original with the same size, position and background colour.
+  - It does not translate the same text twice: shaking video, a moving background, a counter that only changes its digits, or the same line read a little differently by the text reader do not cause new requests.
+  - Text that is part of the game world (it swings when the camera turns) is hidden while the camera moves and shown again when the picture is steady.
+- **Keyboard and mouse as a gamepad** (Settings → Input), for docked play: W A S D = left stick, mouse = right stick, mouse buttons = triggers, and more.
+- **One port per console.** If you stream from outside your home network and have several consoles, each one can use its own remote port (Settings → Streaming).
+- **Fixes.** Changing a setting during a stream no longer closes the stream.
+
+### Privacy note about the translator
+
+The screen is never uploaded anywhere: the text is read on your device. Only the **recognized text** (no pictures) is sent to a public translation service (`translate.googleapis.com`, with `api.mymemory.translated.net` as a fallback). Leave the translator off if the game text may be private.
+
+## Install or update on the Steam Deck
+
+Switch to Desktop Mode, open Konsole and run:
+
+```
+curl -fsSL --proto '=https' --tlsv1.2 https://github.com/Veter1904/greenlight/releases/latest/download/update-greenlight.sh | bash
+```
+
+The same command installs Greenlight if it is not installed yet and updates it later. It removes every older copy of Greenlight (Flathub or earlier builds), installs the new one and keeps your settings (`~/.var/app/io.github.unknownskl.greenlight`). The download is verified with a SHA-256 checksum. After the first run there is an **Update Greenlight** entry in the application menu.
+
+If you use a Steam shortcut and it says that the app was not found after an update, add Greenlight to Steam again.
+
+You can also download `greenlight.flatpak` from the [Releases](https://github.com/Veter1904/greenlight/releases) page and install it with `flatpak install --user greenlight.flatpak`.
+
+## How it is built
+
+Every push to the `deck` branch runs the workflow in `.github/workflows/deck-build.yml`, builds the Flatpak and publishes a release `deck-N`. The workflow uses actions pinned to commit hashes.
+
+## Known limits
+
+- The text reader knows English (the language of the game); the target language is any language of the translation service.
+- Text on a very busy or moving background can be read badly. The translator holds back (it needs two matching readings) instead of showing garbage.
+- Developed and used by the author on a Steam Deck with Xbox consoles over remote play; other setups are less tested. Bug reports are welcome in the issues of this fork.
+
+---
+
+# Greenlight – збірка для Steam Deck
+
+Неофіційна збірка [Greenlight](https://github.com/unknownskl/greenlight) v2 для гри на Xbox через віддалений доступ зі Steam Deck (працює на будь-якому Linux із Flatpak). Має той самий app id, що й версія з Flathub, тому просто замінює її, а налаштування й вхід зберігаються.
+
+_Не пов'язана з Microsoft, Xbox чи автором Greenlight. Усі права й торгові марки належать їхнім власникам._
+
+## Чим відрізняється
+
+- **Інтерфейс у стилі консолі.** Новий вигляд для портативного пристрою, реалістичні зображення Xbox Series X / Series S із підсвіткою стану живлення.
+- **Повне керування геймпадом.** Увесь застосунок (список консолей, налаштування, меню) працює лише з кнопок Deck. Утримуй **LB + RB + View + Menu** одну секунду під час стріму, щоб відкрити меню Greenlight.
+- **Екранний перекладач тексту.** Перекладає текст гри (завдання, субтитри, меню) поверх картинки, рядок за рядком, обраною мовою.
+  - Безкоштовно, **без API-ключів**. Розпізнавання тексту (Tesseract OCR) вбудоване в застосунок і працює без інтернету.
+  - Вікно перекладу ставиш сам: мишею чи дотиком, або геймпадом (**LB + RB + X** під час стріму: лівий стік рухає, правий змінює розмір, A / B завершує). **LB + RB + Y** вмикає й вимикає перекладач.
+  - Кожен рядок перекладається окремо й малюється поверх оригіналу того самого розміру, на тому самому місці й на фоні того самого кольору.
+  - Один і той самий текст двічі не перекладається: тремтіння відео, рухомий фон, лічильник, у якому змінюються лише цифри, чи той самий рядок, прочитаний трохи інакше, не створюють нових запитів.
+  - Текст, що є частиною ігрового світу (гойдається, коли повертаєш камеру), ховається, поки камера рухається, і повертається, коли картинка заспокоїлась.
+- **Клавіатура й миша як геймпад** (Налаштування → Керування), для гри з док-станції: W A S D = лівий стік, миша = правий стік, кнопки миші = тригери тощо.
+- **Окремий порт для кожної консолі.** Якщо граєш не з домашньої мережі й маєш кілька консолей, кожна може мати свій віддалений порт (Налаштування → Стрімінг).
+- **Виправлення.** Зміна налаштування під час стріму більше не закриває стрім.
+
+### Конфіденційність перекладача
+
+Екран нікуди не завантажується: текст читається на твоєму пристрої. До публічного сервісу перекладу (`translate.googleapis.com`, запасний `api.mymemory.translated.net`) надсилається лише **розпізнаний текст** (без зображень). Якщо текст у грі може бути приватним, тримай перекладач вимкненим.
+
+## Встановлення й оновлення на Steam Deck
+
+Перейди в Desktop Mode, відкрий Konsole і виконай:
+
+```
+curl -fsSL --proto '=https' --tlsv1.2 https://github.com/Veter1904/greenlight/releases/latest/download/update-greenlight.sh | bash
+```
+
+Та сама команда встановлює Greenlight, якщо його ще немає, і пізніше оновлює. Вона видаляє всі старіші копії (з Flathub чи ранніх збірок), ставить нову й зберігає налаштування (`~/.var/app/io.github.unknownskl.greenlight`). Завантаження перевіряється контрольною сумою SHA-256. Після першого запуску в меню застосунків з'являється пункт **Update Greenlight**.
+
+Якщо ярлик у Steam після оновлення каже, що застосунок не знайдено, додай Greenlight до Steam знову.
+
+Також можна завантажити `greenlight.flatpak` зі сторінки [Releases](https://github.com/Veter1904/greenlight/releases) і встановити командою `flatpak install --user greenlight.flatpak`.
+
+## Як збирається
+
+Кожен пуш у гілку `deck` запускає воркфлоу `.github/workflows/deck-build.yml`, який збирає Flatpak і публікує реліз `deck-N`. Дії в воркфлоу закріплені на хешах комітів.
+
+## Відомі обмеження
+
+- Розпізнавання знає англійську (мову гри); мова перекладу будь-яка з тих, що підтримує сервіс перекладу.
+- Текст на дуже строкатому чи рухомому фоні може читатись погано. Перекладач утримується (потрібні два однакові читання), а не показує сміття.
+- Автор розробляє й користується на Steam Deck з консолями Xbox через віддалений доступ; інші конфігурації перевірені менше. Повідомлення про помилки вітаються в issues цього форка.
