@@ -274,6 +274,8 @@
       "micActive": "Active",
       "enableMic": "Enable mic",
       "disableMic": "Disable mic",
+      "kbmHintClick": "Click the picture to capture the mouse (Esc releases it)",
+      "kbmHintLocked": "Mouse captured. Press Esc to release it",
       "debugTitle": "Debug",
       "itsTakingALittleLonger": "It's taking a little longer.. Your stream may start soon.",
       "startingConnection": "Starting connection...",

@@ -259,6 +259,8 @@
       "micActive": "Aktiv",
       "enableMic": "Aktiviere Mikro",
       "disableMic": "Deaktiviere Mikro",
+      "kbmHintClick": "Klicke auf das Bild, um die Maus zu erfassen (Esc gibt sie frei)",
+      "kbmHintLocked": "Maus erfasst. Esc gibt sie frei",
       "debugTitle": "Fehlersuche",
       "itsTakingALittleLonger": "Es dauert noch einen Moment.. Dein Stream startet bald.",
       "startingConnection": "Verbindungsaufbau...",

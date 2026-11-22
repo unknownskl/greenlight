@@ -62,6 +62,9 @@ export default class KeyboardMouseEmulation {
     // Asked before the mouse is locked (it must not be while a Greenlight menu is open)
     canLock: () => boolean = () => true
 
+    // The mouse could not be locked (the system refused): it is then used without a lock, while it is over the picture
+    _free = false
+
     constructor(sensitivity: number) {
         this._sensitivity = Math.max(0.1, sensitivity)
     }
@@ -74,6 +77,9 @@ export default class KeyboardMouseEmulation {
         window.addEventListener('mousedown', this._onMouseDown, true)
         window.addEventListener('mouseup', this._onMouseUp, true)
         window.addEventListener('contextmenu', this._onContextMenu, true)
+        document.addEventListener('pointerlockchange', this._onLockChange)
+        document.addEventListener('pointerlockerror', this._onLockError)
+        this._notify(this._isLocked() ? 'locked' : (this._free ? 'free' : 'unlocked'))
     }
 
     stop() {
@@ -84,7 +90,35 @@ export default class KeyboardMouseEmulation {
         window.removeEventListener('mousedown', this._onMouseDown, true)
         window.removeEventListener('mouseup', this._onMouseUp, true)
         window.removeEventListener('contextmenu', this._onContextMenu, true)
+        document.removeEventListener('pointerlockchange', this._onLockChange)
+        document.removeEventListener('pointerlockerror', this._onLockError)
         this.release()
+    }
+
+    /** Tells the interface what the mouse is doing (it shows a hint). */
+    _notify(state: 'unlocked' | 'locked' | 'free') {
+        window.dispatchEvent(new CustomEvent('greenlight-kbm-state', { detail: state }))
+    }
+
+    _onLockChange = () => {
+        this._notify(this._isLocked() ? 'locked' : (this._free ? 'free' : 'unlocked'))
+    }
+
+    _onLockError = () => {
+        this._lockFailed()
+    }
+
+    _lockFailed() {
+        if(!this._free){
+            console.warn('Keyboard and mouse: the mouse could not be locked, using it without a lock')
+            this._free = true
+            this._notify('free')
+        }
+    }
+
+    _inPicture(target: EventTarget | null): boolean {
+        const element = target as HTMLElement | null
+        return element !== null && element !== undefined && element.closest !== undefined && element.closest('#streamComponent') !== null
     }
 
     /** Gives the mouse back (used while a menu is open). */
@@ -128,7 +162,7 @@ export default class KeyboardMouseEmulation {
     }
 
     _onMouseMove = (event: MouseEvent) => {
-        if(this._isLocked()){
+        if(this._isLocked() || (this._free && this._inPicture(event.target))){
             this._mouseX += event.movementX
             this._mouseY += event.movementY
         }
@@ -137,19 +171,27 @@ export default class KeyboardMouseEmulation {
     _onMouseDown = (event: MouseEvent) => {
         const target = event.target as HTMLElement | null
 
-        if(!this._isLocked()){
+        if(!this._isLocked() && !this._free){
             // Click on the picture: take the mouse (Esc gives it back)
-            if(this.canLock() && target !== null && target.closest !== undefined && target.closest('#streamComponent') !== null){
+            if(this.canLock() && this._inPicture(target)){
                 try {
-                    const request = (target as any).requestPointerLock?.()
+                    const holder = (document.getElementById('streamComponent') ?? target) as any
+                    const request = holder.requestPointerLock?.()
                     if(request !== undefined && typeof request.catch === 'function'){
-                        request.catch(() => undefined)
+                        request.catch(() => this._lockFailed())
+                    } else if(request === undefined && holder.requestPointerLock === undefined){
+                        this._lockFailed()
                     }
                 } catch(error) {
-                    // Not available
+                    this._lockFailed()
                 }
                 event.preventDefault()
             }
+            return
+        }
+
+        // Without a lock the buttons only count over the picture
+        if(!this._isLocked() && (!this._inPicture(target) || !this.canLock())){
             return
         }
 
@@ -162,7 +204,7 @@ export default class KeyboardMouseEmulation {
     }
 
     _onContextMenu = (event: Event) => {
-        if(this._isLocked()){
+        if(this._isLocked() || (this._free && this._inPicture(event.target))){
             event.preventDefault()
         }
     }
@@ -205,7 +247,7 @@ export default class KeyboardMouseEmulation {
         frame.RightThumbXAxis = larger(frame.RightThumbXAxis, clamp(rx + this._smoothX))
         frame.RightThumbYAxis = larger(frame.RightThumbYAxis, clamp(ry + this._smoothY))
 
-        // Mouse buttons (only while the mouse is locked): left = RT, right = LT, middle = R3
+        // Mouse buttons (only while the mouse is locked, or over the picture when it cannot be locked): left = RT, right = LT, middle = R3
         if(this._buttons.has(0)){ frame.RightTrigger = 1 }
         if(this._buttons.has(2)){ frame.LeftTrigger = 1 }
         if(this._buttons.has(1)){ frame.RightThumb = 1 }

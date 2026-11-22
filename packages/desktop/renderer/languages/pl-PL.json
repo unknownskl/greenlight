@@ -270,6 +270,8 @@
       "micActive": "Aktywny",
       "enableMic": "Włącz mikrofon",
       "disableMic": "Wyłącz mikrofon",
+      "kbmHintClick": "Kliknij obraz, aby przechwycić mysz (Esc ją zwalnia)",
+      "kbmHintLocked": "Mysz przechwycona. Esc ją zwalnia",
       "debugTitle": "Debugowanie",
       "itsTakingALittleLonger": "Zajmie to chwilę dłużej.. Twój strumień może się rozpocząć za niedługo.",
       "startingConnection": "Rozpoczynanie połączenia...",

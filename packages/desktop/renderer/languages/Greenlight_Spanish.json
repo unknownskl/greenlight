@@ -259,6 +259,8 @@
       "micActive": "Activo",
       "enableMic": "Activar micrófono",
       "disableMic": "Silenciar micrófono",
+      "kbmHintClick": "Haz clic en la imagen para capturar el ratón (Esc lo libera)",
+      "kbmHintLocked": "Ratón capturado. Esc lo libera",
       "debugTitle": "Depuración",
       "itsTakingALittleLonger": "Está tardando un poco más de lo habitual... El streaming debería comenzar pronto.",
       "startingConnection": "Iniciando conexión...",

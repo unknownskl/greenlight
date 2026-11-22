@@ -106,6 +106,26 @@ function StreamComponent({
     const padMenuRef = React.useRef(false)
     const [padMenuOpen, setPadMenuOpen] = React.useState(false)
 
+    // What the keyboard and mouse emulation does with the mouse (see lib/gamepad/kbm.ts): a hint tells how to take it
+    const [mouseState, setMouseState] = React.useState<'unlocked' | 'locked' | 'free'>('unlocked')
+    const [mouseHintVisible, setMouseHintVisible] = React.useState(true)
+    React.useEffect(() => {
+        const onState = (event: Event) => {
+            setMouseState((event as CustomEvent).detail)
+        }
+
+        window.addEventListener('greenlight-kbm-state', onState)
+        return () => {
+            window.removeEventListener('greenlight-kbm-state', onState)
+        }
+    }, [])
+    React.useEffect(() => {
+        // The hint stays for a few seconds after the state changed
+        setMouseHintVisible(true)
+        const timer = setTimeout(() => setMouseHintVisible(false), mouseState === 'unlocked' ? 12000 : 3500)
+        return () => clearTimeout(timer)
+    }, [mouseState])
+
     function setPadMenu(open: boolean) {
         const driver = (xPlayer as any)._inputDriver
 
@@ -560,6 +580,10 @@ function StreamComponent({
                         { padMenuOpen ? t("gamepad.streamMenuOpenHint") : t("gamepad.streamMenuHint") }
                     </div>
                 </div>
+
+                { (settings.input_kbm_emulation === true && mouseHintVisible && mouseState !== 'free' && !padMenuOpen) ? <div className="kbm-hint">
+                    <i className="fa-solid fa-computer-mouse"></i> { mouseState === 'locked' ? t("streamWindow.kbmHintLocked") : t("streamWindow.kbmHintClick") }
+                </div> : '' }
 
                 <TranslatorOverlay xPlayer={xPlayer} />
 
