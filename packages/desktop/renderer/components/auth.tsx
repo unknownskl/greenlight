@@ -35,7 +35,7 @@ function Auth({
             if(confirmed){
                 Ipc.send('app', 'clearData')
             }
-        })
+        }).catch(() => undefined)
     }
 
     function clearData(){
@@ -43,7 +43,7 @@ function Auth({
             if(confirmed){
                 Ipc.send('app', 'clearData')
             }
-        })
+        }).catch(() => undefined)
     }
 
     return (

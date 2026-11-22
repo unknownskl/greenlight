@@ -39,7 +39,7 @@ function SettingsHome() {
             if(confirmed){
                 Ipc.send('app', 'clearData')
             }
-        })
+        }).catch(() => undefined)
     }
 
     return (

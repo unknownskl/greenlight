@@ -68,7 +68,7 @@ function describeStats(report: any, previous: { bytes: number; at: number } | nu
         output += '<hr>\n'
     }
 
-    Object.keys(report).sort().forEach((name) => {
+    Object.keys(report).sort((a, b) => a.localeCompare(b)).forEach((name) => {
         output += '<strong>' + escapeHtml(name) + ':</strong> ' + escapeHtml(formatStat(report[name])) + '<br>\n'
     })
 

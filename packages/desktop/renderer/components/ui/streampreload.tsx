@@ -66,7 +66,7 @@ function StreamPreload({
                 onDisconnect()
                 window.history.back()
             }
-        })
+        }).catch(() => undefined)
     }
 
     function formatWaitingTime(rawSeconds: number): string {

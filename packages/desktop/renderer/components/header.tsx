@@ -119,7 +119,7 @@ function Header({
             if(confirmed){
                 Ipc.send('app', 'quit')
             }
-        })
+        }).catch(() => undefined)
     }
 
     React.useEffect(() => {
