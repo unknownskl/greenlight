@@ -551,36 +551,31 @@ function StreamComponent({
 
                 <div id="component_streamcomponent_gamebar">
                     <div id="component_streamcomponent_gamebar_menu">
-                        <div style={{
-                            width: '25%',
-                        }}>
-                            <Button label={<span><i className="fa-solid fa-xmark"></i> {t("streamWindow.endStreamBtn")}</span>} title={t("streamWindow.endStreamBtn")} className='btn-cancel' onClick={() => {
+                        <div className="gb-left">
+                            <Button label={<span><i className="fa-solid fa-xmark"></i> <span className="gb-label">{t("streamWindow.endStreamBtn")}</span></span>} title={t("streamWindow.endStreamBtn")} className='btn-cancel' onClick={() => {
                                 endStream()
-                            }}></Button> &nbsp;
+                            }}></Button>
                             <Button label={<span><i className="fa-solid fa-xmark"></i></span>} title={t("streamWindow.disconnectBtn")} className='btn' onClick={() => {
                                 streamDisconnect()
                             }}></Button>
                         </div>
 
-                        <div style={{
-                            marginLeft: 'auto',
-                            marginRight: 'auto',
-                        }}>
-                            <Button label={<span><i className="fa-brands fa-xbox"></i> {t("streamWindow.menuBtn")}</span>} title={t("streamWindow.menuTitle")} onClick={(e) => {
+                        <div className="gb-center">
+                            <Button label={<span><i className="fa-brands fa-xbox"></i> <span className="gb-label">{t("streamWindow.menuBtn")}</span></span>} title={t("streamWindow.menuTitle")} onClick={(e) => {
                                 e.target.blur(); onMenu()
-                            }}></Button> &nbsp;
-                            <Button label={<span><i className="fa-solid fa-language"></i> {settings.translator_enabled ? t("translator.btnOn") : t("translator.btnOff")}</span>} title={t("translator.btnTitle")} className={settings.translator_enabled ? 'btn-primary' : ''} onClick={(e) => {
+                            }}></Button>
+                            <Button label={<span><i className="fa-solid fa-language"></i> <span className="gb-label gb-always">{settings.translator_enabled ? t("translator.btnOn") : t("translator.btnOff")}</span></span>} title={t("translator.btnTitle")} className={settings.translator_enabled ? 'btn-primary' : ''} onClick={(e) => {
                                 e.target.blur(); toggleTranslator()
-                            }}></Button> &nbsp;
+                            }}></Button>
                             { (settings.translator_enabled && getRegions(settings).length > 1) ? getRegions(settings).map((win, index) => (
                                 <Button key={index} label={<span>{index + 1}</span>} title={t("translator.windowToggleTitle", { n: index + 1 })} className={win.enabled !== false ? 'btn-primary' : ''} onClick={(e) => {
                                     e.target.blur(); toggleTranslatorWindow(index)
                                 }}></Button>
                             )) : '' }
-                            { settings.translator_enabled ? <React.Fragment><Button label={<span><i className="fa-solid fa-crop-simple"></i> {t("translator.btnArea")}</span>} title={t("translator.btnAreaTitle")} onClick={(e) => {
+                            { settings.translator_enabled ? <Button label={<span><i className="fa-solid fa-crop-simple"></i> <span className="gb-label">{t("translator.btnArea")}</span></span>} title={t("translator.btnAreaTitle")} onClick={(e) => {
                                 e.target.blur(); editTranslatorArea()
-                            }}></Button> &nbsp;</React.Fragment> : '' }
-                            <Button label={(micStatus === false) ? <span><i className="fa-solid fa-microphone-slash"></i> {t("streamWindow.micMuted")}</span> : <span><i className="fa-solid fa-microphone"></i> {t("streamWindow.micActive")}</span>} title={(micStatus === false) ? t("streamWindow.enableMic") : t("streamWindow.disableMic")} className={(micStatus === false) ? 'btn-cancel' : 'btn-primary'} onClick={(e) => {
+                            }}></Button> : '' }
+                            <Button label={(micStatus === false) ? <span><i className="fa-solid fa-microphone-slash"></i> <span className="gb-label">{t("streamWindow.micMuted")}</span></span> : <span><i className="fa-solid fa-microphone"></i> <span className="gb-label">{t("streamWindow.micActive")}</span></span>} title={(micStatus === false) ? t("streamWindow.enableMic") : t("streamWindow.disableMic")} className={(micStatus === false) ? 'btn-cancel' : 'btn-primary'} onClick={(e) => {
                                 e.target.blur(); toggleMic()
                             }}></Button>
                         </div>
@@ -596,11 +591,7 @@ function StreamComponent({
                             svg={volumeIcon}
                         />
 
-                        <div style={{
-                            marginRight: 20,
-                            width: '25%',
-                            textAlign: 'right',
-                        }}>
+                        <div className="gb-right">
                             <Button label={<i className="fa-solid fa-bug"></i>} title={t("streamWindow.debugTitle")} onClick={(e) => {
                                 e.target.blur(); toggleDebug()
                             }}></Button>

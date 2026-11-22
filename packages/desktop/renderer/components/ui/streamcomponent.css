@@ -93,7 +93,48 @@ div#component_streamcomponent_gamebar div#component_streamcomponent_gamebar_menu
     padding-top: 13px;
     padding-left: 20px;
     display: flex;
+    flex-wrap: nowrap;
+    align-items: flex-start;
     gap: 20px;
+}
+
+/* The three groups of the bar never wrap onto a second row: the middle one gives way (labels turn into icons) */
+div#component_streamcomponent_gamebar_menu div.gb-left {
+    display: flex;
+    flex: 0 0 auto;
+    gap: 8px;
+}
+
+div#component_streamcomponent_gamebar_menu div.gb-center {
+    display: flex;
+    flex: 1 1 auto;
+    min-width: 0;
+    flex-wrap: nowrap;
+    justify-content: center;
+    gap: 10px;
+    white-space: nowrap;
+}
+
+div#component_streamcomponent_gamebar_menu div.gb-right {
+    flex: 0 0 auto;
+    margin-right: 20px;
+    text-align: right;
+}
+
+/* Steam Deck (1280x800) and other narrow screens: only icons, except for the translator state */
+@media (max-width: 1500px) {
+    div#component_streamcomponent_gamebar_menu div.gb-center .gb-label:not(.gb-always) {
+        display: none;
+    }
+
+    div#component_streamcomponent_gamebar_menu .slider-container {
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    div#component_streamcomponent_gamebar_menu .slider {
+        width: 110px;
+    }
 }
 
 div#component_streamcomponent_loader {
