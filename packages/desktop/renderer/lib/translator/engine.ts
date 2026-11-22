@@ -133,9 +133,9 @@ const IN_PLACE_PROFILE = 0.1
 // Every translated line stays on screen for a reading time (this much plus a bit per character), even when the
 // original is already gone, and a line that replaces it waits its turn: when subtitles come faster than they can
 // be read, they are shown one after another (a few at most) instead of losing some of them
-const MIN_SHOW_MS = 1600
-const SHOW_PER_CHAR_MS = 45
-const MAX_SHOW_MS = 6000
+const MIN_SHOW_MS = 2200
+const SHOW_PER_CHAR_MS = 60
+const MAX_SHOW_MS = 8000
 const MAX_QUEUED = 5
 // A line is never shown for less than this, however long the queue is
 const MIN_SHOW_FLOOR_MS = 1000
@@ -968,9 +968,19 @@ export default class TranslatorEngine {
         const inMotion = moving || (this._unstableTicks >= MOTION_MIN_TICKS && now - this._lastMovingAt < MOTION_CALM_MS)
         if(inMotion && (this._shown.length > 0 || this._held.length > 0)){
             if(keepsMoving && this._shown.length > 0){
-                this._held = this._shown
-                this._shown = []
-                this._options.onResult(null)
+                // A subtitle does not hang in the air when the camera turns (a cut after the line is spoken):
+                // it stays until it has been read. Text of the game world is hidden.
+                const stay = this._shown.filter(segment => segment.centered && now - segment.shownAt < readingTime(segment, this._queue.length))
+                const leaving = this._shown.filter(segment => stay.indexOf(segment) < 0)
+                if(leaving.length > 0){
+                    this._held = leaving
+                    this._shown = stay
+                    if(stay.length > 0){
+                        this._emit(stay)
+                    } else {
+                        this._options.onResult(null)
+                    }
+                }
                 // Read as soon as the picture is steady again
                 this._sameCount = 0
                 this._hasReadMask = false
@@ -1265,7 +1275,9 @@ export default class TranslatorEngine {
             }
         })
         shown.concat(this._held).forEach((old) => {
-            if(!used.has(old) && old.missed < MAX_MISSED_READS && !segments.some(segment => rectsOverlap(segment.rect, old.rect))){
+            // A line that was not found stays for a couple of reads, and always until it has been read
+            const unread = Date.now() - old.shownAt < readingTime(old, this._queue.length)
+            if(!used.has(old) && (old.missed < MAX_MISSED_READS || unread) && !segments.some(segment => rectsOverlap(segment.rect, old.rect))){
                 segments.push({ ...old, missed: old.missed + 1 })
             }
         })
