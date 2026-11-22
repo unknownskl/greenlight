@@ -52,6 +52,8 @@ export interface EngineOptions {
     translate: (text: string, target: string, source: string) => Promise<string>;
     onResult: (result: TranslatorResult | null) => void;
     onStatus: (status: EngineStatus) => void;
+    // Who goes first when several windows wait for the text reader (higher first; the default is 1)
+    priority?: number;
 }
 
 // A pixel counts as "text" when it stands out from its surroundings: brighter (light text) or darker (dark text)
@@ -1571,7 +1573,7 @@ export default class TranslatorEngine {
             return null
         }
 
-        const result = await recognizeCanvas(prepared.canvas, job.config.source)
+        const result = await recognizeCanvas(prepared.canvas, job.config.source, this._options.priority ?? 1)
         if(result.confidence < MIN_CONFIDENCE){
             return null
         }

@@ -101,7 +101,46 @@ const MIN_WORD_CONFIDENCE = 50
 // Two words further apart than this (in line heights) are separate pieces of text (two interface elements on one row)
 const MAX_WORD_GAP = 2
 
-export async function recognizeCanvas(canvas: HTMLCanvasElement, language = 'en'): Promise<OcrResult> {
+// The reader does one picture at a time. When several windows wait for it, the one with the higher priority goes first
+// (the windows the player placed come before the ones the adaptive mode found); equal priorities take turns.
+let readerBusy = false
+const readerQueue: Array<{ priority: number; resume: () => void }> = []
+
+function acquireReader(priority: number): Promise<void> {
+    if(!readerBusy){
+        readerBusy = true
+        return Promise.resolve()
+    }
+    return new Promise((resume) => {
+        readerQueue.push({ priority, resume })
+    })
+}
+
+function releaseReader() {
+    if(readerQueue.length === 0){
+        readerBusy = false
+        return
+    }
+
+    let best = 0
+    for(let i = 1; i < readerQueue.length; i++){
+        if(readerQueue[i].priority > readerQueue[best].priority){
+            best = i
+        }
+    }
+    readerQueue.splice(best, 1)[0].resume()
+}
+
+export async function recognizeCanvas(canvas: HTMLCanvasElement, language = 'en', priority = 1): Promise<OcrResult> {
+    await acquireReader(priority)
+    try {
+        return await readCanvas(canvas, language)
+    } finally {
+        releaseReader()
+    }
+}
+
+async function readCanvas(canvas: HTMLCanvasElement, language: string): Promise<OcrResult> {
     const worker = await getOcrWorker(language)
     const result = await worker.recognize(canvas, {}, { text: true, blocks: true })
 

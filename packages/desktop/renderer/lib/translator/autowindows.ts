@@ -48,6 +48,10 @@ const NEED_NOTICE = 2
 const NEED_PLATE = 2
 const NEED_OTHER = 4
 
+// A block that has more than this share of its area inside a window of the player (grown by the margin) belongs to that window
+const MANUAL_MARGIN = 0.01
+const MANUAL_TOUCH = 0.02
+
 // A window that has not seen its text for this long is given away (a translation that is still shown is never taken away)
 const HOLD_MS = 8000
 // A window that has not read anything in this time (from the moment the text reader is ready) was a false alarm
@@ -105,6 +109,11 @@ function inside(inner: Region, outer: Region): number {
         return 0
     }
     return (width * height) / Math.max(1e-9, inner.w * inner.h)
+}
+
+// A window of the player, a little bigger: the picture is looked at coarsely, so the edge of a text is not exact
+function grow(region: Region, margin: number): Region {
+    return { x: region.x - margin, y: region.y - margin, w: region.w + 2 * margin, h: region.h + 2 * margin }
 }
 
 function union(a: Region, b: Region): Region {
@@ -169,6 +178,8 @@ export default class AutoWindows {
                     }
                 },
                 translate: (text, target, source) => this._translate(text, target, source),
+                // The windows of the player are read first
+                priority: 0,
                 onResult: (result) => this._onResult(index, result),
                 onStatus: (status: EngineStatus) => {
                     if(status === 'ready'){
@@ -327,8 +338,9 @@ export default class AutoWindows {
                 h: block.h * visible.sh,
             })
 
-            // The player's own windows take care of their places
-            if(manual.some(region => region.enabled !== false && inside(rect, region) > 0.2)){
+            // The player's own windows own their places, and any text that touches them (a block is never split between a
+            // window and the adaptive mode: that would give two translations of one text)
+            if(manual.some(region => region.enabled !== false && inside(rect, grow(region, MANUAL_MARGIN)) > MANUAL_TOUCH)){
                 continue
             }
 
@@ -362,6 +374,14 @@ export default class AutoWindows {
     }
 
     _update(found: Track[], manual: Region[], now: number) {
+        // 0. The player has placed (or turned on, or moved) a window over a place that an automatic window holds: the
+        //    player's window takes it, the automatic one goes
+        this._slots.forEach((slot, index) => {
+            if(slot.region !== null && manual.some(region => region.enabled !== false && regionsOverlap(region, slot.region as Region))){
+                this._release(index)
+            }
+        })
+
         // 1. Windows that have their text in sight
         const claimed = new Set<Track>()
         this._slots.forEach((slot) => {
