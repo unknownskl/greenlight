@@ -24,7 +24,8 @@ export default class IpcApp extends IpcBase {
 
     // How the translation service of the player stands (works / used up / wrong key) and which service answered last
     translatorStatus(args:{ provider?:KeyProvider; key?:string; limit?:number }){
-        return this._translator.status(args || {})
+        // Every action of a channel answers with a promise (see IpcBase.onEvent)
+        return Promise.resolve(this._translator.status(args || {}))
     }
 
     // Tries the key with a short text
