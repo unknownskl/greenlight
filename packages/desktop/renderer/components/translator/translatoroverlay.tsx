@@ -12,6 +12,18 @@ import RegionEditor from './regioneditor'
 
 export const TRANSLATOR_EDIT_EVENT = 'greenlight-translator-edit'
 
+// What a translation request carries: the text, the languages, and the key of the player (if there is one)
+function translateArgs(settings: any, text: string, from: string, to: string) {
+    return {
+        text,
+        from,
+        to,
+        provider: settings.translator_provider,
+        key: settings.translator_key,
+        limit: settings.translator_key_limit,
+    }
+}
+
 interface TranslatorOverlayProps {
     xPlayer: any;
 }
@@ -207,7 +219,7 @@ function TranslatorOverlay({
                     fit: (settingsRef.current.video_size || 'default') as FitMode,
                     }
                 },
-                translate: (text, target, source) => Ipc.send('app', 'translateText', { text, from: source, to: target }) as Promise<string>,
+                translate: (text, target, source) => Ipc.send('app', 'translateText', translateArgs(settingsRef.current, text, source, target)) as Promise<string>,
                 onResult: (result) => setResults(previous => {
                     const next = previous.slice()
                     next[index] = result
@@ -254,7 +266,7 @@ function TranslatorOverlay({
                 color: (settingsRef.current.translator_text_color || 'light') as TextColor,
             }),
             getManualRegions: () => getRegions(settingsRef.current),
-            translate: (text, target, source) => Ipc.send('app', 'translateText', { text, from: source, to: target }) as Promise<string>,
+            translate: (text, target, source) => Ipc.send('app', 'translateText', translateArgs(settingsRef.current, text, source, target)) as Promise<string>,
             onResult: (slot, result) => setAutoResults(previous => {
                 const next = previous.slice()
                 next[slot] = result
@@ -275,6 +287,41 @@ function TranslatorOverlay({
             auto.stop()
         }
     }, [autoOn, sourceLang])
+
+    // The key of the player: a message when it stops working (the free services take over) and when it works again
+    React.useEffect(() => {
+        if(!enabled){
+            return
+        }
+
+        let stopped = false
+        let last: string | null = null
+        const check = () => {
+            const current = settingsRef.current
+            if((current.translator_provider !== 'deepl' && current.translator_provider !== 'google') || !current.translator_key){
+                last = null
+                return
+            }
+
+            Ipc.send('app', 'translatorStatus', { provider: current.translator_provider, key: current.translator_key, limit: current.translator_key_limit }).then((status: any) => {
+                const state: string | undefined = status?.key?.state
+                if(stopped || state === undefined){
+                    return
+                }
+                if(state !== last && (last !== null || state !== 'ok')){
+                    showToast(state === 'ok' ? t('translator.keyBackToast') : t('translator.keyFailedToast_' + state))
+                }
+                last = state
+            }).catch(() => { /* only information */ })
+        }
+
+        check()
+        const timer = setInterval(check, 15000)
+        return () => {
+            stopped = true
+            clearInterval(timer)
+        }
+    }, [enabled])
 
     // Free the memory of the text reader when the stream is closed
     React.useEffect(() => {

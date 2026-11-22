@@ -9,6 +9,7 @@ import { Region, clampRegion, MAX_REGIONS, getRegions, regionsToSettings, constr
 import usePadRegion from '../../lib/translator/usepadregion'
 import { useTranslation } from 'react-i18next'
 import { SOURCE_LANGUAGES } from '../../lib/translator/ocr'
+import TranslatorKeyCard from '../../components/translator/keycard'
 
 // Languages the translation can be made into (codes of the translation service)
 const TARGET_LANGUAGES = ['uk', 'ru', 'pl', 'de', 'es', 'fr', 'it', 'pt', 'tr', 'cs', 'nl', 'sv', 'ja', 'ko', 'zh-CN', 'ar', 'en']
@@ -205,6 +206,8 @@ function SettingsTranslator() {
                     <p><small>{t('translator.note')}</small></p>
                     <p><small><i className="fa-solid fa-gamepad"></i> {t('translator.padShortcuts')}</small></p>
                 </Card>
+
+                <TranslatorKeyCard />
 
                 <Card>
                     <h1>{t('translator.regionTitle')}</h1>

@@ -1,7 +1,7 @@
 import IpcBase from './base'
 import { session } from 'electron'
 import electron from 'electron'
-import Translator from '../helpers/translator'
+import Translator, { TranslateArgs, KeyProvider } from '../helpers/translator'
 
 interface setForceRegionIpArgs {
     ip:string;
@@ -12,10 +12,24 @@ interface setPreferredGameLanguageArgs {
 }
 
 export default class IpcApp extends IpcBase {
-    _translator = new Translator()
+    // The month's count of characters sent to the service of the player is kept in the store (between runs)
+    _translator = new Translator({
+        get: (key: string) => this._application._store.get(key),
+        set: (key: string, value: any) => this._application._store.set(key, value),
+    })
 
-    translateText(args:{ text:string; from?:string; to:string }){
+    translateText(args:TranslateArgs){
         return this._translator.translate(args)
+    }
+
+    // How the translation service of the player stands (works / used up / wrong key) and which service answered last
+    translatorStatus(args:{ provider?:KeyProvider; key?:string; limit?:number }){
+        return this._translator.status(args || {})
+    }
+
+    // Tries the key with a short text
+    translatorTestKey(args:{ provider?:KeyProvider; key?:string }){
+        return this._translator.testKey(args || {})
     }
 
     // _streamingSessions:any = {}
