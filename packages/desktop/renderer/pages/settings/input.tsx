@@ -102,6 +102,25 @@ function SettingsInput() {
         }
     })
 
+    const [rumbleResults, setRumbleResults] = React.useState<Record<number, string>>({})
+
+    // Makes the controller vibrate for half a second and says what came of it
+    async function testRumble(pad: Gamepad){
+        const actuator: any = (pad as any).vibrationActuator
+        let result = t('settings.input.rumbleTestNone')
+
+        if(actuator !== null && actuator !== undefined){
+            try {
+                const outcome = await actuator.playEffect(actuator.type || 'dual-rumble', { startDelay: 0, duration: 500, weakMagnitude: 1, strongMagnitude: 1 })
+                result = outcome === 'complete' ? t('settings.input.rumbleTestOk') : t('settings.input.rumbleTestFailed', { reason: String(outcome) })
+            } catch(error: any) {
+                result = t('settings.input.rumbleTestFailed', { reason: error?.message ?? String(error) })
+            }
+        }
+
+        setRumbleResults(previous => ({ ...previous, [pad.index]: result }))
+    }
+
     function setControllerVibration(){
         setSettings({
             ...settings,
@@ -257,6 +276,7 @@ function SettingsInput() {
                     <h1>{t('settings.input.controllerDetectedTitle')}</h1>
 
                     <p>{t('settings.input.controllerDetectedDescription')}</p>
+                    <p><small>{t('settings.input.rumbleHint')}</small></p>
 
                     <div>
                         {
@@ -266,9 +286,13 @@ function SettingsInput() {
                                 #{ index+1 } &nbsp;
 
                                         { (item) ?
-                                            item.id + ' ' + t('settings.input.axesLabel') + ': ' + item.axes.length + ', ' + t('settings.input.buttonsLabel') + ': ' + item.buttons.length + ', ' + t('settings.input.rumbleLabel') + ': ' + ((item.vibrationActuator !== null) ? (item.vibrationActuator as any).type : t('settings.input.notSupportedLabel'))
+                                            item.id + ' ' + t('settings.input.axesLabel') + ': ' + item.axes.length + ', ' + t('settings.input.buttonsLabel') + ': ' + item.buttons.length + ', ' + t('settings.input.rumbleLabel') + ': ' + ((item.vibrationActuator !== null && item.vibrationActuator !== undefined) ? (item.vibrationActuator as any).type : t('settings.input.notSupportedLabel'))
                                             : t('settings.input.noControllerDetected')
                                         }
+                                        { item ? <React.Fragment>
+                                            {' '}<button className="btn" onClick={() => { void testRumble(item) }}>{t('settings.input.rumbleTest')}</button>
+                                            {' '}{rumbleResults[item.index] ?? ''}
+                                        </React.Fragment> : '' }
                                     </p>
                                 )
                             })

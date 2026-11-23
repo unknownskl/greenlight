@@ -1,4 +1,4 @@
-import TranslatorEngine, { EngineStatus, Polarity, TextColor, TranslatorResult } from './engine'
+import TranslatorEngine, { EngineStatus, Polarity, TextColor, TranslatorResult, Translation, TranslateFunction } from './engine'
 import { Region, FitMode, DEFAULT_REGION, clampRegion, regionToSource, videoRectToScreen, regionsOverlap } from './geometry'
 import { BlockRole, findTextBlocks } from './scout'
 
@@ -31,9 +31,11 @@ export interface AutoOptions {
     getSettings: () => { fit: FitMode; source: string; target: string; color: TextColor };
     // The windows the player has placed himself: the scout leaves those places alone
     getManualRegions: () => Region[];
-    translate: (text: string, target: string, source: string) => Promise<string>;
+    translate: TranslateFunction;
     onResult: (slot: number, result: TranslatorResult | null, mode?: 'dialog' | 'task') => void;
     onFrames?: (frames: AutoFrame[]) => void;
+    // The picture is a menu (a lot of text lines on the whole screen): the whole screen is better read as one
+    onMenu?: (menu: boolean) => void;
 }
 
 // How often the whole picture is looked at (the look costs some milliseconds, so it is never more than a tenth of the time)
@@ -49,6 +51,23 @@ const NEED_SUBTITLE = 1
 const NEED_NOTICE = 2
 const NEED_PLATE = 2
 const NEED_OTHER = 4
+// Text in the middle of the screen is where the player looks (a description, a note, a tutorial): it is trusted sooner
+// and gets a window before the text of the edges (the interface that is always there). centralness(): 1 in the very
+// middle, 0 outside of the ellipse of this size (fractions of the screen).
+const CENTRE_RADIUS = 0.35
+const CENTRE_NEED = 2
+// A central text may take the window of a steady text at the edge when all windows are in use
+const EVICT_CENTRALNESS = 0.35
+const EVICT_EDGE = 0.15
+const EVICT_AFTER_MS = 5000
+
+// A menu: this many lines of text of a size that is not a title, spread over this much of the height, on this many looks
+// in a row; it is over when there are hardly any lines for this many looks
+const MENU_BLOCKS = 6
+const MENU_SPREAD = 0.3
+const MENU_LOOKS = 3
+const MENU_OVER_BLOCKS = 3
+const MENU_OVER_LOOKS = 5
 
 // A block that has more than this share of its area inside a window of the player (grown by the margin) belongs to that window
 const MANUAL_MARGIN = 0.01
@@ -133,6 +152,11 @@ function center(region: Region): { x: number; y: number } {
     return { x: region.x + region.w / 2, y: region.y + region.h / 2 }
 }
 
+function centralness(region: Region): number {
+    const middle = center(region)
+    return Math.max(0, 1 - Math.hypot((middle.x - 0.5) / CENTRE_RADIUS, (middle.y - 0.5) / CENTRE_RADIUS))
+}
+
 function distance(a: Region, b: Region): number {
     const first = center(a)
     const second = center(b)
@@ -162,12 +186,17 @@ export default class AutoWindows {
     _ignored: Array<{ rect: Region; until: number; strikes: number }> = []
     _good: Array<{ rect: Region; until: number }> = []
     // Translations are shared by all the windows (a text that comes back in another window is not translated again)
-    _cache: Map<string, string> = new Map()
-    _translating: Map<string, Promise<string>> = new Map()
+    _cache: Map<string, string | Translation> = new Map()
+    _translating: Map<string, Promise<string | Translation>> = new Map()
     // The text reader is ready (until then nothing counts as a false alarm)
     _ready = false
     _canvas = document.createElement('canvas')
     _scanTook = 0
+    // Whole-screen reading (a menu) is on, or the player asked for it: no windows of their own are made then
+    _menu = false
+    _menuLooks = 0
+    _menuOverLooks = 0
+    _paused = false
 
     constructor(options: AutoOptions) {
         this._options = options
@@ -177,6 +206,14 @@ export default class AutoWindows {
                 region: null, polarity: 'light', role: 'other', mode: 'dialog', epoch: 0, since: 0, lastSeen: 0, grownAt: 0, outside: 0,
                 shown: false, shownSince: 0, everShown: false, lastText: '', changes: [], plate: false, anchor: null, movedAt: 0,
             })
+        }
+    }
+
+    /** While the whole screen is read as one (a menu), the windows are given back and no new ones are made. */
+    setPaused(paused: boolean) {
+        this._paused = paused
+        if(paused){
+            this._slots.forEach((_, index) => this._release(index))
         }
     }
 
@@ -248,7 +285,7 @@ export default class AutoWindows {
         this._options.onFrames?.([])
     }
 
-    _translate(text: string, target: string, source: string): Promise<string> {
+    _translate(text: string, target: string, source: string): Promise<string | Translation> {
         const key = source + '|' + target + '|' + text
         const known = this._cache.get(key)
         if(known !== undefined){
@@ -263,6 +300,15 @@ export default class AutoWindows {
                     this._cache.delete(this._cache.keys().next().value as string)
                 }
                 this._cache.set(key, translated)
+
+                // A draft is replaced in the memory by the better text, so the next window gets that one
+                if(typeof translated !== 'string' && translated.better !== undefined){
+                    translated.better.then((better) => {
+                        if(better !== null && better !== '' && this._cache.get(key) === translated){
+                            this._cache.set(key, better)
+                        }
+                    }).catch(() => { /* the draft stays */ })
+                }
                 return translated
             }, (error) => {
                 this._translating.delete(key)
@@ -353,6 +399,21 @@ export default class AutoWindows {
         const blocks = findTextBlocks(pixels, width, height, polarities)
 
         const now = Date.now()
+
+        // A menu: a lot of lines of text over the screen. It is read as a whole (see the overlay), not in windows
+        const menu = this._detectMenu(blocks)
+        if(menu !== this._menu){
+            this._menu = menu
+            this._options.onMenu?.(menu)
+        }
+        if(this._menu || this._paused){
+            if(this._slots.some(slot => slot.region !== null)){
+                this._slots.forEach((_, index) => this._release(index))
+            }
+            this._tracks = []
+            this._report([])
+            return
+        }
         const manual = this._options.getManualRegions()
         this._ignored = this._ignored.filter(item => item.until + IGNORE_MAX_MS * 2 > now)
         this._good = this._good.filter(item => item.until > now)
@@ -382,6 +443,30 @@ export default class AutoWindows {
         this._report(found)
     }
 
+    /** Is the picture a menu (a list of settings, an inventory)? It takes a few looks to start and a few more to stop. */
+    _detectMenu(blocks: Array<{ y: number; h: number; role: BlockRole }>): boolean {
+        const lines = blocks.filter(block => block.role !== 'subtitle' && block.h > 0.012 && block.h < 0.07)
+        let spread = 0
+        if(lines.length > 0){
+            spread = Math.max(...lines.map(block => block.y + block.h)) - Math.min(...lines.map(block => block.y))
+        }
+
+        if(lines.length >= MENU_BLOCKS && spread >= MENU_SPREAD){
+            this._menuLooks++
+            this._menuOverLooks = 0
+        } else if(lines.length < MENU_OVER_BLOCKS){
+            this._menuLooks = 0
+            this._menuOverLooks++
+        } else {
+            this._menuOverLooks = 0
+        }
+
+        if(this._menu){
+            return this._menuOverLooks < MENU_OVER_LOOKS
+        }
+        return this._menuLooks >= MENU_LOOKS
+    }
+
     _isGood(rect: Region): boolean {
         return this._good.some(item => inside(rect, item.rect) > 0.5)
     }
@@ -398,6 +483,9 @@ export default class AutoWindows {
         let need = track.role === 'subtitle' ? NEED_SUBTITLE : (track.role === 'notice' ? NEED_NOTICE : (track.plate ? NEED_PLATE : NEED_OTHER))
         if(track.role === 'subtitle' && track.plate){
             need = 1
+        }
+        if(track.role === 'other' && centralness(track.rect) > 0) {
+            need = Math.min(need, CENTRE_NEED)
         }
         return need + (track.polarity === 'dark' ? 1 : 0)
     }
@@ -534,6 +622,12 @@ export default class AutoWindows {
             if(index < 0){
                 index = this._victim(now)
             }
+            if(index < 0 && track.role !== 'subtitle' && centralness(track.rect) >= EVICT_CENTRALNESS){
+                index = this._edgeWindow(now)
+                if(index >= 0){
+                    this._release(index)
+                }
+            }
             if(index < 0){
                 break
             }
@@ -566,7 +660,7 @@ export default class AutoWindows {
     }
 
     _priority(track: Track): number {
-        return track.score * (track.role === 'subtitle' ? 2 : (track.role === 'notice' ? 1.4 : 1)) * (this._isGood(track.rect) ? 2 : 1)
+        return track.score * (track.role === 'subtitle' ? 2 : (track.role === 'notice' ? 1.4 : 1)) * (this._isGood(track.rect) ? 2 : 1) * (1 + 1.5 * centralness(track.rect))
     }
 
     // A window that can be given to somebody else: one that has translated nothing, or one whose text is gone for good
@@ -584,6 +678,26 @@ export default class AutoWindows {
             if(quiet >= 2500 && age > bestAge){
                 best = index
                 bestAge = age
+            }
+        })
+
+        return best
+    }
+
+    // The window at the edge of the screen that holds a text that has been read for a while (the interface that is always
+    // there): it can be given to a text in the middle, where the player looks. -1 when there is none.
+    _edgeWindow(now: number): number {
+        let best = -1
+        let bestCentralness = EVICT_EDGE
+
+        this._slots.forEach((slot, index) => {
+            if(slot.region === null || slot.role === 'subtitle' || (slot.shown && now - slot.shownSince < EVICT_AFTER_MS)){
+                return
+            }
+            const value = centralness(slot.region)
+            if(value < bestCentralness){
+                best = index
+                bestCentralness = value
             }
         })
 

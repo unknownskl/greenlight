@@ -285,9 +285,17 @@ export default class GreenlightGamepadDriver {
         input.onMessage = (event: any) => {
             const real = navigator.getGamepads.bind(navigator)
             const pads = getUsablePads()
-            const active = pads.find(pad => pad.index === this._activeIndex) ?? pads[0]
+            const canRumble = (pad: Gamepad | null | undefined) => pad !== null && pad !== undefined && pad.connected && (pad as any).vibrationActuator !== null && (pad as any).vibrationActuator !== undefined
 
-            if(active === undefined){
+            // The controller that was used last, if it can vibrate; else any controller that can (the Steam Deck's own
+            // controls may not be able to while a controller that is connected to it can); else the one used last
+            const active = pads.find(pad => pad.index === this._activeIndex && canRumble(pad))
+                ?? pads.find(pad => canRumble(pad))
+                ?? (Array.from(real()) as Array<Gamepad | null>).find(pad => canRumble(pad))
+                ?? pads.find(pad => pad.index === this._activeIndex)
+                ?? pads[0]
+
+            if(active === undefined || active === null){
                 return original(event)
             }
 

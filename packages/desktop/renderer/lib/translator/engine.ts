@@ -46,12 +46,23 @@ export interface TranslatorResult {
     segments: TranslatedSegment[];
 }
 
+/**
+ * A translation that is there at once and may get better: `better` answers with a better text (or null) a moment
+ * later, and the text that is on screen is replaced then.
+ */
+export interface Translation {
+    text: string;
+    better?: Promise<string | null>;
+}
+
+export type TranslateFunction = (text: string, target: string, source: string) => Promise<string | Translation>
+
 export interface EngineOptions {
     getVideo: () => HTMLVideoElement | null;
     // Size of the area the video is shown in (the window)
     getBox: () => { width: number; height: number };
     getConfig: () => TranslatorConfig;
-    translate: (text: string, target: string, source: string) => Promise<string>;
+    translate: TranslateFunction;
     onResult: (result: TranslatorResult | null) => void;
     onStatus: (status: EngineStatus) => void;
     // Who goes first when several windows wait for the text reader (higher first; the default is 1)
@@ -1748,10 +1759,16 @@ export default class TranslatorEngine {
         }
 
         if(translated === undefined){
-            translated = await this._options.translate(toTranslatable(raw.text), target, config.source)
+            const answer = await this._options.translate(toTranslatable(raw.text), target, config.source)
+            translated = typeof answer === 'string' ? answer : answer.text
 
             if(translated === ''){
                 translated = raw.text
+            }
+
+            // A draft that gets better: when the better text comes, it takes the place of the draft
+            if(typeof answer !== 'string' && answer.better !== undefined){
+                this._improve(answer.better, fullKey, target + '|' + template, raw.text, template, translated)
             }
 
             this._remember(fullKey, translated)
@@ -1785,6 +1802,29 @@ export default class TranslatorEngine {
             missed: 0,
             shownAt: previous !== null ? previous.shownAt : Date.now(),
         }
+    }
+
+    /** The better translation of a text has come: it replaces the draft in the memory and wherever the draft is shown. */
+    _improve(better: Promise<string | null>, fullKey: string, templateId: string, original: string, template: string, draft: string) {
+        const generation = this._generation
+
+        better.then((text) => {
+            if(text === null || text === '' || text === draft || !this._running){
+                return
+            }
+
+            this._remember(fullKey, text)
+            this._templates.set(templateId, { original, translated: text })
+
+            const replace = (list: ShownSegment[]): ShownSegment[] => list.map(segment => (segment.translated === draft && (segment.original === original || segment.template === template)) ? { ...segment, translated: text } : segment)
+            this._queue = replace(this._queue)
+            this._held = replace(this._held)
+
+            if(generation === this._generation && this._shown.some(segment => segment.translated === draft && (segment.original === original || segment.template === template))){
+                this._shown = replace(this._shown)
+                this._emit(this._shown)
+            }
+        }).catch(() => { /* the draft stays */ })
     }
 
     _remember(key: string, translated: string) {

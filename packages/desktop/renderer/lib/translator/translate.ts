@@ -1,0 +1,95 @@
+import Ipc from '../ipc'
+import { Translation, TranslateFunction } from './engine'
+import { isLocalInstalled, translateLocal } from './local'
+
+export type LocalMode = 'off' | 'smart' | 'local' | 'backup'
+
+// In the "smart" mode the online translation gets this long to answer before the local draft is shown
+export const DRAFT_WAIT_MS = 250
+
+interface TranslatorSettings {
+    translator_local_mode?: string;
+    translator_provider?: string;
+    translator_key?: string;
+    translator_key_limit?: number;
+}
+
+export function localMode(settings: TranslatorSettings): LocalMode {
+    const mode = settings.translator_local_mode
+    return mode === 'off' || mode === 'local' || mode === 'backup' ? mode : 'smart'
+}
+
+/** The online services (the key of the player when there is one, then the free ones), through the main process. */
+function translateOnline(settings: TranslatorSettings, text: string, from: string, to: string): Promise<string> {
+    return Ipc.send('app', 'translateText', {
+        text,
+        from,
+        to,
+        provider: settings.translator_provider,
+        key: settings.translator_key,
+        limit: settings.translator_key_limit,
+    }) as Promise<string>
+}
+
+/**
+ * The translation of a text, made of the local translator and the online services:
+ *  - smart (the default once the models are on the device): both are asked at once. The online one is better but needs
+ *    a moment; when it does not answer within DRAFT_WAIT_MS the local translation is shown at once and replaced by the
+ *    online one when that comes (if it differs). Without internet the local one stays.
+ *  - local: only the local translator (nothing leaves the device); the online services only for what it cannot do.
+ *  - backup: the online services; the local translator only when they fail.
+ *  - off: only the online services.
+ */
+export function createTranslate(getSettings: () => TranslatorSettings): TranslateFunction {
+    return async (text: string, target: string, source: string): Promise<string | Translation> => {
+        const settings = getSettings()
+        const mode = localMode(settings)
+        const usable = mode !== 'off' && isLocalInstalled(source, target)
+
+        if(!usable){
+            return translateOnline(settings, text, source, target)
+        }
+
+        if(mode === 'local'){
+            try {
+                return await translateLocal(text, source, target)
+            } catch(error) {
+                return translateOnline(settings, text, source, target)
+            }
+        }
+
+        if(mode === 'backup'){
+            try {
+                return await translateOnline(settings, text, source, target)
+            } catch(error) {
+                return translateLocal(text, source, target)
+            }
+        }
+
+        // smart
+        const online = translateOnline(settings, text, source, target)
+        online.catch(() => { /* handled below */ })
+
+        const wait = new Promise<null>((resolve) => setTimeout(() => resolve(null), DRAFT_WAIT_MS))
+        const quick = await Promise.race([online.then(value => value, () => undefined), wait])
+        if(typeof quick === 'string' && quick !== ''){
+            return quick
+        }
+
+        let draft: string
+        try {
+            draft = await translateLocal(text, source, target)
+        } catch(error) {
+            return online
+        }
+
+        if(draft === ''){
+            return online
+        }
+
+        return {
+            text: draft,
+            better: online.then(value => (value !== '' && value !== draft) ? value : null, () => null),
+        }
+    }
+}

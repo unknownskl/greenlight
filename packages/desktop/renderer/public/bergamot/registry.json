@@ -1,0 +1,358 @@
+{
+  "fren": {
+    "vocab": {
+      "name": "https://bergamot.s3.amazonaws.com/models/fren/vocab.fren.spm",
+      "size": 831382,
+      "expectedSha256Hash": "4c84b95b62c930f0791466d73eb996841eef474c96d0c2f0e6c6d80640f2005a"
+    },
+    "lex": {
+      "name": "https://bergamot.s3.amazonaws.com/models/fren/lex.s2t.bin",
+      "size": 8818768,
+      "expectedSha256Hash": "3148abf21ea98a4d69d0e4504e0d68a6c060204a9b9a39b76855aee1d5b2c8ea"
+    },
+    "model": {
+      "name": "https://bergamot.s3.amazonaws.com/models/fren/model.intgemm.alphas.bin",
+      "size": 17140961,
+      "expectedSha256Hash": "185f76d24c2d400fe4ea0cb2487df77722641b97a3ef10633872e8a7fdf40e09"
+    }
+  },
+  "enfr": {
+    "vocab": {
+      "name": "https://bergamot.s3.amazonaws.com/models/enfr/vocab.fren.spm",
+      "size": 831382,
+      "expectedSha256Hash": "4c84b95b62c930f0791466d73eb996841eef474c96d0c2f0e6c6d80640f2005a"
+    },
+    "lex": {
+      "name": "https://bergamot.s3.amazonaws.com/models/enfr/lex.s2t.bin",
+      "size": 7886500,
+      "expectedSha256Hash": "38fb44bad1fd5f1e6bfdcf15cc8baa09d61aad2a4f9c587914e24e7b5c25c32c"
+    },
+    "model": {
+      "name": "https://bergamot.s3.amazonaws.com/models/enfr/model.intgemm.alphas.bin",
+      "size": 17140961,
+      "expectedSha256Hash": "0678019c4d74c8c81d2de17e3e58d3aba5f5eb48f5595d9240c17f69d30461de"
+    }
+  },
+  "enit": {
+    "vocab": {
+      "name": "https://bergamot.s3.amazonaws.com/models/enit/vocab.enit.spm",
+      "size": 814128,
+      "expectedSha256Hash": "de8cbeb79e0139304bfa47e8559f2447016bf9906225a97d3df1baed4de8f3a3"
+    },
+    "lex": {
+      "name": "https://bergamot.s3.amazonaws.com/models/enit/lex.50.50.enit.s2t.bin",
+      "size": 4489920,
+      "expectedSha256Hash": "bb1fad3b3f6a13ebce1698cf7f39ca736c4dea4525f3dab5e1a78436f07445e6"
+    },
+    "model": {
+      "name": "https://bergamot.s3.amazonaws.com/models/enit/model.enit.intgemm.alphas.bin",
+      "size": 17140836,
+      "expectedSha256Hash": "a5ce3723f62ead92a0e0373b6df0ad8e3e6d22963adb1333984206e33b8b6c61"
+    }
+  },
+  "enpt": {
+    "vocab": {
+      "name": "https://bergamot.s3.amazonaws.com/models/enpt/vocab.enpt.spm",
+      "size": 812781,
+      "expectedSha256Hash": "633a3d782c79f7d5e4b94ab96848f47c2fdf8ba82dd99efd1742b8a696bbd0cc"
+    },
+    "lex": {
+      "name": "https://bergamot.s3.amazonaws.com/models/enpt/lex.50.50.enpt.s2t.bin",
+      "size": 4472528,
+      "expectedSha256Hash": "1e96599123d275afa37353dfe84677a4070f013494fbdc9c52a28445cc9bc38d"
+    },
+    "model": {
+      "name": "https://bergamot.s3.amazonaws.com/models/enpt/model.enpt.intgemm.alphas.bin",
+      "size": 17140836,
+      "expectedSha256Hash": "d968735704c75e33c2e183b9241f14c0b2a560d01d88a2728e5c0119a4d7fb22"
+    }
+  },
+  "enru": {
+    "vocab": {
+      "name": "https://bergamot.s3.amazonaws.com/models/enru/vocab.enru.spm",
+      "size": 937157,
+      "expectedSha256Hash": "feca2d44f01b946c85faba3b15b5eb53344bec84cd14a1a4d4a82ddd774c5edd"
+    },
+    "lex": {
+      "name": "https://bergamot.s3.amazonaws.com/models/enru/lex.50.50.enru.s2t.bin",
+      "size": 3049096,
+      "expectedSha256Hash": "7bd3e2c0a72286fe1f3da65c56c49a7cd77efa5f1d1a444e2a9e769480b96ff3"
+    },
+    "model": {
+      "name": "https://bergamot.s3.amazonaws.com/models/enru/model.enru.intgemm.alphas.bin",
+      "size": 17140836,
+      "expectedSha256Hash": "4a45186a93b8a2dd9301c66a3b3dad580b1bcfa74aadda583ca383f9fe0dea93"
+    }
+  },
+  "iten": {
+    "vocab": {
+      "name": "https://bergamot.s3.amazonaws.com/models/iten/vocab.iten.spm",
+      "size": 814151,
+      "expectedSha256Hash": "22d5ce6973be5360a921103acbe984a9bfca952a1f6c55c9cb5ef7de4fd58266"
+    },
+    "lex": {
+      "name": "https://bergamot.s3.amazonaws.com/models/iten/lex.50.50.iten.s2t.bin",
+      "size": 5238420,
+      "expectedSha256Hash": "357d362373022b029ee9965975a133e6f36fdb0fed749202ff578365cf0111f8"
+    },
+    "model": {
+      "name": "https://bergamot.s3.amazonaws.com/models/iten/model.iten.intgemm.alphas.bin",
+      "size": 17140836,
+      "expectedSha256Hash": "1fae546faeb9046f80b1b7e940b37b660974ce72902778181d6cd1c30b717f35"
+    }
+  },
+  "pten": {
+    "vocab": {
+      "name": "https://bergamot.s3.amazonaws.com/models/pten/vocab.pten.spm",
+      "size": 812889,
+      "expectedSha256Hash": "8389979e3c965688b07aeb712a7e44406e5dcdb2b84087229d26fcc71448c4ed"
+    },
+    "lex": {
+      "name": "https://bergamot.s3.amazonaws.com/models/pten/lex.50.50.pten.s2t.bin",
+      "size": 5001420,
+      "expectedSha256Hash": "212ed0ae44a6f920cd6d17ca02f0a523ba6c4b0ef5078ae310c20bc4c51484c5"
+    },
+    "model": {
+      "name": "https://bergamot.s3.amazonaws.com/models/pten/model.pten.intgemm.alphas.bin",
+      "size": 17140836,
+      "expectedSha256Hash": "6c3b7af01772022a19712410c63342ba581468c2f1aac34d7488409c4043e697"
+    }
+  },
+  "ruen": {
+    "vocab": {
+      "name": "https://bergamot.s3.amazonaws.com/models/ruen/vocab.ruen.spm",
+      "size": 936576,
+      "expectedSha256Hash": "aaf9a325c0a988c507d0312cb6ba1a02bac7a370bcd879aedee626a40bfbda78"
+    },
+    "lex": {
+      "name": "https://bergamot.s3.amazonaws.com/models/ruen/lex.50.50.ruen.s2t.bin",
+      "size": 5090836,
+      "expectedSha256Hash": "e6667e22f5f86be4872e3768b7184727f5dd8c9f2ccfb0639baabcb1176f5d11"
+    },
+    "model": {
+      "name": "https://bergamot.s3.amazonaws.com/models/ruen/model.ruen.intgemm.alphas.bin",
+      "size": 17140836,
+      "expectedSha256Hash": "3b6a0305e3d232fadd54f5a765365b7b96ad6d8f2e818cba594b02fbd8fadb3d"
+    }
+  },
+  "csen": {
+    "vocab": {
+      "name": "https://bergamot.s3.amazonaws.com/models/csen/vocab.csen.spm",
+      "size": 769763,
+      "expectedSha256Hash": "f71cc5d045e479607078e079884f44032f5a0b82547fb96eefa29cd1eb47c6f3"
+    },
+    "lex": {
+      "name": "https://bergamot.s3.amazonaws.com/models/csen/lex.50.50.csen.s2t.bin",
+      "size": 4535788,
+      "expectedSha256Hash": "8228a3c3f7887759a62b7d7c674a7bef9b70161913f9b0939ab58f71186835c2"
+    },
+    "model": {
+      "name": "https://bergamot.s3.amazonaws.com/models/csen/model.csen.intgemm.alphas.bin",
+      "size": 17140756,
+      "expectedSha256Hash": "5b16661e2864dc50b2f4091a16bdd4ec8d8283e04271e602159ba348df5d6e2d"
+    }
+  },
+  "deen": {
+    "vocab": {
+      "name": "https://bergamot.s3.amazonaws.com/models/deen/vocab.deen.spm",
+      "size": 784269,
+      "expectedSha256Hash": "417668f2ed297970febafb5b079a9d5ebc4ed0b3550ac8386d67a90473a09bd7"
+    },
+    "lex": {
+      "name": "https://bergamot.s3.amazonaws.com/models/deen/lex.50.50.deen.s2t.bin",
+      "size": 5047568,
+      "expectedSha256Hash": "2f7c0f7bbce97ae5b52454074a892ba7b7610fb98e3c5d341e4ca79f0850c4de"
+    },
+    "model": {
+      "name": "https://bergamot.s3.amazonaws.com/models/deen/model.deen.intgemm.alphas.bin",
+      "size": 17140837,
+      "expectedSha256Hash": "1980225d00dc5645491777accff5b3c9d20b92eff67a25135f1cf8fe2ed8fb8f"
+    }
+  },
+  "encs": {
+    "vocab": {
+      "name": "https://bergamot.s3.amazonaws.com/models/encs/vocab.csen.spm",
+      "size": 769763,
+      "expectedSha256Hash": "f71cc5d045e479607078e079884f44032f5a0b82547fb96eefa29cd1eb47c6f3"
+    },
+    "lex": {
+      "name": "https://bergamot.s3.amazonaws.com/models/encs/lex.50.50.encs.s2t.bin",
+      "size": 3556124,
+      "expectedSha256Hash": "e19c77231bf977988e31ff8db15fe79966b5170564bd3e10613f239e7f461d97"
+    },
+    "model": {
+      "name": "https://bergamot.s3.amazonaws.com/models/encs/model.encs.intgemm.alphas.bin",
+      "size": 17140756,
+      "expectedSha256Hash": "9a2fe0588bd972accfc801e2f31c945de0557804a91666ae5ab43b94fb74ac4b"
+    }
+  },
+  "ende": {
+    "vocab": {
+      "name": "https://bergamot.s3.amazonaws.com/models/ende/vocab.deen.spm",
+      "size": 784269,
+      "expectedSha256Hash": "417668f2ed297970febafb5b079a9d5ebc4ed0b3550ac8386d67a90473a09bd7"
+    },
+    "lex": {
+      "name": "https://bergamot.s3.amazonaws.com/models/ende/lex.50.50.ende.s2t.bin",
+      "size": 3943644,
+      "expectedSha256Hash": "f03eb8245042feb7a5800815b8d0dc215d7a60691632405b65c461d250cedbe6"
+    },
+    "model": {
+      "name": "https://bergamot.s3.amazonaws.com/models/ende/model.ende.intgemm.alphas.bin",
+      "size": 17140835,
+      "expectedSha256Hash": "b3e980d6602ab0bdfe8d9315cb5fc282a16bb1c8dccf38e70945c584551c4318"
+    }
+  },
+  "enes": {
+    "vocab": {
+      "name": "https://bergamot.s3.amazonaws.com/models/enes/vocab.esen.spm",
+      "size": 825463,
+      "expectedSha256Hash": "909b1eea1face0d7f90a474fe29a8c0fef8d104b6e41e65616f864c964ba8845"
+    },
+    "lex": {
+      "name": "https://bergamot.s3.amazonaws.com/models/enes/lex.50.50.enes.s2t.bin",
+      "size": 3347104,
+      "expectedSha256Hash": "3a113d713dec3cf1d12bba5b138ae616e28bba4bbc7fe7fd39ba145e26b86d7f"
+    },
+    "model": {
+      "name": "https://bergamot.s3.amazonaws.com/models/enes/model.enes.intgemm.alphas.bin",
+      "size": 17140755,
+      "expectedSha256Hash": "fa7460037a3163e03fe1d23602f964bff2331da6ee813637e092ddf37156ef53"
+    }
+  },
+  "enet": {
+    "vocab": {
+      "name": "https://bergamot.s3.amazonaws.com/models/enet/vocab.eten.spm",
+      "size": 828426,
+      "expectedSha256Hash": "e3b66bc141f6123cd40746e2fb9b8ee4f89cbf324ab27d6bbf3782e52f15fa2d"
+    },
+    "lex": {
+      "name": "https://bergamot.s3.amazonaws.com/models/enet/lex.50.50.enet.s2t.bin",
+      "size": 2700780,
+      "expectedSha256Hash": "3d1b40ff43ebef82cf98d416a88a1ea19eb325a85785eef102f59878a63a829d"
+    },
+    "model": {
+      "name": "https://bergamot.s3.amazonaws.com/models/enet/model.enet.intgemm.alphas.bin",
+      "size": 17140754,
+      "expectedSha256Hash": "a28874a8b702a519a14dc71bcee726a5cb4b539eeaada2d06492f751469a1fd6"
+    }
+  },
+  "esen": {
+    "vocab": {
+      "name": "https://bergamot.s3.amazonaws.com/models/esen/vocab.esen.spm",
+      "size": 825463,
+      "expectedSha256Hash": "909b1eea1face0d7f90a474fe29a8c0fef8d104b6e41e65616f864c964ba8845"
+    },
+    "lex": {
+      "name": "https://bergamot.s3.amazonaws.com/models/esen/lex.50.50.esen.s2t.bin",
+      "size": 3860888,
+      "expectedSha256Hash": "f11a2c23ef85ab1fee1c412b908d69bc20d66fd59faa8f7da5a5f0347eddf969"
+    },
+    "model": {
+      "name": "https://bergamot.s3.amazonaws.com/models/esen/model.esen.intgemm.alphas.bin",
+      "size": 17140755,
+      "expectedSha256Hash": "4b6b7f451094aaa447d012658af158ffc708fc8842dde2f871a58404f5457fe0"
+    }
+  },
+  "bgen": {
+    "vocab": {
+      "name": "https://bergamot.s3.amazonaws.com/models/bgen/vocab.bgen.spm",
+      "expectedSha256Hash": "24ce87ba39216714f222ca6a105f30b1863a7ef8b58c9fafdc7a66184e9813a5",
+      "size": 920621
+    },
+    "lex": {
+      "name": "https://bergamot.s3.amazonaws.com/models/bgen/lex.50.50.bgen.s2t.bin",
+      "expectedSha256Hash": "71e8d040a2f63705bec232cd186f32e9f9a78e7968216516c4535589f6a828f9",
+      "size": 6182512
+    },
+    "model": {
+      "name": "https://bergamot.s3.amazonaws.com/models/bgen/model.bgen.intgemm.alphas.bin",
+      "expectedSha256Hash": "71900847a98cf66bd1d05eaafc23a794c8c1285fb3f0e2ecd2849e6f81c79d53",
+      "size": 17140899
+    }
+  },
+  "enbg": {
+    "vocab": {
+      "name": "https://bergamot.s3.amazonaws.com/models/enbg/vocab.enbg.spm",
+      "expectedSha256Hash": "b14e44beb653db924c826e1696bcfab23ca9fd3e479baf8bea67d0be77432192",
+      "size": 919745
+    },
+    "lex": {
+      "name": "https://bergamot.s3.amazonaws.com/models/enbg/lex.50.50.enbg.s2t.bin",
+      "expectedSha256Hash": "0f9b794b6f8a9c4b5b781fde49391852b398184b730f89a09428cf562e8bede6",
+      "size": 5607608
+    },
+    "model": {
+      "name": "https://bergamot.s3.amazonaws.com/models/enbg/model.enbg.intgemm.alphas.bin",
+      "expectedSha256Hash": "02715a7a81a610a37439d4f788a6f3efcc1ecb39618bc4184442a39378907dfe",
+      "size": 17140899
+    }
+  },
+  "eten": {
+    "vocab": {
+      "name": "https://bergamot.s3.amazonaws.com/models/eten/vocab.eten.spm",
+      "size": 828426,
+      "expectedSha256Hash": "e3b66bc141f6123cd40746e2fb9b8ee4f89cbf324ab27d6bbf3782e52f15fa2d"
+    },
+    "lex": {
+      "name": "https://bergamot.s3.amazonaws.com/models/eten/lex.50.50.eten.s2t.bin",
+      "size": 3974944,
+      "expectedSha256Hash": "6992bedc590e60e610a28129c80746fe5f33144a4520e2c5508d87db14ca54f8"
+    },
+    "model": {
+      "name": "https://bergamot.s3.amazonaws.com/models/eten/model.eten.intgemm.alphas.bin",
+      "size": 17140754,
+      "expectedSha256Hash": "aac98a2371e216ee2d4843cbe896c617f6687501e17225ac83482eba52fd0028"
+    }
+  },
+  "uken": {
+    "config": {
+      "gemm-precision": "int8shiftAll"
+    },
+    "srcvocab": {
+      "name": "https://bergamot.s3.amazonaws.com/models/uken/vocab.src.spm",
+      "expectedSha256Hash": "797de9759ff722c124c64663f3b75538516a059cfce3e6cf9446f39d1063cb6d",
+      "size": 984214
+    },
+    "trgvocab": {
+      "name": "https://bergamot.s3.amazonaws.com/models/uken/vocab.trg.spm",
+      "expectedSha256Hash": "d933cbf156c925ef42c064cbd6f85f18516f3ccac49bee7025b19a4a5c0ef711",
+      "size": 803064
+    },
+    "lex": {
+      "name": "https://bergamot.s3.amazonaws.com/models/uken/lex.s2t.bin",
+      "expectedSha256Hash": "7c6f56515fd162526c883df15fee3a288d41884adb81d9c2957802d7ac035d78",
+      "size": 9978860
+    },
+    "model": {
+      "name": "https://bergamot.s3.amazonaws.com/models/uken/model.intgemm8.bin",
+      "expectedSha256Hash": "c1bac32792c2c3c333f0668ac03c80bb0b432b1de0f6113222d7f5a937ed864e",
+      "size": 25315747
+    }
+  },
+  "enuk": {
+    "config": {
+      "gemm-precision": "int8shiftAll"
+    },
+    "srcvocab": {
+      "name": "https://bergamot.s3.amazonaws.com/models/enuk/vocab.src.spm",
+      "expectedSha256Hash": "dd44ee771e3be2fce4986beb4f4386fa0a5b233dfb5602d3cb78461053a6a50e",
+      "size": 789110
+    },
+    "trgvocab": {
+      "name": "https://bergamot.s3.amazonaws.com/models/enuk/vocab.trg.spm",
+      "expectedSha256Hash": "04f3110c139f80a4e72aeb2b6802a0be50b94e36aa89647cab53318a0917e442",
+      "size": 1003426
+    },
+    "lex": {
+      "name": "https://bergamot.s3.amazonaws.com/models/enuk/lex.s2t.bin",
+      "expectedSha256Hash": "946f97fee6fb27834e493b1cd043f7acc2e55940407308dfa2831cd9907502bb",
+      "size": 9397780
+    },
+    "model": {
+      "name": "https://bergamot.s3.amazonaws.com/models/enuk/model.intgemm8.bin",
+      "expectedSha256Hash": "c32321866c35c09113c742e07eaa0811bbbb3b1e4c0dd6730324d69185231124",
+      "size": 25315747
+    }
+  }
+}

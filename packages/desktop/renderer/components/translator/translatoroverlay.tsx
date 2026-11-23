@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 
 import { useSettings } from '../../context/userContext'
 import Ipc from '../../lib/ipc'
+import { createTranslate } from '../../lib/translator/translate'
 import { Region, FitMode, DEFAULT_REGION, MAX_REGIONS, getRegions, regionsToSettings, constrainRegion, findFreeRegion, windowMode } from '../../lib/translator/geometry'
 import TranslatorEngine, { EngineStatus, TranslatorResult, TranslatedSegment, TextColor, dropCovered } from '../../lib/translator/engine'
 import { LogLine, addToLog as appendToLog } from '../../lib/translator/dialoglog'
@@ -12,18 +13,6 @@ import usePadRegion from '../../lib/translator/usepadregion'
 import RegionEditor from './regioneditor'
 
 export const TRANSLATOR_EDIT_EVENT = 'greenlight-translator-edit'
-
-// What a translation request carries: the text, the languages, and the key of the player (if there is one)
-function translateArgs(settings: any, text: string, from: string, to: string) {
-    return {
-        text,
-        from,
-        to,
-        provider: settings.translator_provider,
-        key: settings.translator_key,
-        limit: settings.translator_key_limit,
-    }
-}
 
 interface TranslatorOverlayProps {
     xPlayer: any;
@@ -189,11 +178,17 @@ function TranslatorOverlay({
     const settingsRef = React.useRef(settings)
     settingsRef.current = settings
 
+    // Translation: the local translator and the online services (see createTranslate)
+    const translateWithLocal = React.useMemo(() => createTranslate(() => settingsRef.current), [])
+
     const [results, setResults] = React.useState<(TranslatorResult | null)[]>([])
     const [statuses, setStatuses] = React.useState<EngineStatus[]>([])
     // The adaptive translator: translations in the windows it found, and (for the debug view) what it sees
     const [autoResults, setAutoResults] = React.useState<(TranslatorResult | null)[]>([])
     const [autoFrames, setAutoFrames] = React.useState<AutoFrame[]>([])
+    // The whole screen read as one (a menu, or when the player asks for it)
+    const [menuAuto, setMenuAuto] = React.useState(false)
+    const [screenResult, setScreenResult] = React.useState<TranslatorResult | null>(null)
     const [flash, setFlash] = React.useState(false)
     const [editing, setEditing] = React.useState(false)
     const [toast, setToast] = React.useState('')
@@ -206,6 +201,10 @@ function TranslatorOverlay({
 
     const enabled = settings.translator_enabled === true
     const autoOn = enabled && settings.translator_auto === true
+    const screenOn = enabled && (settings.translator_fullscreen === true || (autoOn && menuAuto && settings.translator_menu_auto !== false))
+    const screenOnRef = React.useRef(screenOn)
+    screenOnRef.current = screenOn
+    const autoRef = React.useRef<AutoWindows | null>(null)
     // The reader is restarted when the language of the game text is changed
     const sourceLang = settings.translator_source_lang || 'en'
     const regions = getRegions(settings)
@@ -258,7 +257,7 @@ function TranslatorOverlay({
                     const region = getRegions(settingsRef.current)[index] ?? DEFAULT_REGION
                     return {
                     region,
-                    enabled: region.enabled !== false,
+                    enabled: region.enabled !== false && !screenOnRef.current,
                     mode: windowMode(region, index),
                     color: (settingsRef.current.translator_text_color || 'light') as TextColor,
                     source: settingsRef.current.translator_source_lang || 'en',
@@ -266,7 +265,7 @@ function TranslatorOverlay({
                     fit: (settingsRef.current.video_size || 'default') as FitMode,
                     }
                 },
-                translate: (text, target, source) => Ipc.send('app', 'translateText', translateArgs(settingsRef.current, text, source, target)) as Promise<string>,
+                translate: translateWithLocal,
                 onResult: (result) => {
                     setResults(previous => {
                         const next = previous.slice()
@@ -300,6 +299,7 @@ function TranslatorOverlay({
     React.useEffect(() => {
         setAutoResults([])
         setAutoFrames([])
+        setMenuAuto(false)
 
         if(!autoOn){
             return
@@ -319,7 +319,7 @@ function TranslatorOverlay({
                 color: (settingsRef.current.translator_text_color || 'light') as TextColor,
             }),
             getManualRegions: () => getRegions(settingsRef.current),
-            translate: (text, target, source) => Ipc.send('app', 'translateText', translateArgs(settingsRef.current, text, source, target)) as Promise<string>,
+            translate: translateWithLocal,
             onResult: (slot, result, mode) => {
                 setAutoResults(previous => {
                     const next = previous.slice()
@@ -330,6 +330,7 @@ function TranslatorOverlay({
                     addToLog('a' + slot, result)
                 }
             },
+            onMenu: (menu) => setMenuAuto(menu),
             onFrames: (frames) => {
                 const wanted = settingsRef.current.translator_auto_debug === true ? frames : []
                 const key = JSON.stringify(wanted.map(frame => [frame.state, frame.slot, frame.plate, frame.steady, frame.floating, Math.round(frame.rect.x * 500), Math.round(frame.rect.y * 500), Math.round(frame.rect.w * 500), Math.round(frame.rect.h * 500)]))
@@ -340,11 +341,53 @@ function TranslatorOverlay({
             },
         })
 
+        autoRef.current = auto
+        auto.setPaused(screenOnRef.current)
         auto.start()
         return () => {
+            autoRef.current = null
             auto.stop()
         }
     }, [autoOn, sourceLang])
+
+    // While the whole screen is read as one, the adaptive windows rest
+    React.useEffect(() => {
+        autoRef.current?.setPaused(screenOn)
+    }, [screenOn])
+
+    // The whole screen as one window (a menu): lines are translated one by one, a steady picture is read calmly
+    React.useEffect(() => {
+        setScreenResult(null)
+
+        if(!screenOn){
+            return
+        }
+
+        const engine = new TranslatorEngine({
+            getVideo: () => (xPlayer?._videoComponent?._videoRender ?? document.querySelector('#streamComponent video')) as HTMLVideoElement | null,
+            getBox: () => {
+                const rect = document.getElementById('streamComponent')?.getBoundingClientRect()
+                return { width: rect?.width || window.innerWidth, height: rect?.height || window.innerHeight }
+            },
+            getConfig: () => ({
+                region: { x: 0, y: 0, w: 1, h: 1 },
+                enabled: true,
+                mode: 'task',
+                color: 'auto' as TextColor,
+                source: settingsRef.current.translator_source_lang || 'en',
+                target: settingsRef.current.translator_target_lang || 'uk',
+                fit: (settingsRef.current.video_size || 'default') as FitMode,
+            }),
+            translate: translateWithLocal,
+            onResult: setScreenResult,
+            onStatus: () => { /* the windows show the status */ },
+        })
+
+        engine.start()
+        return () => {
+            engine.stop()
+        }
+    }, [screenOn, sourceLang])
 
     // The key of the player: a message when it stops working (the free services take over) and when it works again
     React.useEffect(() => {
@@ -530,6 +573,9 @@ function TranslatorOverlay({
         results.slice(0, count).forEach((result, windowIndex) => {
             (result?.segments ?? []).forEach((segment, index) => items.push({ key: windowIndex + '-' + index, segment, rect: segment.rect, shownAt: segment.shownAt }))
         })
+        if(screenOn && screenResult !== null){
+            screenResult.segments.forEach((segment, index) => items.push({ key: 'screen-' + index, segment, rect: segment.rect, shownAt: segment.shownAt }))
+        }
         if(autoOn){
             autoResults.slice(0, MAX_AUTO_WINDOWS).forEach((result, slot) => {
                 (result?.segments ?? []).forEach((segment, index) => items.push({ key: 'auto-' + slot + '-' + index, segment, rect: segment.rect, shownAt: segment.shownAt }))
