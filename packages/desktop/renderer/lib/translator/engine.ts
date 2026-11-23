@@ -176,6 +176,8 @@ const EXACT_RECHECK_MS = 20000
 // Text that is still where it was (the pixels of the last reading are still text pixels) is not "moving" and is not
 // read again because the picture behind it changes (the camera turns, the text of the interface stays). Only text
 // that is added to it (a line that is typed, a second sentence) is read: that is more ink than the last reading had.
+// A draft on screen gets its better translation only within this time of appearing
+const REFINE_WINDOW_MS = 900
 const HELD_RETENTION = 0.8
 const MIN_HELD_INK = 30
 const GROWTH_SHARE = 0.2
@@ -1816,12 +1818,15 @@ export default class TranslatorEngine {
             this._remember(fullKey, text)
             this._templates.set(templateId, { original, translated: text })
 
-            const replace = (list: ShownSegment[]): ShownSegment[] => list.map(segment => (segment.translated === draft && (segment.original === original || segment.template === template)) ? { ...segment, translated: text } : segment)
-            this._queue = replace(this._queue)
-            this._held = replace(this._held)
+            const replace = (list: ShownSegment[], onlyFresh: boolean): ShownSegment[] => list.map(segment => (segment.translated === draft && (segment.original === original || segment.template === template) && (!onlyFresh || Date.now() - segment.shownAt < REFINE_WINDOW_MS)) ? { ...segment, translated: text } : segment)
+            this._queue = replace(this._queue, false)
+            this._held = replace(this._held, false)
 
-            if(generation === this._generation && this._shown.some(segment => segment.translated === draft && (segment.original === original || segment.template === template))){
-                this._shown = replace(this._shown)
+            // A line that is being read is not changed under the eyes of the player: only a line that has just appeared
+            // gets the better text, and none while other lines wait their turn (a fast conversation). The better text
+            // is in the memory anyway, so the line has it when it comes again.
+            if(generation === this._generation && this._queue.length === 0 && this._shown.some(segment => segment.translated === draft && (segment.original === original || segment.template === template) && Date.now() - segment.shownAt < REFINE_WINDOW_MS)){
+                this._shown = replace(this._shown, true)
                 this._emit(this._shown)
             }
         }).catch(() => { /* the draft stays */ })

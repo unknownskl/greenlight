@@ -343,6 +343,7 @@
         "btnArea": "Area",
         "btnAuto": "Auto",
         "btnAutoTitle": "Adaptive mode: finds the text on the whole screen by itself (subtitles, messages, notes)",
+        "btnMoreTitle": "More translator buttons: windows, auto, screen, log, area",
         "btnScreen": "Screen",
         "btnScreenTitle": "Whole screen: translate all the text on the screen as one window (handy in the menus and settings of the game)",
         "menuAutoLabel": "Translate menus automatically",

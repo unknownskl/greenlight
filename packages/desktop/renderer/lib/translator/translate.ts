@@ -6,6 +6,12 @@ export type LocalMode = 'off' | 'smart' | 'local' | 'backup'
 
 // In the "smart" mode the online translation gets this long to answer before the local draft is shown
 export const DRAFT_WAIT_MS = 250
+// When the online service is usually slower than this, waiting for it is pointless: the draft is shown almost at once
+const SLOW_ONLINE_MS = 300
+const SLOW_WAIT_MS = 100
+
+// How long the online service takes on average (a moving average)
+let onlineAverage = 0
 
 interface TranslatorSettings {
     translator_local_mode?: string;
@@ -67,10 +73,14 @@ export function createTranslate(getSettings: () => TranslatorSettings): Translat
         }
 
         // smart
+        const asked = Date.now()
         const online = translateOnline(settings, text, source, target)
-        online.catch(() => { /* handled below */ })
+        online.then(() => {
+            const took = Date.now() - asked
+            onlineAverage = onlineAverage === 0 ? took : onlineAverage * 0.7 + took * 0.3
+        }, () => { /* handled below */ })
 
-        const wait = new Promise<null>((resolve) => setTimeout(() => resolve(null), DRAFT_WAIT_MS))
+        const wait = new Promise<null>((resolve) => setTimeout(() => resolve(null), onlineAverage > SLOW_ONLINE_MS ? SLOW_WAIT_MS : DRAFT_WAIT_MS))
         const quick = await Promise.race([online.then(value => value, () => undefined), wait])
         if(typeof quick === 'string' && quick !== ''){
             return quick
