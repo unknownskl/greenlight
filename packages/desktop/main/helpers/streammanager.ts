@@ -77,6 +77,13 @@ export default class StreamManager {
 
                 resolve(result)
             }).catch((error) => {
+                if(error.status === 404 || error.status === 410){
+                    // The session no longer exists on the server (e.g. it ended while the computer was asleep): just forget it.
+                    console.log('Streammanager - stopStream: session already gone on the server:', sessionId, error.status)
+                    delete this._sessions[sessionId]
+                    resolve(undefined)
+                    return
+                }
                 reject(error)
             })
         })

@@ -160,19 +160,38 @@ export default class Application {
     _xboxWorker:xboxWorker
 
 
-    authenticationCompleted(streamingTokens, webToken){
-        this.log('electron', __filename+'[authenticationCompleted()] authenticationCompleted called')
-        // const tokens = this._authentication._tokens
-        this._xHomeApi = new xCloudApi(this, streamingTokens.xHomeToken.data.offeringSettings.regions.find(region => region.isDefault).baseUri.substring(8), streamingTokens.xHomeToken.data.gsToken, 'home')
+    // Creates the API clients with the given tokens. On a token refresh (keepStreamClients) the existing xCloudApi instances
+    // only get the new token and keep their host, because they hold the state of the running stream session.
+    setApiTokens(streamingTokens, webToken, keepStreamClients = false){
+        this._xHomeApi = this.streamApiWithToken(this._xHomeApi, streamingTokens.xHomeToken, 'home', keepStreamClients)
 
         if(streamingTokens.xCloudToken !== undefined){
-            this._xCloudApi = new xCloudApi(this, streamingTokens.xCloudToken.data.offeringSettings.regions.find(region => region.isDefault).baseUri.substring(8), streamingTokens.xCloudToken.data.gsToken, 'cloud')
+            this._xCloudApi = this.streamApiWithToken(this._xCloudApi, streamingTokens.xCloudToken, 'cloud', keepStreamClients)
         }
 
         this._webApi = new xboxWebApi({
             token: webToken.data.Token,
             uhs: webToken.data.DisplayClaims.xui[0].uhs,
         })
+    }
+
+    private streamApiWithToken(current:xCloudApi|undefined, streamingToken, type:'home'|'cloud', keepClient:boolean):xCloudApi {
+        if(keepClient && current !== undefined){
+            current.setToken(streamingToken.data.gsToken)
+            return current
+        }
+        const host = streamingToken.data.offeringSettings.regions.find(region => region.isDefault).baseUri.substring(8)
+        return new xCloudApi(this, host, streamingToken.data.gsToken, type)
+    }
+
+    // Renews the API tokens after one was refused (see helpers/tokenrefresh.ts).
+    refreshApiTokens():Promise<void> {
+        return this._authentication.refreshApiTokens()
+    }
+
+    authenticationCompleted(streamingTokens, webToken){
+        this.log('electron', __filename+'[authenticationCompleted()] authenticationCompleted called')
+        this.setApiTokens(streamingTokens, webToken)
 
         this._authentication._isAuthenticating = false
         this._authentication._isAuthenticated = true
