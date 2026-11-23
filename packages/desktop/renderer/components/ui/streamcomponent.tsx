@@ -12,6 +12,8 @@ import { useTranslation } from 'react-i18next'
 import { useSettings } from '../../context/userContext'
 import TranslatorOverlay, { TRANSLATOR_EDIT_EVENT } from '../translator/translatoroverlay'
 import { getRegions, regionsToSettings } from '../../lib/translator/geometry'
+import { isLocalInstalled } from '../../lib/translator/local'
+import { localEngine, localMode } from '../../lib/translator/translate'
 
 interface StreamComponentProps {
     onDisconnect?: () => void;
@@ -464,6 +466,19 @@ function StreamComponent({
         setSettings({ ...settings, translator_fullscreen: settings.translator_fullscreen !== true })
     }
 
+    // Local (smart) <-> online: the model of the language pair has to be on the device for the local ones
+    function nextTranslatorMode() {
+        const from = settings.translator_source_lang || 'en'
+        const to = settings.translator_target_lang || 'uk'
+        if(!isLocalInstalled(from, to, localEngine(settings))){
+            return
+        }
+        const order = ['smart', 'local', 'off']
+        const current = localMode(settings)
+        const next = order[(Math.max(0, order.indexOf(current === 'backup' ? 'off' : current)) + 1) % order.length]
+        setSettings({ ...settings, translator_local_mode: next })
+    }
+
     function toggleTranslatorLog() {
         setSettings({ ...settings, translator_log: settings.translator_log !== true })
     }
@@ -585,6 +600,9 @@ function StreamComponent({
                                 e.target.blur(); setTranslatorMore(!translatorMore)
                             }}></Button> : '' }
                             { (settings.translator_enabled && translatorMore) ? <div className="gb-translator-row">
+                            <Button label={<span><i className="fa-solid fa-microchip"></i> <span className="gb-label gb-always">{t('translator.modeShort_' + (isLocalInstalled(settings.translator_source_lang || 'en', settings.translator_target_lang || 'uk', localEngine(settings)) ? localMode(settings) : 'off'))}</span></span>} title={t('translator.btnModeTitle')} className={(isLocalInstalled(settings.translator_source_lang || 'en', settings.translator_target_lang || 'uk', localEngine(settings)) && localMode(settings) !== 'off') ? 'btn-primary' : ''} onClick={(e) => {
+                                e.target.blur(); nextTranslatorMode()
+                            }}></Button>
                             { (settings.translator_enabled && getRegions(settings).length > 1) ? getRegions(settings).map((win, index) => (
                                 <Button key={index} label={<span>{index + 1}</span>} title={t("translator.windowToggleTitle", { n: index + 1 })} className={win.enabled !== false ? 'btn-primary' : ''} onClick={(e) => {
                                     e.target.blur(); toggleTranslatorWindow(index)

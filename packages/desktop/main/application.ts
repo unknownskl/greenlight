@@ -1,4 +1,4 @@
-import { app as ElectronApp, BrowserWindow, dialog, screen } from 'electron'
+import { app as ElectronApp, BrowserWindow, dialog, screen, session } from 'electron'
 import serve from 'electron-serve'
 import Store from 'electron-store'
 import Debug from 'debug'
@@ -126,6 +126,12 @@ export default class Application {
             }, this)
 
             this.log('electron', __filename+'[loadApplicationDefaults()] Electron has been fully loaded. Ready to open windows')
+
+            // The files of the local translator models come from a public server that refuses the user agent of a
+            // browser (it answers 406); the app asks for them under its own name
+            session.defaultSession.webRequest.onBeforeSendHeaders({ urls: ['https://firefox-settings-attachments.cdn.mozilla.net/*'] }, (details, callback) => {
+                callback({ requestHeaders: { ...details.requestHeaders, 'User-Agent': 'Greenlight' } })
+            })
 
             this.openMainWindow()
 

@@ -6,19 +6,31 @@
  * (renderer/public/bergamot).
  */
 
+import firefoxRegistry from './registries/firefox.json'
+import bergamotRegistry from './registries/bergamot.json'
+
 export type LocalState = 'idle' | 'downloading' | 'loading' | 'ready' | 'error'
+
+// Two lists of models for the same engine: the newer models of the Firefox translator (more language pairs), and the
+// models published by the Bergamot project itself. The player can pick one, or leave it to the app ("auto": the one
+// whose models are on the device, else the Firefox one).
+export type Catalog = 'firefox' | 'bergamot'
+export type CatalogChoice = Catalog | 'auto'
+export const CATALOGS: Catalog[] = ['firefox', 'bergamot']
 
 export interface LocalStatus {
     state: LocalState;
     // 0..1 while a model is downloaded
     progress: number;
-    // The models that are on the device ('enuk' = English -> Ukrainian)
+    // The models that are on the device ('firefox:enuk' = English -> Ukrainian from the Firefox list)
     installed: string[];
     message: string;
 }
 
-// The models that exist (the registry of the project): from + to
-const PAIRS = new Set(['bgen', 'csen', 'deen', 'enbg', 'encs', 'ende', 'enes', 'enet', 'enfr', 'enit', 'enpt', 'enru', 'enuk', 'esen', 'eten', 'fren', 'iten', 'pten', 'ruen', 'uken'])
+const REGISTRIES: Record<Catalog, Record<string, Record<string, RegistryFile>>> = {
+    firefox: firefoxRegistry as any,
+    bergamot: bergamotRegistry as any,
+}
 
 const PIVOT = 'en'
 const CACHE_NAME = 'greenlight-translator-models-v1'
@@ -32,22 +44,41 @@ interface RegistryFile {
     expectedSha256Hash?: string;
 }
 
-/** The models (pairs) that are needed to translate from one language to the other; [] when it is not possible. */
-export function modelsFor(from: string, to: string): string[] {
+/** The models (pairs) that are needed to translate from one language to the other with one list; [] when it is not possible. */
+export function modelsFor(from: string, to: string, catalog: Catalog = 'firefox'): string[] {
+    const registry = REGISTRIES[catalog]
     if(from === to || from === '' || to === ''){
         return []
     }
-    if(PAIRS.has(from + to)){
+    if(registry[from + to] !== undefined){
         return [from + to]
     }
-    if(PAIRS.has(from + PIVOT) && PAIRS.has(PIVOT + to)){
+    if(registry[from + PIVOT] !== undefined && registry[PIVOT + to] !== undefined){
         return [from + PIVOT, PIVOT + to]
     }
     return []
 }
 
 export function isLocalSupported(from: string, to: string): boolean {
-    return modelsFor(from, to).length > 0
+    return CATALOGS.some(catalog => modelsFor(from, to, catalog).length > 0)
+}
+
+/**
+ * The list of models to use for a language pair: the one the player chose, or (auto) the one whose models are on the
+ * device, else the first one that can do the pair. null when no list can.
+ */
+export function pickCatalog(from: string, to: string, choice: CatalogChoice = 'auto'): Catalog | null {
+    if(choice !== 'auto'){
+        return modelsFor(from, to, choice).length > 0 ? choice : null
+    }
+
+    const possible = CATALOGS.filter(catalog => modelsFor(from, to, catalog).length > 0)
+    return possible.find(catalog => isInstalledIn(catalog, from, to)) ?? possible[0] ?? null
+}
+
+function isInstalledIn(catalog: Catalog, from: string, to: string): boolean {
+    const needed = modelsFor(from, to, catalog)
+    return needed.length > 0 && needed.every(pair => installed.indexOf(catalog + ':' + pair) >= 0)
 }
 
 let installed: string[] = readInstalled()
@@ -57,7 +88,11 @@ const listeners = new Set<() => void>()
 function readInstalled(): string[] {
     try {
         const parsed = JSON.parse(window.localStorage.getItem(STORE_KEY) || '[]')
-        return Array.isArray(parsed) ? parsed.filter((item: any) => typeof item === 'string' && PAIRS.has(item)) : []
+        if(!Array.isArray(parsed)){
+            return []
+        }
+        // Models stored before there were two lists belong to the Bergamot list
+        return parsed.filter((item: any) => typeof item === 'string').map((item: string) => item.indexOf(':') < 0 ? 'bergamot:' + item : item)
     } catch(error) {
         return []
     }
@@ -86,10 +121,10 @@ export function subscribeLocal(listener: () => void): () => void {
     return () => { listeners.delete(listener) }
 }
 
-/** Are all models that this pair needs on the device? */
-export function isLocalInstalled(from: string, to: string): boolean {
-    const needed = modelsFor(from, to)
-    return needed.length > 0 && needed.every(pair => installed.indexOf(pair) >= 0)
+/** Are all models that this pair needs on the device (in the list that is used)? */
+export function isLocalInstalled(from: string, to: string, choice: CatalogChoice = 'auto'): boolean {
+    const catalog = pickCatalog(from, to, choice)
+    return catalog !== null && isInstalledIn(catalog, from, to)
 }
 
 function assetUrl(path: string): string {
@@ -178,16 +213,15 @@ interface Engine {
     backing: any;
 }
 
-let enginePromise: Promise<Engine> | null = null
-let registry: Record<string, Record<string, RegistryFile>> | null = null
+// One engine (and worker) per list: the models of the lists have the same names
+const engines: Record<Catalog, Promise<Engine> | null> = { firefox: null, bergamot: null }
 
-async function getEngine(): Promise<Engine> {
-    if(enginePromise === null){
-        enginePromise = (async () => {
+async function getEngine(catalog: Catalog): Promise<Engine> {
+    if(engines[catalog] === null){
+        engines[catalog] = (async () => {
             // The engine is a plain script of the app (not part of the bundle)
             const module: any = await import(/* webpackIgnore: true */ /* turbopackIgnore: true */ assetUrl('translator.js'))
-
-            registry = await (await fetch(assetUrl('registry.json'))).json()
+            const registry = REGISTRIES[catalog]
 
             class Backing extends module.TranslatorBacking {
                 constructor(options: any) {
@@ -196,7 +230,7 @@ async function getEngine(): Promise<Engine> {
 
                 // The list of models comes with the app: it works without internet
                 async loadModelRegistery() {
-                    return Object.entries(registry as Record<string, any>).map(([key, files]) => ({ from: key.substring(0, 2), to: key.substring(2, 4), files }))
+                    return Object.entries(registry).map(([key, files]) => ({ from: key.substring(0, 2), to: key.substring(2, 4), files }))
                 }
 
                 async fetch(url: string, checksum: string | undefined, extra?: { signal?: AbortSignal }) {
@@ -209,19 +243,20 @@ async function getEngine(): Promise<Engine> {
             return { translator, backing }
         })()
 
-        enginePromise.catch(() => {
-            enginePromise = null
+        ;(engines[catalog] as Promise<Engine>).catch(() => {
+            engines[catalog] = null
         })
     }
-    return enginePromise
+    return engines[catalog] as Promise<Engine>
 }
 
 /** Downloads the models that translating from one language to the other needs. */
-export async function installLocal(from: string, to: string): Promise<void> {
-    const needed = modelsFor(from, to)
-    if(needed.length === 0){
+export async function installLocal(from: string, to: string, choice: CatalogChoice = 'auto'): Promise<void> {
+    const catalog = pickCatalog(from, to, choice)
+    if(catalog === null){
         throw new Error('no model for ' + from + ' -> ' + to)
     }
+    const needed = modelsFor(from, to, catalog)
     if(status.state === 'downloading'){
         return
     }
@@ -231,19 +266,19 @@ export async function installLocal(from: string, to: string): Promise<void> {
     setStatus({ state: 'downloading', progress: 0, message: '' })
 
     try {
-        const { backing } = await getEngine()
+        const { backing } = await getEngine(catalog)
 
         for(const pair of needed){
-            const files = (registry as any)[pair] as Record<string, RegistryFile>
-            Object.values(files).forEach((file) => {
+            Object.values(REGISTRIES[catalog][pair]).forEach((file) => {
                 if(file !== undefined && typeof file.size === 'number'){ expected += file.size }
             })
         }
 
         for(const pair of needed){
             await backing.getTranslationModel({ from: pair.substring(0, 2), to: pair.substring(2, 4) })
-            if(installed.indexOf(pair) < 0){
-                writeInstalled(installed.concat(pair))
+            const key = catalog + ':' + pair
+            if(installed.indexOf(key) < 0){
+                writeInstalled(installed.concat(key))
             }
         }
         setStatus({ state: 'ready', progress: 1, message: '' })
@@ -253,23 +288,16 @@ export async function installLocal(from: string, to: string): Promise<void> {
     }
 }
 
-/** Removes the models of a language pair from the device. */
-export async function removeLocal(pairs?: string[]): Promise<void> {
-    const list = pairs ?? installed.slice()
+/** Removes models from the device (all of them when none are named). */
+export async function removeLocal(keys?: string[]): Promise<void> {
+    const list = keys ?? installed.slice()
     const cache = await openCache()
 
-    if(cache !== null && registry === null){
-        try {
-            registry = await (await fetch(assetUrl('registry.json'))).json()
-        } catch(error) {
-            // The files stay in the cache then
-        }
-    }
-
-    for(const pair of list){
-        const files = registry === null ? undefined : (registry as any)[pair]
+    for(const key of list){
+        const [catalog, pair] = key.split(':') as [Catalog, string]
+        const files = REGISTRIES[catalog]?.[pair]
         if(cache !== null && files !== undefined){
-            for(const file of Object.values(files) as RegistryFile[]){
+            for(const file of Object.values(files)){
                 if(file !== undefined && typeof file.name === 'string'){
                     await cache.delete(file.name)
                 }
@@ -277,25 +305,28 @@ export async function removeLocal(pairs?: string[]): Promise<void> {
         }
     }
 
-    writeInstalled(installed.filter(pair => list.indexOf(pair) < 0))
+    writeInstalled(installed.filter(key => list.indexOf(key) < 0))
 
-    // The memory of the worker is given back too
-    if(enginePromise !== null){
-        const pending = enginePromise
-        enginePromise = null
-        try {
-            const { translator } = await pending
-            await translator.delete()
-        } catch(error) {
-            // Nothing to clean up
+    // The memory of the workers is given back too
+    for(const catalog of CATALOGS){
+        const pending = engines[catalog]
+        if(pending !== null){
+            engines[catalog] = null
+            try {
+                const { translator } = await pending
+                await translator.delete()
+            } catch(error) {
+                // Nothing to clean up
+            }
         }
     }
     setStatus({ state: 'idle', progress: 0, message: '' })
 }
 
 /** Translates a text on the device. Throws when the models are not there (the caller uses the online service then). */
-export async function translateLocal(text: string, from: string, to: string): Promise<string> {
-    if(!isLocalInstalled(from, to)){
+export async function translateLocal(text: string, from: string, to: string, choice: CatalogChoice = 'auto'): Promise<string> {
+    const catalog = pickCatalog(from, to, choice)
+    if(catalog === null || !isInstalledIn(catalog, from, to)){
         throw new Error('the local translator has no model for ' + from + ' -> ' + to)
     }
 
@@ -305,7 +336,7 @@ export async function translateLocal(text: string, from: string, to: string): Pr
     }
 
     try {
-        const { translator } = await getEngine()
+        const { translator } = await getEngine(catalog)
         const answer: any = await Promise.race([
             translator.translate({ from, to, text, html: false }),
             new Promise((_, reject) => setTimeout(() => reject(new Error('the local translator is too slow')), TRANSLATE_TIMEOUT_MS)),

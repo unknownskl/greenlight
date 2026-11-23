@@ -1,6 +1,6 @@
 import Ipc from '../ipc'
 import { Translation, TranslateFunction } from './engine'
-import { isLocalInstalled, translateLocal } from './local'
+import { CatalogChoice, isLocalInstalled, translateLocal } from './local'
 
 export type LocalMode = 'off' | 'smart' | 'local' | 'backup'
 
@@ -15,9 +15,16 @@ let onlineAverage = 0
 
 interface TranslatorSettings {
     translator_local_mode?: string;
+    translator_local_engine?: string;
     translator_provider?: string;
     translator_key?: string;
     translator_key_limit?: number;
+}
+
+/** Which list of models is used (auto: the one whose models are on the device). */
+export function localEngine(settings: TranslatorSettings): CatalogChoice {
+    const choice = settings.translator_local_engine
+    return choice === 'firefox' || choice === 'bergamot' ? choice : 'auto'
 }
 
 export function localMode(settings: TranslatorSettings): LocalMode {
@@ -50,7 +57,8 @@ export function createTranslate(getSettings: () => TranslatorSettings): Translat
     return async (text: string, target: string, source: string): Promise<string | Translation> => {
         const settings = getSettings()
         const mode = localMode(settings)
-        const usable = mode !== 'off' && isLocalInstalled(source, target)
+        const engine = localEngine(settings)
+        const usable = mode !== 'off' && isLocalInstalled(source, target, engine)
 
         if(!usable){
             return translateOnline(settings, text, source, target)
@@ -58,7 +66,7 @@ export function createTranslate(getSettings: () => TranslatorSettings): Translat
 
         if(mode === 'local'){
             try {
-                return await translateLocal(text, source, target)
+                return await translateLocal(text, source, target, engine)
             } catch(error) {
                 return translateOnline(settings, text, source, target)
             }
@@ -68,7 +76,7 @@ export function createTranslate(getSettings: () => TranslatorSettings): Translat
             try {
                 return await translateOnline(settings, text, source, target)
             } catch(error) {
-                return translateLocal(text, source, target)
+                return translateLocal(text, source, target, engine)
             }
         }
 
@@ -88,7 +96,7 @@ export function createTranslate(getSettings: () => TranslatorSettings): Translat
 
         let draft: string
         try {
-            draft = await translateLocal(text, source, target)
+            draft = await translateLocal(text, source, target, engine)
         } catch(error) {
             return online
         }

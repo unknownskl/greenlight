@@ -139,7 +139,7 @@ div#component_streamcomponent_gamebar_menu div.gb-translator-row {
 /* Steam Deck (1280x800) and other narrow screens: only icons, except for the translator state */
 @media (max-width: 1500px) {
     div#component_streamcomponent_gamebar_menu div.gb-center .gb-label:not(.gb-always),
-    div#component_streamcomponent_gamebar_menu div.gb-translator-row .gb-label {
+    div#component_streamcomponent_gamebar_menu div.gb-translator-row .gb-label:not(.gb-always) {
         display: none;
     }
 
