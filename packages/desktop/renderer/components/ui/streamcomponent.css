@@ -121,9 +121,25 @@ div#component_streamcomponent_gamebar_menu div.gb-right {
     text-align: right;
 }
 
+/* The extra buttons of the translator open in a row under the bar, so nothing else on the bar is pushed away */
+div#component_streamcomponent_gamebar_menu div.gb-translator-row {
+    position: absolute;
+    top: 74px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(20px);
+    white-space: nowrap;
+}
+
 /* Steam Deck (1280x800) and other narrow screens: only icons, except for the translator state */
 @media (max-width: 1500px) {
-    div#component_streamcomponent_gamebar_menu div.gb-center .gb-label:not(.gb-always) {
+    div#component_streamcomponent_gamebar_menu div.gb-center .gb-label:not(.gb-always),
+    div#component_streamcomponent_gamebar_menu div.gb-translator-row .gb-label {
         display: none;
     }
 

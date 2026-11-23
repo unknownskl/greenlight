@@ -584,23 +584,25 @@ function StreamComponent({
                             { settings.translator_enabled ? <Button label={<span><i className={translatorMore ? 'fa-solid fa-angle-left' : 'fa-solid fa-angle-right'}></i></span>} title={t("translator.btnMoreTitle")} onClick={(e) => {
                                 e.target.blur(); setTranslatorMore(!translatorMore)
                             }}></Button> : '' }
-                            { (settings.translator_enabled && translatorMore && getRegions(settings).length > 1) ? getRegions(settings).map((win, index) => (
+                            { (settings.translator_enabled && translatorMore) ? <div className="gb-translator-row">
+                            { (settings.translator_enabled && getRegions(settings).length > 1) ? getRegions(settings).map((win, index) => (
                                 <Button key={index} label={<span>{index + 1}</span>} title={t("translator.windowToggleTitle", { n: index + 1 })} className={win.enabled !== false ? 'btn-primary' : ''} onClick={(e) => {
                                     e.target.blur(); toggleTranslatorWindow(index)
                                 }}></Button>
                             )) : '' }
-                            { (settings.translator_enabled && translatorMore) ? <Button label={<span><i className="fa-solid fa-wand-magic-sparkles"></i> <span className="gb-label">{t("translator.btnAuto")}</span></span>} title={t("translator.btnAutoTitle")} className={settings.translator_auto === true ? 'btn-primary' : ''} onClick={(e) => {
+                            { settings.translator_enabled ? <Button label={<span><i className="fa-solid fa-wand-magic-sparkles"></i> <span className="gb-label">{t("translator.btnAuto")}</span></span>} title={t("translator.btnAutoTitle")} className={settings.translator_auto === true ? 'btn-primary' : ''} onClick={(e) => {
                                 e.target.blur(); toggleTranslatorAuto()
                             }}></Button> : '' }
-                            { (settings.translator_enabled && translatorMore) ? <Button label={<span><i className="fa-solid fa-expand"></i> <span className="gb-label">{t("translator.btnScreen")}</span></span>} title={t("translator.btnScreenTitle")} className={settings.translator_fullscreen === true ? 'btn-primary' : ''} onClick={(e) => {
+                            { settings.translator_enabled ? <Button label={<span><i className="fa-solid fa-expand"></i> <span className="gb-label">{t("translator.btnScreen")}</span></span>} title={t("translator.btnScreenTitle")} className={settings.translator_fullscreen === true ? 'btn-primary' : ''} onClick={(e) => {
                                 e.target.blur(); toggleTranslatorScreen()
                             }}></Button> : '' }
-                            { (settings.translator_enabled && translatorMore) ? <Button label={<span><i className="fa-solid fa-clock-rotate-left"></i> <span className="gb-label">{t("translator.btnLog")}</span></span>} title={t("translator.btnLogTitle")} className={settings.translator_log === true ? 'btn-primary' : ''} onClick={(e) => {
+                            { settings.translator_enabled ? <Button label={<span><i className="fa-solid fa-clock-rotate-left"></i> <span className="gb-label">{t("translator.btnLog")}</span></span>} title={t("translator.btnLogTitle")} className={settings.translator_log === true ? 'btn-primary' : ''} onClick={(e) => {
                                 e.target.blur(); toggleTranslatorLog()
                             }}></Button> : '' }
-                            { (settings.translator_enabled && translatorMore) ? <Button label={<span><i className="fa-solid fa-crop-simple"></i> <span className="gb-label">{t("translator.btnArea")}</span></span>} title={t("translator.btnAreaTitle")} onClick={(e) => {
+                            { settings.translator_enabled ? <Button label={<span><i className="fa-solid fa-crop-simple"></i> <span className="gb-label">{t("translator.btnArea")}</span></span>} title={t("translator.btnAreaTitle")} onClick={(e) => {
                                 e.target.blur(); editTranslatorArea()
                             }}></Button> : '' }
+                            </div> : '' }
                             <Button label={(micStatus === false) ? <span><i className="fa-solid fa-microphone-slash"></i> <span className="gb-label">{t("streamWindow.micMuted")}</span></span> : <span><i className="fa-solid fa-microphone"></i> <span className="gb-label">{t("streamWindow.micActive")}</span></span>} title={(micStatus === false) ? t("streamWindow.enableMic") : t("streamWindow.disableMic")} className={(micStatus === false) ? 'btn-cancel' : 'btn-primary'} onClick={(e) => {
                                 e.target.blur(); toggleMic()
                             }}></Button>
