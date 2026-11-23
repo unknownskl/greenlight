@@ -80,6 +80,10 @@ const EVICT_AFTER_MS = 5000
 // A menu: this many lines of text of a size that is not a title, spread over this much of the height, on this many looks
 // in a row; it is over when there are hardly any lines for this many looks
 const MENU_BLOCKS = 6
+// Tiles for reading a whole screen piece by piece: tiles that lie over each other by this much are one tile (no more,
+// or the tiles of a busy menu all grow together into one big piece), and how many tiles at most
+const TILE_JOIN = 0.3
+const MAX_TILES = 10
 const MENU_SPREAD = 0.3
 const MENU_LOOKS = 3
 const MENU_OVER_BLOCKS = 3
@@ -230,6 +234,8 @@ export default class AutoWindows {
     _learned: Zone[] = []
     _saveTimer: ReturnType<typeof setTimeout> | undefined
     _placedFromPanel = false
+    // Where the text of the picture is, in pieces (for reading a whole screen piece by piece)
+    _tiles: Region[] = []
 
     constructor(options: AutoOptions) {
         this._options = options
@@ -474,6 +480,8 @@ export default class AutoWindows {
 
         const now = Date.now()
 
+        this._tiles = this._makeTiles(blocks, video, box, settings.fit, visible)
+
         // A menu: a lot of lines of text over the screen. It is read as a whole (see the overlay), not in windows
         const menu = this._detectMenu(blocks)
         if(menu !== this._menu){
@@ -524,6 +532,49 @@ export default class AutoWindows {
 
         this._update(found, manual, now)
         this._report(found)
+    }
+
+    /** The places of text on the screen, for reading it piece by piece: close blocks are joined, there are not many of them. */
+    getTiles(): Region[] {
+        return this._tiles
+    }
+
+    _makeTiles(blocks: Array<{ x: number; y: number; w: number; h: number }>, video: HTMLVideoElement, box: { width: number; height: number }, fit: FitMode, visible: { sx: number; sy: number; sw: number; sh: number }): Region[] {
+        let tiles: Region[] = blocks.map((block) => {
+            const rect = videoRectToScreen(video.videoWidth, video.videoHeight, box.width, box.height, fit, {
+                x: visible.sx + block.x * visible.sw,
+                y: visible.sy + block.y * visible.sh,
+                w: block.w * visible.sw,
+                h: block.h * visible.sh,
+            })
+            const padX = 0.012
+            const padY = Math.max(0.012, rect.h * 0.4)
+            const x = Math.max(0, rect.x - padX)
+            const y = Math.max(0, rect.y - padY)
+            return { x, y, w: Math.min(1, rect.x + rect.w + padX) - x, h: Math.min(1, rect.y + rect.h + padY) - y }
+        })
+
+        // Tiles that lie over each other are one tile
+        let merged = true
+        while(merged){
+            merged = false
+            for(let a = 0; a < tiles.length && !merged; a++){
+                for(let b = a + 1; b < tiles.length && !merged; b++){
+                    if(Math.max(inside(tiles[a], tiles[b]), inside(tiles[b], tiles[a])) > TILE_JOIN){
+                        tiles[a] = union(tiles[a], tiles[b])
+                        tiles.splice(b, 1)
+                        merged = true
+                    }
+                }
+            }
+        }
+
+        // Too many, or most of the screen: the whole screen is read in one go then
+        const area = tiles.reduce((sum, tile) => sum + tile.w * tile.h, 0)
+        if(tiles.length > MAX_TILES || area > 0.7){
+            tiles = []
+        }
+        return tiles
     }
 
     /** Is the picture a menu (a list of settings, an inventory)? It takes a few looks to start and a few more to stop. */
@@ -702,8 +753,20 @@ export default class AutoWindows {
             }
 
             let index = this._slots.findIndex(slot => slot.region === null)
+
             if(index < 0){
                 index = this._victim(now)
+            }
+            // A subtitle comes and goes and must find a window: it takes the window of a text that has not been read (a false
+            // alarm that is still being tried), else the window of the text that has been on screen the longest without changing
+            if(index < 0 && track.role === 'subtitle'){
+                index = this._unproductive()
+                if(index < 0){
+                    index = this._edgeWindow(now, 2)
+                }
+                if(index >= 0){
+                    this._release(index)
+                }
             }
             if(index < 0 && track.role !== 'subtitle' && centralness(track.rect) >= EVICT_CENTRALNESS){
                 index = this._edgeWindow(now)
@@ -768,11 +831,26 @@ export default class AutoWindows {
         return best
     }
 
+    // The window that has not translated anything yet and is not a subtitle one (longest waiting first), -1 when there is none
+    _unproductive(): number {
+        let best = -1
+        let bestSince = Infinity
+
+        this._slots.forEach((slot, index) => {
+            if(slot.region !== null && slot.role !== 'subtitle' && !slot.shown && !slot.everShown && slot.since < bestSince){
+                best = index
+                bestSince = slot.since
+            }
+        })
+
+        return best
+    }
+
     // The window at the edge of the screen that holds a text that has been read for a while (the interface that is always
     // there): it can be given to a text in the middle, where the player looks. -1 when there is none.
-    _edgeWindow(now: number): number {
+    _edgeWindow(now: number, limit = EVICT_EDGE): number {
         let best = -1
-        let bestCentralness = EVICT_EDGE
+        let bestCentralness = limit
 
         this._slots.forEach((slot, index) => {
             if(slot.region === null || slot.role === 'subtitle' || (slot.shown && now - slot.shownSince < EVICT_AFTER_MS)){

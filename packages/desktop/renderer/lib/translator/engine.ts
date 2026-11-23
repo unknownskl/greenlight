@@ -23,6 +23,9 @@ export interface TranslatorConfig {
     epoch?: number;
     // The window is the whole screen: its text is read as a page (text of different sizes in different places)
     fullScreen?: boolean;
+    // Where the text of the screen is (fractions of the stream area): the whole screen is then read piece by piece, each piece
+    // enlarged like a window of its own, instead of in one go (small text is lost when a whole screen is read at once)
+    tiles?: Region[];
 }
 
 /** One piece of text of the interface (a line, or a few lines that belong together) with its translation. */
@@ -176,6 +179,14 @@ const FINE_SAME = 0.04
 // A steady text that is shown (a task, a description) is read again only when this much of its pixels is different:
 // a glowing or shaking panel changes the picture a little all the time, but not the text
 const STEADY_FINE_CHANGE = 0.1
+// The whole screen: a line of text that comes in (a description that fades in, the next item of a list) is a small part
+// of all the pixels, so even a small change is a reason to read again; it is read at most this often, less and less often
+// while the readings are the same
+const SCREEN_FINE_CHANGE = 0.02
+const SCREEN_GAP_MS = 2000
+const SCREEN_GAP_MAX_MS = 15000
+// New text that waits for a second reading (see _confirm) gets it soon
+const SCREEN_PENDING_GAP_MS = 1200
 const EXACT_RECHECK_MS = 20000
 // Text that is still where it was (the pixels of the last reading are still text pixels) is not "moving" and is not
 // read again because the picture behind it changes (the camera turns, the text of the interface stays). Only text
@@ -1048,6 +1059,7 @@ export default class TranslatorEngine {
             return
         }
         const taskMode = config.mode === 'task'
+        const fullScreen = config.fullScreen === true
         this._taskMode = taskMode
 
         // The window was moved: start over
@@ -1218,15 +1230,21 @@ export default class TranslatorEngine {
 
         // A steady text that is on screen and whose pixels are almost the same as at the last reading is the same text,
         // whatever the coarse picture says: it is not read (and not translated) again
-        if(taskMode && changed && !appearing && this._hasReadMask && this._shown.length > 0 && this._pixelsSame(present, width, height, STEADY_FINE_CHANGE)){
+        if(taskMode && changed && !appearing && this._hasReadMask && this._shown.length > 0 && this._pixelsSame(present, width, height, fullScreen ? SCREEN_FINE_CHANGE : STEADY_FINE_CHANGE)){
             changed = false
+        }
+
+        // The whole screen: a small change in the pixels is new text (the coarse picture does not see it)
+        if(fullScreen && !changed && this._hasReadMask && !this._pixelsSame(present, width, height, SCREEN_FINE_CHANGE)){
+            changed = true
         }
 
         // A steady interface that sways with the camera is not "moving text": it keeps its translation, and the
         // readings (which differ a little every time) are voted on instead (see _confirm)
         if(taskMode){
             moving = false
-            settled = true
+            // A whole screen that is still fading in is not read yet (a busy picture behind it may never settle: see FORCE_OCR_MS)
+            settled = fullScreen ? settled : true
         } else if(!held && (changed || appearing || profileChanged)){
             // Something is going on: look more often for a while
             this._activeUntil = now + ACTIVE_MS
@@ -1290,7 +1308,8 @@ export default class TranslatorEngine {
         const idle = !this._working && this._jobs.length === 0
 
         // The longer the text stays the same, the less often it is read again; changed text is photographed without that delay
-        const minGap = taskMode ? 1200 : (held ? GROWTH_GAP_MS : (changed ? SNAPSHOT_GAP_MS : Math.min(3000, 400 + this._sameCount * 400)))
+        const waiting = this._pending.length > 0
+        const minGap = fullScreen ? (waiting ? SCREEN_PENDING_GAP_MS : Math.min(SCREEN_GAP_MAX_MS, SCREEN_GAP_MS + this._sameCount * 2000)) : taskMode ? 1200 : (held ? GROWTH_GAP_MS : (changed ? SNAPSHOT_GAP_MS : Math.min(3000, 400 + this._sameCount * 400)))
 
         // Read again now and then even when the picture looks the same: it may be a different line in the same place.
         // Reading the same text again costs nothing visible (see _process), and it happens less often the longer the text stays.
@@ -1298,7 +1317,7 @@ export default class TranslatorEngine {
 
         // The same pixels as at the last reading: the text is the same and is translated already, so it is not read
         // again (only now and then, in case the picture has changed in a way the pixels do not show)
-        if(recheck && !changed && this._shown.length > 0 && now - this._lastReadAt < EXACT_RECHECK_MS && (held || this._pixelsSame(present, width, height))){
+        if(recheck && !changed && this._shown.length > 0 && !(fullScreen && waiting) && now - this._lastReadAt < EXACT_RECHECK_MS && (held || this._pixelsSame(present, width, height))){
             recheck = false
         }
 
@@ -1495,8 +1514,9 @@ export default class TranslatorEngine {
         let best: ReadResult = { segments: [], text: '', score: 0 }
         let bestPolarity: Polarity = job.polarities[0]
 
+        const tiles = job.config.fullScreen === true ? (job.config.tiles ?? []) : []
         for(const polarity of job.polarities){
-            const result = await this._read(job, polarity)
+            const result = tiles.length > 0 ? await this._readTiles(job, polarity, tiles, video, box) : await this._read(job, polarity)
             if(result !== null && result.score > best.score){
                 best = result
                 bestPolarity = polarity
@@ -1841,6 +1861,60 @@ export default class TranslatorEngine {
             this._cache.delete(this._cache.keys().next().value as string)
         }
         this._cache.set(key, translated)
+    }
+
+    /**
+     * Reads the whole screen piece by piece: every tile is cut out of the snapshot and read like a window of its own (so it is
+     * enlarged as much as a window is), and the pieces of text of all tiles are put together.
+     */
+    async _readTiles(job: Snapshot, polarity: Polarity, tiles: Region[], video: HTMLVideoElement, box: { width: number; height: number }): Promise<ReadResult | null> {
+        const segments: RawSegment[] = []
+        let score = 0
+
+        for(const tile of tiles){
+            // The window was closed meanwhile: the rest is not read
+            if(job.generation !== this._generation || !this._running){
+                return null
+            }
+
+            const sub = regionToSource(video.videoWidth, video.videoHeight, box.width, box.height, job.config.fit, tile)
+            if(sub === null){
+                continue
+            }
+
+            const canvasWidth = job.canvas.width
+            const canvasHeight = job.canvas.height
+            const x = Math.max(0, Math.round((sub.sx - job.source.sx) / job.source.sw * canvasWidth))
+            const y = Math.max(0, Math.round((sub.sy - job.source.sy) / job.source.sh * canvasHeight))
+            const width = Math.min(canvasWidth - x, Math.round(sub.sw / job.source.sw * canvasWidth))
+            const height = Math.min(canvasHeight - y, Math.round(sub.sh / job.source.sh * canvasHeight))
+            if(width < 16 || height < 8){
+                continue
+            }
+
+            const piece = document.createElement('canvas')
+            piece.width = width
+            piece.height = height
+            const context = piece.getContext('2d')
+            if(context === null){
+                continue
+            }
+            context.drawImage(job.canvas, x, y, width, height, 0, 0, width, height)
+
+            const result = await this._read({ ...job, canvas: piece, source: { sx: job.source.sx + x / canvasWidth * job.source.sw, sy: job.source.sy + y / canvasHeight * job.source.sh, sw: width / canvasWidth * job.source.sw, sh: height / canvasHeight * job.source.sh } }, polarity)
+            piece.width = 0
+            piece.height = 0
+
+            if(result !== null){
+                segments.push(...result.segments)
+                score += result.score
+            }
+        }
+
+        if(segments.length === 0){
+            return null
+        }
+        return { segments, text: segments.map(segment => segment.text).join(' '), score }
     }
 
     /** Reads the window with one text colour and turns the result into pieces of text with their position and colours. */

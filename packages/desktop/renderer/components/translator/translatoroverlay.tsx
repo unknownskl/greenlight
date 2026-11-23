@@ -410,6 +410,7 @@ function TranslatorOverlay({
                 enabled: true,
                 mode: 'task',
                 fullScreen: true,
+                tiles: autoRef.current?.getTiles() ?? [],
                 color: 'auto' as TextColor,
                 source: settingsRef.current.translator_source_lang || 'en',
                 target: settingsRef.current.translator_target_lang || 'uk',

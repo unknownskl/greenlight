@@ -30,7 +30,17 @@ function assetUrl(path: string): string {
     return new URL('/tesseract/' + path, window.location.href).href
 }
 
+// The reader has been shut down (the stream was closed): nothing reads any more and no new reader is made, until
+// somebody asks for one on purpose (getOcrWorker, when a translator starts)
+let closed = false
+const NOTHING: OcrResult = { text: '', confidence: 0, lines: [] }
+
 export function getOcrWorker(language = 'en'): Promise<Worker> {
+    closed = false
+    return makeOcrWorker(language)
+}
+
+function makeOcrWorker(language: string): Promise<Worker> {
     const code = SOURCE_LANGUAGES[language] ? language : 'en'
 
     if(workerPromise !== null && workerLanguage !== code){
@@ -139,19 +149,32 @@ let currentLayout: 'block' | 'page' | null = null
 export async function recognizeCanvas(canvas: HTMLCanvasElement, language = 'en', priority = 1, maxGap = MAX_WORD_GAP, layout: 'block' | 'page' = 'block'): Promise<OcrResult> {
     await acquireReader(priority)
     try {
+        if(closed){
+            return NOTHING
+        }
+
+        const worker = await makeOcrWorker(language)
+        if(closed){
+            return NOTHING
+        }
+
         if(currentLayout !== layout){
-            const worker = await getOcrWorker(language)
             await worker.setParameters({ tessedit_pageseg_mode: (layout === 'page' ? '3' : '6') as any })
             currentLayout = layout
         }
-        return await readCanvas(canvas, language, maxGap)
+        return await readCanvas(worker, canvas, maxGap)
+    } catch(error) {
+        // The reader was shut down while this picture was being read: that is not a failure
+        if(closed || /postMessage/.test(String(error))){
+            return NOTHING
+        }
+        throw error
     } finally {
         releaseReader()
     }
 }
 
-async function readCanvas(canvas: HTMLCanvasElement, language: string, maxGap: number): Promise<OcrResult> {
-    const worker = await getOcrWorker(language)
+async function readCanvas(worker: Worker, canvas: HTMLCanvasElement, maxGap: number): Promise<OcrResult> {
     const result = await worker.recognize(canvas, {}, { text: true, blocks: true })
 
     const lines: OcrLine[] = []
@@ -216,6 +239,7 @@ async function readCanvas(canvas: HTMLCanvasElement, language: string, maxGap: n
 }
 
 export async function terminateOcr(): Promise<void> {
+    closed = true
     if(workerPromise === null){
         return
     }
