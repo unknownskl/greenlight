@@ -32,7 +32,7 @@ export interface AutoOptions {
     // The windows the player has placed himself: the scout leaves those places alone
     getManualRegions: () => Region[];
     translate: (text: string, target: string, source: string) => Promise<string>;
-    onResult: (slot: number, result: TranslatorResult | null) => void;
+    onResult: (slot: number, result: TranslatorResult | null, mode?: 'dialog' | 'task') => void;
     onFrames?: (frames: AutoFrame[]) => void;
 }
 
@@ -297,7 +297,7 @@ export default class AutoWindows {
 
         slot.shown = shown
         slot.lastText = text
-        this._options.onResult(index, result)
+        this._options.onResult(index, result, slot.mode)
     }
 
     _scan() {

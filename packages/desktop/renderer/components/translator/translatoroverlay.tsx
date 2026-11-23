@@ -4,7 +4,8 @@ import { useTranslation } from 'react-i18next'
 import { useSettings } from '../../context/userContext'
 import Ipc from '../../lib/ipc'
 import { Region, FitMode, DEFAULT_REGION, MAX_REGIONS, getRegions, regionsToSettings, constrainRegion, findFreeRegion, windowMode } from '../../lib/translator/geometry'
-import TranslatorEngine, { EngineStatus, TranslatorResult, TranslatedSegment, TextColor } from '../../lib/translator/engine'
+import TranslatorEngine, { EngineStatus, TranslatorResult, TranslatedSegment, TextColor, dropCovered } from '../../lib/translator/engine'
+import { LogLine, addToLog as appendToLog } from '../../lib/translator/dialoglog'
 import { terminateOcr } from '../../lib/translator/ocr'
 import AutoWindows, { AutoFrame, MAX_AUTO_WINDOWS } from '../../lib/translator/autowindows'
 import usePadRegion from '../../lib/translator/usepadregion'
@@ -29,6 +30,9 @@ interface TranslatorOverlayProps {
 }
 
 let measureContext: CanvasRenderingContext2D | null | undefined
+
+// The dialogue log shows this many of the last lines
+const LOG_SHOWN = 6
 
 // How many rows a text takes when it is wrapped at `width` (a word is never cut)
 function wrapRows(text: string, size: number, width: number): number {
@@ -75,7 +79,26 @@ export function nextBelow(segments: TranslatedSegment[], index: number): number 
     return best
 }
 
-export function segmentStyle(segment: TranslatedSegment, viewport: { width: number; height: number }, autoFont: boolean, fixedSize: number, opacity: number, below?: number): React.CSSProperties {
+/** The nearest piece of text on the same row to the left and to the right (fractions of the width): the translation stays between them. */
+export function sideLimits(segments: TranslatedSegment[], index: number): { left?: number; right?: number } {
+    const segment = segments[index]
+    const limits: { left?: number; right?: number } = {}
+    segments.forEach((other, i) => {
+        if(i === index){ return }
+        const top = Math.max(segment.rect.y, other.rect.y)
+        const bottom = Math.min(segment.rect.y + segment.rect.h, other.rect.y + other.rect.h)
+        if(bottom - top < Math.min(segment.rect.h, other.rect.h) * 0.4){ return }
+
+        if(other.rect.x >= segment.rect.x + segment.rect.w * 0.5 && other.rect.x + other.rect.w > segment.rect.x + segment.rect.w){
+            limits.right = limits.right === undefined ? other.rect.x : Math.min(limits.right, other.rect.x)
+        } else if(other.rect.x + other.rect.w <= segment.rect.x + segment.rect.w * 0.5 && other.rect.x < segment.rect.x){
+            limits.left = limits.left === undefined ? other.rect.x + other.rect.w : Math.max(limits.left, other.rect.x + other.rect.w)
+        }
+    })
+    return limits
+}
+
+export function segmentStyle(segment: TranslatedSegment, viewport: { width: number; height: number }, autoFont: boolean, fixedSize: number, opacity: number, below?: number, sides?: { left?: number; right?: number }): React.CSSProperties {
     const originalWidth = segment.rect.w * viewport.width
     const left = segment.rect.x * viewport.width
     const centerX = left + originalWidth / 2
@@ -83,11 +106,19 @@ export function segmentStyle(segment: TranslatedSegment, viewport: { width: numb
     // One line of the original stays one line: the translation may grow sideways (as far as the picture goes),
     // so it does not wrap onto the line below, which is another piece of text
     const lines = Math.max(1, Math.round(segment.rect.h / Math.max(0.001, segment.lineHeight)))
-    const room = segment.centered
+    let room = segment.centered
         ? 2 * Math.min(centerX, viewport.width - centerX) - 16
         : viewport.width - left - 8
+    // ... and not over the piece of text next to it on the same row
+    if(sides !== undefined){
+        const leftEdge = sides.left === undefined ? 0 : sides.left * viewport.width + 4
+        const rightEdge = sides.right === undefined ? viewport.width : sides.right * viewport.width - 4
+        room = segment.centered
+            ? Math.min(room, 2 * Math.min(centerX - leftEdge, rightEdge - centerX))
+            : Math.min(room, rightEdge - left)
+    }
     // A paragraph keeps the width of the original (the translation is made to fit into it); one line may grow sideways
-    const maxWidth = Math.max(140, Math.min(room, originalWidth * (lines === 1 ? 2.1 : 1.1)))
+    const maxWidth = Math.max(Math.min(140, Math.max(60, room)), Math.min(room, originalWidth * (lines === 1 ? 2.1 : 1.1)))
     const originalHeight = segment.rect.h * viewport.height + 8
     // How tall the box may get: a paragraph stays inside the box of the original, a single line may take one more row
     const roomHeight = lines === 1 ? originalHeight * 2 : originalHeight * 1.12
@@ -188,6 +219,22 @@ function TranslatorOverlay({
         toastTimer.current = setTimeout(() => setToast(''), 1800)
     }, [])
 
+    // The dialogue log (it is kept while the stream is open, whether it is shown or not)
+    const [log, setLog] = React.useState<LogLine[]>([])
+    const logRef = React.useRef<LogLine[]>([])
+    const logCounter = React.useRef(0)
+    const addToLog = React.useCallback((source: string, result: TranslatorResult | null) => {
+        if(result === null){
+            return
+        }
+
+        const next = appendToLog(logRef.current, source, result.segments, Date.now(), () => ++logCounter.current)
+        if(next !== logRef.current){
+            logRef.current = next
+            setLog(next)
+        }
+    }, [])
+
     // The text reader runs while the translator is on (one reader per window)
     React.useEffect(() => {
         setResults([])
@@ -220,11 +267,17 @@ function TranslatorOverlay({
                     }
                 },
                 translate: (text, target, source) => Ipc.send('app', 'translateText', translateArgs(settingsRef.current, text, source, target)) as Promise<string>,
-                onResult: (result) => setResults(previous => {
-                    const next = previous.slice()
-                    next[index] = result
-                    return next
-                }),
+                onResult: (result) => {
+                    setResults(previous => {
+                        const next = previous.slice()
+                        next[index] = result
+                        return next
+                    })
+                    const region = getRegions(settingsRef.current)[index]
+                    if(region !== undefined && windowMode(region, index) === 'dialog'){
+                        addToLog('w' + index, result)
+                    }
+                },
                 onStatus: (status) => setStatuses(previous => {
                     const next = previous.slice()
                     next[index] = status
@@ -267,11 +320,16 @@ function TranslatorOverlay({
             }),
             getManualRegions: () => getRegions(settingsRef.current),
             translate: (text, target, source) => Ipc.send('app', 'translateText', translateArgs(settingsRef.current, text, source, target)) as Promise<string>,
-            onResult: (slot, result) => setAutoResults(previous => {
-                const next = previous.slice()
-                next[slot] = result
-                return next
-            }),
+            onResult: (slot, result, mode) => {
+                setAutoResults(previous => {
+                    const next = previous.slice()
+                    next[slot] = result
+                    return next
+                })
+                if(mode !== 'task'){
+                    addToLog('a' + slot, result)
+                }
+            },
             onFrames: (frames) => {
                 const wanted = settingsRef.current.translator_auto_debug === true ? frames : []
                 const key = JSON.stringify(wanted.map(frame => [frame.state, frame.slot, frame.plate, frame.steady, frame.floating, Math.round(frame.rect.x * 500), Math.round(frame.rect.y * 500), Math.round(frame.rect.w * 500), Math.round(frame.rect.h * 500)]))
@@ -465,15 +523,35 @@ function TranslatorOverlay({
     const autoFont = settings.translator_font_auto !== false
     const fixedSize = settings.translator_font_size || 26
 
+    // Everything that is shown (the windows of the player and the ones the adaptive mode found). Two translations never
+    // lie on top of each other (the newer one stays), and each knows its neighbours, so it does not grow over them.
+    const items: Array<{ key: string; segment: TranslatedSegment; rect: Region; shownAt?: number }> = []
+    if(enabled && !editing){
+        results.slice(0, count).forEach((result, windowIndex) => {
+            (result?.segments ?? []).forEach((segment, index) => items.push({ key: windowIndex + '-' + index, segment, rect: segment.rect, shownAt: segment.shownAt }))
+        })
+        if(autoOn){
+            autoResults.slice(0, MAX_AUTO_WINDOWS).forEach((result, slot) => {
+                (result?.segments ?? []).forEach((segment, index) => items.push({ key: 'auto-' + slot + '-' + index, segment, rect: segment.rect, shownAt: segment.shownAt }))
+            })
+        }
+    }
+    const visible = dropCovered(items)
+    const all = visible.map(item => item.segment)
+
     return (
         <div id="translator_layer" className={editing ? 'editing' : ''} data-gp-ignore>
-            { (enabled && !editing) ? results.slice(0, count).map((result, windowIndex) => (result === null || result === undefined) ? null : result.segments.map((segment, index) => (
-                <div key={windowIndex + '-' + index} className="translator-segment" style={segmentStyle(segment, viewport, autoFont, fixedSize, opacity, nextBelow(result.segments, index))}>{segment.translated}</div>
-            ))) : '' }
+            { visible.map((item, index) => (
+                <div key={item.key} className="translator-segment" style={segmentStyle(item.segment, viewport, autoFont, fixedSize, opacity, nextBelow(all, index), sideLimits(all, index))}>{item.segment.translated}</div>
+            )) }
 
-            { (autoOn && !editing) ? autoResults.slice(0, MAX_AUTO_WINDOWS).map((result, slot) => (result === null || result === undefined) ? null : result.segments.map((segment, index) => (
-                <div key={'auto-' + slot + '-' + index} className="translator-segment" style={segmentStyle(segment, viewport, autoFont, fixedSize, opacity, nextBelow(result.segments, index))}>{segment.translated}</div>
-            ))) : '' }
+            { (enabled && !editing && settings.translator_log === true) ? <div className="translator-log">
+                { log.length === 0
+                    ? <p className="translator-log-empty">{t('translator.logEmpty')}</p>
+                    : log.slice(-LOG_SHOWN).map((line, index, lines) => (
+                        <p key={line.id} style={{ opacity: 0.5 + 0.5 * (index + 1) / lines.length }}>{line.translated}</p>
+                    )) }
+            </div> : '' }
 
             { (autoOn && !editing && settings.translator_auto_debug === true) ? autoFrames.map((frame, index) => (
                 <div key={'frame-' + index} className={'translator-auto-frame translator-auto-' + frame.state} style={{

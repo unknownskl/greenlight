@@ -70,6 +70,7 @@ export const defaultSettings = {
     translator_text_color: 'light',
     // Adaptive translator: finds the text on the whole screen by itself (and shows what it found, for testing)
     translator_auto: false,
+    translator_log: false,
     translator_auto_debug: false,
     // Translation service of the player (optional): 'none' | 'deepl' | 'google', the key, and the characters a month that the plan allows
     translator_provider: 'none',

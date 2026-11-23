@@ -167,6 +167,38 @@ div.translator-segment {
     animation: translator-pop 0.15s ease-out;
 }
 
+/* The dialogue log: the last lines of the conversation */
+div.translator-log {
+    position: absolute;
+    top: 70px;
+    left: 14px;
+    max-width: min(44vw, 520px);
+    max-height: 42vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 4px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    background: rgba(10, 12, 15, 0.78);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.25;
+    text-shadow: none;
+}
+
+div.translator-log p {
+    margin: 0;
+}
+
+div.translator-log p.translator-log-empty {
+    opacity: 0.6;
+    font-weight: 500;
+}
+
 div.translator-toast {
     position: absolute;
     top: 86px;

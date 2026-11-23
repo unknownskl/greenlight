@@ -131,16 +131,16 @@ function releaseReader() {
     readerQueue.splice(best, 1)[0].resume()
 }
 
-export async function recognizeCanvas(canvas: HTMLCanvasElement, language = 'en', priority = 1): Promise<OcrResult> {
+export async function recognizeCanvas(canvas: HTMLCanvasElement, language = 'en', priority = 1, maxGap = MAX_WORD_GAP): Promise<OcrResult> {
     await acquireReader(priority)
     try {
-        return await readCanvas(canvas, language)
+        return await readCanvas(canvas, language, maxGap)
     } finally {
         releaseReader()
     }
 }
 
-async function readCanvas(canvas: HTMLCanvasElement, language: string): Promise<OcrResult> {
+async function readCanvas(canvas: HTMLCanvasElement, language: string, maxGap: number): Promise<OcrResult> {
     const worker = await getOcrWorker(language)
     const result = await worker.recognize(canvas, {}, { text: true, blocks: true })
 
@@ -186,7 +186,7 @@ async function readCanvas(canvas: HTMLCanvasElement, language: string): Promise<
 
                 for(const word of words){
                     const previous = chunk[chunk.length - 1]
-                    if(previous !== undefined && word.bbox.x0 - previous.bbox.x1 > height * MAX_WORD_GAP){
+                    if(previous !== undefined && word.bbox.x0 - previous.bbox.x1 > height * maxGap){
                         flush()
                     }
                     chunk.push(word)

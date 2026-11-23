@@ -36,6 +36,8 @@ export interface TranslatedSegment {
     foreground: string;
     // True when the text is centred in the window (a subtitle), false when it starts at the left edge of the window
     centered: boolean;
+    // When it was put on screen (the newer of two translations that overlap stays)
+    shownAt?: number;
 }
 
 export interface TranslatorResult {
@@ -160,6 +162,16 @@ const FINE_SAME = 0.04
 // a glowing or shaking panel changes the picture a little all the time, but not the text
 const STEADY_FINE_CHANGE = 0.1
 const EXACT_RECHECK_MS = 20000
+// Text that is still where it was (the pixels of the last reading are still text pixels) is not "moving" and is not
+// read again because the picture behind it changes (the camera turns, the text of the interface stays). Only text
+// that is added to it (a line that is typed, a second sentence) is read: that is more ink than the last reading had.
+const HELD_RETENTION = 0.8
+const MIN_HELD_INK = 30
+const GROWTH_SHARE = 0.2
+const GROWTH_GAP_MS = 2000
+// How wide a gap inside one piece of text may be (in heights of a word): a subtitle is one text, a menu has pieces
+const DIALOG_WORD_GAP = 8
+const TASK_WORD_GAP = 2
 
 // A row of letters is at most this many times as tall as the (taller) words in it
 const WORD_HEIGHT_CAP = 1.3
@@ -560,6 +572,91 @@ function fineDifference(a: Uint8Array, b: Uint8Array, width: number, height: num
     return total === 0 ? 0 : lost / total
 }
 
+/** The pixels of the text itself (not of the picture behind it) at the last reading, and the box around them. */
+interface TextInk {
+    polarity: Polarity;
+    mask: Uint8Array;
+    width: number;
+    height: number;
+    box: { x0: number; y0: number; x1: number; y1: number };
+}
+
+/** Keeps the text pixels of `fine` that lie inside the boxes of the lines that were read. */
+function textInkOf(polarity: Polarity, fine: Uint8Array, width: number, height: number, boxes: Array<{ x0: number; y0: number; x1: number; y1: number }>): TextInk | null {
+    const mask = new Uint8Array(fine.length)
+    const box = { x0: width, y0: height, x1: -1, y1: -1 }
+    let ink = 0
+
+    for(const wanted of boxes){
+        const top = Math.max(0, Math.floor(wanted.y0) - 1)
+        const bottom = Math.min(height - 1, Math.ceil(wanted.y1) + 1)
+        const left = Math.max(0, Math.floor(wanted.x0) - 1)
+        const right = Math.min(width - 1, Math.ceil(wanted.x1) + 1)
+        for(let y = top; y <= bottom; y++){
+            for(let x = left; x <= right; x++){
+                const i = y * width + x
+                if(fine[i] === 1 && mask[i] === 0){
+                    mask[i] = 1
+                    ink++
+                    box.x0 = Math.min(box.x0, x)
+                    box.y0 = Math.min(box.y0, y)
+                    box.x1 = Math.max(box.x1, x)
+                    box.y1 = Math.max(box.y1, y)
+                }
+            }
+        }
+    }
+
+    return ink >= MIN_HELD_INK ? { polarity, mask, width, height, box } : null
+}
+
+/**
+ * How much of the text pixels of the last reading is still there (within one pixel), and how much new ink there is
+ * around the text (to its sides and above / below it) that was there at the look before as well, as a share of the text pixels. Ink somewhere else in the window
+ * (the picture behind the text, which changes when the camera turns) is neither.
+ */
+function fineHold(text: TextInk, now: Uint8Array, before: Uint8Array | null): { kept: number; extra: number } {
+    const { width, height, mask, box } = text
+    const near = (other: Uint8Array, x: number, y: number): boolean => {
+        for(let dy = -1; dy <= 1; dy++){
+            const yy = y + dy
+            if(yy < 0 || yy >= height){ continue }
+            for(let dx = -1; dx <= 1; dx++){
+                const xx = x + dx
+                if(xx >= 0 && xx < width && other[yy * width + xx] === 1){ return true }
+            }
+        }
+        return false
+    }
+
+    let ink = 0
+    let kept = 0
+    for(let y = box.y0; y <= box.y1; y++){
+        for(let x = box.x0; x <= box.x1; x++){
+            if(mask[y * width + x] === 1){
+                ink++
+                // The very same pixel: a different text in the same place has other letters, and hardly keeps a third of them
+                if(now[y * width + x] === 1){ kept++ }
+            }
+        }
+    }
+
+    const reachX = Math.max(24, Math.round((box.x1 - box.x0) * 0.5))
+    const reachY = Math.max(6, Math.round((box.y1 - box.y0) * 0.8))
+    let extra = 0
+    for(let y = Math.max(0, box.y0 - reachY); y <= Math.min(height - 1, box.y1 + reachY); y++){
+        for(let x = Math.max(0, box.x0 - reachX); x <= Math.min(width - 1, box.x1 + reachX); x++){
+            const inside = x >= box.x0 - 1 && x <= box.x1 + 1 && y >= box.y0 - 1 && y <= box.y1 + 1
+            const i = y * width + x
+            if(!inside && now[i] === 1 && (before === null || before[i] === 1)){
+                extra++
+            }
+        }
+    }
+
+    return { kept: ink === 0 ? 1 : kept / ink, extra: ink === 0 ? 0 : extra / ink }
+}
+
 /**
  * Puts the new numbers of a text into the translation of the old one, so a counter or a timer that only changes
  * its digits does not need a new translation. Returns null when that is not possible.
@@ -617,6 +714,8 @@ interface Snapshot {
     // The text pixels at that moment (coarse): two snapshots with the same mask are the same picture
     masks: Partial<Record<Polarity, Uint8Array>>;
     profiles: Partial<Record<Polarity, Float32Array>>;
+    fines: Partial<Record<Polarity, Uint8Array>>;
+    sig: { width: number; height: number };
     // How much the text pixels differed from the snapshot before (coarse mask, and the columns of ink)
     changeAmount: number;
     profileAmount: number;
@@ -642,6 +741,28 @@ function sameSnapshot(a: Snapshot, b: Snapshot): boolean {
 }
 
 // New text that waits for a second reading before it is translated
+/**
+ * Two translations never lie on top of each other: of two that overlap the newer one stays (the older one is out of
+ * date), unless the newer one is only a small piece of the older one (a fragment of the same line): then the whole
+ * line stays.
+ */
+export function dropCovered<T extends { rect: Region; shownAt?: number }>(segments: T[]): T[] {
+    const area = (segment: T) => segment.rect.w * segment.rect.h
+    const order = segments.map((segment, index) => ({ segment, index })).sort((a, b) => (b.segment.shownAt ?? 0) - (a.segment.shownAt ?? 0) || a.index - b.index)
+    let kept: Array<{ segment: T; index: number }> = []
+
+    for(const item of order){
+        const conflicts = kept.filter(other => overlapShare(item.segment.rect, other.segment.rect) > 0.4)
+        if(conflicts.length === 0){
+            kept.push(item)
+        } else if(conflicts.every(other => area(other.segment) * 2.5 < area(item.segment))){
+            kept = kept.filter(other => conflicts.indexOf(other) < 0)
+            kept.push(item)
+        }
+    }
+    return kept.sort((a, b) => a.index - b.index).map(item => item.segment)
+}
+
 interface PendingText {
     key: string;
     seen: number;
@@ -675,6 +796,10 @@ export default class TranslatorEngine {
     _readProfile: Partial<Record<Polarity, Float32Array>> = {}
     // The text pixels (fine) at the last reading: if they are still the same, the text is the same
     _readFine: Partial<Record<Polarity, { mask: Uint8Array; width: number; height: number }>> = {}
+    // Only the pixels of the text that was read (not the picture behind it), to see whether that text is still there
+    _textInk: TextInk | null = null
+    _grownTicks = 0
+    _prevFine: Uint8Array | null = null
     _identity = ''
     // The window as it was at the last look, and how far it has been carried along with its text since the start
     _region: Region | null = null
@@ -753,6 +878,8 @@ export default class TranslatorEngine {
         this._readMask = {}
         this._readProfile = {}
         this._readFine = {}
+        this._textInk = null
+        this._grownTicks = 0
         this._shift = { x: 0, y: 0 }
         this._hasReadMask = false
         this._emptySince = 0
@@ -929,6 +1056,7 @@ export default class TranslatorEngine {
                 this._readMask = {}
                 this._readProfile = {}
                 this._readFine = {}
+                this._textInk = null
                 this._hasReadMask = false
                 this._sameCount = 0
             }
@@ -1037,6 +1165,40 @@ export default class TranslatorEngine {
 
         const now = Date.now()
 
+        // Is the text of the last reading still where it was? Then the camera may turn and the picture behind it may
+        // change as it likes: the text is not moving, it is not hidden and it is not read again for that.
+        // Only more ink around the text (a line that is typed, another sentence) is a reason to read it again.
+        let held = false
+        const ink = this._textInk
+        if(ink !== null && this._hasReadMask && this._shown.length > 0 && !taskMode && ink.width === width && ink.height === height){
+            const candidate = present.find(item => item.polarity === ink.polarity)
+            const before = this._prevFine
+            this._prevFine = candidate === undefined ? null : candidate.fine
+            if(candidate !== undefined){
+                const hold = fineHold(ink, candidate.fine, before)
+                if(hold.kept >= HELD_RETENTION){
+                    held = true
+                    // More ink has to be there in two looks in a row (a living background is different every time)
+                    this._grownTicks = hold.extra >= GROWTH_SHARE ? this._grownTicks + 1 : 0
+                    moving = false
+                    settled = true
+                    profileChanged = false
+                    changed = this._grownTicks >= 2
+                    this._unstableTicks = 0
+                    this._unstableSince = 0
+                    if(changed){
+                        this._activeUntil = now + ACTIVE_MS
+                    }
+                }
+            }
+        }
+        if(!held){
+            this._grownTicks = 0
+        }
+        if(ink === null){
+            this._prevFine = null
+        }
+
         // A steady text that is on screen and whose pixels are almost the same as at the last reading is the same text,
         // whatever the coarse picture says: it is not read (and not translated) again
         if(taskMode && changed && !appearing && this._hasReadMask && this._shown.length > 0 && this._pixelsSame(present, width, height, STEADY_FINE_CHANGE)){
@@ -1048,7 +1210,7 @@ export default class TranslatorEngine {
         if(taskMode){
             moving = false
             settled = true
-        } else if(changed || appearing || profileChanged){
+        } else if(!held && (changed || appearing || profileChanged)){
             // Something is going on: look more often for a while
             this._activeUntil = now + ACTIVE_MS
         }
@@ -1111,7 +1273,7 @@ export default class TranslatorEngine {
         const idle = !this._working && this._jobs.length === 0
 
         // The longer the text stays the same, the less often it is read again; changed text is photographed without that delay
-        const minGap = taskMode ? 1200 : (changed ? SNAPSHOT_GAP_MS : Math.min(3000, 400 + this._sameCount * 400))
+        const minGap = taskMode ? 1200 : (held ? GROWTH_GAP_MS : (changed ? SNAPSHOT_GAP_MS : Math.min(3000, 400 + this._sameCount * 400)))
 
         // Read again now and then even when the picture looks the same: it may be a different line in the same place.
         // Reading the same text again costs nothing visible (see _process), and it happens less often the longer the text stays.
@@ -1119,7 +1281,7 @@ export default class TranslatorEngine {
 
         // The same pixels as at the last reading: the text is the same and is translated already, so it is not read
         // again (only now and then, in case the picture has changed in a way the pixels do not show)
-        if(recheck && !changed && this._shown.length > 0 && now - this._lastReadAt < EXACT_RECHECK_MS && this._pixelsSame(present, width, height)){
+        if(recheck && !changed && this._shown.length > 0 && now - this._lastReadAt < EXACT_RECHECK_MS && (held || this._pixelsSame(present, width, height))){
             recheck = false
         }
 
@@ -1152,7 +1314,7 @@ export default class TranslatorEngine {
             }
         }
 
-        const snapshot = this._capture(video, source, box, config, present, changeAmount, profileAmount, now)
+        const snapshot = this._capture(video, source, box, config, present, changeAmount, profileAmount, now, { width, height })
         if(snapshot === null){
             return
         }
@@ -1197,7 +1359,7 @@ export default class TranslatorEngine {
     }
 
     /** A copy of the window as it is right now (the reader may get to it a second later). */
-    _capture(video: HTMLVideoElement, source: SourceRect, box: { width: number; height: number }, config: TranslatorConfig, present: Array<{ polarity: Polarity; mask: Uint8Array; profile: Float32Array }>, changeAmount: number, profileAmount: number, now: number): Snapshot | null {
+    _capture(video: HTMLVideoElement, source: SourceRect, box: { width: number; height: number }, config: TranslatorConfig, present: Array<{ polarity: Polarity; mask: Uint8Array; profile: Float32Array; fine: Uint8Array }>, changeAmount: number, profileAmount: number, now: number, sig: { width: number; height: number }): Snapshot | null {
         const canvas = document.createElement('canvas')
         canvas.width = Math.max(1, Math.round(source.sw))
         canvas.height = Math.max(1, Math.round(source.sh))
@@ -1210,9 +1372,11 @@ export default class TranslatorEngine {
 
         const masks: Partial<Record<Polarity, Uint8Array>> = {}
         const profiles: Partial<Record<Polarity, Float32Array>> = {}
+        const fines: Partial<Record<Polarity, Uint8Array>> = {}
         for(const candidate of present){
             masks[candidate.polarity] = candidate.mask
             profiles[candidate.polarity] = candidate.profile
+            fines[candidate.polarity] = candidate.fine
         }
 
         return {
@@ -1225,6 +1389,8 @@ export default class TranslatorEngine {
             polarities: present.map(candidate => candidate.polarity),
             masks,
             profiles,
+            fines,
+            sig,
             changeAmount,
             profileAmount,
             shift: { x: this._shift.x, y: this._shift.y },
@@ -1310,11 +1476,13 @@ export default class TranslatorEngine {
         const now = job.at
         const generation = job.generation
         let best: ReadResult = { segments: [], text: '', score: 0 }
+        let bestPolarity: Polarity = job.polarities[0]
 
         for(const polarity of job.polarities){
             const result = await this._read(job, polarity)
             if(result !== null && result.score > best.score){
                 best = result
+                bestPolarity = polarity
             }
         }
 
@@ -1367,6 +1535,19 @@ export default class TranslatorEngine {
             this._sameCount = 0
             this._hasReadMask = false
             return
+        }
+
+        // The pixels of the text that was read: as long as they stay, the text is still there (see _step)
+        const fine = job.fines[bestPolarity]
+        if(fine !== undefined && job.config.mode !== 'task'){
+            const toSignature = (x: number, y: number) => ({ x: (x - job.source.sx) / job.source.sw * job.sig.width, y: (y - job.source.sy) / job.source.sh * job.sig.height })
+            const boxes = best.segments.map((raw) => {
+                const from = toSignature(raw.rect.x, raw.rect.y)
+                const to = toSignature(raw.rect.x + raw.rect.w, raw.rect.y + raw.rect.h)
+                return { x0: from.x, y0: from.y, x1: to.x, y1: to.y }
+            })
+            this._textInk = textInkOf(bestPolarity, fine, job.sig.width, job.sig.height, boxes)
+            this._grownTicks = 0
         }
 
         // 5. Translate what is new
@@ -1438,6 +1619,7 @@ export default class TranslatorEngine {
                 segments.push({ ...old, missed: old.missed + 1 })
             }
         })
+        segments = dropCovered(segments)
         segments.sort((a, b) => a.rect.y - b.rect.y || a.rect.x - b.rect.x)
         this._held = []
 
@@ -1620,7 +1802,7 @@ export default class TranslatorEngine {
             return null
         }
 
-        const result = await recognizeCanvas(prepared.canvas, job.config.source, this._options.priority ?? 1)
+        const result = await recognizeCanvas(prepared.canvas, job.config.source, this._options.priority ?? 1, job.config.mode === 'task' ? TASK_WORD_GAP : DIALOG_WORD_GAP)
         if(result.confidence < MIN_CONFIDENCE){
             return null
         }

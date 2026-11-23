@@ -458,6 +458,10 @@ function StreamComponent({
         setSettings({ ...settings, translator_auto: settings.translator_auto !== true })
     }
 
+    function toggleTranslatorLog() {
+        setSettings({ ...settings, translator_log: settings.translator_log !== true })
+    }
+
     function toggleTranslatorWindow(index: number) {
         const list = getRegions(settings)
         if(list[index] === undefined){
@@ -578,6 +582,9 @@ function StreamComponent({
                             )) : '' }
                             { settings.translator_enabled ? <Button label={<span><i className="fa-solid fa-wand-magic-sparkles"></i> <span className="gb-label">{t("translator.btnAuto")}</span></span>} title={t("translator.btnAutoTitle")} className={settings.translator_auto === true ? 'btn-primary' : ''} onClick={(e) => {
                                 e.target.blur(); toggleTranslatorAuto()
+                            }}></Button> : '' }
+                            { settings.translator_enabled ? <Button label={<span><i className="fa-solid fa-clock-rotate-left"></i> <span className="gb-label">{t("translator.btnLog")}</span></span>} title={t("translator.btnLogTitle")} className={settings.translator_log === true ? 'btn-primary' : ''} onClick={(e) => {
+                                e.target.blur(); toggleTranslatorLog()
                             }}></Button> : '' }
                             { settings.translator_enabled ? <Button label={<span><i className="fa-solid fa-crop-simple"></i> <span className="gb-label">{t("translator.btnArea")}</span></span>} title={t("translator.btnAreaTitle")} onClick={(e) => {
                                 e.target.blur(); editTranslatorArea()
