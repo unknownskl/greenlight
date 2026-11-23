@@ -1,6 +1,7 @@
 import Ipc from '../ipc'
 import { Translation, TranslateFunction } from './engine'
 import { CatalogChoice, isLocalInstalled, translateLocal } from './local'
+import { glossaryTranslation } from './uiwords'
 
 export type LocalMode = 'off' | 'smart' | 'local' | 'backup'
 
@@ -45,6 +46,12 @@ function translateOnline(text: string, from: string, to: string): Promise<string
  */
 export function createTranslate(getSettings: () => TranslatorSettings): TranslateFunction {
     return async (text: string, target: string, source: string): Promise<string | Translation> => {
+        // A label that is just a word of the interface ("PAUSED", "Inventory") comes from the list: no request, no mistake
+        const known = glossaryTranslation(text, source, target)
+        if(known !== null){
+            return known
+        }
+
         const settings = getSettings()
         const mode = localMode(settings)
         const engine = localEngine(settings)

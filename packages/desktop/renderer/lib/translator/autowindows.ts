@@ -1,6 +1,7 @@
 import TranslatorEngine, { EngineStatus, Polarity, TextColor, TranslatorResult, Translation, TranslateFunction } from './engine'
 import { Region, FitMode, DEFAULT_REGION, clampRegion, regionToSource, videoRectToScreen, regionsOverlap } from './geometry'
 import { BlockRole, findTextBlocks } from './scout'
+import { menuConcepts, menuWordCount } from './uiwords'
 
 /**
  * The adaptive translator: instead of windows that the player places by hand, a scout looks at the whole picture every
@@ -88,6 +89,11 @@ const MENU_SPREAD = 0.3
 const MENU_LOOKS = 3
 const MENU_OVER_BLOCKS = 3
 const MENU_OVER_LOOKS = 5
+// Words of a menu (pause, settings, inventory ...) among the texts that were read lately: this many different ones make a
+// menu even when only a few lines of text were found, and as long as two of them are there the menu is not over
+const MENU_WORDS = 3
+const MENU_WORDS_STAY = 2
+const MENU_WORDS_MS = 8000
 
 // A block that has more than this share of its area inside a window of the player (grown by the margin) belongs to that window
 const MANUAL_MARGIN = 0.01
@@ -236,6 +242,8 @@ export default class AutoWindows {
     _placedFromPanel = false
     // Where the text of the picture is, in pieces (for reading a whole screen piece by piece)
     _tiles: Region[] = []
+    // The words of the interface in the texts that were read lately (when, and which)
+    _words: Array<{ at: number; ids: string[] }> = []
 
     constructor(options: AutoOptions) {
         this._options = options
@@ -390,6 +398,9 @@ export default class AutoWindows {
 
         slot.shown = shown
         slot.lastText = text
+        if(result !== null){
+            this._noteWords(result.segments.map(segment => segment.original), now)
+        }
         this._options.onResult(index, (result !== null && slot.fromPanel && slot.region !== null) ? { ...result, bounds: slot.region } : result, slot.mode)
     }
 
@@ -534,6 +545,32 @@ export default class AutoWindows {
         this._report(found)
     }
 
+    /** The texts that were read on the screen (by the whole-screen reading): their words of the interface tell it is a menu. */
+    noteTexts(texts: string[]) {
+        this._noteWords(texts, Date.now())
+    }
+
+    _noteWords(texts: string[], now: number) {
+        const language = this._options.getSettings().source
+        const ids = new Set<string>()
+        texts.forEach(text => menuConcepts(text, language).forEach(id => ids.add(id)))
+        if(ids.size > 0){
+            this._words.push({ at: now, ids: Array.from(ids) })
+        }
+        this._words = this._words.filter(item => now - item.at < MENU_WORDS_MS)
+    }
+
+    /** How many different words of a menu were read lately. */
+    _recentMenuWords(now: number): number {
+        const ids = new Set<string>()
+        this._words.forEach((item) => {
+            if(now - item.at < MENU_WORDS_MS){
+                item.ids.forEach(id => ids.add(id))
+            }
+        })
+        return menuWordCount(ids)
+    }
+
     /** The places of text on the screen, for reading it piece by piece: close blocks are joined, there are not many of them. */
     getTiles(): Region[] {
         return this._tiles
@@ -585,10 +622,11 @@ export default class AutoWindows {
             spread = Math.max(...lines.map(block => block.y + block.h)) - Math.min(...lines.map(block => block.y))
         }
 
-        if(lines.length >= MENU_BLOCKS && spread >= MENU_SPREAD){
+        const words = this._recentMenuWords(Date.now())
+        if((lines.length >= MENU_BLOCKS && spread >= MENU_SPREAD) || (words >= MENU_WORDS && lines.length >= 3)){
             this._menuLooks++
             this._menuOverLooks = 0
-        } else if(lines.length < MENU_OVER_BLOCKS){
+        } else if(lines.length < MENU_OVER_BLOCKS && words < MENU_WORDS_STAY){
             this._menuLooks = 0
             this._menuOverLooks++
         } else {

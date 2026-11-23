@@ -227,6 +227,11 @@ function TranslatorOverlay({
     const screenOn = enabled && (settings.translator_fullscreen === true || (autoOn && menuAuto && settings.translator_menu_auto !== false))
     const screenOnRef = React.useRef(screenOn)
     screenOnRef.current = screenOn
+    // A menu was recognised (not the whole-screen reading that the player asked for): the windows for subtitles rest then,
+    // and what lies under them is read with the rest of the screen
+    const menuActive = autoOn && menuAuto && settings.translator_menu_auto !== false
+    const menuActiveRef = React.useRef(menuActive)
+    menuActiveRef.current = menuActive
     // What is learned about a game (where its text is) is kept per console / game of the stream
     const router = useRouter()
     const profileKey = String(router.query.serverid ?? 'default')
@@ -285,7 +290,7 @@ function TranslatorOverlay({
                     const region = getRegions(settingsRef.current)[index] ?? DEFAULT_REGION
                     return {
                     region,
-                    enabled: region.enabled !== false,
+                    enabled: region.enabled !== false && !(menuActiveRef.current && windowMode(region, index) === 'dialog'),
                     mode: windowMode(region, index),
                     color: (settingsRef.current.translator_text_color || 'light') as TextColor,
                     source: settingsRef.current.translator_source_lang || 'en',
@@ -390,6 +395,13 @@ function TranslatorOverlay({
     React.useEffect(() => {
         autoRef.current?.setPaused(screenOn)
     }, [screenOn])
+
+    // The words of the interface in what the whole-screen reading found keep the menu mode on
+    React.useEffect(() => {
+        if(screenOn && screenResult !== null){
+            autoRef.current?.noteTexts(screenResult.segments.map(segment => segment.original))
+        }
+    }, [screenResult])
 
     // The whole screen as one window (a menu): lines are translated one by one, a steady picture is read calmly
     React.useEffect(() => {
@@ -578,7 +590,7 @@ function TranslatorOverlay({
         })
         if(screenOn && screenResult !== null){
             // The windows of the player work during the whole-screen reading too: their places are left to them
-            const own = regions.filter(region => region.enabled !== false)
+            const own = regions.filter((region, index) => region.enabled !== false && !(menuActive && windowMode(region, index) === 'dialog'))
             screenResult.segments.forEach((segment, index) => {
                 if(!own.some(region => coveredBy(segment.rect, region) > 0.3)){
                     items.push({ key: 'screen-' + index, segment, rect: segment.rect, shownAt: segment.shownAt })
