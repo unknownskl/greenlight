@@ -22,6 +22,8 @@ export interface TextBlock {
     score: number;
     // The text sits on a "plate": a panel of the interface with a flat background that has edges (a message box, a task list)
     plate: boolean;
+    // The panel of the interface the text sits on (fractions of the picture), when its edges were found
+    panel?: { x: number; y: number; w: number; h: number };
     stats?: { fill: number; ratio: number; onShare: number };
 }
 
@@ -52,6 +54,11 @@ const MIN_ON_SHARE_BLOCK = 0.2
 // A plate: the background around the text is this flat (the spread of the brightness) and differs from what lies beyond it
 const PLATE_FLAT = 20
 const PLATE_EDGE = 12
+// The panel of a plate grows outwards in steps while the strip beyond it is as flat as the plate; it ends at an edge
+const PANEL_STEP = 4
+const PANEL_MAX_GROW = 0.25
+const PANEL_SAME = 16
+const PANEL_FLAT = 30
 // A block as wide as the picture is a horizon or a bar, not text
 const MAX_BLOCK_WIDTH = 0.88
 // Rows of text one under another (lines of one subtitle, one message) are one block when they are this close
@@ -122,6 +129,56 @@ function hasPlate(data: Uint8ClampedArray, mask: Uint8Array, width: number, heig
     }
 
     return inside.spread <= PLATE_FLAT && (Math.abs(inside.mean - outside.mean) >= PLATE_EDGE || outside.spread >= inside.spread * 1.8 + 6)
+}
+
+/**
+ * The panel a text sits on: the rectangle around the text whose background is as flat as the plate, up to the edge where
+ * the background changes. null when the edges are not clear (the background goes on and on, or the plate is cut off).
+ */
+function findPanel(data: Uint8ClampedArray, mask: Uint8Array, width: number, height: number, box: { x0: number; y0: number; x1: number; y1: number }): { x0: number; y0: number; x1: number; y1: number } | null {
+    const pad = Math.min(14, Math.max(4, Math.round((box.y1 - box.y0) * 0.35)))
+    const base = ringStats(data, mask, width, height, [box.x0, box.y0, box.x1, box.y1], [box.x0 - pad, box.y0 - pad, box.x1 + pad, box.y1 + pad])
+    if(base.count < 30){
+        return null
+    }
+
+    const rect = { x0: box.x0, y0: box.y0, x1: box.x1, y1: box.y1 }
+    const none = [0, 0, 0, 0]
+    const growX = Math.round(width * PANEL_MAX_GROW)
+    const growY = Math.round(height * PANEL_MAX_GROW)
+    const same = (strip: number[]) => {
+        const stats = ringStats(data, mask, width, height, none, strip)
+        return stats.count >= 8 && Math.abs(stats.mean - base.mean) <= PANEL_SAME && stats.spread <= PANEL_FLAT
+    }
+
+    // Per side: still growing / stopped at an edge / stopped at the limit
+    const state = { left: 'grow', right: 'grow', top: 'grow', bottom: 'grow' } as Record<string, string>
+    for(let round = 0; round < 80 && Object.values(state).includes('grow'); round++){
+        if(state.left === 'grow'){
+            if(box.x0 - rect.x0 >= growX || rect.x0 - PANEL_STEP < 0){ state.left = rect.x0 - PANEL_STEP < 0 ? 'edge' : 'limit' }
+            else if(same([rect.x0 - PANEL_STEP, rect.y0, rect.x0, rect.y1])){ rect.x0 -= PANEL_STEP } else { state.left = 'edge' }
+        }
+        if(state.right === 'grow'){
+            if(rect.x1 - box.x1 >= growX || rect.x1 + PANEL_STEP > width){ state.right = rect.x1 + PANEL_STEP > width ? 'edge' : 'limit' }
+            else if(same([rect.x1, rect.y0, rect.x1 + PANEL_STEP, rect.y1])){ rect.x1 += PANEL_STEP } else { state.right = 'edge' }
+        }
+        if(state.top === 'grow'){
+            if(box.y0 - rect.y0 >= growY || rect.y0 - PANEL_STEP < 0){ state.top = rect.y0 - PANEL_STEP < 0 ? 'edge' : 'limit' }
+            else if(same([rect.x0, rect.y0 - PANEL_STEP, rect.x1, rect.y0])){ rect.y0 -= PANEL_STEP } else { state.top = 'edge' }
+        }
+        if(state.bottom === 'grow'){
+            if(rect.y1 - box.y1 >= growY || rect.y1 + PANEL_STEP > height){ state.bottom = rect.y1 + PANEL_STEP > height ? 'edge' : 'limit' }
+            else if(same([rect.x0, rect.y1, rect.x1, rect.y1 + PANEL_STEP])){ rect.y1 += PANEL_STEP } else { state.bottom = 'edge' }
+        }
+    }
+
+    // A clear panel: it ended at an edge on every side (not because it was cut short), and it is bigger than the text
+    if(Object.values(state).some(value => value !== 'edge')){
+        return null
+    }
+    const textArea = (box.x1 - box.x0) * (box.y1 - box.y0)
+    const panelArea = (rect.x1 - rect.x0) * (rect.y1 - rect.y0)
+    return panelArea >= textArea * 1.15 ? rect : null
 }
 
 function overlapShare(a: { x: number; y: number; w: number; h: number }, b: { x: number; y: number; w: number; h: number }): number {
@@ -368,8 +425,11 @@ export function findTextBlocks(data: Uint8ClampedArray, width: number, height: n
                 w: w * CELL / width,
                 h: h * CELL / height,
             }
-            const plate = hasPlate(data, fine.mask, width, height, { x0: part.x0 * CELL, y0: part.y0 * CELL, x1: part.x1 * CELL, y1: part.y1 * CELL })
-            blocks.push({ ...block, polarity: part.polarity, role: classify(block), plate, score: Math.min(ratio, 12) * Math.sqrt(part.ink) * (plate ? 1.5 : 1), stats: { fill, ratio, onShare } })
+            const textBox = { x0: part.x0 * CELL, y0: part.y0 * CELL, x1: part.x1 * CELL, y1: part.y1 * CELL }
+            const plate = hasPlate(data, fine.mask, width, height, textBox)
+            const found = plate ? findPanel(data, fine.mask, width, height, textBox) : null
+            const panel = found === null ? undefined : { x: found.x0 / width, y: found.y0 / height, w: (found.x1 - found.x0) / width, h: (found.y1 - found.y0) / height }
+            blocks.push({ ...block, ...(panel === undefined ? {} : { panel }), polarity: part.polarity, role: classify(block), plate, score: Math.min(ratio, 12) * Math.sqrt(part.ink) * (plate ? 1.5 : 1), stats: { fill, ratio, onShare } })
         }
     })
 

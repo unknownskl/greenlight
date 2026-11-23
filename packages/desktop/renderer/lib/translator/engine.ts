@@ -44,6 +44,8 @@ export interface TranslatorResult {
     original: string;
     translated: string;
     segments: TranslatedSegment[];
+    // The panel of the interface the text is in (the translation is fitted into it), when it is known
+    bounds?: Region;
 }
 
 /**

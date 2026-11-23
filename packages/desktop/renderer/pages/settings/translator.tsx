@@ -148,6 +148,39 @@ function SettingsTranslator() {
                     </p> : '' }
 
                     { settings.translator_auto === true ? <p>
+                        <label>{t('translator.panelsLabel')}</label>
+                        <label style={{ minWidth: 0 }} className="toggle-label">
+                            <input type='checkbox' checked={settings.translator_panels !== false} onChange={(e) => {
+                                update({ translator_panels: e.target.checked })
+                            }} />
+                        </label>
+                        <small style={{ display: 'block', opacity: 0.7 }}>{t('translator.panelsHint')}</small>
+                    </p> : '' }
+
+                    { settings.translator_auto === true ? <p>
+                        <label>{t('translator.profileLabel')}</label>
+                        <label style={{ minWidth: 0 }} className="toggle-label">
+                            <input type='checkbox' checked={settings.translator_profile_on !== false} onChange={(e) => {
+                                update({ translator_profile_on: e.target.checked })
+                            }} />
+                        </label>
+                        {' '}<Button label={<span><i className="fa-solid fa-eraser"></i> {t('translator.profileForget')}</span>} className="btn-cancel" onClick={() => {
+                            update({ translator_profiles: {} })
+                        }}></Button>
+                        <small style={{ display: 'block', opacity: 0.7 }}>{t('translator.profileHint')}</small>
+                    </p> : '' }
+
+                    { settings.translator_auto === true ? <p>
+                        <label>{t('translator.fullscreenLabel')}</label>
+                        <label style={{ minWidth: 0 }} className="toggle-label">
+                            <input type='checkbox' checked={settings.translator_fullscreen === true} onChange={(e) => {
+                                update({ translator_fullscreen: e.target.checked })
+                            }} />
+                        </label>
+                        <small style={{ display: 'block', opacity: 0.7 }}>{t('translator.fullscreenHint')}</small>
+                    </p> : '' }
+
+                    { settings.translator_auto === true ? <p>
                         <label>{t('translator.autoDebugLabel')}</label>
                         <label style={{ minWidth: 0 }} className="toggle-label">
                             <input type='checkbox' checked={settings.translator_auto_debug === true} onChange={(e) => {

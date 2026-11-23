@@ -25,10 +25,24 @@ export interface AutoFrame {
     floating?: boolean;
 }
 
+// A place where text was translated, remembered between runs (a profile of the game): fractions of the screen,
+// how many times the place proved itself, and when it last did
+export interface Zone {
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+    hits: number;
+    seen: number;
+}
+
 export interface AutoOptions {
     getVideo: () => HTMLVideoElement | null;
     getBox: () => { width: number; height: number };
-    getSettings: () => { fit: FitMode; source: string; target: string; color: TextColor };
+    getSettings: () => { fit: FitMode; source: string; target: string; color: TextColor; panels?: boolean };
+    // What was learned in earlier runs (places where text was translated) and where to keep what is learned now
+    getProfile?: () => Zone[];
+    onProfile?: (zones: Zone[]) => void;
     // The windows the player has placed himself: the scout leaves those places alone
     getManualRegions: () => Region[];
     translate: TranslateFunction;
@@ -90,6 +104,11 @@ const IGNORE_MS = 25000
 const IGNORE_MAX_MS = 300000
 // A place where text was translated is remembered for this long
 const GOOD_MS = 600000
+// A place that proved itself this many times is remembered for the next runs (a few at most, for this long)
+const PROFILE_MIN_HITS = 2
+const PROFILE_MAX_ZONES = 24
+const PROFILE_KEEP_MS = 60 * 24 * 3600 * 1000
+const PROFILE_SAVE_MS = 20000
 // A window grows when its text has grown out of it on two looks in a row, but not more often than this
 const GROW_MS = 3000
 // A window whose translation has not changed for this long holds a steady text (a task list): it is handled like a
@@ -106,6 +125,8 @@ interface Track {
     plate: boolean;
     streak: number;
     score: number;
+    // The panel of the interface the text sits on, when its edges were found
+    panel?: Region;
 }
 
 interface Slot {
@@ -131,6 +152,8 @@ interface Slot {
     // Where the text was at the last look (the window is carried along when the text moves) and when it last moved
     anchor: Region | null;
     movedAt: number;
+    // The window is the panel of the interface the text sits on (the translation is fitted into it)
+    fromPanel: boolean;
 }
 
 // How much of the first box lies inside the second one (0..1)
@@ -150,6 +173,10 @@ function grow(region: Region, margin: number): Region {
 
 function center(region: Region): { x: number; y: number } {
     return { x: region.x + region.w / 2, y: region.y + region.h / 2 }
+}
+
+function round3(value: number): number {
+    return Math.round(value * 1000) / 1000
 }
 
 function centralness(region: Region): number {
@@ -197,6 +224,10 @@ export default class AutoWindows {
     _menuLooks = 0
     _menuOverLooks = 0
     _paused = false
+    // The places that proved themselves, now and in earlier runs; saved now and then
+    _learned: Zone[] = []
+    _saveTimer: ReturnType<typeof setTimeout> | undefined
+    _placedFromPanel = false
 
     constructor(options: AutoOptions) {
         this._options = options
@@ -204,7 +235,7 @@ export default class AutoWindows {
         for(let index = 0; index < MAX_AUTO_WINDOWS; index++){
             this._slots.push({
                 region: null, polarity: 'light', role: 'other', mode: 'dialog', epoch: 0, since: 0, lastSeen: 0, grownAt: 0, outside: 0,
-                shown: false, shownSince: 0, everShown: false, lastText: '', changes: [], plate: false, anchor: null, movedAt: 0,
+                shown: false, shownSince: 0, everShown: false, lastText: '', changes: [], plate: false, anchor: null, movedAt: 0, fromPanel: false,
             })
         }
     }
@@ -222,6 +253,12 @@ export default class AutoWindows {
             return
         }
         this._running = true
+
+        // Places where text was translated in earlier runs are trusted at once
+        const remembered = this._options.getProfile?.() ?? []
+        const now = Date.now()
+        this._learned = remembered.filter(zone => zone.hits >= 1 && now - zone.seen < PROFILE_KEEP_MS).map(zone => ({ ...zone }))
+        this._learned.forEach(zone => this._good.push({ rect: { x: zone.x, y: zone.y, w: zone.w, h: zone.h }, until: now + GOOD_MS }))
 
         for(let index = 0; index < MAX_AUTO_WINDOWS; index++){
             const engine = new TranslatorEngine({
@@ -263,6 +300,7 @@ export default class AutoWindows {
 
     stop() {
         this._running = false
+        this._flushProfile()
         if(this._timer !== undefined){
             clearTimeout(this._timer)
             this._timer = undefined
@@ -335,6 +373,7 @@ export default class AutoWindows {
             // A place where text was translated is trusted more from now on
             if(!slot.everShown && slot.region !== null){
                 this._good.push({ rect: slot.region, until: now + GOOD_MS })
+                this._learn(slot.region, now)
             }
             slot.everShown = true
         } else {
@@ -343,7 +382,40 @@ export default class AutoWindows {
 
         slot.shown = shown
         slot.lastText = text
-        this._options.onResult(index, result, slot.mode)
+        this._options.onResult(index, (result !== null && slot.fromPanel && slot.region !== null) ? { ...result, bounds: slot.region } : result, slot.mode)
+    }
+
+    /** A place proved itself again: it counts once more, and is kept for the next runs when it has proved itself enough. */
+    _learn(rect: Region, now: number) {
+        const known = this._learned.find(zone => inside(rect, { x: zone.x, y: zone.y, w: zone.w, h: zone.h }) > 0.6 && inside({ x: zone.x, y: zone.y, w: zone.w, h: zone.h }, rect) > 0.4)
+        if(known !== undefined){
+            known.hits++
+            known.seen = now
+        } else {
+            this._learned.push({ x: rect.x, y: rect.y, w: rect.w, h: rect.h, hits: 1, seen: now })
+        }
+
+        if(this._options.onProfile !== undefined && this._saveTimer === undefined){
+            this._saveTimer = setTimeout(() => this._flushProfile(), PROFILE_SAVE_MS)
+        }
+    }
+
+    _flushProfile() {
+        if(this._saveTimer !== undefined){
+            clearTimeout(this._saveTimer)
+            this._saveTimer = undefined
+        }
+        if(this._options.onProfile === undefined || this._learned.length === 0){
+            return
+        }
+
+        const now = Date.now()
+        const keep = this._learned
+            .filter(zone => zone.hits >= PROFILE_MIN_HITS && now - zone.seen < PROFILE_KEEP_MS)
+            .sort((a, b) => b.hits - a.hits)
+            .slice(0, PROFILE_MAX_ZONES)
+            .map(zone => ({ x: round3(zone.x), y: round3(zone.y), w: round3(zone.w), h: round3(zone.h), hits: zone.hits, seen: zone.seen }))
+        this._options.onProfile(keep)
     }
 
     _scan() {
@@ -435,7 +507,16 @@ export default class AutoWindows {
             }
 
             const previous = this._tracks.find(track => track.polarity === block.polarity && ((inside(rect, track.rect) > 0.6 && inside(track.rect, rect) > 0.4) || (similarSize(rect, track.rect) && distance(rect, track.rect) <= 0.08)))
-            found.push({ rect, role: block.role, polarity: block.polarity, plate: block.plate, streak: (previous?.streak ?? 0) + 1, score: block.score })
+            let panel: Region | undefined
+            if(block.panel !== undefined){
+                panel = videoRectToScreen(video.videoWidth, video.videoHeight, box.width, box.height, settings.fit, {
+                    x: visible.sx + block.panel.x * visible.sw,
+                    y: visible.sy + block.panel.y * visible.sh,
+                    w: block.panel.w * visible.sw,
+                    h: block.panel.h * visible.sh,
+                })
+            }
+            found.push({ rect, role: block.role, polarity: block.polarity, plate: block.plate, streak: (previous?.streak ?? 0) + 1, score: block.score, panel })
         }
         this._tracks = found
 
@@ -553,7 +634,7 @@ export default class AutoWindows {
                 if(inside(track.rect, slot.region) < 0.85){
                     sticking = true
                     if(slot.outside >= 1 && now - slot.grownAt >= GROW_MS){
-                        const grown = this._place(union(slot.region, track.rect), track.role, track.plate, manual, slot)
+                        const grown = this._place(union(slot.region, track.rect), track.role, track.plate, manual, slot, undefined)
                         if(grown !== null){
                             slot.region = grown
                             slot.grownAt = now
@@ -632,13 +713,14 @@ export default class AutoWindows {
                 break
             }
 
-            const region = this._place(track.rect, track.role, track.plate, manual, this._slots[index])
+            const region = this._place(track.rect, track.role, track.plate, manual, this._slots[index], this._options.getSettings().panels === false ? undefined : track.panel)
             if(region === null){
                 continue
             }
 
             const slot = this._slots[index]
             slot.region = region
+            slot.fromPanel = this._placedFromPanel
             slot.polarity = track.polarity
             slot.role = track.role
             // Text that is not a subtitle or a message is usually a steady interface (names, tasks, menus)
@@ -715,7 +797,8 @@ export default class AutoWindows {
      * The window for a block of text: a little bigger than the text (so it hardly ever has to grow), and for subtitles
      * wide (the next line may be longer). Never over a window of the player or over another automatic window.
      */
-    _place(rect: Region, role: BlockRole, plate: boolean, manual: Region[], own: Slot): Region | null {
+    _place(rect: Region, role: BlockRole, plate: boolean, manual: Region[], own: Slot, panel?: Region): Region | null {
+        this._placedFromPanel = false
         const padX = role === 'subtitle' ? 0.02 : 0.03
         const padY = Math.min(0.035, Math.max(0.015, rect.h * 0.6))
 
@@ -727,6 +810,15 @@ export default class AutoWindows {
         const tight = { x: rect.x - padX / 2, y: rect.y - padY / 2, w: rect.w + padX, h: rect.h + padY }
         const others = manual.filter(region => region.enabled !== false)
             .concat(this._slots.filter(slot => slot !== own && slot.region !== null).map(slot => slot.region as Region))
+
+        // The panel of the interface the text is on: the window is the whole panel, and the translation is fitted into it
+        if(panel !== undefined && role !== 'subtitle'){
+            const region = clampRegion(panel)
+            if(!others.some(other => regionsOverlap(region, other))){
+                this._placedFromPanel = true
+                return region
+            }
+        }
 
         for(const wanted of [wide, tight, rect]){
             const region = clampRegion(wanted)

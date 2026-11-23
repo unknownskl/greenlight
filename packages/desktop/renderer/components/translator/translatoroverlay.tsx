@@ -1,5 +1,6 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
+import { useRouter } from 'next/router'
 
 import { useSettings } from '../../context/userContext'
 import Ipc from '../../lib/ipc'
@@ -8,7 +9,7 @@ import { Region, FitMode, DEFAULT_REGION, MAX_REGIONS, getRegions, regionsToSett
 import TranslatorEngine, { EngineStatus, TranslatorResult, TranslatedSegment, TextColor, dropCovered } from '../../lib/translator/engine'
 import { LogLine, addToLog as appendToLog } from '../../lib/translator/dialoglog'
 import { terminateOcr } from '../../lib/translator/ocr'
-import AutoWindows, { AutoFrame, MAX_AUTO_WINDOWS } from '../../lib/translator/autowindows'
+import AutoWindows, { AutoFrame, MAX_AUTO_WINDOWS, Zone } from '../../lib/translator/autowindows'
 import usePadRegion from '../../lib/translator/usepadregion'
 import RegionEditor from './regioneditor'
 
@@ -68,6 +69,16 @@ export function nextBelow(segments: TranslatedSegment[], index: number): number 
     return best
 }
 
+/** How much of the first box lies inside the second one (0..1). */
+function coveredBy(inner: Region, outer: Region): number {
+    const width = Math.min(inner.x + inner.w, outer.x + outer.w) - Math.max(inner.x, outer.x)
+    const height = Math.min(inner.y + inner.h, outer.y + outer.h) - Math.max(inner.y, outer.y)
+    if(width <= 0 || height <= 0){
+        return 0
+    }
+    return (width * height) / Math.max(1e-9, inner.w * inner.h)
+}
+
 /** The nearest piece of text on the same row to the left and to the right (fractions of the width): the translation stays between them. */
 export function sideLimits(segments: TranslatedSegment[], index: number): { left?: number; right?: number } {
     const segment = segments[index]
@@ -87,7 +98,7 @@ export function sideLimits(segments: TranslatedSegment[], index: number): { left
     return limits
 }
 
-export function segmentStyle(segment: TranslatedSegment, viewport: { width: number; height: number }, autoFont: boolean, fixedSize: number, opacity: number, below?: number, sides?: { left?: number; right?: number }): React.CSSProperties {
+export function segmentStyle(segment: TranslatedSegment, viewport: { width: number; height: number }, autoFont: boolean, fixedSize: number, opacity: number, below?: number, sides?: { left?: number; right?: number }, bounds?: Region): React.CSSProperties {
     const originalWidth = segment.rect.w * viewport.width
     const left = segment.rect.x * viewport.width
     const centerX = left + originalWidth / 2
@@ -106,12 +117,24 @@ export function segmentStyle(segment: TranslatedSegment, viewport: { width: numb
             ? Math.min(room, 2 * Math.min(centerX - leftEdge, rightEdge - centerX))
             : Math.min(room, rightEdge - left)
     }
+    // A text in a panel of the interface may use the whole panel (the width to its right edge, the height to its bottom)
+    const panelWidth = bounds === undefined ? 0 : (bounds.x + bounds.w) * viewport.width - left - 10
+    const panelHeight = bounds === undefined ? 0 : (bounds.y + bounds.h) * viewport.height - segment.rect.y * viewport.height - 6
+    if(bounds !== undefined && !segment.centered){
+        room = Math.min(room, Math.max(originalWidth, panelWidth))
+    }
+
     // A paragraph keeps the width of the original (the translation is made to fit into it); one line may grow sideways
-    const maxWidth = Math.max(Math.min(140, Math.max(60, room)), Math.min(room, originalWidth * (lines === 1 ? 2.1 : 1.1)))
+    const wide = Math.max(originalWidth * (lines === 1 ? 2.1 : 1.1), lines > 1 ? panelWidth : 0)
+    const maxWidth = Math.max(Math.min(140, Math.max(60, room)), Math.min(room, wide))
     const originalHeight = segment.rect.h * viewport.height + 8
     // How tall the box may get: a paragraph stays inside the box of the original, a single line may take one more row
     const roomHeight = lines === 1 ? originalHeight * 2 : originalHeight * 1.12
-    const allowed = Math.max(originalHeight, below === undefined ? roomHeight : Math.min(roomHeight * 1.5, (below - segment.rect.y) * viewport.height - 6))
+    let allowed = Math.max(originalHeight, below === undefined ? roomHeight : Math.min(roomHeight * 1.5, (below - segment.rect.y) * viewport.height - 6))
+    // ... in a panel a paragraph may go down to the bottom of the panel (but not over the text under it)
+    if(bounds !== undefined && lines > 1){
+        allowed = Math.max(allowed, below === undefined ? panelHeight : Math.min(panelHeight, (below - segment.rect.y) * viewport.height - 6))
+    }
 
     // The size of the original text; shrunk when the translation is longer than the original and would not fit
     let size = autoFont ? Math.min(56, Math.max(12, segment.lineHeight * viewport.height * 1.02)) : fixedSize
@@ -204,6 +227,11 @@ function TranslatorOverlay({
     const screenOn = enabled && (settings.translator_fullscreen === true || (autoOn && menuAuto && settings.translator_menu_auto !== false))
     const screenOnRef = React.useRef(screenOn)
     screenOnRef.current = screenOn
+    // What is learned about a game (where its text is) is kept per console / game of the stream
+    const router = useRouter()
+    const profileKey = String(router.query.serverid ?? 'default')
+    const profileKeyRef = React.useRef(profileKey)
+    profileKeyRef.current = profileKey
     const autoRef = React.useRef<AutoWindows | null>(null)
     // The reader is restarted when the language of the game text is changed
     const sourceLang = settings.translator_source_lang || 'en'
@@ -257,7 +285,7 @@ function TranslatorOverlay({
                     const region = getRegions(settingsRef.current)[index] ?? DEFAULT_REGION
                     return {
                     region,
-                    enabled: region.enabled !== false && !screenOnRef.current,
+                    enabled: region.enabled !== false,
                     mode: windowMode(region, index),
                     color: (settingsRef.current.translator_text_color || 'light') as TextColor,
                     source: settingsRef.current.translator_source_lang || 'en',
@@ -317,7 +345,15 @@ function TranslatorOverlay({
                 source: settingsRef.current.translator_source_lang || 'en',
                 target: settingsRef.current.translator_target_lang || 'uk',
                 color: (settingsRef.current.translator_text_color || 'light') as TextColor,
+                panels: settingsRef.current.translator_panels !== false,
             }),
+            getProfile: () => (settingsRef.current.translator_profile_on === false ? [] : ((settingsRef.current.translator_profiles ?? {})[profileKeyRef.current] ?? [])) as Zone[],
+            onProfile: (zones) => {
+                if(settingsRef.current.translator_profile_on === false){
+                    return
+                }
+                setSettings({ ...settingsRef.current, translator_profiles: { ...(settingsRef.current.translator_profiles ?? {}), [profileKeyRef.current]: zones } })
+            },
             getManualRegions: () => getRegions(settingsRef.current),
             translate: translateWithLocal,
             onResult: (slot, result, mode) => {
@@ -568,17 +604,23 @@ function TranslatorOverlay({
 
     // Everything that is shown (the windows of the player and the ones the adaptive mode found). Two translations never
     // lie on top of each other (the newer one stays), and each knows its neighbours, so it does not grow over them.
-    const items: Array<{ key: string; segment: TranslatedSegment; rect: Region; shownAt?: number }> = []
+    const items: Array<{ key: string; segment: TranslatedSegment; rect: Region; shownAt?: number; bounds?: Region }> = []
     if(enabled && !editing){
         results.slice(0, count).forEach((result, windowIndex) => {
             (result?.segments ?? []).forEach((segment, index) => items.push({ key: windowIndex + '-' + index, segment, rect: segment.rect, shownAt: segment.shownAt }))
         })
         if(screenOn && screenResult !== null){
-            screenResult.segments.forEach((segment, index) => items.push({ key: 'screen-' + index, segment, rect: segment.rect, shownAt: segment.shownAt }))
+            // The windows of the player work during the whole-screen reading too: their places are left to them
+            const own = regions.filter(region => region.enabled !== false)
+            screenResult.segments.forEach((segment, index) => {
+                if(!own.some(region => coveredBy(segment.rect, region) > 0.3)){
+                    items.push({ key: 'screen-' + index, segment, rect: segment.rect, shownAt: segment.shownAt })
+                }
+            })
         }
         if(autoOn){
             autoResults.slice(0, MAX_AUTO_WINDOWS).forEach((result, slot) => {
-                (result?.segments ?? []).forEach((segment, index) => items.push({ key: 'auto-' + slot + '-' + index, segment, rect: segment.rect, shownAt: segment.shownAt }))
+                (result?.segments ?? []).forEach((segment, index) => items.push({ key: 'auto-' + slot + '-' + index, segment, rect: segment.rect, shownAt: segment.shownAt, bounds: result?.bounds }))
             })
         }
     }
@@ -588,7 +630,7 @@ function TranslatorOverlay({
     return (
         <div id="translator_layer" className={editing ? 'editing' : ''} data-gp-ignore>
             { visible.map((item, index) => (
-                <div key={item.key} className="translator-segment" style={segmentStyle(item.segment, viewport, autoFont, fixedSize, opacity, nextBelow(all, index), sideLimits(all, index))}>{item.segment.translated}</div>
+                <div key={item.key} className="translator-segment" style={segmentStyle(item.segment, viewport, autoFont, fixedSize, opacity, nextBelow(all, index), sideLimits(all, index), item.bounds)}>{item.segment.translated}</div>
             )) }
 
             { (enabled && !editing && settings.translator_log === true) ? <div className="translator-log">

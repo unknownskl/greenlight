@@ -70,6 +70,9 @@ export const defaultSettings = {
     translator_text_color: 'light',
     // Adaptive translator: finds the text on the whole screen by itself (and shows what it found, for testing)
     translator_auto: false,
+    translator_panels: true,
+    translator_profile_on: true,
+    translator_profiles: {},
     translator_menu_auto: true,
     translator_fullscreen: false,
     translator_local_mode: 'smart',
