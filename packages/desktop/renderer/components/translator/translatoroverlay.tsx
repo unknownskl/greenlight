@@ -409,6 +409,7 @@ function TranslatorOverlay({
                 region: { x: 0, y: 0, w: 1, h: 1 },
                 enabled: true,
                 mode: 'task',
+                fullScreen: true,
                 color: 'auto' as TextColor,
                 source: settingsRef.current.translator_source_lang || 'en',
                 target: settingsRef.current.translator_target_lang || 'uk',

@@ -55,7 +55,9 @@ export interface AutoOptions {
 // How often the whole picture is looked at (the look costs some milliseconds, so it is never more than a tenth of the time)
 const SCAN_MS = 700
 const IDLE_SCAN_MS = 1200
-const SCAN_WIDTH = 720
+// The picture is looked at in the size it is (up to this width): small text, such as the description of an item on a
+// handheld screen, is only 9 px high on a picture 720 px wide and is not found there
+const SCAN_WIDTH = 1280
 
 // A block has to be seen on this many looks in a row before it gets a window. A subtitle (the place is known) at once;
 // a message in a corner, or any text on a plate, twice; other text (it may be a sign in the world) four times.

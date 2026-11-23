@@ -40,6 +40,7 @@ export function getOcrWorker(language = 'en'): Promise<Worker> {
 
     if(workerPromise === null){
         workerLanguage = code
+        currentLayout = null
         const bundled = code === 'en'
 
         workerPromise = (async () => {
@@ -131,9 +132,18 @@ function releaseReader() {
     readerQueue.splice(best, 1)[0].resume()
 }
 
-export async function recognizeCanvas(canvas: HTMLCanvasElement, language = 'en', priority = 1, maxGap = MAX_WORD_GAP): Promise<OcrResult> {
+// How the reader looks at a picture: as one uniform block of text (a window with a subtitle or a few lines), or as a page
+// with text of different sizes in different places (the whole screen). Set again only when it changes.
+let currentLayout: 'block' | 'page' | null = null
+
+export async function recognizeCanvas(canvas: HTMLCanvasElement, language = 'en', priority = 1, maxGap = MAX_WORD_GAP, layout: 'block' | 'page' = 'block'): Promise<OcrResult> {
     await acquireReader(priority)
     try {
+        if(currentLayout !== layout){
+            const worker = await getOcrWorker(language)
+            await worker.setParameters({ tessedit_pageseg_mode: (layout === 'page' ? '3' : '6') as any })
+            currentLayout = layout
+        }
         return await readCanvas(canvas, language, maxGap)
     } finally {
         releaseReader()

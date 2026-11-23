@@ -21,6 +21,8 @@ export interface TranslatorConfig {
     // A window that is made bigger (not moved) keeps what it shows when `soft` is set; another `epoch` is another window
     soft?: boolean;
     epoch?: number;
+    // The window is the whole screen: its text is read as a page (text of different sizes in different places)
+    fullScreen?: boolean;
 }
 
 /** One piece of text of the interface (a line, or a few lines that belong together) with its translation. */
@@ -1849,7 +1851,7 @@ export default class TranslatorEngine {
             return null
         }
 
-        const result = await recognizeCanvas(prepared.canvas, job.config.source, this._options.priority ?? 1, job.config.mode === 'task' ? TASK_WORD_GAP : DIALOG_WORD_GAP)
+        const result = await recognizeCanvas(prepared.canvas, job.config.source, this._options.priority ?? 1, job.config.mode === 'task' ? TASK_WORD_GAP : DIALOG_WORD_GAP, job.config.fullScreen === true ? 'page' : 'block')
         if(result.confidence < MIN_CONFIDENCE){
             return null
         }

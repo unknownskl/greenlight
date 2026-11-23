@@ -64,6 +64,8 @@ const MAX_BLOCK_WIDTH = 0.88
 // Rows of text one under another (lines of one subtitle, one message) are one block when they are this close
 const LINE_GAP = 1.1
 const MAX_BLOCKS = 10
+// A block that scores less than this (per pixel of the width of the picture) is noise: 90 on a picture 1280 wide
+const MIN_SCORE_PER_PIXEL = 0.07
 
 interface Part {
     x0: number;
@@ -441,6 +443,7 @@ export function findTextBlocks(data: Uint8ClampedArray, width: number, height: n
         }
     }
 
-    // The ones that look most like text first
-    return kept.sort((a, b) => b.score - a.score).slice(0, MAX_BLOCKS)
+    // The ones that look most like text first; the faintest are noise (more of it shows up in a sharper picture)
+    const floor = MIN_SCORE_PER_PIXEL * width
+    return kept.filter(block => block.score >= floor).sort((a, b) => b.score - a.score).slice(0, MAX_BLOCKS)
 }
