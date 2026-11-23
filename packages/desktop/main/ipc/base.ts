@@ -15,9 +15,7 @@ export default class IpcBase {
     }
 
     onEvent(channel, event, args:EventArgs){
-        // A key (the translation service of the player) must never end up in a log
-        const logged = (args.data !== null && typeof args.data === 'object' && 'key' in args.data) ? { ...args, data: { ...args.data, key: '***' } } : args
-        this._application.log('Ipc:Recv', 'Received event: ['+channel+']', logged)
+        this._application.log('Ipc:Recv', 'Received event: ['+channel+']', args)
         if(typeof this[args.action] === 'function') {
             const response = (Object.keys(args.data).length > 0) ? this[args.action](args.data) : this[args.action]()
             response.then((result) => {

@@ -78,10 +78,6 @@ export const defaultSettings = {
     translator_local_mode: 'smart',
     translator_log: false,
     translator_auto_debug: false,
-    // Translation service of the player (optional): 'none' | 'deepl' | 'google', the key, and the characters a month that the plan allows
-    translator_provider: 'none',
-    translator_key: '',
-    translator_key_limit: 500000,
     // Size of the translated text follows the size of the original text (translator_font_size is used when this is off)
     translator_font_auto: true,
     translator_font_size: 26,

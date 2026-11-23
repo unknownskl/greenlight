@@ -16,9 +16,6 @@ let onlineAverage = 0
 interface TranslatorSettings {
     translator_local_mode?: string;
     translator_local_engine?: string;
-    translator_provider?: string;
-    translator_key?: string;
-    translator_key_limit?: number;
 }
 
 /** Which list of models is used (auto: the one whose models are on the device). */
@@ -32,16 +29,9 @@ export function localMode(settings: TranslatorSettings): LocalMode {
     return mode === 'off' || mode === 'local' || mode === 'backup' ? mode : 'smart'
 }
 
-/** The online services (the key of the player when there is one, then the free ones), through the main process. */
-function translateOnline(settings: TranslatorSettings, text: string, from: string, to: string): Promise<string> {
-    return Ipc.send('app', 'translateText', {
-        text,
-        from,
-        to,
-        provider: settings.translator_provider,
-        key: settings.translator_key,
-        limit: settings.translator_key_limit,
-    }) as Promise<string>
+/** The free online services, through the main process. */
+function translateOnline(text: string, from: string, to: string): Promise<string> {
+    return Ipc.send('app', 'translateText', { text, from, to }) as Promise<string>
 }
 
 /**
@@ -61,20 +51,20 @@ export function createTranslate(getSettings: () => TranslatorSettings): Translat
         const usable = mode !== 'off' && isLocalInstalled(source, target, engine)
 
         if(!usable){
-            return translateOnline(settings, text, source, target)
+            return translateOnline(text, source, target)
         }
 
         if(mode === 'local'){
             try {
                 return await translateLocal(text, source, target, engine)
             } catch(error) {
-                return translateOnline(settings, text, source, target)
+                return translateOnline(text, source, target)
             }
         }
 
         if(mode === 'backup'){
             try {
-                return await translateOnline(settings, text, source, target)
+                return await translateOnline(text, source, target)
             } catch(error) {
                 return translateLocal(text, source, target, engine)
             }
@@ -82,7 +72,7 @@ export function createTranslate(getSettings: () => TranslatorSettings): Translat
 
         // smart
         const asked = Date.now()
-        const online = translateOnline(settings, text, source, target)
+        const online = translateOnline(text, source, target)
         online.then(() => {
             const took = Date.now() - asked
             onlineAverage = onlineAverage === 0 ? took : onlineAverage * 0.7 + took * 0.3

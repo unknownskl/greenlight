@@ -425,41 +425,6 @@ function TranslatorOverlay({
         }
     }, [screenOn, sourceLang])
 
-    // The key of the player: a message when it stops working (the free services take over) and when it works again
-    React.useEffect(() => {
-        if(!enabled){
-            return
-        }
-
-        let stopped = false
-        let last: string | null = null
-        const check = () => {
-            const current = settingsRef.current
-            if((current.translator_provider !== 'deepl' && current.translator_provider !== 'google') || !current.translator_key){
-                last = null
-                return
-            }
-
-            Ipc.send('app', 'translatorStatus', { provider: current.translator_provider, key: current.translator_key, limit: current.translator_key_limit }).then((status: any) => {
-                const state: string | undefined = status?.key?.state
-                if(stopped || state === undefined){
-                    return
-                }
-                if(state !== last && (last !== null || state !== 'ok')){
-                    showToast(state === 'ok' ? t('translator.keyBackToast') : t('translator.keyFailedToast_' + state))
-                }
-                last = state
-            }).catch(() => { /* only information */ })
-        }
-
-        check()
-        const timer = setInterval(check, 15000)
-        return () => {
-            stopped = true
-            clearInterval(timer)
-        }
-    }, [enabled])
-
     // Free the memory of the text reader when the stream is closed
     React.useEffect(() => {
         return () => {

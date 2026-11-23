@@ -19,7 +19,18 @@ export default class IpcSettings extends IpcBase {
 
     getSettings(){
         return new Promise<typeof defaultSettings>((resolve) => {
-            const settings = this._application._store.get('settings', defaultSettings) as object
+            let settings = this._application._store.get('settings', defaultSettings) as Record<string, unknown>
+
+            // The own translation key (DeepL / Google Cloud) was removed from the app: a key that was typed in earlier is
+            // wiped from the settings file (it was kept there unencrypted)
+            const obsolete = ['translator_provider', 'translator_key', 'translator_key_limit']
+            if(obsolete.some(name => name in settings)){
+                settings = { ...settings }
+                obsolete.forEach(name => delete settings[name])
+                this._application._store.set('settings', settings)
+                this._application._store.delete('translator_usage')
+            }
+
             resolve({...defaultSettings, ...settings})
         })
     }
