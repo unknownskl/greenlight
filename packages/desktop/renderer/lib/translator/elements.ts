@@ -45,6 +45,8 @@ const SCAN_WIDTH = 1920
 const SCAN_WIDTH_SMALL = 1280
 const SCAN_SLOW_MS = 260
 const SCAN_FAST_MS = 70
+// A look in the worker that has not come back in this time is given up (it is made on the page then)
+const WORKER_TIMEOUT_MS = 4000
 const MAX_BLOCKS = 30
 const MAX_ELEMENTS = 48
 
@@ -224,6 +226,10 @@ export default class ElementsEngine {
     _cache: Map<string, string> = new Map()
     _pending: Map<string, Promise<string>> = new Map()
     _lastKey = ''
+    // The worker that does the analysis of the picture (null: it is done here), and the looks that wait for it
+    _worker: Worker | null = null
+    _requestId = 0
+    _pendingLooks: Map<number, (answer: any) => void> = new Map()
     // What the last look found (for tests)
     _lastPieces: Array<{ x: number; y: number; w: number; h: number; polarity: Polarity; role: BlockRole; score: number }> = []
 
@@ -241,11 +247,79 @@ export default class ElementsEngine {
         })
     }
 
+    /**
+     * Looks at the picture: in the worker when there is one (the page does not stop for it), otherwise here. The pixels go to
+     * the worker without being copied and the text pixels come back the same way.
+     */
+    _analyse(pixels: Uint8ClampedArray, width: number, height: number): Promise<{ blocks: ReturnType<typeof analyseScreen>['blocks']; masks: Array<{ mask: Uint8Array; count: number }> }> {
+        const worker = this._worker
+        if(worker === null){
+            return Promise.resolve(analyseScreen(pixels, width, height, this._polarities, MAX_BLOCKS))
+        }
+
+        return new Promise((resolve) => {
+            const id = ++this._requestId
+            const timer = setTimeout(() => {
+                // The worker does not answer: it is given up (the pictures that were sent to it are gone) and the page does the looks
+                this._pendingLooks.delete(id)
+                this._dropWorker()
+                resolve({ blocks: [], masks: [] })
+            }, WORKER_TIMEOUT_MS)
+            this._pendingLooks.set(id, (answer: any) => {
+                clearTimeout(timer)
+                resolve(answer)
+            })
+
+            try {
+                worker.postMessage({ id, buffer: pixels.buffer, width, height, polarities: this._polarities, limit: MAX_BLOCKS }, [pixels.buffer])
+            } catch(error) {
+                clearTimeout(timer)
+                this._pendingLooks.delete(id)
+                this._dropWorker()
+                resolve(analyseScreen(pixels, width, height, this._polarities, MAX_BLOCKS))
+            }
+        })
+    }
+
+    _dropWorker() {
+        if(this._worker !== null){
+            this._worker.terminate()
+            this._worker = null
+        }
+    }
+
     start() {
         if(this._running){
             return
         }
         this._running = true
+
+        // The scout runs in a worker when the page can make one
+        if(typeof Worker !== 'undefined' && typeof window !== 'undefined'){
+            try {
+                const worker = new Worker(new URL('/scout/worker.js', window.location.href).href)
+                worker.onmessage = (event: MessageEvent) => {
+                    const answer = event.data
+                    const waiting = this._pendingLooks.get(answer.id)
+                    if(waiting !== undefined){
+                        this._pendingLooks.delete(answer.id)
+                        if(answer.error !== undefined){
+                            // The worker could not do it: from now on the page does
+                            this._dropWorker()
+                            waiting({ blocks: [], masks: [] })
+                            return
+                        }
+                        waiting(answer)
+                    }
+                }
+                worker.onerror = () => {
+                    this._dropWorker()
+                }
+                this._worker = worker
+            } catch(error) {
+                this._worker = null
+            }
+        }
         this._options.onStatus?.('loading')
 
         getOcrWorker(this._options.getSettings().source).then(() => {
@@ -274,6 +348,8 @@ export default class ElementsEngine {
             clearTimeout(this._readTimer)
             this._readTimer = undefined
         }
+        this._dropWorker()
+        this._pendingLooks.clear()
         this._elements = []
         this._lastKey = ''
         this._options.onResults([])
@@ -284,14 +360,14 @@ export default class ElementsEngine {
 
     // ----------------------------------------------------------------------------------------------- looking
 
-    _scan() {
+    async _scan() {
         if(!this._running){
             return
         }
 
         const began = Date.now()
         try {
-            this._scanOnce()
+            await this._scanOnce()
         } catch(error) {
             console.warn('Translator: look failed:', error)
         }
@@ -307,7 +383,7 @@ export default class ElementsEngine {
         }
     }
 
-    _scanOnce() {
+    async _scanOnce() {
         if(document.hidden){
             return
         }
@@ -335,7 +411,10 @@ export default class ElementsEngine {
         context.drawImage(video, visible.sx, visible.sy, visible.sw, visible.sh, 0, 0, width, height)
         const pixels = context.getImageData(0, 0, width, height).data
 
-        const { blocks, masks } = analyseScreen(pixels, width, height, this._polarities, MAX_BLOCKS)
+        const { blocks, masks } = await this._analyse(pixels, width, height)
+        if(!this._running){
+            return
+        }
         this._masks = masks
         this._scanSize = { width, height }
 

@@ -1,4 +1,4 @@
-import { Polarity, inkMasks } from './engine'
+import { Polarity, inkMasks } from './ink'
 
 /**
  * The "scout" of the adaptive translator: looks at the whole picture and finds the places that look like text

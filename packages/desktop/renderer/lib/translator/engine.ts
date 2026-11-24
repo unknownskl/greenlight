@@ -1,5 +1,8 @@
 import { Region, FitMode, clampRegion, regionToSource, videoRectToScreen, SourceRect } from './geometry'
 import { getOcrWorker, recognizeCanvas, OcrLine } from './ocr'
+import { inkMasks } from './ink'
+
+export { inkMasks }
 
 export type TextColor = 'light' | 'dark' | 'auto'
 export type Polarity = 'light' | 'dark'
@@ -231,60 +234,6 @@ function overlapShare(a: Region, b: Region): number {
 // Do two boxes (fractions of the stream area) cover a common part of the picture?
 function rectsOverlap(a: Region, b: Region): boolean {
     return a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h
-}
-
-function luminance(data: Uint8ClampedArray, offset: number): number {
-    return (data[offset] * 299 + data[offset + 1] * 587 + data[offset + 2] * 114) / 1000
-}
-
-/** Marks the pixels that stand out from their surroundings (see CONTRAST_MIN), for one or both kinds of text at once. */
-export function inkMasks(data: Uint8ClampedArray, width: number, height: number, polarities: Polarity[]): Array<{ mask: Uint8Array; count: number }> {
-    const pixels = width * height
-    const luma = new Uint8Array(pixels)
-    for(let i = 0; i < pixels; i++){
-        luma[i] = luminance(data, i * 4)
-    }
-
-    // Integral image: the average of any window is then four lookups
-    const stride = width + 1
-    const integral = new Uint32Array(stride * (height + 1))
-    for(let y = 0; y < height; y++){
-        let row = 0
-        for(let x = 0; x < width; x++){
-            row += luma[y * width + x]
-            integral[(y + 1) * stride + x + 1] = integral[y * stride + x + 1] + row
-        }
-    }
-
-    const radius = Math.max(4, Math.round(width * 0.014))
-    const results = polarities.map(() => ({ mask: new Uint8Array(pixels), count: 0 }))
-
-    for(let y = 0; y < height; y++){
-        const y0 = Math.max(0, y - radius)
-        const y1 = Math.min(height - 1, y + radius)
-
-        for(let x = 0; x < width; x++){
-            const x0 = Math.max(0, x - radius)
-            const x1 = Math.min(width - 1, x + radius)
-            const area = (x1 - x0 + 1) * (y1 - y0 + 1)
-            const sum = integral[(y1 + 1) * stride + x1 + 1] - integral[y0 * stride + x1 + 1] - integral[(y1 + 1) * stride + x0] + integral[y0 * stride + x0]
-            const mean = sum / area
-            const value = luma[y * width + x]
-
-            for(let k = 0; k < polarities.length; k++){
-                const ink = polarities[k] === 'light'
-                    ? (value - mean >= CONTRAST_MIN && value >= LIGHT_FLOOR)
-                    : (mean - value >= CONTRAST_MIN && value <= DARK_CEIL)
-
-                if(ink){
-                    results[k].mask[y * width + x] = 1
-                    results[k].count++
-                }
-            }
-        }
-    }
-
-    return results
 }
 
 function inkMask(data: Uint8ClampedArray, width: number, height: number, polarity: Polarity): { mask: Uint8Array; count: number } {

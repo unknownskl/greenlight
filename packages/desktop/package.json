@@ -11,6 +11,7 @@
   },
   "scripts": {
     "dev": "DEBUG=greenlight:* nextron",
+    "build:scoutworker": "node scripts/build-scoutworker.js",
     "build": "nextron build",
     "lint": "eslint . --ext .ts && eslint renderer/ --ext .tsx",
     "lint:fix": "eslint . --ext .ts --fix && eslint renderer/ --ext .tsx --fix",
