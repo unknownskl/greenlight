@@ -722,6 +722,8 @@ interface ReadResult {
     segments: RawSegment[];
     text: string;
     score: number;
+    // How sure the reader was about the picture (0..100)
+    confidence: number;
 }
 
 interface ShownSegment extends TranslatedSegment {
@@ -1513,7 +1515,7 @@ export default class TranslatorEngine {
         const offset = { x: this._shift.x - job.shift.x, y: this._shift.y - job.shift.y }
         const now = job.at
         const generation = job.generation
-        let best: ReadResult = { segments: [], text: '', score: 0 }
+        let best: ReadResult = { segments: [], text: '', score: 0, confidence: 0 }
         let bestPolarity: Polarity = job.polarities[0]
 
         const tiles = job.config.fullScreen === true ? (job.config.tiles ?? []) : []
@@ -1916,7 +1918,7 @@ export default class TranslatorEngine {
         if(segments.length === 0){
             return null
         }
-        return { segments, text: segments.map(segment => segment.text).join(' '), score }
+        return { segments, text: segments.map(segment => segment.text).join(' '), score, confidence: 100 }
     }
 
     /** Reads the window with one text colour and turns the result into pieces of text with their position and colours. */
@@ -1996,6 +1998,7 @@ export default class TranslatorEngine {
             segments,
             text: segments.map(segment => segment.text).join(' '),
             score: segments.length === 0 ? 0 : result.confidence * Math.min(characters, 60),
+            confidence: result.confidence,
         }
     }
 

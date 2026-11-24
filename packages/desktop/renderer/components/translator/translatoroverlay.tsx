@@ -695,9 +695,9 @@ function TranslatorOverlay({
                 <div key={'cover-' + item.key} style={{
                     position: 'absolute',
                     pointerEvents: 'none',
-                    left: (item.segment.rect.x * viewport.width - 5) + 'px',
+                    left: (item.segment.rect.x * viewport.width - Math.max(6, item.segment.rect.h * viewport.height * 0.35)) + 'px',
                     top: (item.segment.rect.y * viewport.height - 5) + 'px',
-                    width: (item.segment.rect.w * viewport.width + 10) + 'px',
+                    width: (item.segment.rect.w * viewport.width + 2 * Math.max(6, item.segment.rect.h * viewport.height * 0.35) + 8) + 'px',
                     height: (item.segment.rect.h * viewport.height + 10) + 'px',
                     background: 'rgb(' + item.segment.background[0] + ', ' + item.segment.background[1] + ', ' + item.segment.background[2] + ')',
                     borderRadius: '4px',

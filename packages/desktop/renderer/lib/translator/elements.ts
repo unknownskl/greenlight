@@ -61,6 +61,13 @@ const SHOWN_READ_GAP_MS = 1800
 const MOVE_TOLERANCE = 0.006
 // A translation that has got a better version is replaced only while it is young
 const BETTER_MS = 4000
+// Up to this many letters is a short text: it has to be read with at least this confidence, or it is not believed
+const SHORT_TEXT_LETTERS = 6
+const SHORT_TEXT_CONFIDENCE = 68
+// A reading that the reader is this unsure about is not believed at all (pictures and noise)
+const MIN_CONFIDENCE = 55
+
+const LETTER = new RegExp('\\p{L}', 'gu')
 
 interface Segment extends TranslatedSegment {
     template: string;
@@ -564,6 +571,17 @@ export default class ElementsEngine {
         if(current !== null){
             element.sig = current.cells
             element.sigSum = current.sum
+        }
+
+        // A few letters that the reader is not sure about are the pattern of an icon (a button of the pad, a symbol), not a word
+        if(result !== null && result.confidence < MIN_CONFIDENCE){
+            result = null
+        }
+        if(result !== null && result.segments.length > 0 && result.confidence < SHORT_TEXT_CONFIDENCE){
+            const letters = result.segments.reduce((sum, segment) => sum + (segment.text.match(LETTER) || []).length, 0)
+            if(letters <= SHORT_TEXT_LETTERS){
+                result = null
+            }
         }
 
         if(result === null || result.segments.length === 0){
