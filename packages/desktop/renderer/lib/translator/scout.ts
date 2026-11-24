@@ -51,6 +51,8 @@ const SMALL_WIDTH_CELLS = 16
 const SMALL_RING_RATIO = 6
 const MIN_ON_SHARE_ROW = 0.3
 const MIN_ON_SHARE_BLOCK = 0.2
+// How strongly the ink inside must be more than around for a line to need fewer 'on' cells
+const STRONG_RATIO = 15
 // A plate: the background around the text is this flat (the spread of the brightness) and differs from what lies beyond it
 const PLATE_FLAT = 20
 const PLATE_EDGE = 12
@@ -422,7 +424,9 @@ export function analyseScreen(data: Uint8ClampedArray, width: number, height: nu
             const ringInk = inkOf(ex0, ey0, ex1, ey1) - insideInk
             const ratio = ringArea > 0 && ringInk > 0 ? (insideInk / insideArea) / (ringInk / ringArea) : 20
             const onShare = part.on / (w * h)
-            if(ratio < (w < SMALL_WIDTH_CELLS ? SMALL_RING_RATIO : RING_RATIO) || onShare < (single ? MIN_ON_SHARE_ROW : MIN_ON_SHARE_BLOCK)){
+            // A text that stands out a lot from its surroundings may be thin (a line with wide spaces between the words)
+            const minOn = (single ? MIN_ON_SHARE_ROW : MIN_ON_SHARE_BLOCK) * (ratio >= STRONG_RATIO ? 0.6 : 1)
+            if(ratio < (w < SMALL_WIDTH_CELLS ? SMALL_RING_RATIO : RING_RATIO) || onShare < minOn){
                 continue
             }
 
