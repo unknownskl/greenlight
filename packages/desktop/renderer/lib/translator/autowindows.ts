@@ -50,7 +50,8 @@ export interface AutoOptions {
     onResult: (slot: number, result: TranslatorResult | null, mode?: 'dialog' | 'task') => void;
     onFrames?: (frames: AutoFrame[]) => void;
     // The picture is a menu (a lot of text lines on the whole screen): the whole screen is better read as one
-    onMenu?: (menu: boolean) => void;
+    // The whole screen looks like a menu (it is read as a whole to see), and the menu is confirmed (the reading found text)
+    onMenu?: (menu: boolean, confirmed: boolean) => void;
 }
 
 // How often the whole picture is looked at (the look costs some milliseconds, so it is never more than a tenth of the time)
@@ -246,6 +247,8 @@ export default class AutoWindows {
     _menuTextAt = 0
     _menuBlockedUntil = 0
     _menuFalse = 0
+    _menuConfirmed = false
+    _menuReported = false
     _paused = false
     // The places that proved themselves, now and in earlier runs; saved now and then
     _learned: Zone[] = []
@@ -523,11 +526,16 @@ export default class AutoWindows {
             this._menuOverLooks = 0
             this._words = []
         }
-        if(menu !== this._menu){
-            this._menu = menu
-            this._options.onMenu?.(menu)
+        this._menu = menu
+        // A picture that only looks like a menu does not cost the windows anything: they work as usual until the whole-screen
+        // reading has found text on it
+        const confirmed = menu && this._menuTextAt > 0
+        if(menu !== this._menuReported || confirmed !== this._menuConfirmed){
+            this._menuReported = menu
+            this._menuConfirmed = confirmed
+            this._options.onMenu?.(menu, confirmed)
         }
-        if(this._menu || this._paused){
+        if(this._menuConfirmed || this._paused){
             if(this._slots.some(slot => slot.region !== null)){
                 this._slots.forEach((_, index) => this._release(index))
             }

@@ -211,6 +211,8 @@ function TranslatorOverlay({
     const [autoFrames, setAutoFrames] = React.useState<AutoFrame[]>([])
     // The whole screen read as one (a menu, or when the player asks for it)
     const [menuAuto, setMenuAuto] = React.useState(false)
+    // ... and the menu is confirmed: the whole-screen reading found text, so the windows rest and its translation is shown
+    const [menuConfirmed, setMenuConfirmed] = React.useState(false)
     const [screenResult, setScreenResult] = React.useState<TranslatorResult | null>(null)
     const [flash, setFlash] = React.useState(false)
     const [editing, setEditing] = React.useState(false)
@@ -229,7 +231,11 @@ function TranslatorOverlay({
     screenOnRef.current = screenOn
     // A menu was recognised (not the whole-screen reading that the player asked for): the windows for subtitles rest then,
     // and what lies under them is read with the rest of the screen
-    const menuActive = autoOn && menuAuto && settings.translator_menu_auto !== false
+    const menuActive = autoOn && menuAuto && menuConfirmed && settings.translator_menu_auto !== false
+    // The player asked for the whole screen to be read: no windows of the adaptive mode then
+    const forcedScreen = enabled && settings.translator_fullscreen === true
+    const forcedScreenRef = React.useRef(forcedScreen)
+    forcedScreenRef.current = forcedScreen
     const menuActiveRef = React.useRef(menuActive)
     menuActiveRef.current = menuActive
     // What is learned about a game (where its text is) is kept per console / game of the stream
@@ -333,6 +339,7 @@ function TranslatorOverlay({
         setAutoResults([])
         setAutoFrames([])
         setMenuAuto(false)
+        setMenuConfirmed(false)
 
         if(!autoOn){
             return
@@ -371,7 +378,10 @@ function TranslatorOverlay({
                     addToLog('a' + slot, result)
                 }
             },
-            onMenu: (menu) => setMenuAuto(menu),
+            onMenu: (menu, confirmed) => {
+                setMenuAuto(menu)
+                setMenuConfirmed(confirmed)
+            },
             onFrames: (frames) => {
                 const wanted = settingsRef.current.translator_auto_debug === true ? frames : []
                 const key = JSON.stringify(wanted.map(frame => [frame.state, frame.slot, frame.plate, frame.steady, frame.floating, Math.round(frame.rect.x * 500), Math.round(frame.rect.y * 500), Math.round(frame.rect.w * 500), Math.round(frame.rect.h * 500)]))
@@ -383,7 +393,7 @@ function TranslatorOverlay({
         })
 
         autoRef.current = auto
-        auto.setPaused(screenOnRef.current)
+        auto.setPaused(forcedScreenRef.current)
         auto.start()
         return () => {
             autoRef.current = null
@@ -391,10 +401,11 @@ function TranslatorOverlay({
         }
     }, [autoOn, sourceLang])
 
-    // While the whole screen is read as one, the adaptive windows rest
+    // While the player has the whole screen read as one, the adaptive windows rest (in a menu they rest by themselves, when
+    // the menu is confirmed)
     React.useEffect(() => {
-        autoRef.current?.setPaused(screenOn)
-    }, [screenOn])
+        autoRef.current?.setPaused(forcedScreen)
+    }, [forcedScreen])
 
     // The words of the interface in what the whole-screen reading found keep the menu mode on, and so does any text it has
     // (a menu that has no text is a false alarm: see AutoWindows). It is told every moment, not only when the text changes.
@@ -601,7 +612,7 @@ function TranslatorOverlay({
         results.slice(0, count).forEach((result, windowIndex) => {
             (result?.segments ?? []).forEach((segment, index) => items.push({ key: windowIndex + '-' + index, segment, rect: segment.rect, shownAt: segment.shownAt }))
         })
-        if(screenOn && screenResult !== null){
+        if(screenOn && screenResult !== null && (forcedScreen || menuConfirmed)){
             // The windows of the player work during the whole-screen reading too: their places are left to them
             const own = regions.filter((region, index) => region.enabled !== false && !(menuActive && windowMode(region, index) === 'dialog'))
             screenResult.segments.forEach((segment, index) => {
@@ -645,7 +656,7 @@ function TranslatorOverlay({
             )) : '' }
 
             { (autoOn && !editing && settings.translator_auto_debug === true) ? <div style={{ position: 'absolute', left: '1%', top: '1%', padding: '2px 8px', borderRadius: 6, background: 'rgba(0,0,0,0.65)', color: '#fff', fontSize: '0.8em', pointerEvents: 'none' }}>
-                { menuAuto ? t('translator.debugMenu', { count: screenResult === null ? 0 : screenResult.segments.length }) : t('translator.debugNormal') }
+                { menuConfirmed ? t('translator.debugMenu', { count: screenResult === null ? 0 : screenResult.segments.length }) : (menuAuto ? t('translator.debugMenuCheck') : t('translator.debugNormal')) }
             </div> : '' }
 
             { (enabled && !editing && (flash || status !== 'ready')) ? regions.map((frame, index) => frame.enabled === false ? null : (
