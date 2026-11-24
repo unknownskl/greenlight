@@ -35,6 +35,16 @@ function assetUrl(path: string): string {
 let closed = false
 const NOTHING: OcrResult = { text: '', confidence: 0, lines: [] }
 
+// Settles when the reader is shut down. The library does not settle a reading that is sent to a reader that has been shut down
+// (it only drops an error that nobody can catch: "Cannot read properties of null (reading 'postMessage')"), so a reading that is
+// waiting for the reader gives up when this settles, and the reader is not left in use for ever.
+type Abort = Promise<'aborted'>
+let abortReading: () => void = () => { /* replaced below */ }
+let aborted: Abort = new Promise((resolve) => { abortReading = () => resolve('aborted') })
+function renewAbort() {
+    aborted = new Promise((resolve) => { abortReading = () => resolve('aborted') })
+}
+
 export function getOcrWorker(language = 'en'): Promise<Worker> {
     closed = false
     return makeOcrWorker(language)
@@ -148,21 +158,31 @@ let currentLayout: 'block' | 'page' | null = null
 
 export async function recognizeCanvas(canvas: HTMLCanvasElement, language = 'en', priority = 1, maxGap = MAX_WORD_GAP, layout: 'block' | 'page' = 'block'): Promise<OcrResult> {
     await acquireReader(priority)
+    // The reader that is shut down while this reading goes on is not used any more (see aborted)
+    const mine = aborted
     try {
         if(closed){
             return NOTHING
         }
 
         const worker = await makeOcrWorker(language)
-        if(closed){
+        if(closed || mine !== aborted){
             return NOTHING
         }
 
         if(currentLayout !== layout){
-            await worker.setParameters({ tessedit_pageseg_mode: (layout === 'page' ? '3' : '6') as any })
+            const outcome = await Promise.race([worker.setParameters({ tessedit_pageseg_mode: (layout === 'page' ? '3' : '6') as any }), mine])
+            if(outcome === 'aborted' || mine !== aborted){
+                return NOTHING
+            }
             currentLayout = layout
         }
-        return await readCanvas(worker, canvas, maxGap)
+
+        const read = await Promise.race([readCanvas(worker, canvas, maxGap), mine])
+        if(read === 'aborted'){
+            return NOTHING
+        }
+        return read
     } catch(error) {
         // The reader was shut down while this picture was being read: that is not a failure
         if(closed || /postMessage/.test(String(error))){
@@ -240,6 +260,9 @@ async function readCanvas(worker: Worker, canvas: HTMLCanvasElement, maxGap: num
 
 export async function terminateOcr(): Promise<void> {
     closed = true
+    // The readings that wait for the reader give up (and the next reader starts with a clean slate)
+    abortReading()
+    renewAbort()
     if(workerPromise === null){
         return
     }
