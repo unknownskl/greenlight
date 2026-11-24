@@ -19,6 +19,9 @@ import KeyboardMouseEmulation from './kbm'
  *  - setSuspended(true) sends neutral input (used while the Greenlight menu is open),
  *  - holding LB + RB + View + Menu for `chordHoldMs` calls `onChord` (opens the Greenlight menu).
  */
+// How long one vibration effect may last (ms): the game renews it all the time while it is running
+const MAX_RUMBLE_MS = 250
+
 export default class GreenlightGamepadDriver {
 
     _application: any = null
@@ -241,7 +244,7 @@ export default class GreenlightGamepadDriver {
     /** The controller as the player sees it when it makes it vibrate: with the vibration scaled to the setting. */
     _weakenRumble(pad: Gamepad | null): Gamepad | null {
         const actuator: any = pad === null ? undefined : (pad as any).vibrationActuator
-        if(pad === null || actuator === undefined || actuator === null || this._rumbleStrength >= 0.999){
+        if(pad === null || actuator === undefined || actuator === null){
             return pad
         }
 
@@ -250,6 +253,10 @@ export default class GreenlightGamepadDriver {
             type: actuator.type,
             playEffect: (type: string, params: any) => actuator.playEffect(type, {
                 ...params,
+                // The console asks for the longest time (2.55 s) every time and sends a new state many times a second while the game
+                // runs; when the game is paused nothing more comes, and the last effect would go on for seconds. A short effect that
+                // the stream keeps renewing stops almost at once then.
+                duration: Math.min(typeof params.duration === 'number' ? params.duration : MAX_RUMBLE_MS, MAX_RUMBLE_MS),
                 weakMagnitude: (params.weakMagnitude ?? 0) * factor,
                 strongMagnitude: (params.strongMagnitude ?? 0) * factor,
                 leftTrigger: (params.leftTrigger ?? 0) * factor,
