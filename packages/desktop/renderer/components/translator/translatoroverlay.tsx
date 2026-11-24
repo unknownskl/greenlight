@@ -396,12 +396,25 @@ function TranslatorOverlay({
         autoRef.current?.setPaused(screenOn)
     }, [screenOn])
 
-    // The words of the interface in what the whole-screen reading found keep the menu mode on
+    // The words of the interface in what the whole-screen reading found keep the menu mode on, and so does any text it has
+    // (a menu that has no text is a false alarm: see AutoWindows). It is told every moment, not only when the text changes.
+    const screenResultRef = React.useRef(screenResult)
+    screenResultRef.current = screenResult
     React.useEffect(() => {
-        if(screenOn && screenResult !== null){
-            autoRef.current?.noteTexts(screenResult.segments.map(segment => segment.original))
+        if(!screenOn){
+            return
         }
-    }, [screenResult])
+
+        const tell = () => {
+            const current = screenResultRef.current
+            if(current !== null){
+                autoRef.current?.noteTexts(current.segments.map(segment => segment.original))
+            }
+        }
+        tell()
+        const timer = setInterval(tell, 2000)
+        return () => clearInterval(timer)
+    }, [screenOn, screenResult])
 
     // The whole screen as one window (a menu): lines are translated one by one, a steady picture is read calmly
     React.useEffect(() => {
@@ -630,6 +643,10 @@ function TranslatorOverlay({
                     <span>{t('translator.autoState_' + frame.state)} · {t('translator.autoRole_' + frame.role)}{frame.plate ? ' · ' + t('translator.autoPlate') : ''}{frame.floating ? ' · ' + t('translator.autoFloating') : (frame.steady ? ' · ' + t('translator.autoSteady') : '')}</span>
                 </div>
             )) : '' }
+
+            { (autoOn && !editing && settings.translator_auto_debug === true) ? <div style={{ position: 'absolute', left: '1%', top: '1%', padding: '2px 8px', borderRadius: 6, background: 'rgba(0,0,0,0.65)', color: '#fff', fontSize: '0.8em', pointerEvents: 'none' }}>
+                { menuAuto ? t('translator.debugMenu', { count: screenResult === null ? 0 : screenResult.segments.length }) : t('translator.debugNormal') }
+            </div> : '' }
 
             { (enabled && !editing && (flash || status !== 'ready')) ? regions.map((frame, index) => frame.enabled === false ? null : (
                 <div key={index} className="translator-hint-frame" style={{

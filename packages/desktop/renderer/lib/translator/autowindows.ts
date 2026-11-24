@@ -94,6 +94,12 @@ const MENU_OVER_LOOKS = 5
 const MENU_WORDS = 3
 const MENU_WORDS_STAY = 2
 const MENU_WORDS_MS = 8000
+// A menu has to prove itself: when the whole-screen reading has found no text for this long, it was a false alarm (a busy
+// scene, an interface that only looks like a menu) and the usual windows come back. It is not tried again for a while,
+// longer after every false alarm
+const MENU_IDLE_MS = 15000
+const MENU_COOLDOWN_MS = 20000
+const MENU_COOLDOWN_MAX_MS = 160000
 
 // A block that has more than this share of its area inside a window of the player (grown by the margin) belongs to that window
 const MANUAL_MARGIN = 0.01
@@ -235,6 +241,11 @@ export default class AutoWindows {
     _menu = false
     _menuLooks = 0
     _menuOverLooks = 0
+    // When the menu mode began, when the whole-screen reading last had text, and when a menu may be tried again
+    _menuSince = 0
+    _menuTextAt = 0
+    _menuBlockedUntil = 0
+    _menuFalse = 0
     _paused = false
     // The places that proved themselves, now and in earlier runs; saved now and then
     _learned: Zone[] = []
@@ -494,7 +505,24 @@ export default class AutoWindows {
         this._tiles = this._makeTiles(blocks, video, box, settings.fit, visible)
 
         // A menu: a lot of lines of text over the screen. It is read as a whole (see the overlay), not in windows
-        const menu = this._detectMenu(blocks)
+        let menu = this._detectMenu(blocks)
+        if(menu && !this._menu){
+            if(now < this._menuBlockedUntil){
+                // It looked like a menu and had no text lately: not again for a while
+                menu = false
+            } else {
+                this._menuSince = now
+                this._menuTextAt = 0
+            }
+        } else if(menu && this._menu && now - Math.max(this._menuSince, this._menuTextAt) > MENU_IDLE_MS){
+            // The whole-screen reading has found nothing for long: a false alarm, the usual windows come back
+            menu = false
+            this._menuFalse++
+            this._menuBlockedUntil = now + Math.min(MENU_COOLDOWN_MAX_MS, MENU_COOLDOWN_MS * Math.pow(2, this._menuFalse - 1))
+            this._menuLooks = 0
+            this._menuOverLooks = 0
+            this._words = []
+        }
         if(menu !== this._menu){
             this._menu = menu
             this._options.onMenu?.(menu)
@@ -547,7 +575,18 @@ export default class AutoWindows {
 
     /** The texts that were read on the screen (by the whole-screen reading): their words of the interface tell it is a menu. */
     noteTexts(texts: string[]) {
+        if(texts.some(text => text.trim() !== '')){
+            // The menu has proved itself
+            this._menuTextAt = Date.now()
+            this._menuFalse = 0
+        }
         this._noteWords(texts, Date.now())
+    }
+
+    /** Is the whole-screen (menu) mode on, and how many words of a menu were read lately: for the debug view. */
+    getMenuState(): { menu: boolean; words: number; blockedFor: number } {
+        const now = Date.now()
+        return { menu: this._menu, words: this._recentMenuWords(now), blockedFor: Math.max(0, this._menuBlockedUntil - now) }
     }
 
     _noteWords(texts: string[], now: number) {

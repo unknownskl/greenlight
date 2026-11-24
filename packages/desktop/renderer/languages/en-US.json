@@ -346,6 +346,8 @@
         "btnMoreTitle": "More translator buttons: windows, auto, screen, log, area",
         "btnScreen": "Screen",
         "btnScreenTitle": "Whole screen: translate all the text on the screen as one window (handy in the menus and settings of the game)",
+        "debugMenu": "Menu: the whole screen is read (lines: {{count}})",
+        "debugNormal": "Usual mode: the windows look for text",
         "advancedShow": "Advanced",
         "advancedHide": "Hide advanced",
         "advancedHint": "Rare switches: usually not needed, the adaptive mode decides everything by itself.",
