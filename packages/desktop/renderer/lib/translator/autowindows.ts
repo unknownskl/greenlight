@@ -99,6 +99,8 @@ const MENU_WORDS_MS = 8000
 // scene, an interface that only looks like a menu) and the usual windows come back. It is not tried again for a while,
 // longer after every false alarm
 const MENU_IDLE_MS = 15000
+// Lines of text that the whole-screen reading must find to confirm a menu (without words of a menu)
+const MENU_PROOF_LINES = 4
 const MENU_COOLDOWN_MS = 20000
 const MENU_COOLDOWN_MAX_MS = 160000
 
@@ -583,12 +585,16 @@ export default class AutoWindows {
 
     /** The texts that were read on the screen (by the whole-screen reading): their words of the interface tell it is a menu. */
     noteTexts(texts: string[]) {
-        if(texts.some(text => text.trim() !== '')){
-            // The menu has proved itself
-            this._menuTextAt = Date.now()
+        const now = Date.now()
+        this._noteWords(texts, now)
+
+        // A menu has proved itself when the whole-screen reading found several lines of text, or words of a menu. One or two
+        // lines are what any scene has (a task, a subtitle): that is not a menu
+        const lines = texts.filter(text => text.trim().length >= 2).length
+        if(lines >= MENU_PROOF_LINES || this._recentMenuWords(now) >= MENU_WORDS_STAY){
+            this._menuTextAt = now
             this._menuFalse = 0
         }
-        this._noteWords(texts, Date.now())
     }
 
     /** Is the whole-screen (menu) mode on, and how many words of a menu were read lately: for the debug view. */
