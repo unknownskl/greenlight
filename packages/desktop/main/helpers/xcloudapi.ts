@@ -163,7 +163,9 @@ export default class xCloudApi {
         return this.get('/v5/sessions/'+this._type+'/'+sessionId, 'DELETE')
     }
 
-    startStream(target:string){
+    startStream(target:string, resolution = 1080){
+        const height = [720, 1080, 1440].includes(resolution) ? resolution : 1080
+
         const deviceInfo = JSON.stringify({
             'appInfo': {
                 'env': {
@@ -188,8 +190,8 @@ export default class xCloudApi {
                 },
                 'displayInfo': {
                     'dimensions': {
-                        'widthInPixels': 1920,
-                        'heightInPixels': 1080,
+                        'widthInPixels': height * 16 / 9,
+                        'heightInPixels': height,
                     },
                     'pixelDensity': {
                         'dpiX': 1,
