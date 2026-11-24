@@ -54,10 +54,35 @@ const CONCEPTS: Concept[] = [
     { id: 'achievements', uk: 'Досягнення', ru: 'Достижения', words: { en: ['achievements', 'trophies'], de: ['erfolge', 'trophäen'], fr: ['succès', 'trophées'], es: ['logros', 'trofeos'], it: ['obiettivi', 'trofei'], pt: ['conquistas', 'troféus'], pl: ['osiągnięcia', 'trofea'], ru: ['достижения'], uk: ['досягнення'] } },
     { id: 'stats', uk: 'Статистика', ru: 'Статистика', words: { en: ['stats', 'statistics'], de: ['statistiken'], fr: ['statistiques'], es: ['estadísticas'], it: ['statistiche'], pt: ['estatísticas'], pl: ['statystyki'], ru: ['статистика'], uk: ['статистика'] } },
     { id: 'help', uk: 'Довідка', ru: 'Справка', words: { en: ['help', 'tutorial', 'how to play'], de: ['hilfe', 'anleitung'], fr: ['aide', 'tutoriel'], es: ['ayuda', 'tutorial'], it: ['aiuto', 'tutorial'], pt: ['ajuda', 'tutorial'], pl: ['pomoc', 'samouczek'], ru: ['справка', 'помощь', 'обучение'], uk: ['довідка', 'допомога', 'навчання'] } },
+    // Labels that are often translated badly out of context (one word, a column of a table, a button). They are weak words:
+    // they are in games as well as in menus, so they do not tell a menu by themselves.
+    { id: 'system', uk: 'Система', ru: 'Система', words: { en: ['system'] } },
+    { id: 'cards', uk: 'Картки', ru: 'Карточки', words: { en: ['cards'] } },
+    { id: 'forums', uk: 'Форуми', ru: 'Форумы', words: { en: ['forums', 'forum'] } },
+    { id: 'topics', uk: 'Теми', ru: 'Темы', words: { en: ['topics'] } },
+    { id: 'replies', uk: 'Відповіді', ru: 'Ответы', words: { en: ['replies'] } },
+    { id: 'views', uk: 'Перегляди', ru: 'Просмотры', words: { en: ['views'] } },
+    { id: 'complete', uk: 'Завершено', ru: 'Завершено', words: { en: ['complete', 'completed'] } },
+    { id: 'nextpost', uk: 'Наступний пост', ru: 'Следующий пост', words: { en: ['next post'] } },
+    { id: 'connecting', uk: 'З’єднання…', ru: 'Соединение…', words: { en: ['connecting', 'loading', 'please wait'] } },
+    { id: 'equip', uk: 'Екіпірувати', ru: 'Экипировать', words: { en: ['equip'] } },
+    { id: 'equipped', uk: 'Екіпіровано', ru: 'Экипировано', words: { en: ['equipped'] } },
+    { id: 'equipmod', uk: 'Екіпірувати мод', ru: 'Экипировать мод', words: { en: ['equip mod'] } },
+    { id: 'mods', uk: 'Моди', ru: 'Моды', words: { en: ['mods'] } },
+    { id: 'buy', uk: 'Купити', ru: 'Купить', words: { en: ['buy', 'purchase'] } },
+    { id: 'sell', uk: 'Продати', ru: 'Продать', words: { en: ['sell'] } },
+    { id: 'use', uk: 'Використати', ru: 'Использовать', words: { en: ['use'] } },
+    { id: 'close', uk: 'Закрити', ru: 'Закрыть', words: { en: ['close'] } },
+    { id: 'next', uk: 'Далі', ru: 'Далее', words: { en: ['next'] } },
+    { id: 'locked', uk: 'Заблоковано', ru: 'Заблокировано', words: { en: ['locked'] } },
+    { id: 'unlocked', uk: 'Відкрито', ru: 'Открыто', words: { en: ['unlocked'] } },
+    { id: 'level', uk: 'Рівень', ru: 'Уровень', words: { en: ['level'] } },
+    { id: 'health', uk: 'Здоров’я', ru: 'Здоровье', words: { en: ['health'] } },
+    { id: 'ammo', uk: 'Набої', ru: 'Патроны', words: { en: ['ammo'] } },
 ]
 
 // Words that are in dialogs and prompts as well as in menus: they do not tell a menu by themselves
-const WEAK = new Set(['yes', 'no', 'confirm', 'cancel', 'select', 'apply', 'items', 'journal', 'weapons', 'character', 'help'])
+const WEAK = new Set(['yes', 'no', 'confirm', 'cancel', 'select', 'apply', 'items', 'journal', 'weapons', 'character', 'help', 'system', 'cards', 'forums', 'topics', 'replies', 'views', 'complete', 'nextpost', 'connecting', 'equip', 'equipped', 'equipmod', 'mods', 'buy', 'sell', 'use', 'close', 'next', 'locked', 'unlocked', 'level', 'health', 'ammo'])
 
 /** How many different words of a menu (not the weak ones) are among these concepts. */
 export function menuWordCount(ids: Set<string> | string[]): number {
@@ -132,8 +157,20 @@ export function glossaryTranslation(text: string, source: string, target: string
         return null
     }
 
-    const clean = plain(text)
-    const id = LOOKUP.en?.get(clean)
+    // An icon in front of the label is read as a stray letter or digit ("Ba INVENTORY", ") FORUMS"): it is left out
+    let clean = plain(text)
+    let id = LOOKUP.en?.get(clean)
+    if(id === undefined){
+        const words = clean.split(' ')
+        let skip = 0
+        while(skip < 2 && skip < words.length - 1 && words[skip].length <= 2 && LOOKUP.en?.get(words[skip]) === undefined){
+            skip++
+        }
+        if(skip > 0){
+            clean = words.slice(skip).join(' ')
+            id = LOOKUP.en?.get(clean)
+        }
+    }
     if(id === undefined){
         return null
     }
