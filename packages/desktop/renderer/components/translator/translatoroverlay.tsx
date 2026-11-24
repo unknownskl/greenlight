@@ -10,6 +10,7 @@ import TranslatorEngine, { EngineStatus, TranslatorResult, TranslatedSegment, Te
 import { LogLine, addToLog as appendToLog } from '../../lib/translator/dialoglog'
 import { terminateOcr } from '../../lib/translator/ocr'
 import AutoWindows, { AutoFrame, MAX_AUTO_WINDOWS, Zone } from '../../lib/translator/autowindows'
+import ElementsEngine, { ElementResult } from '../../lib/translator/elements'
 import usePadRegion from '../../lib/translator/usepadregion'
 import RegionEditor from './regioneditor'
 
@@ -209,6 +210,8 @@ function TranslatorOverlay({
     // The adaptive translator: translations in the windows it found, and (for the debug view) what it sees
     const [autoResults, setAutoResults] = React.useState<(TranslatorResult | null)[]>([])
     const [autoFrames, setAutoFrames] = React.useState<AutoFrame[]>([])
+    // The translations of the elements of the interface (the engine with elements)
+    const [elementResults, setElementResults] = React.useState<ElementResult[]>([])
     // The whole screen read as one (a menu, or when the player asks for it)
     const [menuAuto, setMenuAuto] = React.useState(false)
     // ... and the menu is confirmed: the whole-screen reading found text, so the windows rest and its translation is shown
@@ -225,7 +228,10 @@ function TranslatorOverlay({
     activeRef.current = active
 
     const enabled = settings.translator_enabled === true
-    const autoOn = enabled && settings.translator_auto === true
+    // The adaptive translator works in one of two ways: with windows and modes (classic) or with elements of the interface
+    const autoWanted = enabled && settings.translator_auto === true
+    const elementsOn = autoWanted && settings.translator_engine === 'elements'
+    const autoOn = autoWanted && !elementsOn
     const screenOn = enabled && (settings.translator_fullscreen === true || (autoOn && menuAuto && settings.translator_menu_auto !== false))
     const screenOnRef = React.useRef(screenOn)
     screenOnRef.current = screenOn
@@ -400,6 +406,54 @@ function TranslatorOverlay({
             auto.stop()
         }
     }, [autoOn, sourceLang])
+
+    // The engine with elements of the interface: it takes the place of the adaptive windows and of the menu mode
+    React.useEffect(() => {
+        setElementResults([])
+        if(!elementsOn){
+            return
+        }
+        setAutoFrames([])
+
+        let lastFrames = ''
+        const engine = new ElementsEngine({
+            getVideo: () => (xPlayer?._videoComponent?._videoRender ?? document.querySelector('#streamComponent video')) as HTMLVideoElement | null,
+            getBox: () => {
+                const rect = document.getElementById('streamComponent')?.getBoundingClientRect()
+                return { width: rect?.width || window.innerWidth, height: rect?.height || window.innerHeight }
+            },
+            getSettings: () => ({
+                fit: (settingsRef.current.video_size || 'default') as FitMode,
+                source: settingsRef.current.translator_source_lang || 'en',
+                target: settingsRef.current.translator_target_lang || 'uk',
+                color: (settingsRef.current.translator_text_color || 'light') as TextColor,
+                panels: settingsRef.current.translator_panels !== false,
+            }),
+            getManualRegions: () => getRegions(settingsRef.current),
+            translate: translateWithLocal,
+            onResults: (results) => {
+                setElementResults(results)
+                results.forEach((item) => {
+                    if(item.role === 'subtitle'){
+                        addToLog('e' + item.id, item.result)
+                    }
+                })
+            },
+            onFrames: (frames) => {
+                const wanted = settingsRef.current.translator_auto_debug === true ? frames : []
+                const key = JSON.stringify(wanted.map(frame => [frame.state, frame.slot, frame.plate, Math.round(frame.rect.x * 500), Math.round(frame.rect.y * 500), Math.round(frame.rect.w * 500), Math.round(frame.rect.h * 500)]))
+                if(key !== lastFrames){
+                    lastFrames = key
+                    setAutoFrames(wanted)
+                }
+            },
+        })
+
+        engine.start()
+        return () => {
+            engine.stop()
+        }
+    }, [elementsOn, sourceLang])
 
     // While the player has the whole screen read as one, the adaptive windows rest (in a menu they rest by themselves, when
     // the menu is confirmed)
@@ -621,6 +675,11 @@ function TranslatorOverlay({
                 }
             })
         }
+        if(elementsOn){
+            elementResults.forEach((item) => {
+                item.result.segments.forEach((segment, index) => items.push({ key: 'el-' + item.id + '-' + index, segment, rect: segment.rect, shownAt: segment.shownAt, bounds: item.result.bounds }))
+            })
+        }
         if(autoOn){
             autoResults.slice(0, MAX_AUTO_WINDOWS).forEach((result, slot) => {
                 (result?.segments ?? []).forEach((segment, index) => items.push({ key: 'auto-' + slot + '-' + index, segment, rect: segment.rect, shownAt: segment.shownAt, bounds: result?.bounds }))
@@ -644,7 +703,7 @@ function TranslatorOverlay({
                     )) }
             </div> : '' }
 
-            { (autoOn && !editing && settings.translator_auto_debug === true) ? autoFrames.map((frame, index) => (
+            { ((autoOn || elementsOn) && !editing && settings.translator_auto_debug === true) ? autoFrames.map((frame, index) => (
                 <div key={'frame-' + index} className={'translator-auto-frame translator-auto-' + frame.state} style={{
                     left: (frame.rect.x * 100) + '%',
                     top: (frame.rect.y * 100) + '%',
@@ -655,8 +714,8 @@ function TranslatorOverlay({
                 </div>
             )) : '' }
 
-            { (autoOn && !editing && settings.translator_auto_debug === true) ? <div style={{ position: 'absolute', left: '1%', top: '1%', padding: '2px 8px', borderRadius: 6, background: 'rgba(0,0,0,0.65)', color: '#fff', fontSize: '0.8em', pointerEvents: 'none' }}>
-                { menuConfirmed ? t('translator.debugMenu', { count: screenResult === null ? 0 : screenResult.segments.length }) : (menuAuto ? t('translator.debugMenuCheck') : t('translator.debugNormal')) }
+            { ((autoOn || elementsOn) && !editing && settings.translator_auto_debug === true) ? <div style={{ position: 'absolute', left: '1%', top: '1%', padding: '2px 8px', borderRadius: 6, background: 'rgba(0,0,0,0.65)', color: '#fff', fontSize: '0.8em', pointerEvents: 'none' }}>
+                { elementsOn ? t('translator.debugElements', { count: elementResults.length }) : menuConfirmed ? t('translator.debugMenu', { count: screenResult === null ? 0 : screenResult.segments.length }) : (menuAuto ? t('translator.debugMenuCheck') : t('translator.debugNormal')) }
             </div> : '' }
 
             { (enabled && !editing && (flash || status !== 'ready')) ? regions.map((frame, index) => frame.enabled === false ? null : (

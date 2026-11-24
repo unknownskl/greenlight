@@ -358,6 +358,11 @@ function mergeLines(parts: Part[], rows: number): Part[] {
  * of text to look for (light on dark, dark on light).
  */
 export function findTextBlocks(data: Uint8ClampedArray, width: number, height: number, polarities: Polarity[], limit = MAX_BLOCKS): TextBlock[] {
+    return analyseScreen(data, width, height, polarities, limit).blocks
+}
+
+/** The same, and the text pixels (one mask per polarity) that the blocks were found in: they tell later whether a block has changed. */
+export function analyseScreen(data: Uint8ClampedArray, width: number, height: number, polarities: Polarity[], limit = MAX_BLOCKS): { blocks: TextBlock[]; masks: Array<{ mask: Uint8Array; count: number }> } {
     const masks = inkMasks(data, width, height, polarities)
     const rows = Math.floor(height / CELL)
     const blocks: TextBlock[] = []
@@ -445,5 +450,5 @@ export function findTextBlocks(data: Uint8ClampedArray, width: number, height: n
 
     // The ones that look most like text first; the faintest are noise (more of it shows up in a sharper picture)
     const floor = MIN_SCORE_PER_PIXEL * width
-    return kept.filter(block => block.score >= floor).sort((a, b) => b.score - a.score).slice(0, limit)
+    return { blocks: kept.filter(block => block.score >= floor).sort((a, b) => b.score - a.score).slice(0, limit), masks }
 }

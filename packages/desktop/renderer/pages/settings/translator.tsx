@@ -159,6 +159,16 @@ function SettingsTranslator() {
                     </p> : '' }
 
                     { (settings.translator_auto === true && advanced) ? <p>
+                        <label>{t('translator.engineLabel')}</label>
+                        <label style={{ minWidth: 0 }} className="toggle-label">
+                            <input type='checkbox' checked={settings.translator_engine === 'elements'} onChange={(e) => {
+                                update({ translator_engine: e.target.checked ? 'elements' : 'classic' })
+                            }} />
+                        </label>
+                        <small style={{ display: 'block', opacity: 0.7 }}>{t('translator.engineHint')}</small>
+                    </p> : '' }
+
+                    { (settings.translator_auto === true && advanced) ? <p>
                         <label>{t('translator.menuAutoLabel')}</label>
                         <label style={{ minWidth: 0 }} className="toggle-label">
                             <input type='checkbox' checked={settings.translator_menu_auto !== false} onChange={(e) => {

@@ -74,6 +74,7 @@ export const defaultSettings = {
     translator_profile_on: true,
     translator_profiles: {},
     translator_menu_auto: true,
+    translator_engine: 'classic',
     translator_fullscreen: false,
     translator_local_mode: 'smart',
     translator_log: false,
