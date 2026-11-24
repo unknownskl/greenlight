@@ -61,6 +61,11 @@ const SHOWN_READ_GAP_MS = 1800
 const MOVE_TOLERANCE = 0.006
 // A translation that has got a better version is replaced only while it is young
 const BETTER_MS = 4000
+// Pieces of text that are at least this tall (fractions of the screen) and not further apart than this many heights are one title
+const TITLE_MIN_HEIGHT = 0.03
+const TITLE_GAP = 0.7
+// ... and one row of text (a block of several rows or a picture is not a title)
+const TITLE_MAX_HEIGHT = 0.08
 // Up to this many letters is a short text: it has to be read with at least this confidence, or it is not believed
 const SHORT_TEXT_LETTERS = 6
 const SHORT_TEXT_CONFIDENCE = 68
@@ -324,8 +329,12 @@ export default class ElementsEngine {
             h: b.h * visible.sh,
         })
 
+        // The words of a big title are far apart ("H U N T E R  F O R U M S"): they are found as separate pieces and are put
+        // together here, so that the title is translated as one phrase ("Hunter Forums" is "Форум мисливців", not "Мисливець Форуми")
+        const pieces = this._joinTitles(blocks, toScreen)
+
         const taken = new Set<Element>()
-        for(const block of blocks){
+        for(const block of pieces){
             const rect = toScreen(block)
 
             // The places the player has taken are not ours
@@ -393,6 +402,35 @@ export default class ElementsEngine {
 
         this._emit()
         this._report()
+    }
+
+    /** Big pieces of text that stand on one row, close to each other and about as big, are one piece (a title in several words). */
+    _joinTitles<T extends { x: number; y: number; w: number; h: number; score: number }>(blocks: T[], toScreen: (b: { x: number; y: number; w: number; h: number }) => Region): T[] {
+        const list = blocks.slice()
+        let joined = true
+
+        while(joined){
+            joined = false
+            for(let a = 0; a < list.length && !joined; a++){
+                for(let b = a + 1; b < list.length && !joined; b++){
+                    const first = toScreen(list[a])
+                    const second = toScreen(list[b])
+                    const high = Math.max(first.h, second.h)
+                    const low = Math.min(first.h, second.h)
+                    const overlap = Math.min(first.y + first.h, second.y + second.h) - Math.max(first.y, second.y)
+                    const gap = Math.max(first.x, second.x) - Math.min(first.x + first.w, second.x + second.w)
+                    if(low >= TITLE_MIN_HEIGHT && high <= TITLE_MAX_HEIGHT && low / high >= 0.6 && overlap >= 0.7 * low && gap <= TITLE_GAP * high){
+                        const x = Math.min(list[a].x, list[b].x)
+                        const y = Math.min(list[a].y, list[b].y)
+                        const best = list[a].score >= list[b].score ? list[a] : list[b]
+                        list[a] = { ...best, x, y, w: Math.max(list[a].x + list[a].w, list[b].x + list[b].w) - x, h: Math.max(list[a].y + list[a].h, list[b].y + list[b].h) - y, score: Math.max(list[a].score, list[b].score) }
+                        list.splice(b, 1)
+                        joined = true
+                    }
+                }
+            }
+        }
+        return list
     }
 
     /** An element was found again: its place is followed, and its text pixels say whether it has to be read (again). */
