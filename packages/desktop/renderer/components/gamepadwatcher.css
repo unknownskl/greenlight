@@ -1,0 +1,40 @@
+div#component_gamepadwatcher {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 200;
+    max-width: 640px;
+    width: calc(100vw - 40px);
+    padding: 14px 18px;
+    border-radius: 14px;
+    background: rgba(30, 30, 30, 0.92);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 185, 0, 0.6);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+}
+
+div.component_gamepadwatcher_item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 8px;
+}
+
+div.component_gamepadwatcher_item > i {
+    font-size: 26px;
+    color: #ffb900;
+}
+
+div.component_gamepadwatcher_item > div:nth-child(2) {
+    flex: 1;
+    line-height: 1.4;
+}
+
+div.component_gamepadwatcher_actions {
+    white-space: nowrap;
+}
+
+small.component_gamepadwatcher_hint {
+    opacity: 0.6;
+}

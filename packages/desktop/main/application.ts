@@ -23,6 +23,7 @@ export default class Application {
 
     private _log
     public _store = new Store()
+    public _webrtcMdnsDisabled = false
     private _startupFlags: startupFlags = {
         fullscreen: false,
         autoStream: '',
@@ -56,6 +57,14 @@ export default class Application {
         // ElectronApp.commandLine.appendSwitch('ignore-gpu-blocklist')
         // ElectronApp.commandLine.appendSwitch('no-sandbox')
         ElectronApp.commandLine.appendSwitch('enable-zero-copy')
+
+        // Network interface selection (Settings > Network) needs real local IPs in
+        // WebRTC host candidates, so disable Chromium's mDNS obfuscation for those modes.
+        const storedSettings = this._store.get('settings', {}) as { network_interface?: string }
+        if(storedSettings.network_interface === 'wifi' || storedSettings.network_interface === 'lan'){
+            ElectronApp.commandLine.appendSwitch('disable-features', 'WebRtcHideLocalIpsWithMdns')
+            this._webrtcMdnsDisabled = true
+        }
 
         this.readStartupFlags()
         this.loadApplicationDefaults()

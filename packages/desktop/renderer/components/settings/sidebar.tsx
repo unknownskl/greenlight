@@ -20,7 +20,9 @@ function SettingsSidebar({
                     <ul>
                         <li className={ router.pathname.includes('settings/home') ? 'active' : ''}><Link href="/settings/home">{t('settings.sidebar.about')}</Link></li>
                         <li className={ router.pathname.includes('settings/streaming') ? 'active' : ''}><Link href="/settings/streaming">{t('settings.sidebar.streaming')}</Link></li>
+                        <li className={ router.pathname.includes('settings/network') ? 'active' : ''}><Link href="/settings/network">{t('settings.sidebar.network')}</Link></li>
                         <li className={ router.pathname.includes('settings/input') ? 'active' : ''}><Link href="/settings/input">{t('settings.sidebar.input')}</Link></li>
+                        <li className={ router.pathname.includes('settings/controller') ? 'active' : ''}><Link href="/settings/controller">{t('settings.sidebar.controller')}</Link></li>
                         <li className={ router.pathname.includes('settings/video') ? 'active' : ''}><Link href="/settings/video">{t('settings.sidebar.videoAudio')}</Link></li>
                         <li className={ router.pathname.includes('settings/webui') ? 'active' : ''}><Link href="/settings/webui">{t('settings.sidebar.webUI')}</Link></li>
                         <li className={ router.pathname.includes('settings/debug') ? 'active' : ''}><Link href="/settings/debug">{t('settings.sidebar.debug')}</Link></li>

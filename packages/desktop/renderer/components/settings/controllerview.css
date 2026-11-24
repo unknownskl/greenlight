@@ -1,0 +1,80 @@
+div.component_controllerview {
+    max-width: 480px;
+    margin: 0 auto 10px auto;
+    text-align: center;
+}
+
+div.component_controllerview svg {
+    width: 100%;
+    height: auto;
+}
+
+div.component_controllerview .cv-body {
+    fill: rgba(255, 255, 255, 0.08);
+    stroke: rgba(255, 255, 255, 0.35);
+    stroke-width: 2;
+}
+
+div.component_controllerview .cv-well {
+    fill: rgba(0, 0, 0, 0.35);
+}
+
+div.component_controllerview .cv-btn rect,
+div.component_controllerview .cv-btn circle {
+    fill: rgba(255, 255, 255, 0.18);
+    stroke: rgba(255, 255, 255, 0.45);
+    stroke-width: 1.5;
+    transition: fill 60ms linear;
+}
+
+div.component_controllerview .cv-btn text {
+    fill: #fff;
+    font-size: 11px;
+    text-anchor: middle;
+    pointer-events: none;
+}
+
+div.component_controllerview .cv-btn .cv-fill {
+    fill: rgba(16, 124, 16, 0.85);
+    stroke: none;
+}
+
+div.component_controllerview .cv-btn.active rect:not(.cv-fill),
+div.component_controllerview .cv-btn.active circle {
+    fill: #107c10;
+    stroke: #fff;
+}
+
+div.component_controllerview .cv-a.active circle { fill: #5dc21e; }
+div.component_controllerview .cv-b.active circle { fill: #e81123; }
+div.component_controllerview .cv-x.active circle { fill: #0078d7; }
+div.component_controllerview .cv-y.active circle { fill: #ffb900; }
+
+div.component_controllerview .cv-btn.highlight rect:not(.cv-fill),
+div.component_controllerview .cv-btn.highlight circle {
+    stroke: #ffb900;
+    stroke-width: 3;
+}
+
+small.component_controllerview_raw {
+    opacity: 0.6;
+}
+
+table.component_controllermapping {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+table.component_controllermapping td {
+    padding: 4px 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+table.component_controllermapping tr.changed td:first-child {
+    color: #ffb900;
+}
+
+table.component_controllermapping tr.duplicate td:nth-child(2) {
+    color: orange;
+}
