@@ -21,6 +21,11 @@ import KeyboardMouseEmulation from './kbm'
  */
 // How long one vibration effect may last (ms): the game renews it all the time while it is running
 const MAX_RUMBLE_MS = 250
+// The state of the vibration is sent to the controller at most this often, a state that has not changed (by less than
+// RUMBLE_SAME) is renewed after RUMBLE_RENEW_MS, before the effect of MAX_RUMBLE_MS runs out
+const RUMBLE_GAP_MS = 40
+const RUMBLE_SAME = 0.04
+const RUMBLE_RENEW_MS = 160
 
 export default class GreenlightGamepadDriver {
 
@@ -241,6 +246,75 @@ export default class GreenlightGamepadDriver {
         }
     }
 
+    // What was last sent to each controller that vibrates, and what waits for its turn (see _playRumble)
+    _rumbleSent = new Map<any, { at: number; params: any; timer: ReturnType<typeof setTimeout> | undefined; latest: { type: string; params: any } | null }>()
+
+    /**
+     * The console sends 80 to 100 vibration states a second (in bursts), and the controller (above all one on Bluetooth) cannot
+     * take so many: they stand in a queue and the controller goes on vibrating after the shot is over. Only the latest state is
+     * sent, not more often than every RUMBLE_GAP_MS, a state that has not changed is not sent again until it must be renewed,
+     * and a stop (no vibration) is sent at once.
+     */
+    _playRumble(actuator: any, type: string, params: any): Promise<string> {
+        let entry = this._rumbleSent.get(actuator)
+        if(entry === undefined){
+            entry = { at: 0, params: null, timer: undefined, latest: null }
+            this._rumbleSent.set(actuator, entry)
+        }
+        const state = entry
+
+        const send = () => {
+            if(state.timer !== undefined){
+                clearTimeout(state.timer)
+                state.timer = undefined
+            }
+            const next = state.latest
+            state.latest = null
+            if(next === null){
+                return Promise.resolve('complete')
+            }
+            state.at = Date.now()
+            state.params = next.params
+            return Promise.resolve(actuator.playEffect(next.type, next.params)).catch(() => 'complete')
+        }
+
+        const strength = (value: any) => Math.max(value.weakMagnitude ?? 0, value.strongMagnitude ?? 0, value.leftTrigger ?? 0, value.rightTrigger ?? 0)
+        const difference = state.params === null ? 1 : Math.max(
+            Math.abs((params.weakMagnitude ?? 0) - (state.params.weakMagnitude ?? 0)),
+            Math.abs((params.strongMagnitude ?? 0) - (state.params.strongMagnitude ?? 0)),
+            Math.abs((params.leftTrigger ?? 0) - (state.params.leftTrigger ?? 0)),
+            Math.abs((params.rightTrigger ?? 0) - (state.params.rightTrigger ?? 0)),
+        )
+        const now = Date.now()
+        const since = now - state.at
+
+        state.latest = { type, params }
+
+        // A stop goes at once (and a stop of what is already stopped is not sent at all)
+        if(strength(params) < 0.01){
+            if(state.params !== null && strength(state.params) < 0.01){
+                state.latest = null
+                return Promise.resolve('complete')
+            }
+            return send()
+        }
+
+        // The same state again: it is only renewed before the effect runs out
+        if(difference < RUMBLE_SAME && since < RUMBLE_RENEW_MS){
+            state.latest = null
+            return Promise.resolve('complete')
+        }
+
+        if(since >= RUMBLE_GAP_MS){
+            return send()
+        }
+
+        if(state.timer === undefined){
+            state.timer = setTimeout(() => { void send() }, RUMBLE_GAP_MS - since)
+        }
+        return Promise.resolve('complete')
+    }
+
     /** The controller as the player sees it when it makes it vibrate: with the vibration scaled to the setting. */
     _weakenRumble(pad: Gamepad | null): Gamepad | null {
         const actuator: any = pad === null ? undefined : (pad as any).vibrationActuator
@@ -251,7 +325,7 @@ export default class GreenlightGamepadDriver {
         const factor = this._rumbleStrength
         const scaled = {
             type: actuator.type,
-            playEffect: (type: string, params: any) => actuator.playEffect(type, {
+            playEffect: (type: string, params: any) => this._playRumble(actuator, type, {
                 ...params,
                 // The console asks for the longest time (2.55 s) every time and sends a new state many times a second while the game
                 // runs; when the game is paused nothing more comes, and the last effect would go on for seconds. A short effect that
