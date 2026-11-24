@@ -66,6 +66,10 @@ const SHORT_TEXT_LETTERS = 6
 const SHORT_TEXT_CONFIDENCE = 68
 // A reading that the reader is this unsure about is not believed at all (pictures and noise)
 const MIN_CONFIDENCE = 55
+// A reading this sure is taken at once; a weaker one is tried again in another way, and the best one is taken
+const GOOD_CONFIDENCE = 72
+// The picture in grey is tried (it takes time) only for places that look like text to the scout
+const RAW_MIN_SCORE = 120
 
 const LETTER = new RegExp('\\p{L}', 'gu')
 
@@ -83,6 +87,8 @@ interface Element {
     role: BlockRole;
     plate: boolean;
     panel?: Region;
+    // How much the place looked like text to the scout
+    score: number;
     // On how many looks in a row it was found / not found
     seen: number;
     missed: number;
@@ -330,14 +336,15 @@ export default class ElementsEngine {
             const scan: Region = { x: block.x, y: block.y, w: block.w, h: block.h }
             const panel = block.panel === undefined ? undefined : toScreen(block.panel)
 
-            // The same element as before: about the same place and size (a shift is followed: a text that floats)
+            // The same element as before: about the same place and size (a shift is followed: a text that floats, but never as far
+            // as the next row of a list: that is another element)
             let best: Element | null = null
             let bestDistance = Infinity
             for(const element of this._elements){
                 if(taken.has(element)){
                     continue
                 }
-                const same = (inside(rect, element.rect) > 0.6 && inside(element.rect, rect) > 0.4) || (similarSize(rect, element.rect) && distance(rect, element.rect) <= 0.06)
+                const same = (inside(rect, element.rect) > 0.6 && inside(element.rect, rect) > 0.4) || (similarSize(rect, element.rect) && distance(rect, element.rect) <= Math.max(0.015, Math.min(rect.h, element.rect.h) * 0.9))
                 if(same){
                     const gap = distance(rect, element.rect)
                     if(gap < bestDistance){
@@ -352,14 +359,14 @@ export default class ElementsEngine {
                     continue
                 }
                 best = {
-                    id: this._nextId++, rect, scan, polarity: block.polarity, role: block.role, plate: block.plate, panel,
+                    id: this._nextId++, rect, scan, polarity: block.polarity, role: block.role, plate: block.plate, panel, score: block.score,
                     seen: 0, missed: 0, state: 'new', dirty: false, dirtySince: now, reading: false, readAt: 0, deadUntil: 0, deadCount: 0,
                     sig: null, sigSum: 0, segments: [],
                 }
                 this._elements.push(best)
             }
             taken.add(best)
-            this._follow(best, rect, scan, panel, block.role, block.plate, block.polarity, now)
+            this._follow(best, rect, scan, panel, block.role, block.plate, block.polarity, block.score, now)
         }
 
         // Elements that were not found this time
@@ -389,9 +396,10 @@ export default class ElementsEngine {
     }
 
     /** An element was found again: its place is followed, and its text pixels say whether it has to be read (again). */
-    _follow(element: Element, rect: Region, scan: Region, panel: Region | undefined, role: BlockRole, plate: boolean, polarity: Polarity, now: number) {
+    _follow(element: Element, rect: Region, scan: Region, panel: Region | undefined, role: BlockRole, plate: boolean, polarity: Polarity, score: number, now: number) {
         element.missed = 0
         element.seen++
+        element.score = Math.max(element.score * 0.9, score)
         element.role = role
         element.plate = plate
         element.panel = panel
@@ -556,9 +564,24 @@ export default class ElementsEngine {
             config: { region, mode: element.role === 'subtitle' ? 'dialog' : 'task', color: 'auto', source: settings.source, target: settings.target, fit: settings.fit },
         }
         // The text colour the scout found first; when nothing is read, the other one (white text on a light bar looks dark)
-        let result = await this._toolbox._read(job, element.polarity)
-        if((result === null || result.segments.length === 0) && this._running){
-            result = await this._toolbox._read(job, element.polarity === 'light' ? 'dark' : 'light')
+        // and, when that does not work, the picture in grey (thin or faint letters are lost when it is cut into black and white)
+        const other: Polarity = element.polarity === 'light' ? 'dark' : 'light'
+        const attempts: Array<[Polarity, boolean]> = [[element.polarity, false], [other, false]]
+        if(element.score >= RAW_MIN_SCORE){
+            attempts.push([element.polarity, true])
+        }
+        let result: Awaited<ReturnType<TranslatorEngine['_read']>> = null
+        for(const [polarity, raw] of attempts){
+            if(!this._running){
+                break
+            }
+            const attempt = await this._toolbox._read(job, polarity, raw)
+            if(attempt !== null && attempt.segments.length > 0 && (result === null || attempt.confidence > result.confidence)){
+                result = attempt
+            }
+            if(result !== null && result.confidence >= GOOD_CONFIDENCE){
+                break
+            }
         }
         crop.width = 0
         crop.height = 0
