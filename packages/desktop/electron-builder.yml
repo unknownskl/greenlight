@@ -1,6 +1,6 @@
-appId: com.unknownskl.greenlight
+appId: com.amenefus.greenlight
 productName: Greenlight
-copyright: Copyright © 2021-2024 UnknownSKL
+copyright: Copyright © 2026 amenefus
 
 directories:
   output: dist
@@ -12,12 +12,18 @@ files:
       - package.json
       - app
 publish:
-- github
+  - provider: github
+    owner: amenefus
+    repo: greenlight
 
 
 # Mac OS configuration
 mac:
   category: public.app-category.games
+  # Native helper for Settings > Controller > Reconnect (software USB replug)
+  extraResources:
+    - from: native-bin/mac/gl-usb-reenumerate
+      to: native/gl-usb-reenumerate
   # icon: "src/app/assets/images/icon.icns"
   target: 
   - target: dmg

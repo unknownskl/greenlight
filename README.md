@@ -29,7 +29,7 @@ _DISCLAIMER: Greenlight is not affiliated with Microsoft, Xbox or Moonlight. All
 [Install on Flathub](https://flathub.org/apps/details/io.github.unknownskl.greenlight)
 
 ### Download pre-compiled binaries:
-[Latest releases can be found here](https://github.com/unknownskl/greenlight/releases).
+[Latest releases can be found here](https://github.com/amenefus/greenlight/releases).
 
 ### Compile from source
 
@@ -89,7 +89,7 @@ Click on the Xbox logo at the top-left. It will ask you to confirm to close the 
 
 Clone the repository:
 
-    git clone https://github.com/unknownskl/greenlight.git
+    git clone https://github.com/amenefus/greenlight.git
     cd greenlight
 
 Install dependencies:
