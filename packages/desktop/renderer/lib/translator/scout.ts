@@ -357,7 +357,7 @@ function mergeLines(parts: Part[], rows: number): Part[] {
  * Finds the places in a picture that look like text. `data` is the picture (RGBA), `polarities` says which kinds
  * of text to look for (light on dark, dark on light).
  */
-export function findTextBlocks(data: Uint8ClampedArray, width: number, height: number, polarities: Polarity[]): TextBlock[] {
+export function findTextBlocks(data: Uint8ClampedArray, width: number, height: number, polarities: Polarity[], limit = MAX_BLOCKS): TextBlock[] {
     const masks = inkMasks(data, width, height, polarities)
     const rows = Math.floor(height / CELL)
     const blocks: TextBlock[] = []
@@ -445,5 +445,5 @@ export function findTextBlocks(data: Uint8ClampedArray, width: number, height: n
 
     // The ones that look most like text first; the faintest are noise (more of it shows up in a sharper picture)
     const floor = MIN_SCORE_PER_PIXEL * width
-    return kept.filter(block => block.score >= floor).sort((a, b) => b.score - a.score).slice(0, MAX_BLOCKS)
+    return kept.filter(block => block.score >= floor).sort((a, b) => b.score - a.score).slice(0, limit)
 }

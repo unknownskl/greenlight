@@ -85,7 +85,13 @@ const MENU_BLOCKS = 6
 // Tiles for reading a whole screen piece by piece: tiles that lie over each other by this much are one tile (no more,
 // or the tiles of a busy menu all grow together into one big piece), and how many tiles at most
 const TILE_JOIN = 0.3
-const MAX_TILES = 10
+const MAX_TILES = 12
+// Tiles on the same row (the tabs of a menu) that are this close are one tile; the row is not wider than TILE_ROW_WIDTH
+const TILE_ROW_GAP = 0.09
+const TILE_ROW_WIDTH = 0.75
+// How many blocks the scout looks for (for a menu), and how many of them the windows follow
+const MENU_SCAN_BLOCKS = 30
+const WINDOW_BLOCKS = 10
 const MENU_SPREAD = 0.3
 const MENU_LOOKS = 3
 const MENU_OVER_BLOCKS = 3
@@ -214,6 +220,17 @@ function distance(a: Region, b: Region): number {
 // About as big as each other (the same text a little nearer or further away is still the same text)
 function similarSize(a: Region, b: Region): boolean {
     return a.w > b.w * 0.75 && a.w < b.w * 1.33 && a.h > b.h * 0.65 && a.h < b.h * 1.5
+}
+
+// Two pieces of text on one row that are close to each other (the tabs of a menu)
+function sameRow(a: Region, b: Region): boolean {
+    const overlap = Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y)
+    if(overlap < 0.5 * Math.min(a.h, b.h)){
+        return false
+    }
+    const gap = Math.max(a.x, b.x) - Math.min(a.x + a.w, b.x + b.w)
+    const width = Math.max(a.x + a.w, b.x + b.w) - Math.min(a.x, b.x)
+    return gap <= TILE_ROW_GAP && width <= TILE_ROW_WIDTH
 }
 
 function union(a: Region, b: Region): Region {
@@ -503,14 +520,17 @@ export default class AutoWindows {
         const pixels = context.getImageData(0, 0, width, height).data
 
         const polarities: Polarity[] = ['light', 'dark']
-        const blocks = findTextBlocks(pixels, width, height, polarities)
+        // A menu has many more lines than the windows can follow: all of them tell it is a menu and are read as tiles; the
+        // windows follow the best ones
+        const everything = findTextBlocks(pixels, width, height, polarities, MENU_SCAN_BLOCKS)
+        const blocks = everything.slice(0, WINDOW_BLOCKS)
 
         const now = Date.now()
 
-        this._tiles = this._makeTiles(blocks, video, box, settings.fit, visible)
+        this._tiles = this._makeTiles(everything, video, box, settings.fit, visible)
 
         // A menu: a lot of lines of text over the screen. It is read as a whole (see the overlay), not in windows
-        let menu = this._detectMenu(blocks)
+        let menu = this._detectMenu(everything)
         if(menu && !this._menu){
             if(now < this._menuBlockedUntil){
                 // It looked like a menu and had no text lately: not again for a while
@@ -650,7 +670,7 @@ export default class AutoWindows {
             merged = false
             for(let a = 0; a < tiles.length && !merged; a++){
                 for(let b = a + 1; b < tiles.length && !merged; b++){
-                    if(Math.max(inside(tiles[a], tiles[b]), inside(tiles[b], tiles[a])) > TILE_JOIN){
+                    if(Math.max(inside(tiles[a], tiles[b]), inside(tiles[b], tiles[a])) > TILE_JOIN || sameRow(tiles[a], tiles[b])){
                         tiles[a] = union(tiles[a], tiles[b])
                         tiles.splice(b, 1)
                         merged = true
