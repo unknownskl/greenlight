@@ -26,6 +26,8 @@ function languageName(code: string, locale: string): string {
 function SettingsTranslator() {
     const { settings, setSettings } = useSettings()
     const { t } = useTranslation()
+    // The rare switches are folded away
+    const [advanced, setAdvanced] = React.useState(false)
 
     const regions = getRegions(settings)
     const [selected, setSelected] = React.useState(0)
@@ -137,26 +139,6 @@ function SettingsTranslator() {
                     </p>
 
                     { settings.translator_auto === true ? <p>
-                        <label>{t('translator.menuAutoLabel')}</label>
-                        <label style={{ minWidth: 0 }} className="toggle-label">
-                            <input type='checkbox' checked={settings.translator_menu_auto !== false} onChange={(e) => {
-                                update({ translator_menu_auto: e.target.checked })
-                            }} />
-                        </label>
-                        <small style={{ display: 'block', opacity: 0.7 }}>{t('translator.menuAutoHint')}</small>
-                    </p> : '' }
-
-                    { settings.translator_auto === true ? <p>
-                        <label>{t('translator.panelsLabel')}</label>
-                        <label style={{ minWidth: 0 }} className="toggle-label">
-                            <input type='checkbox' checked={settings.translator_panels !== false} onChange={(e) => {
-                                update({ translator_panels: e.target.checked })
-                            }} />
-                        </label>
-                        <small style={{ display: 'block', opacity: 0.7 }}>{t('translator.panelsHint')}</small>
-                    </p> : '' }
-
-                    { settings.translator_auto === true ? <p>
                         <label>{t('translator.profileLabel')}</label>
                         <label style={{ minWidth: 0 }} className="toggle-label">
                             <input type='checkbox' checked={settings.translator_profile_on !== false} onChange={(e) => {
@@ -170,6 +152,33 @@ function SettingsTranslator() {
                     </p> : '' }
 
                     { settings.translator_auto === true ? <p>
+                        <Button label={<span><i className={advanced ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down'}></i> {advanced ? t('translator.advancedHide') : t('translator.advancedShow')}</span>} onClick={() => {
+                            setAdvanced(!advanced)
+                        }}></Button>
+                        <small style={{ display: 'block', opacity: 0.7 }}>{t('translator.advancedHint')}</small>
+                    </p> : '' }
+
+                    { (settings.translator_auto === true && advanced) ? <p>
+                        <label>{t('translator.menuAutoLabel')}</label>
+                        <label style={{ minWidth: 0 }} className="toggle-label">
+                            <input type='checkbox' checked={settings.translator_menu_auto !== false} onChange={(e) => {
+                                update({ translator_menu_auto: e.target.checked })
+                            }} />
+                        </label>
+                        <small style={{ display: 'block', opacity: 0.7 }}>{t('translator.menuAutoHint')}</small>
+                    </p> : '' }
+
+                    { (settings.translator_auto === true && advanced) ? <p>
+                        <label>{t('translator.panelsLabel')}</label>
+                        <label style={{ minWidth: 0 }} className="toggle-label">
+                            <input type='checkbox' checked={settings.translator_panels !== false} onChange={(e) => {
+                                update({ translator_panels: e.target.checked })
+                            }} />
+                        </label>
+                        <small style={{ display: 'block', opacity: 0.7 }}>{t('translator.panelsHint')}</small>
+                    </p> : '' }
+
+                    { (settings.translator_auto === true && advanced) ? <p>
                         <label>{t('translator.fullscreenLabel')}</label>
                         <label style={{ minWidth: 0 }} className="toggle-label">
                             <input type='checkbox' checked={settings.translator_fullscreen === true} onChange={(e) => {
@@ -179,7 +188,7 @@ function SettingsTranslator() {
                         <small style={{ display: 'block', opacity: 0.7 }}>{t('translator.fullscreenHint')}</small>
                     </p> : '' }
 
-                    { settings.translator_auto === true ? <p>
+                    { (settings.translator_auto === true && advanced) ? <p>
                         <label>{t('translator.autoDebugLabel')}</label>
                         <label style={{ minWidth: 0 }} className="toggle-label">
                             <input type='checkbox' checked={settings.translator_auto_debug === true} onChange={(e) => {
