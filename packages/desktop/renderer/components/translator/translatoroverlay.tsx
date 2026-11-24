@@ -691,6 +691,19 @@ function TranslatorOverlay({
 
     return (
         <div id="translator_layer" className={editing ? 'editing' : ''} data-gp-ignore>
+            { settings.translator_cover !== false ? visible.map(item => (
+                <div key={'cover-' + item.key} style={{
+                    position: 'absolute',
+                    pointerEvents: 'none',
+                    left: (item.segment.rect.x * viewport.width - 5) + 'px',
+                    top: (item.segment.rect.y * viewport.height - 5) + 'px',
+                    width: (item.segment.rect.w * viewport.width + 10) + 'px',
+                    height: (item.segment.rect.h * viewport.height + 10) + 'px',
+                    background: 'rgb(' + item.segment.background[0] + ', ' + item.segment.background[1] + ', ' + item.segment.background[2] + ')',
+                    borderRadius: '4px',
+                }} />
+            )) : '' }
+
             { visible.map((item, index) => (
                 <div key={item.key} className="translator-segment" style={segmentStyle(item.segment, viewport, autoFont, fixedSize, opacity, nextBelow(all, index), sideLimits(all, index), item.bounds)}>{item.segment.translated}</div>
             )) }

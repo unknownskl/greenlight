@@ -360,6 +360,19 @@ export default class ElementsEngine {
             if(!taken.has(element)){
                 element.missed++
                 element.seen = 0
+
+                // The text is not there any more (the scene has changed, a menu was closed): the translation is taken away at
+                // once, not after a few more looks
+                if(element.state === 'text' && element.sig !== null && element.sigSum > 0){
+                    const mask = this._masks[this._polarities.indexOf(element.polarity)]
+                    if(mask !== undefined){
+                        const current = cellsOf(mask.mask, width, height, element.scan)
+                        if(current.sum < element.sigSum * 0.5 || cellsDifference(element.sig, current.cells) > 0.7){
+                            element.segments = []
+                            element.state = 'idle'
+                        }
+                    }
+                }
             }
         }
         this._elements = this._elements.filter(element => element.missed < (element.state === 'dead' ? DEAD_DROP_MISSES : DROP_MISSES) || element.reading)

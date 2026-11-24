@@ -209,6 +209,16 @@ function SettingsTranslator() {
                     </p> : '' }
 
                     <p>
+                        <label>{t('translator.coverLabel')}</label>
+                        <label style={{ minWidth: 0 }} className="toggle-label">
+                            <input type='checkbox' checked={settings.translator_cover !== false} onChange={(e) => {
+                                update({ translator_cover: e.target.checked })
+                            }} />
+                        </label>
+                        <small style={{ display: 'block', opacity: 0.7 }}>{t('translator.coverHint')}</small>
+                    </p>
+
+                    <p>
                         <label>{t('translator.sourceLabel')}</label>
                         <select value={settings.translator_source_lang || 'en'} onChange={(e) => {
                             update({ translator_source_lang: e.target.value })

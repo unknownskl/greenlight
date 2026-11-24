@@ -352,6 +352,8 @@
         "engineLabel": "New engine: elements of the interface (experimental)",
         "engineHint": "Instead of windows and the menu mode the translator keeps track of the elements of the interface (tabs, buttons, lines, subtitles): each one is read once, does not blink, and is read again only when it changes. Turn it off to get the usual adaptive mode back.",
         "debugElements": "Elements of the interface: {{count}} translated",
+        "coverLabel": "Paint over the original under the translation",
+        "coverHint": "A solid plate of the colour of the interface is drawn over the whole area of the original text, so that it does not show through. Turn it off if the plate spoils the look.",
         "advancedShow": "Advanced",
         "advancedHide": "Hide advanced",
         "advancedHint": "Rare switches: usually not needed, the adaptive mode decides everything by itself.",
