@@ -39,7 +39,12 @@ export interface ElementResult {
 
 // How often the picture is looked at, and in what size (small text is lost in a smaller picture)
 const SCAN_MS = 700
-const SCAN_WIDTH = 1280
+// The picture is looked at in the size it comes (up to SCAN_WIDTH): thin or faint text on a busy picture (the description of
+// an item) is lost when it is made smaller. When a look takes too long it is made smaller, and bigger again when it is fast.
+const SCAN_WIDTH = 1920
+const SCAN_WIDTH_SMALL = 1280
+const SCAN_SLOW_MS = 260
+const SCAN_FAST_MS = 70
 const MAX_BLOCKS = 30
 const MAX_ELEMENTS = 48
 
@@ -64,6 +69,10 @@ const BETTER_MS = 4000
 // Pieces of text that are at least this tall (fractions of the screen) and not further apart than this many heights are one title
 const TITLE_MIN_HEIGHT = 0.03
 const TITLE_GAP = 0.7
+// More ink than this between two pieces (an icon) and they are not one title
+const GAP_INK = 0.3
+// ... or when a line of ink runs through the gap: a column that is this much ink
+const GAP_LINE = 0.75
 // ... and one row of text (a block of several rows or a picture is not a title)
 const TITLE_MAX_HEIGHT = 0.08
 // Up to this many letters is a short text: it has to be read with at least this confidence, or it is not believed
@@ -73,6 +82,8 @@ const SHORT_TEXT_CONFIDENCE = 68
 const MIN_CONFIDENCE = 55
 // A reading this sure is taken at once; a weaker one is tried again in another way, and the best one is taken
 const GOOD_CONFIDENCE = 72
+// ... and covers at least this part of the place (the rest of a paragraph is tried in other ways)
+const GOOD_COVERAGE = 0.6
 // The picture in grey is tried (it takes time) only for places that look like text to the scout
 const RAW_MIN_SCORE = 120
 
@@ -203,6 +214,7 @@ export default class ElementsEngine {
     _nextId = 1
     _canvas = document.createElement('canvas')
     _scanTook = 0
+    _width = SCAN_WIDTH
     // The text pixels of the last look (for the signatures of the elements)
     _masks: Array<{ mask: Uint8Array; count: number }> = []
     _scanSize = { width: 0, height: 0 }
@@ -212,6 +224,8 @@ export default class ElementsEngine {
     _cache: Map<string, string> = new Map()
     _pending: Map<string, Promise<string>> = new Map()
     _lastKey = ''
+    // What the last look found (for tests)
+    _lastPieces: Array<{ x: number; y: number; w: number; h: number; polarity: Polarity; role: BlockRole; score: number }> = []
 
     constructor(options: ElementsOptions) {
         this._options = options
@@ -282,6 +296,11 @@ export default class ElementsEngine {
             console.warn('Translator: look failed:', error)
         }
         this._scanTook = Date.now() - began
+        if(this._width > SCAN_WIDTH_SMALL && this._scanTook > SCAN_SLOW_MS){
+            this._width = SCAN_WIDTH_SMALL
+        } else if(this._width < SCAN_WIDTH && this._scanTook < SCAN_FAST_MS){
+            this._width = SCAN_WIDTH
+        }
 
         if(this._running){
             this._timer = setTimeout(() => this._scan(), Math.max(SCAN_MS, this._scanTook * 8))
@@ -305,7 +324,7 @@ export default class ElementsEngine {
             return
         }
 
-        const width = Math.min(SCAN_WIDTH, Math.round(visible.sw))
+        const width = Math.min(this._width, Math.round(visible.sw))
         const height = Math.max(8, Math.round(width * visible.sh / visible.sw))
         this._canvas.width = width
         this._canvas.height = height
@@ -332,6 +351,7 @@ export default class ElementsEngine {
         // The words of a big title are far apart ("H U N T E R  F O R U M S"): they are found as separate pieces and are put
         // together here, so that the title is translated as one phrase ("Hunter Forums" is "Форум мисливців", not "Мисливець Форуми")
         const pieces = this._joinTitles(blocks, toScreen)
+        this._lastPieces = pieces.map(piece => ({ x: piece.x, y: piece.y, w: piece.w, h: piece.h, polarity: piece.polarity, role: piece.role, score: piece.score }))
 
         const taken = new Set<Element>()
         for(const block of pieces){
@@ -404,8 +424,45 @@ export default class ElementsEngine {
         this._report()
     }
 
+    /** Is there nothing between two pieces of text (no frame of a button, no icon)? Only then they can be one title. */
+    _gapIsEmpty(a: { x: number; y: number; w: number; h: number; polarity: Polarity; score: number }, b: { x: number; y: number; w: number; h: number; polarity: Polarity; score: number }): boolean {
+        const left = a.x <= b.x ? a : b
+        const right = a.x <= b.x ? b : a
+        const { width, height } = this._scanSize
+        const x0 = Math.floor((left.x + left.w) * width)
+        const x1 = Math.ceil(right.x * width)
+        const y0 = Math.floor(Math.max(a.y, b.y) * height)
+        const y1 = Math.ceil(Math.min(a.y + a.h, b.y + b.h) * height)
+        if(x1 <= x0 || y1 <= y0){
+            return true
+        }
+
+        // The text pixels of the kind of the better piece (the other kind is the plain background next to the letters)
+        const mask = this._masks[this._polarities.indexOf(a.score >= b.score ? a.polarity : b.polarity)]
+        if(mask === undefined){
+            return true
+        }
+        // A line that runs through the gap (the edge of a button, a divider) tells the pieces are not one phrase; so does a lot of ink
+        // (an icon). A little ink at the edges of the letters is only the glow around them.
+        let count = 0
+        let line = false
+        for(let x = x0; x < x1; x++){
+            let column = 0
+            for(let y = y0; y < y1; y++){
+                if(mask.mask[y * width + x] === 1){
+                    column++
+                }
+            }
+            count += column
+            if(column >= GAP_LINE * (y1 - y0)){
+                line = true
+            }
+        }
+        return !line && count / ((x1 - x0) * (y1 - y0)) < GAP_INK
+    }
+
     /** Big pieces of text that stand on one row, close to each other and about as big, are one piece (a title in several words). */
-    _joinTitles<T extends { x: number; y: number; w: number; h: number; score: number }>(blocks: T[], toScreen: (b: { x: number; y: number; w: number; h: number }) => Region): T[] {
+    _joinTitles<T extends { x: number; y: number; w: number; h: number; score: number; polarity: Polarity }>(blocks: T[], toScreen: (b: { x: number; y: number; w: number; h: number }) => Region): T[] {
         const list = blocks.slice()
         let joined = true
 
@@ -609,16 +666,23 @@ export default class ElementsEngine {
             attempts.push([element.polarity, true])
         }
         let result: Awaited<ReturnType<TranslatorEngine['_read']>> = null
+        let resultValue = 0
         for(const [polarity, raw] of attempts){
             if(!this._running){
                 break
             }
             const attempt = await this._toolbox._read(job, polarity, raw)
-            if(attempt !== null && attempt.segments.length > 0 && (result === null || attempt.confidence > result.confidence)){
-                result = attempt
-            }
-            if(result !== null && result.confidence >= GOOD_CONFIDENCE){
-                break
+            if(attempt !== null && attempt.segments.length > 0){
+                // How much of the place the text that was read covers: a reading of one line out of a paragraph is a poor one
+                const coverage = this._coverage(element, attempt, video, box, settings.fit)
+                const value = attempt.confidence * (0.4 + 0.6 * coverage)
+                if(result === null || value > resultValue){
+                    result = attempt
+                    resultValue = value
+                }
+                if(attempt.confidence >= GOOD_CONFIDENCE && coverage >= GOOD_COVERAGE){
+                    break
+                }
             }
         }
         crop.width = 0
@@ -826,6 +890,23 @@ export default class ElementsEngine {
             plate: element.plate,
         }))
         this._options.onFrames(frames)
+    }
+
+    /** How much of the place of an element the text of a reading covers (0..1). */
+    _coverage(element: Element, reading: { segments: Array<{ rect: { x: number; y: number; w: number; h: number } }> }, video: HTMLVideoElement, box: { width: number; height: number }, fit: FitMode): number {
+        let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity
+        for(const segment of reading.segments){
+            const screen = videoRectToScreen(video.videoWidth, video.videoHeight, box.width, box.height, fit, segment.rect)
+            x0 = Math.min(x0, screen.x)
+            y0 = Math.min(y0, screen.y)
+            x1 = Math.max(x1, screen.x + screen.w)
+            y1 = Math.max(y1, screen.y + screen.h)
+        }
+        const area = element.rect.w * element.rect.h
+        if(area <= 0 || x1 <= x0 || y1 <= y0){
+            return 1
+        }
+        return Math.min(1, ((x1 - x0) * (y1 - y0)) / area)
     }
 
     /** What every element is doing (for tests). */
