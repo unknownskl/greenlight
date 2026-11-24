@@ -596,6 +596,9 @@ function StreamComponent({
                             <Button label={<span><i className="fa-solid fa-language"></i> <span className="gb-label gb-always">{settings.translator_enabled ? t("translator.btnOn") : t("translator.btnOff")}</span></span>} title={t("translator.btnTitle")} className={settings.translator_enabled ? 'btn-primary' : ''} onClick={(e) => {
                                 e.target.blur(); toggleTranslator()
                             }}></Button>
+                            { settings.translator_enabled ? <Button label={<span><i className="fa-solid fa-wand-magic-sparkles"></i> <span className="gb-label">{t("translator.btnAuto")}</span></span>} title={t("translator.btnAutoTitle")} className={settings.translator_auto === true ? 'btn-primary' : ''} onClick={(e) => {
+                                e.target.blur(); toggleTranslatorAuto()
+                            }}></Button> : '' }
                             { settings.translator_enabled ? <Button label={<span><i className={translatorMore ? 'fa-solid fa-angle-left' : 'fa-solid fa-angle-right'}></i></span>} title={t("translator.btnMoreTitle")} onClick={(e) => {
                                 e.target.blur(); setTranslatorMore(!translatorMore)
                             }}></Button> : '' }
@@ -608,9 +611,6 @@ function StreamComponent({
                                     e.target.blur(); toggleTranslatorWindow(index)
                                 }}></Button>
                             )) : '' }
-                            { settings.translator_enabled ? <Button label={<span><i className="fa-solid fa-wand-magic-sparkles"></i> <span className="gb-label">{t("translator.btnAuto")}</span></span>} title={t("translator.btnAutoTitle")} className={settings.translator_auto === true ? 'btn-primary' : ''} onClick={(e) => {
-                                e.target.blur(); toggleTranslatorAuto()
-                            }}></Button> : '' }
                             { settings.translator_enabled ? <Button label={<span><i className="fa-solid fa-clock-rotate-left"></i> <span className="gb-label">{t("translator.btnLog")}</span></span>} title={t("translator.btnLogTitle")} className={settings.translator_log === true ? 'btn-primary' : ''} onClick={(e) => {
                                 e.target.blur(); toggleTranslatorLog()
                             }}></Button> : '' }
