@@ -1,6 +1,6 @@
 import { Region, FitMode, clampRegion, regionToSource, videoRectToScreen, SourceRect } from './geometry'
 import { getOcrWorker, recognizeCanvas, OcrLine } from './ocr'
-import { inkMasks } from './ink'
+import { inkMasks, inkMasksInSlices } from './ink'
 
 export { inkMasks }
 
@@ -760,6 +760,11 @@ interface PendingText {
  *  - when only numbers change (a counter, a timer) the new numbers are put into the old translation,
  *  - translations are cached.
  */
+// Lets the page do its own work (draw the game, read the pad) before the next piece of work
+function breathe(): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, 0))
+}
+
 export default class TranslatorEngine {
 
     _options: EngineOptions
@@ -1873,7 +1878,7 @@ export default class TranslatorEngine {
     /** Reads the window with one text colour and turns the result into pieces of text with their position and colours. */
     async _read(job: Snapshot, polarity: Polarity, raw = false): Promise<ReadResult | null> {
         const source = job.source
-        const prepared = this._prepareForReading(job.canvas, source, polarity, raw)
+        const prepared = await this._prepareForReading(job.canvas, source, polarity, raw)
         if(prepared === null){
             return null
         }
@@ -2072,7 +2077,7 @@ export default class TranslatorEngine {
     }
 
     /** Crops the window from the video and turns it into black text on white, which is what the text reader likes. */
-    _prepareForReading(frame: HTMLCanvasElement, source: SourceRect, polarity: Polarity, raw = false): PreparedImage | null {
+    async _prepareForReading(frame: HTMLCanvasElement, source: SourceRect, polarity: Polarity, raw = false): Promise<PreparedImage | null> {
         // Small interface text needs to be enlarged a lot to be read reliably
         let scale = Math.min(3, Math.max(2, 1300 / source.sw))
         // A big window (the whole screen) is not enlarged as much: the time of the reader grows with the number of pixels
@@ -2092,12 +2097,16 @@ export default class TranslatorEngine {
         }
 
         workContext.drawImage(frame, 0, 0, frame.width, frame.height, 0, 0, width, height)
+        // The picture is prepared in several short pieces, not one long one: the page draws the game and reads the pad in between
+        await breathe()
         const image = workContext.getImageData(0, 0, width, height)
         const data = image.data
 
         // Keep the original colours (to find the colour of the interface behind the text) before the picture is turned black and white
         const colors = new Uint8ClampedArray(data)
-        const ink = inkMask(data, width, height, polarity).mask
+        await breathe()
+        const ink = (await inkMasksInSlices(data, width, height, [polarity], breathe))[0].mask
+        await breathe()
 
         if(raw){
             // The picture as it is, in grey with more contrast: thin or faint letters (a menu in a pale colour) are lost when the

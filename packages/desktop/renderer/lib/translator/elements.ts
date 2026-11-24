@@ -409,6 +409,12 @@ export default class ElementsEngine {
             return
         }
         context.drawImage(video, visible.sx, visible.sy, visible.sw, visible.sh, 0, 0, width, height)
+        // The copy of the frame and its reading are two tasks, not one: each is short, so the picture of the game and the pad are
+        // not held up for the sum of them (on the Deck 14 ms and 8 ms, and the page waits for 22 ms in one piece)
+        await new Promise<void>(resolve => setTimeout(resolve, 0))
+        if(!this._running){
+            return
+        }
         const pixels = context.getImageData(0, 0, width, height).data
 
         const { blocks, masks } = await this._analyse(pixels, width, height)
