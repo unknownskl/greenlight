@@ -10,7 +10,9 @@ command: run.sh
 separate-locales: false
 finish-args:
   - --share=ipc
-  - --socket=fallback-x11
+  # X11 always (not only when there is no Wayland): in a Wayland desktop session the app has no Wayland socket, so without X11 it
+  # cannot show a window at all (it crashed on start in Desktop Mode)
+  - --socket=x11
   - --socket=pulseaudio
   - --share=network
   - --allow=bluetooth
@@ -75,4 +77,5 @@ modules:
           - export LD_LIBRARY_PATH=/app/extralib:${LD_LIBRARY_PATH}
           - echo runtime LD_LIBRARY_PATH = $LD_LIBRARY_PATH
           - echo runtime ARCH = $(uname -m)-$(uname -s | tr '[:upper:]' '[:lower:]')
-          - zypak-wrapper.sh /app/main/greenlight-desktop "$@"
+          # The window is made through X11 (the sandbox has no Wayland socket; Electron chooses Wayland by itself in a Wayland session)
+          - zypak-wrapper.sh /app/main/greenlight-desktop --ozone-platform=x11 "$@"
