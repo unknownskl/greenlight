@@ -206,6 +206,8 @@ const WORD_HEIGHT_CAP = 1.3
 
 // A line that was not found by the reader this many times in a row is dropped from the screen
 const MAX_MISSED_READS = 2
+// The whole screen is read rarely, and a line of a menu that the reader misses once or twice is still there
+const SCREEN_MAX_MISSED_READS = 5
 
 // Built from strings: the unicode flag is not allowed by the TypeScript target of the project
 const NOT_TEXT = new RegExp('[^\\p{L}\\p{N}\\s.,!?\'"’:;()\\-–—…/%&+]', 'gu')
@@ -1652,7 +1654,7 @@ export default class TranslatorEngine {
         shown.concat(this._held).forEach((old) => {
             // A line that was not found stays for a couple of reads, and always until it has been read
             const unread = Date.now() - old.shownAt < readingTime(old, this._queue.length)
-            if(!used.has(old) && (old.missed < MAX_MISSED_READS || unread) && !segments.some(segment => rectsOverlap(segment.rect, old.rect))){
+            if(!used.has(old) && (old.missed < (config.fullScreen === true ? SCREEN_MAX_MISSED_READS : MAX_MISSED_READS) || unread) && !segments.some(segment => rectsOverlap(segment.rect, old.rect))){
                 segments.push({ ...old, missed: old.missed + 1 })
             }
         })

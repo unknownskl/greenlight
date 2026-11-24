@@ -679,9 +679,28 @@ export default class AutoWindows {
             }
         }
 
-        // Too many, or most of the screen: the whole screen is read in one go then
+        // Too many: the two tiles that waste the least room when joined are joined, until there are few enough (the set of tiles
+        // has to stay the same from one look to the next, or what is read jumps)
+        while(tiles.length > MAX_TILES){
+            let bestA = 0, bestB = 1, bestWaste = Infinity
+            for(let a = 0; a < tiles.length; a++){
+                for(let b = a + 1; b < tiles.length; b++){
+                    const joined = union(tiles[a], tiles[b])
+                    const waste = joined.w * joined.h - tiles[a].w * tiles[a].h - tiles[b].w * tiles[b].h
+                    if(waste < bestWaste){
+                        bestWaste = waste
+                        bestA = a
+                        bestB = b
+                    }
+                }
+            }
+            tiles[bestA] = union(tiles[bestA], tiles[bestB])
+            tiles.splice(bestB, 1)
+        }
+
+        // Most of the screen: the whole screen is read in one go then
         const area = tiles.reduce((sum, tile) => sum + tile.w * tile.h, 0)
-        if(tiles.length > MAX_TILES || area > 0.7){
+        if(area > 0.7){
             tiles = []
         }
         return tiles
