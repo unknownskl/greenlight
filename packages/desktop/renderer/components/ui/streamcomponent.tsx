@@ -606,7 +606,7 @@ function StreamComponent({
                             { localReady ? <Button label={<span><i className="fa-solid fa-microchip"></i> <span className="gb-label gb-always">{t('translator.modeShort_' + (localMode(settings)))}</span></span>} title={t('translator.btnModeTitle')} className={localMode(settings) !== 'off' ? 'btn-primary' : ''} onClick={(e) => {
                                 e.target.blur(); nextTranslatorMode()
                             }}></Button> : '' }
-                            { (settings.translator_enabled && getRegions(settings).length > 1) ? getRegions(settings).map((win, index) => (
+                            { (settings.translator_enabled && getRegions(settings).length >= 1) ? getRegions(settings).map((win, index) => (
                                 <Button key={index} label={<span>{index + 1}</span>} title={t("translator.windowToggleTitle", { n: index + 1 })} className={win.enabled !== false ? 'btn-primary' : ''} onClick={(e) => {
                                     e.target.blur(); toggleTranslatorWindow(index)
                                 }}></Button>
