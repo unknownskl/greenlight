@@ -75,6 +75,48 @@ function SettingsVideo() {
                     </p>
 
                     <p>
+                        <label>{t('settings.videoAudio.streamResolutionLabel')}</label>
+                        <select value={ settings.video_resolution } onChange={(e) => {
+                            setSettings({
+                                ...settings,
+                                video_resolution: parseInt(e.target.value),
+                            })
+                        }}>
+                            <option value={720}>720p</option>
+                            <option value={1080}>1080p</option>
+                            <option value={1440}>1440p ({t('settings.videoAudio.streamResolutionCloudOnly')})</option>
+                        </select><br />
+                        <small>{t('settings.videoAudio.streamResolutionDescription')}</small>
+                    </p>
+
+                    <p>
+                        <label>{t('settings.videoAudio.frameRateLabel')}</label>
+                        <select value={ settings.video_framerate } onChange={(e) => {
+                            setSettings({
+                                ...settings,
+                                video_framerate: parseInt(e.target.value),
+                            })
+                        }}>
+                            <option value={0}>{t('settings.videoAudio.frameRateValueNoLimit')}</option>
+                            <option value={30}>30 FPS</option>
+                        </select><br />
+                        <small>{t('settings.videoAudio.frameRateDescription')}</small>
+                    </p>
+
+                    <p>
+                        <label>{t('settings.videoAudio.motionSmoothingLabel')}</label>
+                        <label style={{ minWidth: 0 }}>
+                            <input type='checkbox' onChange={() => {
+                                setSettings({
+                                    ...settings,
+                                    video_motion_smoothing: !settings.video_motion_smoothing,
+                                })
+                            }} checked={settings.video_motion_smoothing} />&nbsp; ({ settings.video_motion_smoothing ? t('settings.videoAudio.enabledLabel') : t('settings.videoAudio.disabledLabel')})
+                        </label><br />
+                        <small>{t('settings.videoAudio.motionSmoothingDescription')}</small>
+                    </p>
+
+                    <p>
                         <label>{t('settings.videoAudio.forceLowResLabel')}</label>
                         <label style={{ minWidth: 0 }}>
                             <input type='checkbox' onChange={ forceLowResolution } checked={settings.app_lowresolution} />&nbsp; ({ settings.app_lowresolution ? t('settings.videoAudio.enabledLabel') : t('settings.videoAudio.disabledLabel')})

@@ -2,7 +2,6 @@
   "translation": {
     "languageName": "Українська",
     "authorOfLocalization": "Українська локалізація: Євген Чефранов",
-
     "header": {
       "myConsoles": "Мої консолі",
       "viewConsoles": "Перегляд консолей",
@@ -14,7 +13,6 @@
       "quitQuestion": "Ви впевнені, що хочете вийти?",
       "home": "Головна"
     },
-
     "auth": {
       "logoutQuestion": "Ви впевнені, що хочете вийти з акаунту?",
       "clearDataBtn": "Очистити дані",
@@ -27,7 +25,6 @@
       "pleaseAuthenticate": "Будь ласка, авторизуйтесь нижче для доступу до xCloud та xHome Streaming",
       "windowTitle": "Авторизація"
     },
-
     "settings": {
       "sidebar": {
         "about": "Про програму",
@@ -35,9 +32,87 @@
         "input": "Ввід",
         "videoAudio": "Відео та аудіо",
         "webUI": "Web UI",
-        "debug": "Відлагодження"
+        "debug": "Відлагодження",
+        "controller": "Controller",
+        "network": "Network"
       },
-
+      "network": {
+        "pageTitle": "Settings: Network",
+        "title": "Network interface",
+        "description": "Choose which network connection Greenlight uses to connect to your Xbox.",
+        "mode": {
+          "nat": "NAT (system default)",
+          "wifi": "Wi-Fi",
+          "lan": "LAN (Ethernet)"
+        },
+        "modeDescription": {
+          "nat": "Use the operating system's default route. If a VPN is active, the stream may go through the VPN.",
+          "wifi": "Connect only through the Wi-Fi adapter. Any active VPN is bypassed for the stream.",
+          "lan": "Connect only through a wired Ethernet adapter. Any active VPN is bypassed for the stream."
+        },
+        "type": {
+          "wifi": "Wi-Fi",
+          "lan": "LAN",
+          "vpn": "VPN",
+          "other": "Other"
+        },
+        "restartRequired": "Restart Greenlight to fully apply this setting (WebRTC needs to expose real local addresses).",
+        "restartBtn": "Restart now",
+        "missingInterface": "No {{type}} connection with an IPv4 address was detected. Streams will fail until it is connected.",
+        "vpnDetectedNat": "A VPN connection is active. In NAT mode the stream may be routed through it. Choose Wi-Fi or LAN to bypass it.",
+        "detectedTitle": "Detected connections",
+        "noInterfaces": "No network connections detected.",
+        "refreshBtn": "Refresh",
+        "lastRouteTitle": "Last stream connection",
+        "lastRouteMode": "Mode",
+        "lastRouteLocal": "Local",
+        "lastRouteRemote": "Remote",
+        "lastRouteOk": "The stream used the selected connection.",
+        "lastRouteMismatch": "The stream did not use the selected connection. Check the Wi-Fi / LAN connection and VPN settings."
+      },
+      "controller": {
+        "pageTitle": "Settings: Controller",
+        "testTitle": "Test controller",
+        "noController": "No controller detected. Connect a controller and press any button.",
+        "selectController": "Controller",
+        "showMapped": "Show with remapping applied",
+        "testRumble": "Test vibration",
+        "noRumble": "This controller does not support vibration",
+        "reconnectBtn": "Reconnect controller",
+        "reconnecting": "Reconnecting...",
+        "reconnectDescription": "Not detected even though macOS shows it connected? This does a software unplug and replug of USB controllers. Press a button afterwards.",
+        "reconnectDone": "Reconnected {{devices}}. Press any button on the controller.",
+        "reconnectNone": "No USB game controller was found to reconnect.",
+        "reconnectFailed": "Reconnect failed:",
+        "remapTitle": "Button remapping",
+        "remapDescription": "Click Remap and press the physical button you want to use. Press Escape to cancel. Remapping applies to controller input during streams.",
+        "pressButton": "Press a button...",
+        "physicalButton": "Button {{index}}",
+        "remap": "Remap",
+        "cancel": "Cancel",
+        "reset": "Reset",
+        "resetAll": "Reset all to default",
+        "duplicateWarning": "Some physical buttons are assigned to more than one Xbox button.",
+        "buttons": {
+          "A": "A",
+          "B": "B",
+          "X": "X",
+          "Y": "Y",
+          "LeftShoulder": "Left bumper (LB)",
+          "RightShoulder": "Right bumper (RB)",
+          "LeftTrigger": "Left trigger (LT)",
+          "RightTrigger": "Right trigger (RT)",
+          "View": "View",
+          "Menu": "Menu",
+          "LeftThumb": "Left stick click (LS)",
+          "RightThumb": "Right stick click (RS)",
+          "DPadUp": "D-pad up",
+          "DPadDown": "D-pad down",
+          "DPadLeft": "D-pad left",
+          "DPadRight": "D-pad right",
+          "Nexus": "Xbox button (Nexus)"
+        }
+      },
       "about": {
         "logoutQuestion": "Ви впевнені, що хочете вийти з акаунту?",
         "title": "Налаштування",
@@ -48,7 +123,6 @@
         "website": "Веб-сайт",
         "websiteLinkTitle": "Відкрити посилання у зовнішньому браузері"
       },
-
       "input": {
         "pageTitle": "Налаштування: Ввід",
         "dPadUp": "Хрестовина вгору",
@@ -83,7 +157,6 @@
         "noControllerDetected": "Контролер не виявлено",
         "keyboardMappingsTitle": "Призначення клавіш"
       },
-
       "streaming": {
         "pageTitle": "Налаштування: Трансляція",
         "title": "Налаштування трансляції",
@@ -136,7 +209,6 @@
         "preferredGameLanguageValueChineseCN": "Китайська (спрощена)",
         "preferredGameLanguageValueChineseTW": "Китайська (традиційна)"
       },
-
       "videoAudio": {
         "pageTitle": "Налаштування: Відео та Аудіо",
         "videoTitle": "Відео",
@@ -147,12 +219,19 @@
         "aspectSizeValueDefault": "За замовчуванням",
         "aspectSizeValueStretch": "Розтягнути",
         "aspectSizeValueZoom": "Зум",
+        "streamResolutionLabel": "Stream resolution",
+        "streamResolutionCloudOnly": "cloud gaming only",
+        "streamResolutionDescription": "(Higher resolutions need a fast connection. 1440p only works for cloud gaming on supported games; Remote Play to your own console is limited to 1080p. Takes effect on the next stream.)",
+        "frameRateLabel": "Frame rate limit",
+        "frameRateValueNoLimit": "No limit (60 FPS)",
+        "frameRateDescription": "(Caps the displayed frame rate to save battery and GPU. Greenlight also asks the server for this frame rate, but it may ignore the request, so data usage might not go down. Takes effect on the next stream.)",
+        "motionSmoothingLabel": "Motion smoothing (30 → 60 FPS)",
+        "motionSmoothingDescription": "(Experimental. Generates in-between frames when a game streams at 30 FPS, so motion looks smoother. Adds about 33 ms of input delay while active, and does nothing for 60 FPS games. Overrides the frame rate limit. While streaming: Ctrl+Shift+S toggles it, Ctrl+Shift+I shows live stats.)",
         "forceLowResLabel": "Примусово низька роздільна здатність відео",
         "forceLowResDescription": "(Ця опція корисна на Steam Deck і дозволяє додатку працювати у низькій роздільній здатності, щоб можна було увімкнути FSR.)",
         "audioTitle": "Аудіо",
         "disableAudioLabel": "Вимкнути аудіо"
       },
-
       "webUI": {
         "pageTitle": "Налаштування: Web UI",
         "title": "WebUI",
@@ -166,12 +245,10 @@
         "portLabel": "Порт",
         "portPlaceholder": "наприклад: 9003"
       },
-
       "debug": {
         "pageTitle": "Налаштування: Відлагодження"
       }
     },
-
     "page": {
       "xCloud": {
         "pageTitle": "Бібліотека xCloud",
@@ -180,7 +257,6 @@
         "recentlyAdded": "Нещодавно додані",
         "viewLibraryBtn": "Переглянути бібліотеку"
       },
-
       "xCloudLibrary": {
         "pageTitle": "Бібліотека xCloud",
         "breadcrumb1": "xCloud",
@@ -193,7 +269,6 @@
         "nextPageBtn": "Наступна сторінка",
         "viewGamePageIcon": "Переглянути сторінку гри"
       },
-
       "myConsoles": {
         "pageTitle": "Мої консолі",
         "poweredOn": "Увімкнена",
@@ -204,7 +279,6 @@
         "startStreamBtn": "Почати трансляцію",
         "noConsoles": "Консолі не знайдено у вашому акаунті. Якщо у вас є консоль Xbox, переконайтеся, що віддалена гра увімкнена і консоль відображається в офіційному додатку Xbox."
       },
-
       "titleInfo": {
         "pageTitle": "Перегляд інформації про тайтл:",
         "breadcrumb1": "xCloud",
@@ -215,22 +289,18 @@
         "startStreamBtn": "Почати трансляцію",
         "purchaseRequiredBtn": "Потрібна покупка"
       },
-
       "page404": {
         "pageTitle": "Помилка",
         "message": "Упс.. 404.. Дію не знайдено"
       },
-
       "page500": {
         "pageTitle": "Помилка",
         "message": "Упс.. 500.. У додатку сталася помилка"
       }
     },
-
     "friends": {
       "allFriendsOffline": "Всі ваші друзі офлайн"
     },
-
     "streamWindow": {
       "pageTitle": "Трансляція",
       "endStreamConfirmMessage": "Ви впевнені, що хочете завершити свою трансляцію?",
@@ -252,9 +322,24 @@
       "itsTakingALittleLonger": "Це займає трохи більше часу.. Ваша трансляція може скоро початися.",
       "startingConnection": "Початок підключення...",
       "connectingToConsole": "Підключення до консолі...",
-      "clientHasBeenDisconnected": "Клієнт був відключений."
+      "clientHasBeenDisconnected": "Клієнт був відключений.",
+      "errorConsoleOfflineTitle": "Can't reach your console",
+      "errorConsoleOfflineMessage": "Your console is turned off, offline, or not connected to the Xbox servers right now.",
+      "errorConsoleOfflineHintPower": "Make sure the console is turned on, or set to \"Sleep\" power mode so it can be woken remotely.",
+      "errorConsoleOfflineHintSignIn": "Make sure you are signed in on the console with the same account.",
+      "errorConsoleOfflineHintRemotePlay": "Check that Remote Play is enabled in Settings > Devices & connections > Remote features.",
+      "errorConsoleOfflineHintReboot": "If the console was just updated, hard reboot it (hold the power button for 10 seconds) and try again.",
+      "errorStreamFailedTitle": "Stream could not be started",
+      "errorStreamFailedMessage": "Something went wrong while starting the stream. Please try again.",
+      "errorStartFailedTitle": "Failed to start stream",
+      "errorStartFailedMessage": "Could not request a new stream session. Check your internet connection and try again.",
+      "errorSessionLostMessage": "The stream session was closed by the server before it could start.",
+      "errorTechnicalDetails": "Technical details",
+      "retryBtn": "Try again",
+      "backBtn": "Back",
+      "errorNetworkUnavailableTitle": "Selected network is not available",
+      "errorNetworkUnavailableMessage": "Greenlight is set to connect over {{type}}, but no {{type}} connection was found. Connect it or change Settings > Network."
     },
-
     "updater": {
       "unableToCheckForUpdates": "Не вдалося перевірити наявність оновлень зараз. Спробуйте ще раз.",
       "alreadyOnLatestVersion": "Ви вже використовуєте останню версію. Поточна версія:",
@@ -267,7 +352,16 @@
       "updateChecker": "Перевірка оновлень",
       "closeBtn": "Закрити"
     },
-
+    "gamepadWatcher": {
+      "title": "Controller is being used by another app",
+      "message": "{{app}} is holding {{device}}, so Greenlight can't read it.",
+      "quitBtn": "Quit {{app}}",
+      "dismissBtn": "Dismiss",
+      "hint": "Alternatively, unplug and replug the controller after Greenlight is open.",
+      "confirmQuit": "Quit {{app}} so Greenlight can use the controller? Unsaved work in {{app}} may be lost.",
+      "quitDone": "{{app}} was asked to quit. Press a button on your controller.",
+      "quitFailed": "Could not quit {{app}}."
+    },
     "errors": {
       "failedToRetrieveUserProfile": "Помилка! Не вдалося отримати профіль користувача:",
       "repositoryNotFound": "Помилка! URL репозиторію не знайдено у файлі package.json.",
