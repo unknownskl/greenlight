@@ -1,12 +1,12 @@
 import React from 'react'
 import Button from './button'
-import Slider from './slider'
 import xPlayer from 'xbox-xcloud-player'
 import Loader from './loader'
 import Card from './card'
 import uPlot from 'uplot'
 import Ipc from '../../lib/ipc'
 import { useTranslation } from 'react-i18next'
+import { computeQuality, QualitySample, qualityLevel } from '../../lib/connectionQuality'
 
 interface StreamComponentProps {
     onDisconnect?: () => void;
@@ -30,6 +30,37 @@ function StreamComponent({
     let debugElement = document.getElementById('component_streamcomponent_debug')
     let webRtcStatsInterval
 
+    // Connection quality overlay
+    const [qualityVisible, setQualityVisible] = React.useState(() => {
+        try { return localStorage.getItem('greenlight_quality_overlay') === '1' } catch (e) { return false }
+    })
+    const [quality, setQuality] = React.useState<QualitySample | undefined>(undefined)
+    const [qualityHistory, setQualityHistory] = React.useState<number[]>([])
+
+    function toggleQuality() {
+        const next = !qualityVisible
+        setQualityVisible(next)
+        try { localStorage.setItem('greenlight_quality_overlay', next ? '1' : '0') } catch (e) { /* ignore */ }
+    }
+
+    React.useEffect(() => {
+        if (!qualityVisible) return
+        let previous: any = undefined
+        const timer = setInterval(() => {
+            const pc = (xPlayer as any)._webrtcClient
+            if (!pc || typeof pc.getStats !== 'function') return
+            pc.getStats().then((stats) => {
+                const result = computeQuality(stats, previous)
+                previous = result.raw
+                if (result.sample) {
+                    setQuality(result.sample)
+                    setQualityHistory((h) => [...h.slice(-59), result.sample.rtt ?? 0])
+                }
+            }).catch(() => undefined)
+        }, 1000)
+        return () => clearInterval(timer)
+    }, [qualityVisible, xPlayer])
+
     const [micStatus, setMicStatus] = React.useState(false)
     const [waitingSeconds, setWaitingSeconds] = React.useState(0)
 
@@ -49,9 +80,16 @@ function StreamComponent({
         }
 
     }
-    const volumeIcon = ( //from https://www.svgrepo.com/svg/502904/volume-low and optimized w/ https://jakearchibald.github.io/svgomg/
-        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 14v-4a1 1 0 0 1 1-1h2.65a1 1 0 0 0 .624-.22l3.101-2.48A1 1 0 0 1 16 7.08v9.84a1 1 0 0 1-1.625.78l-3.101-2.48a1 1 0 0 0-.625-.22H8a1 1 0 0 1-1-1Z" /></svg>
-    )
+    // Speaker icon toggles mute and restores the previous level
+    const lastVolumeRef = React.useRef(1.0)
+    const toggleVolumeMute = () => {
+        if (volume > 0) {
+            lastVolumeRef.current = volume
+            handleVolumeChange(0)
+        } else {
+            handleVolumeChange(lastVolumeRef.current || 1.0)
+        }
+    }
 
 
     let jitterData = [new Float32Array([performance_now_seconds()]), new Float32Array([0.0])]
@@ -372,53 +410,84 @@ function StreamComponent({
                     </Card>
                 </div>
 
+                {/* Note: the gamebar's className is toggled to 'hidden' by the mouse timer, so it is styled by id */}
                 <div id="component_streamcomponent_gamebar">
                     <div id="component_streamcomponent_gamebar_menu">
-                        <div style={{
-                            width: '25%',
-                        }}>
-                            <Button label={<span><i className="fa-solid fa-xmark"></i> {t("streamWindow.endStreamBtn")}</span>} title={t("streamWindow.endStreamBtn")} className='btn-cancel' onClick={() => {
+                        <div className="gamebar-group">
+                            <Button label={<span><i className="fa-solid fa-xmark"></i> {t("streamWindow.endStreamBtn")}</span>} title={t("streamWindow.endStreamBtn")} className='btn-cancel gamebar-btn' onClick={() => {
                                 endStream()
-                            }}></Button> &nbsp;
-                            <Button label={<span><i className="fa-solid fa-xmark"></i></span>} title={t("streamWindow.disconnectBtn")} className='btn' onClick={() => {
+                            }}></Button>
+                            <Button label={<i className="fa-solid fa-right-from-bracket"></i>} title={t("streamWindow.disconnectBtn")} className='gamebar-btn gamebar-icon' onClick={() => {
                                 streamDisconnect()
                             }}></Button>
                         </div>
 
-                        <div style={{
-                            marginLeft: 'auto',
-                            marginRight: 'auto',
-                        }}>
-                            <Button label={<span><i className="fa-brands fa-xbox"></i> {t("streamWindow.menuBtn")}</span>} title={t("streamWindow.menuTitle")} onClick={(e) => {
+                        <div className="gamebar-divider" />
+
+                        <div className="gamebar-group">
+                            <Button label={<span><i className="fa-brands fa-xbox"></i> {t("streamWindow.menuBtn")}</span>} title={t("streamWindow.menuTitle")} className='gamebar-btn' onClick={(e) => {
                                 e.target.blur(); onMenu()
-                            }}></Button> &nbsp;
-                            <Button label={(micStatus === false) ? <span><i className="fa-solid fa-microphone-slash"></i> {t("streamWindow.micMuted")}</span> : <span><i className="fa-solid fa-microphone"></i> {t("streamWindow.micActive")}</span>} title={(micStatus === false) ? t("streamWindow.enableMic") : t("streamWindow.disableMic")} className={(micStatus === false) ? 'btn-cancel' : 'btn-primary'} onClick={(e) => {
+                            }}></Button>
+                            <Button label={<i className={(micStatus === false) ? 'fa-solid fa-microphone-slash' : 'fa-solid fa-microphone'}></i>} title={(micStatus === false) ? t("streamWindow.enableMic") : t("streamWindow.disableMic")} className={(micStatus === false) ? 'gamebar-btn gamebar-icon' : 'gamebar-btn gamebar-icon gamebar-active'} onClick={(e) => {
                                 e.target.blur(); toggleMic()
                             }}></Button>
+                            <div className="gamebar-volume">
+                                <button className="gamebar-volume-icon" title="Volume" aria-label="Mute / unmute" onClick={(e) => {
+                                    (e.target as HTMLElement).blur(); toggleVolumeMute()
+                                }}>
+                                    <i className={(volume === 0) ? 'fa-solid fa-volume-xmark' : (volume < 0.5) ? 'fa-solid fa-volume-low' : 'fa-solid fa-volume-high'}></i>
+                                </button>
+                                <input
+                                    id="volume-slider"
+                                    type="range"
+                                    min={0}
+                                    max={1}
+                                    step={0.01}
+                                    value={volume}
+                                    aria-label="Volume"
+                                    style={{ '--gamebar-volume': (volume * 100) + '%' } as React.CSSProperties}
+                                    onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
+                                    onKeyDown={(e) => e.preventDefault()}
+                                />
+                            </div>
                         </div>
 
-                        <Slider
-                            id="volume-slider"
-                            min={0}
-                            max={1}
-                            step={0.01}
-                            value={volume}
-                            onChange={handleVolumeChange}
-                            label="Volume"
-                            svg={volumeIcon}
-                        />
+                        <div className="gamebar-divider" />
 
-                        <div style={{
-                            marginRight: 20,
-                            width: '25%',
-                            textAlign: 'right',
-                        }}>
-                            <Button label={<i className="fa-solid fa-bug"></i>} title={t("streamWindow.debugTitle")} onClick={(e) => {
+                        <div className="gamebar-group">
+                            <Button label={<i className="fa-solid fa-signal"></i>} title={t("streamWindow.qualityTitle", { defaultValue: 'Connection quality' })} className={qualityVisible ? 'gamebar-btn gamebar-icon gamebar-active' : 'gamebar-btn gamebar-icon'} onClick={(e) => {
+                                e.target.blur(); toggleQuality()
+                            }}></Button>
+                            <Button label={<i className="fa-solid fa-chart-simple"></i>} title={t("streamWindow.debugTitle")} className='gamebar-btn gamebar-icon' onClick={(e) => {
                                 e.target.blur(); toggleDebug()
                             }}></Button>
                         </div>
                     </div>
                 </div>
+
+                { qualityVisible ? (
+                    <div id="component_streamcomponent_quality">
+                        <div className={'quality-badge quality-' + qualityLevel(quality)}>
+                            {quality ? t('streamWindow.quality.' + qualityLevel(quality), { defaultValue: qualityLevel(quality) }) : t('streamWindow.quality.measuring', { defaultValue: 'Measuring...' })}
+                        </div>
+                        { quality ? (
+                            <table>
+                                <tbody>
+                                    <tr><td>{t('streamWindow.quality.rtt', { defaultValue: 'Latency' })}</td><td>{quality.rtt !== undefined ? quality.rtt.toFixed(0) + ' ms' : '-'}</td></tr>
+                                    <tr><td>{t('streamWindow.quality.jitter', { defaultValue: 'Jitter' })}</td><td>{quality.jitter !== undefined ? quality.jitter.toFixed(1) + ' ms' : '-'}</td></tr>
+                                    <tr><td>{t('streamWindow.quality.loss', { defaultValue: 'Packet loss' })}</td><td>{quality.lossPercent.toFixed(1)}%</td></tr>
+                                    <tr><td>{t('streamWindow.quality.bitrate', { defaultValue: 'Bitrate' })}</td><td>{(quality.bitrateKbps / 1000).toFixed(1)} Mbps</td></tr>
+                                    <tr><td>{t('streamWindow.quality.fps', { defaultValue: 'FPS' })}</td><td>{quality.fps !== undefined ? quality.fps.toFixed(0) : '-'}{quality.framesDropped > 0 ? ` (${quality.framesDropped} ${t('streamWindow.quality.dropped', { defaultValue: 'dropped' })})` : ''}</td></tr>
+                                    <tr><td>{t('streamWindow.quality.resolution', { defaultValue: 'Resolution' })}</td><td>{quality.resolution || '-'}</td></tr>
+                                    <tr><td>{t('streamWindow.quality.path', { defaultValue: 'Path' })}</td><td>{quality.path || '-'}</td></tr>
+                                </tbody>
+                            </table>
+                        ) : null }
+                        <svg className="quality-spark" viewBox="0 0 120 24" preserveAspectRatio="none">
+                            <polyline fill="none" strokeWidth="1.5" points={qualityHistory.map((v, i) => `${(i / 59) * 120},${24 - Math.min(24, (v / 100) * 24)}`).join(' ')} />
+                        </svg>
+                    </div>
+                ) : null }
 
                 <div id="component_streamcomponent_debug" className='hidden'>
                     <p>{t("streamWindow.debugTitle")}:</p>

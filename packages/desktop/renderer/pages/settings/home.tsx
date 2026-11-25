@@ -81,8 +81,8 @@ function SettingsHome() {
                         <p>
                             {t('settings.about.version')}: { window.Greenlight.getVersion() }<br /><br />
                             <small>{t('settings.about.website')}: <Link href="#" title={t('settings.about.websiteLinkTitle')} onClick={ () => {
-                                window.Greenlight.openExternal('https://github.com/unknownskl/greenlight')
-                            }}>github.com/unknownskl/greenlight</Link></small><br />
+                                window.Greenlight.openExternal('https://github.com/amenefus/greenlight')
+                            }}>github.com/amenefus/greenlight</Link></small><br />
                             <small>{t('authorOfLocalization')}</small>
                         </p>
                     </div>

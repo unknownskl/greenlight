@@ -4,6 +4,8 @@ import IpcStreaming from './ipc/streaming'
 import IpcxCloud from './ipc/xcloud'
 import IpcApp from './ipc/app'
 import IpcSettings from './ipc/settings'
+import IpcNetwork from './ipc/network'
+import IpcGamepad from './ipc/gamepad'
 
 import { ipcMain } from 'electron'
 
@@ -13,6 +15,8 @@ interface IpcChannels {
     app: IpcApp;
     xCloud: IpcxCloud;
     settings: IpcSettings;
+    network: IpcNetwork;
+    gamepad: IpcGamepad;
 }
 
 export default class Ipc {
@@ -30,6 +34,8 @@ export default class Ipc {
             app: new IpcApp(this._application),
             xCloud: new IpcxCloud(this._application),
             settings: new IpcSettings(this._application),
+            network: new IpcNetwork(this._application),
+            gamepad: new IpcGamepad(this._application),
         }
 
         for(const channel in this._channels){

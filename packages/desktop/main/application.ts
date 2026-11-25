@@ -23,16 +23,18 @@ export default class Application {
 
     private _log
     public _store = new Store()
+    public _webrtcMdnsDisabled = false
     private _startupFlags: startupFlags = {
         fullscreen: false,
         autoStream: '',
     }
 
     public _isProduction:boolean = (process.env.NODE_ENV === 'production')
-    private _isCi:boolean = (process.env.CI !== undefined)
+    private _isCi:boolean = (process.env.CI !== undefined && !['', '0', 'false'].includes(process.env.CI.toLowerCase()))
     private _isMac:boolean = (process.platform === 'darwin')
     private _isWindows:boolean = (process.platform === 'win32')
     private _isQuitting:boolean = false
+    private _quitCleanupDone:boolean = false
 
     public _mainWindow
     public _ipc:Ipc
@@ -56,6 +58,14 @@ export default class Application {
         // ElectronApp.commandLine.appendSwitch('ignore-gpu-blocklist')
         // ElectronApp.commandLine.appendSwitch('no-sandbox')
         ElectronApp.commandLine.appendSwitch('enable-zero-copy')
+
+        // Network interface selection (Settings > Network) needs real local IPs in
+        // WebRTC host candidates, so disable Chromium's mDNS obfuscation for those modes.
+        const storedSettings = this._store.get('settings', {}) as { network_interface?: string }
+        if(storedSettings.network_interface === 'wifi' || storedSettings.network_interface === 'lan'){
+            ElectronApp.commandLine.appendSwitch('disable-features', 'WebRtcHideLocalIpsWithMdns')
+            this._webrtcMdnsDisabled = true
+        }
 
         this.readStartupFlags()
         this.loadApplicationDefaults()
@@ -151,7 +161,35 @@ export default class Application {
         ElectronApp.on('activate', () => {
             (this._mainWindow !== undefined) ? this._mainWindow.show() : this.openMainWindow()
         })
-        ElectronApp.on('before-quit', () => this._isQuitting = true)
+        ElectronApp.on('before-quit', (event) => {
+            this._isQuitting = true
+
+            // Offer to remove VPN bypass routes (needs the admin password again)
+            const routes = this._store.get('vpnbypass.targets', []) as string[]
+            if(routes.length > 0 && this._quitCleanupDone === false){
+                event.preventDefault()
+                this._quitCleanupDone = true
+                dialog.showMessageBox({
+                    type: 'question',
+                    message: this.t('settings.network.bypass.quitTitle', { defaultValue: 'VPN bypass routes are still active' }),
+                    detail: this.t('settings.network.bypass.quitDetail', { defaultValue: 'Remove the routes you added for {{targets}}? You will be asked for your admin password.', targets: routes.join(', ') }),
+                    buttons: [
+                        this.t('settings.network.bypass.quitRemove', { defaultValue: 'Remove routes' }),
+                        this.t('settings.network.bypass.quitKeep', { defaultValue: 'Keep them' }),
+                    ],
+                    defaultId: 0,
+                    cancelId: 1,
+                }).then(async (result) => {
+                    if(result.response === 0){
+                        try {
+                            await this._ipc._channels.network.removeVpnBypass()
+                        } catch(error){
+                            this.log('electron', 'Failed to remove VPN bypass routes on quit:', error)
+                        }
+                    }
+                }).finally(() => ElectronApp.quit())
+            }
+        })
     }
 
     _webApi:xboxWebApi

@@ -8,6 +8,7 @@ import Header from '../components/header'
 import Footer from '../components/footer'
 import Auth from '../components/auth'
 import SidebarFriends from '../components/sidebar/friends'
+import GamepadWatcher from '../components/gamepadwatcher'
 import '../lib/i18n'
 
 import { UserProvider } from '../context/userContext'
@@ -150,6 +151,7 @@ export default function MyApp({ Component, pageProps }) {
                     <LanguageProvider>
                         <UserProvider>
                             {appBody}
+                            <GamepadWatcher />
                         </UserProvider>
                     </LanguageProvider>
                 </QueryClientProvider>

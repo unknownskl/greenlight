@@ -5,6 +5,7 @@
 @import 'components/header.css';
 @import 'components/footer.css';
 @import 'components/auth.css';
+@import 'components/gamepadwatcher.css';
 
 /* 
  * UI Components
@@ -26,6 +27,7 @@
 @import 'components/achievement/gamerow.css';
 
 @import 'components/settings/sidebar.css';
+@import 'components/settings/controllerview.css';
 
 /*  
  * Pages

@@ -1,6 +1,7 @@
 import https from 'https'
 import Application from '../application'
 import { Address6 } from 'ip-address'
+import { getBindAddress } from './network'
 
 export interface playResult {
     sessionPath:string;
@@ -37,6 +38,13 @@ export default class xCloudApi {
         this._type = type
     }
 
+    // Settings > Network: bind API traffic to the Wi-Fi / LAN address so it bypasses a VPN default route
+    _requestBindOptions(): { localAddress?: string; family?: number } {
+        const settings = this._application._store.get('settings', {}) as { network_interface?: string }
+        const localAddress = getBindAddress(settings.network_interface)
+        return localAddress ? { localAddress, family: 4 } : {}
+    }
+
     get(url: string, method = 'GET') {
         return new Promise((resolve, reject) => {
             let responseData = ''
@@ -45,6 +53,7 @@ export default class xCloudApi {
                 host: this._host,
                 path: url,
                 method: method,
+                ...this._requestBindOptions(),
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': 'Bearer '+this._token,
@@ -107,6 +116,7 @@ export default class xCloudApi {
                 host: this._host,
                 path: url,
                 method: 'POST',
+                ...this._requestBindOptions(),
                 headers: mergedHeaders,
             }, (response:any) => {
 
@@ -164,6 +174,17 @@ export default class xCloudApi {
     }
 
     startStream(target:string){
+        const settings = this._application._store.get('settings', {}) as { video_resolution?: number | string }
+        let resolution = Number(settings.video_resolution) || 1080
+        // Remote Play (xHome) tops out at 1080p. Reporting a larger display there may make the
+        // console fall back to 720p, so keep the original 1080p device info for home streams.
+        if (this._type === 'home' && resolution > 1080) resolution = 1080
+        const display = (resolution >= 1440) ? { width: 2560, height: 1440 }
+            : (resolution <= 720) ? { width: 1280, height: 720 }
+                : { width: 1920, height: 1080 }
+        // xCloud picks the stream profile based on the reported OS: 'android' caps at 720p
+        const osName = (resolution <= 720) ? 'android' : 'windows'
+
         const deviceInfo = JSON.stringify({
             'appInfo': {
                 'env': {
@@ -188,8 +209,8 @@ export default class xCloudApi {
                 },
                 'displayInfo': {
                     'dimensions': {
-                        'widthInPixels': 1920,
-                        'heightInPixels': 1080,
+                        'widthInPixels': display.width,
+                        'heightInPixels': display.height,
                     },
                     'pixelDensity': {
                         'dpiX': 1,
@@ -211,7 +232,7 @@ export default class xCloudApi {
                 'useIceConnection': false,
                 'timezoneOffsetMinutes': 120,
                 'sdkType': 'web',
-                'osName': 'windows',
+                'osName': osName,
             },
             'serverId': (this._type === 'home') ? target : '',
             'fallbackRegionNames': [],

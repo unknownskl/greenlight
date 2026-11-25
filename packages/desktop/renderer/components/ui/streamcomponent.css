@@ -15,6 +15,47 @@ div#streamComponent video {
     z-index: 96;
 }
 
+div#streamComponent canvas.framelimiter-canvas {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    z-index: 96;
+}
+
+div#streamComponent div.motionsmoother-badge {
+    display: none;
+    position: absolute;
+    /* Below the floating gamebar */
+    top: 64px;
+    right: 12px;
+    z-index: 98;
+    padding: 6px 10px;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.65);
+    color: #ffffff;
+    font-size: 13px;
+    pointer-events: none;
+}
+
+div#streamComponent div.stream-notice {
+    position: absolute;
+    top: 64px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 98;
+    max-width: 640px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: rgba(120, 80, 0, 0.85);
+    color: #ffffff;
+    font-size: 13px;
+    line-height: 1.4;
+    text-align: center;
+    pointer-events: none;
+}
+
 div#streamComponent.size_stretch video {
     object-fit: fill;
 }
@@ -65,33 +106,139 @@ div#component_streamcomponent_debug.hidden {
     display: none;
 }
 
+/* Floating toolbar, centred at the top of the stream */
 div#component_streamcomponent_gamebar {
     z-index: 98;
-
-    backdrop-filter: blur(20px);
-    background: rgba(0, 0, 0, 0.3);
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 70px;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
 
-    -webkit-transition: all 0.3s ease-in-out;
-    -moz-transition: all 0.3s ease-in-out;
-    -ms-transition: all 0.3s ease-in-out;
-    -o-transition: all 0.3s ease-in-out;
-    transition: all 0.3s ease-in-out;
+    padding: 6px;
+    border-radius: 12px;
+    background: rgba(20, 20, 20, 0.6);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+
+    transition: opacity 0.3s ease-in-out;
 }
 
 div#component_streamcomponent_gamebar.hidden {
     opacity: 0;
+    pointer-events: none;
 }
 
 div#component_streamcomponent_gamebar div#component_streamcomponent_gamebar_menu {
-    padding-top: 13px;
-    padding-left: 20px;
     display: flex;
-    gap: 20px;
+    align-items: center;
+    gap: 6px;
+}
+
+div#component_streamcomponent_gamebar .gamebar-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+div#component_streamcomponent_gamebar .gamebar-divider {
+    width: 1px;
+    height: 24px;
+    margin: 0 4px;
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* Uniform 36px controls */
+div#component_streamcomponent_gamebar .btn.gamebar-btn {
+    height: 36px;
+    padding: 0 14px;
+    border-radius: 8px;
+    border: none;
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    background-color: rgba(255, 255, 255, 0.08);
+    white-space: nowrap;
+}
+
+div#component_streamcomponent_gamebar .btn.gamebar-btn:hover {
+    background-color: rgba(255, 255, 255, 0.18);
+}
+
+div#component_streamcomponent_gamebar .btn.gamebar-btn span i {
+    margin-right: 6px;
+}
+
+div#component_streamcomponent_gamebar .btn.gamebar-icon {
+    width: 36px;
+    padding: 0;
+    font-size: 15px;
+}
+
+div#component_streamcomponent_gamebar .btn.gamebar-btn.btn-cancel {
+    background-color: rgb(195, 0, 0);
+}
+
+div#component_streamcomponent_gamebar .btn.gamebar-btn.btn-cancel:hover {
+    background-color: rgb(155, 0, 0);
+}
+
+div#component_streamcomponent_gamebar .btn.gamebar-btn.gamebar-active {
+    background-color: #008746;
+}
+
+div#component_streamcomponent_gamebar .btn.gamebar-btn.gamebar-active:hover {
+    background-color: #005e31;
+}
+
+/* Volume: icon + slider in one pill */
+div#component_streamcomponent_gamebar .gamebar-volume {
+    height: 36px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 12px 0 4px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+div#component_streamcomponent_gamebar .gamebar-volume-icon {
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: #ffffff;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+div#component_streamcomponent_gamebar .gamebar-volume-icon:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+div#component_streamcomponent_gamebar .gamebar-volume input[type=range] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 110px;
+    height: 4px;
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+    background: linear-gradient(to right, #10b060 var(--gamebar-volume, 100%), rgba(255, 255, 255, 0.25) var(--gamebar-volume, 100%));
+}
+
+div#component_streamcomponent_gamebar .gamebar-volume input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
 }
 
 div#component_streamcomponent_loader {
@@ -112,5 +259,72 @@ div#component_streamcomponent_loader.hidden {
     display: none;
 }
 
+div.component_streampreload_error {
+    max-width: 520px;
+    text-align: left;
+}
+
+div.component_streampreload_error h1 {
+    text-align: center;
+}
+
+i.component_streampreload_error_icon {
+    display: block;
+    text-align: center;
+    font-size: 36px;
+    color: #ffb900;
+    margin-bottom: 10px;
+}
+
+div.component_streampreload_error p,
+div.component_streampreload_error ul {
+    margin-bottom: 12px;
+    line-height: 1.5;
+}
+
+div.component_streampreload_error ul {
+    padding-left: 20px;
+}
+
+div.component_streampreload_error details {
+    margin-bottom: 15px;
+    opacity: 0.7;
+    font-size: 12px;
+}
+
+div.component_streampreload_error details code {
+    display: block;
+    margin-top: 6px;
+    word-break: break-word;
+    white-space: pre-wrap;
+}
+
+p.component_streampreload_error_actions {
+    text-align: center;
+}
+
 /* uPlot css */
 .uplot, .uplot *, .uplot *::before, .uplot *::after {box-sizing: border-box;}.uplot {font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";line-height: 1.5;width: min-content;}.u-title {text-align: center;font-size: 18px;font-weight: bold;}.u-wrap {position: relative;user-select: none;}.u-over, .u-under {position: absolute;}.u-under {overflow: hidden;}.uplot canvas {display: block;position: relative;width: 100%;height: 100%;}.u-axis {position: absolute;}.u-legend {font-size: 14px;margin: auto;text-align: center;}.u-inline {display: block;}.u-inline * {display: inline-block;}.u-inline tr {margin-right: 16px;}.u-legend th {font-weight: 600;}.u-legend th > * {vertical-align: middle;display: inline-block;}.u-legend .u-marker {width: 1em;height: 1em;margin-right: 4px;background-clip: padding-box !important;}.u-inline.u-live th::after {content: ":";vertical-align: middle;}.u-inline:not(.u-live) .u-value {display: none;}.u-series > * {padding: 4px;}.u-series th {cursor: pointer;}.u-legend .u-off > * {opacity: 0.3;}.u-select {background: rgba(0,0,0,0.07);position: absolute;pointer-events: none;}.u-cursor-x, .u-cursor-y {position: absolute;left: 0;top: 0;pointer-events: none;will-change: transform;z-index: 100;}.u-hz .u-cursor-x, .u-vt .u-cursor-y {height: 100%;border-right: 1px dashed #607D8B;}.u-hz .u-cursor-y, .u-vt .u-cursor-x {width: 100%;border-bottom: 1px dashed #607D8B;}.u-cursor-pt {position: absolute;top: 0;left: 0;border-radius: 50%;border: 0 solid;pointer-events: none;will-change: transform;z-index: 100;/*this has to be !important since we set inline "background" shorthand */background-clip: padding-box !important;}.u-axis.u-off, .u-select.u-off, .u-cursor-x.u-off, .u-cursor-y.u-off, .u-cursor-pt.u-off {display: none;}
+/* Connection quality overlay */
+div#component_streamcomponent_quality {
+    position: fixed;
+    top: 80px;
+    left: 16px;
+    z-index: 20;
+    min-width: 170px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.65);
+    color: #fff;
+    font-size: 12px;
+    pointer-events: none;
+}
+div#component_streamcomponent_quality table { width: 100%; border-collapse: collapse; }
+div#component_streamcomponent_quality td { padding: 1px 0; }
+div#component_streamcomponent_quality td:last-child { text-align: right; padding-left: 12px; font-variant-numeric: tabular-nums; }
+div#component_streamcomponent_quality .quality-badge { font-weight: bold; margin-bottom: 4px; text-transform: capitalize; }
+div#component_streamcomponent_quality .quality-good { color: #5dc21e; }
+div#component_streamcomponent_quality .quality-fair { color: #f5a623; }
+div#component_streamcomponent_quality .quality-poor { color: #e5484d; }
+div#component_streamcomponent_quality .quality-spark { width: 100%; height: 24px; margin-top: 6px; }
+div#component_streamcomponent_quality .quality-spark polyline { stroke: rgba(255, 255, 255, 0.7); }

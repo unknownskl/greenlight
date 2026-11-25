@@ -5,11 +5,17 @@ import Card from '../../components/ui/card'
 import Ipc from '../../lib/ipc'
 import { useSettings } from '../../context/userContext'
 import { useTranslation } from 'react-i18next'
+import { supportedCodecs } from '../../lib/videoCodec'
 
 
 function SettingsVideo() {
     const { settings, setSettings} = useSettings()
     const { t } = useTranslation()
+    // Codecs this device can receive (checked in the browser, so after mount)
+    const [codecSupport, setCodecSupport] = React.useState({ auto: true, h265: true, av1: true, h264: true })
+    React.useEffect(() => {
+        setCodecSupport(supportedCodecs())
+    }, [])
 
     React.useEffect(() => {
     //
@@ -72,6 +78,64 @@ function SettingsVideo() {
                             <option value='stretch'>{t('settings.videoAudio.aspectSizeValueStretch')}</option>
                             <option value='zoom'>{t('settings.videoAudio.aspectSizeValueZoom')}</option>
                         </select>
+                    </p>
+
+                    <p>
+                        <label>{t('settings.videoAudio.streamResolutionLabel')}</label>
+                        <select value={ settings.video_resolution } onChange={(e) => {
+                            setSettings({
+                                ...settings,
+                                video_resolution: parseInt(e.target.value),
+                            })
+                        }}>
+                            <option value={720}>720p</option>
+                            <option value={1080}>1080p</option>
+                            <option value={1440}>1440p ({t('settings.videoAudio.streamResolutionCloudOnly')})</option>
+                        </select><br />
+                        <small>{t('settings.videoAudio.streamResolutionDescription')}</small>
+                    </p>
+
+                    <p>
+                        <label>{t('settings.videoAudio.codecLabel')}</label>
+                        <select value={ settings.video_codec || 'auto' } onChange={(e) => {
+                            setSettings({
+                                ...settings,
+                                video_codec: e.target.value,
+                            })
+                        }}>
+                            <option value='auto'>{t('settings.videoAudio.codecValueAuto')}</option>
+                            <option value='h265' disabled={!codecSupport.h265}>H.265 / HEVC ({codecSupport.h265 ? t('settings.videoAudio.codecExperimental') : t('settings.videoAudio.codecNotSupported')})</option>
+                            <option value='av1' disabled={!codecSupport.av1}>AV1{codecSupport.av1 ? '' : ' (' + t('settings.videoAudio.codecNotSupported') + ')'}</option>
+                            <option value='h264'>H.264</option>
+                        </select><br />
+                        <small>{t('settings.videoAudio.codecDescription')}</small>
+                    </p>
+
+                    <p>
+                        <label>{t('settings.videoAudio.frameRateLabel')}</label>
+                        <select value={ settings.video_framerate } onChange={(e) => {
+                            setSettings({
+                                ...settings,
+                                video_framerate: parseInt(e.target.value),
+                            })
+                        }}>
+                            <option value={0}>{t('settings.videoAudio.frameRateValueNoLimit')}</option>
+                            <option value={30}>30 FPS</option>
+                        </select><br />
+                        <small>{t('settings.videoAudio.frameRateDescription')}</small>
+                    </p>
+
+                    <p>
+                        <label>{t('settings.videoAudio.motionSmoothingLabel')}</label>
+                        <label style={{ minWidth: 0 }}>
+                            <input type='checkbox' onChange={() => {
+                                setSettings({
+                                    ...settings,
+                                    video_motion_smoothing: !settings.video_motion_smoothing,
+                                })
+                            }} checked={settings.video_motion_smoothing} />&nbsp; ({ settings.video_motion_smoothing ? t('settings.videoAudio.enabledLabel') : t('settings.videoAudio.disabledLabel')})
+                        </label><br />
+                        <small>{t('settings.videoAudio.motionSmoothingDescription')}</small>
                     </p>
 
                     <p>

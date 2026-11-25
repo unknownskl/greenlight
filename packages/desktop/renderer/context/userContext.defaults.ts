@@ -6,6 +6,14 @@ export const defaultSettings = {
     preferred_game_language: 'en-US',
     controller_vibration: true,
     video_size: 'default',
+    // Requested stream resolution (vertical pixels): 720, 1080 or 1440
+    video_resolution: 1080,
+    // Frame rate limit: 0 = no limit (server default, usually 60), or e.g. 30
+    video_framerate: 0,
+    // Generate in-between frames when the stream is ~30 fps (adds ~1 frame of latency)
+    video_motion_smoothing: false,
+    // Preferred video codec: 'auto' (original behaviour), 'h265', 'av1' or 'h264'. H.264 is always kept as fallback
+    video_codec: 'auto',
     force_region_ip: '',
     input_touch: false,
     input_mousekeyboard: false,
@@ -35,6 +43,11 @@ export const defaultSettings = {
         n: 'Nexus',
     },
     input_newgamepad: false,
+    // Gamepad remapping: { XboxButton: physicalButtonIndex }. Empty = default layout
+    controller_mapping: {},
+
+    // Network interface used for the stream connection: 'nat' (system default), 'wifi' or 'lan'
+    network_interface: 'nat',
     app_lowresolution: false,
 
     video_enabled: true,
