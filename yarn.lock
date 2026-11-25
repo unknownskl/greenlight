@@ -6134,16 +6134,16 @@ fumadocs-mdx@^15.6.4:
     yuku-analyzer "^0.19.0"
     zod "^4.6.7"
 
-fumadocs-typescript@^5.6.0:
-  version "5.6.0"
-  resolved "https://registry.yarnpkg.com/fumadocs-typescript/-/fumadocs-typescript-5.6.0.tgz#93816d5fdea9c236885f4fb2cafb3986f2b05186"
-  integrity sha512-ZJLYaK8zxsQggj1MTRhtFZxmPSUAhqZrhjo+zYupNcWDW+CfF2YhyYx42a/FWwGxErX0ZzXNLlQvBqkdWGHFlA==
+fumadocs-typescript@^5.6.2:
+  version "5.6.2"
+  resolved "https://registry.yarnpkg.com/fumadocs-typescript/-/fumadocs-typescript-5.6.2.tgz#b2dc816cee22b6c5115c12c5bd7824409bc6a622"
+  integrity sha512-DUElDUbBTaJVkfw6BgbPUoQqxYhlXFxM0vU6xFPwhoheyFwpw6vcWxBl6ob9r3jmz3lLBPkQ+4pGOve7YqU61g==
   dependencies:
     estree-util-value-to-estree "^3.5.0"
     hast-util-to-estree "^3.1.3"
     remark "^15.0.1"
     remark-rehype "^11.1.2"
-    shiki "^4.5.0"
+    shiki "^4.6.0"
     typescript "7.1.0-beta"
     unified "^11.0.5"
 
@@ -9529,10 +9529,17 @@ react-dom@^19.3.1:
   dependencies:
     scheduler "^0.28.0"
 
-react-i18next@*, react-i18next@^18.0.1:
+react-i18next@*:
   version "18.0.1"
   resolved "https://registry.yarnpkg.com/react-i18next/-/react-i18next-18.0.1.tgz#b235e41a7f8549a37cd6d2251b025fac07feba9d"
   integrity sha512-kPWXI0E/lrPj3+/umcKNzYZVnWmEedLiamMzDIHfbs+5ANf6yzvlZsjKou8f7kaGkfMMDLIZBejV+4aSN1CyBw==
+  dependencies:
+    html-parse-stringify "^4.0.1"
+
+react-i18next@^18.0.3:
+  version "18.0.3"
+  resolved "https://registry.yarnpkg.com/react-i18next/-/react-i18next-18.0.3.tgz#1d85c7a09454f2163acad1bc830d14801f9c500a"
+  integrity sha512-S84rtVuaKuiRtoCOspbGEaDlFjka+KvK/A5YCOr4LQ41XF3iJOrJ5rqQTD/jJHFVUf6X1i4ZMN5PGGgpz8NN6g==
   dependencies:
     html-parse-stringify "^4.0.1"
 
@@ -10263,7 +10270,7 @@ shell-quote@1.8.3:
   resolved "https://registry.yarnpkg.com/shell-quote/-/shell-quote-1.8.3.tgz#55e40ef33cf5c689902353a3d8cd1a6725f08b4b"
   integrity sha512-ObmnIF4hXNg1BqhnHmgbDETF8dLPCggZWBjkQfhZpbszZnYur5DUljTcCHii5LC3J5E0yeO/1LIMyH+UvHQgyw==
 
-shiki@^4.5.0, shiki@^4.6.0:
+shiki@^4.6.0:
   version "4.6.0"
   resolved "https://registry.yarnpkg.com/shiki/-/shiki-4.6.0.tgz#1f1bfbcdc908411d52b9c3fc7ac4a2d4297a2288"
   integrity sha512-imjLsVHgPuWhvpU3P+zOekvMYqnel7QmKsFC4Sn0fCuAvaaalBsxwKEsrU8Ko5BdFnZA6Go/8a0RzahS634UgA==
