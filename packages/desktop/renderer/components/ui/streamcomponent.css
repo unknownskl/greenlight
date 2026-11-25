@@ -83,6 +83,57 @@ div#component_streamcomponent_gamebar {
     transition: all 0.3s ease-in-out;
 }
 
+/* Hint to free the mouse: a tab hanging from the top edge, with rounded bottom corners and concave top corners. */
+div#component_streamcomponent_mousehint {
+    --hint-color: rgba(0, 0, 0, 0.35);
+    --hint-radius: 14px;
+    --hint-flare: 28px;
+
+    z-index: 99;
+    position: fixed;
+    top: 0;
+    left: 37.5%;
+    width: 25%;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 8px;
+    box-sizing: border-box;
+    text-align: center;
+    font-size: 14px;
+    line-height: 16px;
+    color: #ffffff;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    background: var(--hint-color);
+    border-radius: 0 0 var(--hint-radius) var(--hint-radius);
+    pointer-events: none;
+    transition: opacity 0.3s ease-in-out;
+}
+
+div#component_streamcomponent_mousehint::before,
+div#component_streamcomponent_mousehint::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    width: var(--hint-flare);
+    height: var(--hint-flare);
+}
+
+div#component_streamcomponent_mousehint::before {
+    left: calc(var(--hint-flare) * -1);
+    background: radial-gradient(circle at 0 100%, transparent var(--hint-flare), var(--hint-color) var(--hint-flare));
+}
+
+div#component_streamcomponent_mousehint::after {
+    right: calc(var(--hint-flare) * -1);
+    background: radial-gradient(circle at 100% 100%, transparent var(--hint-flare), var(--hint-color) var(--hint-flare));
+}
+
+div#component_streamcomponent_mousehint.hidden {
+    opacity: 0;
+}
+
 div#component_streamcomponent_gamebar.hidden {
     opacity: 0;
 }
