@@ -82,7 +82,8 @@ export function getBindAddress(mode: string | undefined): string | undefined {
     if (mode !== 'wifi' && mode !== 'lan') return undefined
     for (const iface of getNetworkInterfaces()) {
         if (iface.type !== mode) continue
-        const v4 = iface.addresses.find((a) => a.family === 'IPv4')
+        // Skip self-assigned 169.254.x.x addresses (interface up but no DHCP lease)
+        const v4 = iface.addresses.find((a) => a.family === 'IPv4' && !a.address.startsWith('169.254.'))
         if (v4) return v4.address
     }
     return undefined

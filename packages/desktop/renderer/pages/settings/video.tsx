@@ -5,11 +5,17 @@ import Card from '../../components/ui/card'
 import Ipc from '../../lib/ipc'
 import { useSettings } from '../../context/userContext'
 import { useTranslation } from 'react-i18next'
+import { supportedCodecs } from '../../lib/videoCodec'
 
 
 function SettingsVideo() {
     const { settings, setSettings} = useSettings()
     const { t } = useTranslation()
+    // Codecs this device can receive (checked in the browser, so after mount)
+    const [codecSupport, setCodecSupport] = React.useState({ auto: true, h265: true, av1: true, h264: true })
+    React.useEffect(() => {
+        setCodecSupport(supportedCodecs())
+    }, [])
 
     React.useEffect(() => {
     //
@@ -87,6 +93,22 @@ function SettingsVideo() {
                             <option value={1440}>1440p ({t('settings.videoAudio.streamResolutionCloudOnly')})</option>
                         </select><br />
                         <small>{t('settings.videoAudio.streamResolutionDescription')}</small>
+                    </p>
+
+                    <p>
+                        <label>{t('settings.videoAudio.codecLabel')}</label>
+                        <select value={ settings.video_codec || 'auto' } onChange={(e) => {
+                            setSettings({
+                                ...settings,
+                                video_codec: e.target.value,
+                            })
+                        }}>
+                            <option value='auto'>{t('settings.videoAudio.codecValueAuto')}</option>
+                            <option value='h265' disabled={!codecSupport.h265}>H.265 / HEVC ({codecSupport.h265 ? t('settings.videoAudio.codecExperimental') : t('settings.videoAudio.codecNotSupported')})</option>
+                            <option value='av1' disabled={!codecSupport.av1}>AV1{codecSupport.av1 ? '' : ' (' + t('settings.videoAudio.codecNotSupported') + ')'}</option>
+                            <option value='h264'>H.264</option>
+                        </select><br />
+                        <small>{t('settings.videoAudio.codecDescription')}</small>
                     </p>
 
                     <p>

@@ -12,6 +12,8 @@ export const defaultSettings = {
     video_framerate: 0,
     // Generate in-between frames when the stream is ~30 fps (adds ~1 frame of latency)
     video_motion_smoothing: false,
+    // Preferred video codec: 'auto' (original behaviour), 'h265', 'av1' or 'h264'. H.264 is always kept as fallback
+    video_codec: 'auto',
     force_region_ip: '',
     input_touch: false,
     input_mousekeyboard: false,

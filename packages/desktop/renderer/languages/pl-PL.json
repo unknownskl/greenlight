@@ -59,7 +59,7 @@
         "restartRequired": "Restart Greenlight to fully apply this setting (WebRTC needs to expose real local addresses).",
         "restartBtn": "Restart now",
         "missingInterface": "No {{type}} connection with an IPv4 address was detected. Streams will fail until it is connected.",
-        "vpnDetectedNat": "A VPN connection is active. In NAT mode the stream may be routed through it. Choose Wi-Fi or LAN to bypass it.",
+        "vpnDetectedNat": "A VPN connection is active, so the stream may be routed through it, which adds latency. Choosing Wi-Fi or LAN only helps with VPNs that allow it (split tunnel). Full-tunnel VPNs, such as many company VPNs, route all traffic and must be disconnected for a direct connection.",
         "detectedTitle": "Detected connections",
         "noInterfaces": "No network connections detected.",
         "refreshBtn": "Refresh",
@@ -68,7 +68,25 @@
         "lastRouteLocal": "Local",
         "lastRouteRemote": "Remote",
         "lastRouteOk": "The stream used the selected connection.",
-        "lastRouteMismatch": "The stream did not use the selected connection. Check the Wi-Fi / LAN connection and VPN settings."
+        "lastRouteMismatch": "The stream did not use the selected connection. Check the Wi-Fi / LAN connection and VPN settings.",
+        "bypass": {
+          "title": "Omiń VPN (nadpisanie trasy)",
+          "description": "Dodaje trasy, aby ruch do poniższych adresów wychodził przez sieć fizyczną zamiast tunelu VPN. Wymaga hasła administratora Maca. Wpisz adres IP konsoli Xbox (streaming domowy).",
+          "gateway": "Fizyczna brama",
+          "noGateway": "nie znaleziono - brak sieci poza VPN",
+          "apply": "Zastosuj",
+          "waiting": "Oczekiwanie na zgodę administratora...",
+          "viaVpn": "Nadal przez VPN",
+          "direct": "Bezpośrednio (z pominięciem VPN)",
+          "recheck": "Sprawdź ponownie",
+          "remove": "Usuń trasy",
+          "lastStream": "Ostatni stream połączył się z",
+          "useIt": "użyj tego adresu",
+          "quitTitle": "Trasy omijające VPN są nadal aktywne",
+          "quitDetail": "Usunąć trasy dodane dla {{targets}}? Zostaniesz poproszony o hasło administratora.",
+          "quitRemove": "Usuń trasy",
+          "quitKeep": "Zachowaj"
+        }
       },
       "controller": {
         "pageTitle": "Settings: Controller",
@@ -221,6 +239,11 @@
         "streamResolutionLabel": "Stream resolution",
         "streamResolutionCloudOnly": "cloud gaming only",
         "streamResolutionDescription": "(Higher resolutions need a fast connection. 1440p only works for cloud gaming on supported games; Remote Play to your own console is limited to 1080p. Takes effect on the next stream.)",
+        "codecLabel": "Video codec",
+        "codecValueAuto": "Auto (H.264, default)",
+        "codecNotSupported": "not supported on this device",
+        "codecExperimental": "experimental",
+        "codecDescription": "(H.265 and AV1 give a sharper picture at the same bitrate. The server decides which codec it uses; if it does not support your choice, the stream falls back to H.264. Check the stats overlay or the motion smoothing badge to see the codec in use. Takes effect on the next stream.)",
         "frameRateLabel": "Frame rate limit",
         "frameRateValueNoLimit": "No limit (60 FPS)",
         "frameRateDescription": "(Caps the displayed frame rate to save battery and GPU. Greenlight also asks the server for this frame rate, but it may ignore the request, so data usage might not go down. Takes effect on the next stream.)",
@@ -334,7 +357,24 @@
       "retryBtn": "Try again",
       "backBtn": "Back",
       "errorNetworkUnavailableTitle": "Selected network is not available",
-      "errorNetworkUnavailableMessage": "Greenlight is set to connect over {{type}}, but no {{type}} connection was found. Connect it or change Settings > Network."
+      "errorNetworkUnavailableMessage": "Greenlight is set to connect over {{type}}, but no {{type}} connection was found. Connect it or change Settings > Network.",
+      "noticeNotOnSelectedNetwork": "This stream is not going over {{type}}. A VPN is probably routing all traffic, which adds latency. Disconnect the VPN, or ask your IT team to exclude your console or Xbox cloud gaming, for a direct connection.",
+      "noticeBypassNotActive": "Omijanie VPN jest skonfigurowane, ale {{targets}} nadal przechodzi przez VPN. Zastosuj je ponownie w Ustawienia > Sieć.",
+      "qualityTitle": "Jakość połączenia",
+      "quality": {
+        "good": "Dobra",
+        "fair": "Średnia",
+        "poor": "Słaba",
+        "measuring": "Pomiar...",
+        "rtt": "Opóźnienie",
+        "jitter": "Jitter",
+        "loss": "Utrata pakietów",
+        "bitrate": "Przepływność",
+        "fps": "FPS",
+        "dropped": "odrzucone",
+        "resolution": "Rozdzielczość",
+        "path": "Ścieżka"
+      }
     },
     "updater": {
       "unableToCheckForUpdates": "Nie udało się sprawdzić czy jest dostępna aktualizacja w tej chwili. Spróbuj ponownie.",
@@ -374,7 +414,8 @@
       "unableToStartStreamSession": "Nie udało się zacząć sesji strumieniowania na konsoli. Konsola nie jest podłączona do serwerów Xbox. To się dzieje okazjonalnie gdy jest aktualizacja albo gdy użytkownik nie jest zalogowany do konsoli. Wykonaj pełny restart konsoli i spróbuj ponownie.",
       "streamErrorResult": "Wynik błędu strumienia:",
       "details": "Szczegóły:",
-      "failedToGetPlayerState": "Nie udało się uzyskać stanu gracza. Szczegóły błędu:"
+      "failedToGetPlayerState": "Nie udało się uzyskać stanu gracza. Szczegóły błędu:",
+      "codecNoVideo": "The stream connected with the H.265 codec, but no video is coming through. H.265 is experimental: go to Settings > Video & Audio, set Video codec to AV1 or Auto, and start the stream again."
     }
   }
 }

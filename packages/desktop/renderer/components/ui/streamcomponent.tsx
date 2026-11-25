@@ -6,6 +6,7 @@ import Card from './card'
 import uPlot from 'uplot'
 import Ipc from '../../lib/ipc'
 import { useTranslation } from 'react-i18next'
+import { computeQuality, QualitySample, qualityLevel } from '../../lib/connectionQuality'
 
 interface StreamComponentProps {
     onDisconnect?: () => void;
@@ -28,6 +29,37 @@ function StreamComponent({
     // let gamebarElement = document.getElementById('component_streamcomponent_gamebar')
     let debugElement = document.getElementById('component_streamcomponent_debug')
     let webRtcStatsInterval
+
+    // Connection quality overlay
+    const [qualityVisible, setQualityVisible] = React.useState(() => {
+        try { return localStorage.getItem('greenlight_quality_overlay') === '1' } catch (e) { return false }
+    })
+    const [quality, setQuality] = React.useState<QualitySample | undefined>(undefined)
+    const [qualityHistory, setQualityHistory] = React.useState<number[]>([])
+
+    function toggleQuality() {
+        const next = !qualityVisible
+        setQualityVisible(next)
+        try { localStorage.setItem('greenlight_quality_overlay', next ? '1' : '0') } catch (e) { /* ignore */ }
+    }
+
+    React.useEffect(() => {
+        if (!qualityVisible) return
+        let previous: any = undefined
+        const timer = setInterval(() => {
+            const pc = (xPlayer as any)._webrtcClient
+            if (!pc || typeof pc.getStats !== 'function') return
+            pc.getStats().then((stats) => {
+                const result = computeQuality(stats, previous)
+                previous = result.raw
+                if (result.sample) {
+                    setQuality(result.sample)
+                    setQualityHistory((h) => [...h.slice(-59), result.sample.rtt ?? 0])
+                }
+            }).catch(() => undefined)
+        }, 1000)
+        return () => clearInterval(timer)
+    }, [qualityVisible, xPlayer])
 
     const [micStatus, setMicStatus] = React.useState(false)
     const [waitingSeconds, setWaitingSeconds] = React.useState(0)
@@ -423,12 +455,39 @@ function StreamComponent({
                         <div className="gamebar-divider" />
 
                         <div className="gamebar-group">
+                            <Button label={<i className="fa-solid fa-signal"></i>} title={t("streamWindow.qualityTitle", { defaultValue: 'Connection quality' })} className={qualityVisible ? 'gamebar-btn gamebar-icon gamebar-active' : 'gamebar-btn gamebar-icon'} onClick={(e) => {
+                                e.target.blur(); toggleQuality()
+                            }}></Button>
                             <Button label={<i className="fa-solid fa-chart-simple"></i>} title={t("streamWindow.debugTitle")} className='gamebar-btn gamebar-icon' onClick={(e) => {
                                 e.target.blur(); toggleDebug()
                             }}></Button>
                         </div>
                     </div>
                 </div>
+
+                { qualityVisible ? (
+                    <div id="component_streamcomponent_quality">
+                        <div className={'quality-badge quality-' + qualityLevel(quality)}>
+                            {quality ? t('streamWindow.quality.' + qualityLevel(quality), { defaultValue: qualityLevel(quality) }) : t('streamWindow.quality.measuring', { defaultValue: 'Measuring...' })}
+                        </div>
+                        { quality ? (
+                            <table>
+                                <tbody>
+                                    <tr><td>{t('streamWindow.quality.rtt', { defaultValue: 'Latency' })}</td><td>{quality.rtt !== undefined ? quality.rtt.toFixed(0) + ' ms' : '-'}</td></tr>
+                                    <tr><td>{t('streamWindow.quality.jitter', { defaultValue: 'Jitter' })}</td><td>{quality.jitter !== undefined ? quality.jitter.toFixed(1) + ' ms' : '-'}</td></tr>
+                                    <tr><td>{t('streamWindow.quality.loss', { defaultValue: 'Packet loss' })}</td><td>{quality.lossPercent.toFixed(1)}%</td></tr>
+                                    <tr><td>{t('streamWindow.quality.bitrate', { defaultValue: 'Bitrate' })}</td><td>{(quality.bitrateKbps / 1000).toFixed(1)} Mbps</td></tr>
+                                    <tr><td>{t('streamWindow.quality.fps', { defaultValue: 'FPS' })}</td><td>{quality.fps !== undefined ? quality.fps.toFixed(0) : '-'}{quality.framesDropped > 0 ? ` (${quality.framesDropped} ${t('streamWindow.quality.dropped', { defaultValue: 'dropped' })})` : ''}</td></tr>
+                                    <tr><td>{t('streamWindow.quality.resolution', { defaultValue: 'Resolution' })}</td><td>{quality.resolution || '-'}</td></tr>
+                                    <tr><td>{t('streamWindow.quality.path', { defaultValue: 'Path' })}</td><td>{quality.path || '-'}</td></tr>
+                                </tbody>
+                            </table>
+                        ) : null }
+                        <svg className="quality-spark" viewBox="0 0 120 24" preserveAspectRatio="none">
+                            <polyline fill="none" strokeWidth="1.5" points={qualityHistory.map((v, i) => `${(i / 59) * 120},${24 - Math.min(24, (v / 100) * 24)}`).join(' ')} />
+                        </svg>
+                    </div>
+                ) : null }
 
                 <div id="component_streamcomponent_debug" className='hidden'>
                     <p>{t("streamWindow.debugTitle")}:</p>

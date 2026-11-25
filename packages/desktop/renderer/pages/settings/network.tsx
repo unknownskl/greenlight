@@ -22,6 +22,10 @@ function SettingsNetwork() {
     const { settings, setSettings } = useSettings()
     const [status, setStatus] = React.useState<NetworkStatus | undefined>(undefined)
     const [lastRoute, setLastRoute] = React.useState<any>(undefined)
+    const [bypass, setBypass] = React.useState<any>(undefined)
+    const [bypassInput, setBypassInput] = React.useState('')
+    const [bypassError, setBypassError] = React.useState('')
+    const [bypassBusy, setBypassBusy] = React.useState(false)
 
     const mode: NetworkMode = ((settings as any).network_interface || 'nat') as NetworkMode
 
@@ -33,8 +37,30 @@ function SettingsNetwork() {
         })
     }
 
+    function refreshBypass() {
+        Ipc.send('network', 'getVpnBypass').then((result: any) => setBypass(result)).catch((e) => console.log('Failed to load VPN bypass state:', e))
+    }
+
+    function applyBypass() {
+        const targets = bypassInput.split(/[\s,]+/).filter(Boolean)
+        setBypassBusy(true)
+        setBypassError('')
+        Ipc.send('network', 'addVpnBypass', { targets }).then((result: any) => {
+            setBypass(result)
+            setBypassInput('')
+        }).catch((e: any) => setBypassError(e?.message || String(e))).finally(() => setBypassBusy(false))
+    }
+
+    function clearBypass() {
+        setBypassBusy(true)
+        setBypassError('')
+        Ipc.send('network', 'removeVpnBypass').then((result: any) => setBypass(result))
+            .catch((e: any) => setBypassError(e?.message || String(e))).finally(() => setBypassBusy(false))
+    }
+
     React.useEffect(() => {
         refresh()
+        refreshBypass()
         try {
             const raw = localStorage.getItem('greenlight_last_route')
             if (raw) setLastRoute(JSON.parse(raw))
@@ -121,6 +147,56 @@ function SettingsNetwork() {
 
                     <p><Button label={t('settings.network.refreshBtn')} onClick={refresh} /></p>
                 </Card>
+
+
+                { bypass?.supported ? (
+                    <Card>
+                        <h1>{t('settings.network.bypass.title', { defaultValue: 'Bypass VPN (route override)' })}</h1>
+                        <p><small>{t('settings.network.bypass.description', { defaultValue: 'Adds routes so traffic to the addresses below leaves through your physical network instead of the VPN tunnel. Needs your Mac admin password. Enter your Xbox console IP (home streaming).' })}</small></p>
+
+                        <p>
+                            {t('settings.network.bypass.gateway', { defaultValue: 'Physical gateway' })}:{' '}
+                            { bypass.gateway ? `${bypass.gateway.gateway} (${bypass.gateway.iface})` : <span style={{ color: 'orange' }}>{t('settings.network.bypass.noGateway', { defaultValue: 'none found - no non-VPN network available' })}</span> }
+                        </p>
+
+                        <p>
+                            <input type="text" value={bypassInput} placeholder="192.168.1.50 or 20.0.0.0/16" style={{ width: '60%' }}
+                                onChange={(e) => setBypassInput(e.target.value)} />
+                            &nbsp;
+                            <Button label={t('settings.network.bypass.apply', { defaultValue: 'Apply' })} className="btn-primary" onClick={applyBypass} />
+                        </p>
+                        { lastRoute?.remoteAddress && /^\d+\.\d+\.\d+\.\d+$/.test(lastRoute.remoteAddress) ? (
+                            <p><small>
+                                {t('settings.network.bypass.lastStream', { defaultValue: 'Last stream connected to' })} {lastRoute.remoteAddress}{' '}
+                                <a href="#" onClick={(e) => { e.preventDefault(); setBypassInput(lastRoute.remoteAddress) }}>{t('settings.network.bypass.useIt', { defaultValue: 'use this address' })}</a>
+                            </small></p>
+                        ) : null }
+
+                        { bypassError ? <p><small style={{ color: 'orange' }}>{bypassError}</small></p> : null }
+                        { bypassBusy ? <p><small>{t('settings.network.bypass.waiting', { defaultValue: 'Waiting for admin permission...' })}</small></p> : null }
+
+                        { bypass.routes.length > 0 ? (
+                            <table className="component_controllermapping">
+                                <tbody>
+                                    { bypass.routes.map((r: any) => (
+                                        <tr key={r.target}>
+                                            <td>{r.target}</td>
+                                            <td>{r.iface || '-'}</td>
+                                            <td>{r.viaVpn === undefined ? '-' : (r.viaVpn
+                                                ? <span style={{ color: 'orange' }}>{t('settings.network.bypass.viaVpn', { defaultValue: 'Still via VPN' })}</span>
+                                                : <span style={{ color: '#5dc21e' }}>{t('settings.network.bypass.direct', { defaultValue: 'Direct (bypassing VPN)' })}</span>)}</td>
+                                        </tr>
+                                    )) }
+                                </tbody>
+                            </table>
+                        ) : null }
+
+                        <p>
+                            <Button label={t('settings.network.bypass.recheck', { defaultValue: 'Re-check' })} onClick={refreshBypass} />
+                            { bypass.routes.length > 0 ? <Button label={t('settings.network.bypass.remove', { defaultValue: 'Remove routes' })} onClick={clearBypass} /> : null }
+                        </p>
+                    </Card>
+                ) : null }
 
                 { lastRoute ? (
                     <Card>

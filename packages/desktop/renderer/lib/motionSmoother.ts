@@ -73,7 +73,7 @@ float sad(ivec2 base, ivec2 d){
 
 // Coarse full search on 1/8 luma, 4x4 blocks (= 32x32 source px), +-6 px (= +-48 source px).
 // Output: xy = motion (prev -> cur) in source pixels, z = SAD, w = zero-motion SAD.
-const FS_ME_COARSE = `#version 300 es
+const coarseShader = (range: number) => `#version 300 es
 precision highp float;
 precision highp int;
 ${SAD_COMMON}
@@ -83,8 +83,8 @@ void main(){
     float zero = sad(base, ivec2(0));
     float best = zero;
     ivec2 bd = ivec2(0);
-    for(int dy = -6; dy <= 6; dy++){
-        for(int dx = -6; dx <= 6; dx++){
+    for(int dy = -${range}; dy <= ${range}; dy++){
+        for(int dx = -${range}; dx <= ${range}; dx++){
             ivec2 d = ivec2(dx, dy);
             float c = sad(base, d) + 0.02 * length(vec2(d));
             if(c < best){ best = c; bd = d; }
@@ -93,19 +93,29 @@ void main(){
     o = vec4(vec2(bd) * 8.0, best, zero);
 }`
 
-// Refinement on 1/4 luma, 4x4 blocks (= 16x16 source px), seeded by the 3x3 coarse
-// neighbourhood, then +-2 local search and a parabolic sub-pixel fit.
+// Full search (+-6 = +-48 source px) and a lighter one for GPUs that cannot keep up (+-3 = +-24 px)
+const FS_ME_COARSE = coarseShader(6)
+const FS_ME_COARSE_LIGHT = coarseShader(3)
+
+// Refinement on 1/4 luma. One vector per 8x8 source px: 4x4 matching windows (= 16x16 source px,
+// so matching stays robust) placed every 2 luma px, centred on their cell and overlapping.
+// Seeded by the 3x3 coarse neighbourhood and by the previous frame's final vectors (temporal
+// seeding: at the same cell, and at the cell the object has since moved to), then +-2 local
+// search and a parabolic sub-pixel fit.
 const FS_ME_FINE = `#version 300 es
 precision highp float;
 precision highp int;
 ${SAD_COMMON}
 uniform highp sampler2D u_coarse;
 uniform ivec2 u_coarseSize;
+uniform highp sampler2D u_prevField;   // previous frame's median-filtered vectors (source px)
+uniform ivec2 u_fieldSize;
+uniform int u_usePrev;
 out vec4 o;
 void main(){
     ivec2 cell = ivec2(gl_FragCoord.xy);
-    ivec2 base = cell * 4;
-    ivec2 cc = cell / 2;
+    ivec2 base = cell * 2 - ivec2(1);
+    ivec2 cc = cell / 4;
 
     float zero = sad(base, ivec2(0));
     float best = zero;
@@ -114,6 +124,18 @@ void main(){
         for(int i = -1; i <= 1; i++){
             vec2 v = texelFetch(u_coarse, clamp(cc + ivec2(i, j), ivec2(0), u_coarseSize - 1), 0).xy;
             ivec2 d = ivec2(round(v / 4.0));
+            float c = sad(base, d) + 0.01 * length(vec2(d));
+            if(c < best){ best = c; bd = d; }
+        }
+    }
+    if(u_usePrev == 1){
+        vec2 p0 = texelFetch(u_prevField, clamp(cell, ivec2(0), u_fieldSize - 1), 0).xy;
+        // The object now at this cell was one motion step back in the previous field.
+        ivec2 back = clamp(cell - ivec2(round(p0 / 8.0)), ivec2(0), u_fieldSize - 1);
+        vec2 p1 = texelFetch(u_prevField, back, 0).xy;
+        vec2 seeds[2] = vec2[2](p0, p1);
+        for(int k = 0; k < 2; k++){
+            ivec2 d = ivec2(round(seeds[k] / 4.0));
             float c = sad(base, d) + 0.01 * length(vec2(d));
             if(c < best){ best = c; bd = d; }
         }
@@ -174,7 +196,7 @@ void main(){
 // Per-pixel vector selection at quarter resolution, for the current time phase t.
 // The block field stores motion at each block's position in the *current* frame, which is
 // wrong for pixels a moving object is passing over at time t. So every pixel tests the
-// 3x3 neighbouring block vectors (plus zero) and keeps the one where the previous frame
+// neighbouring block vectors (plus zero) and keeps the one where the previous frame
 // warped forward and the current frame warped backward agree best.
 const FS_SELECT = `#version 300 es
 precision highp float;
@@ -202,15 +224,20 @@ float cost(vec2 uv, vec2 mv){
 }
 void main(){
     vec2 uv = gl_FragCoord.xy / u_lsize;
-    ivec2 cell = ivec2(uv * u_size / 16.0);
+    ivec2 cell = ivec2(uv * u_size / 8.0);
     vec2 best = vec2(0.0);
     float bestCost = cost(uv, vec2(0.0));
-    for(int j = -1; j <= 1; j++){
-        for(int i = -1; i <= 1; i++){
-            vec2 v = texelFetch(u_field, clamp(cell + ivec2(i, j), ivec2(0), u_fieldSize - 1), 0).xy / u_size;
-            float c = cost(uv, v) + 0.002;
-            if(c < bestCost){ bestCost = c; best = v; }
-        }
+    // Cells are 8 px now, so look two cells out (same 16 px reach as before) plus the adjacent ones.
+    const ivec2 offs[12] = ivec2[12](
+        ivec2(-2,-2), ivec2(0,-2), ivec2(2,-2),
+        ivec2(-2, 0), ivec2(2, 0),
+        ivec2(-2, 2), ivec2(0, 2), ivec2(2, 2),
+        ivec2(-1, 0), ivec2(1, 0), ivec2(0,-1), ivec2(0, 1));
+    for(int k = -1; k < 12; k++){
+        ivec2 o2 = (k < 0) ? ivec2(0) : offs[k];
+        vec2 v = texelFetch(u_field, clamp(cell + o2, ivec2(0), u_fieldSize - 1), 0).xy / u_size;
+        float c = cost(uv, v) + 0.002;
+        if(c < bestCost){ bestCost = c; best = v; }
     }
     o = vec4(best, bestCost, 1.0);
 }`
@@ -241,11 +268,11 @@ void main(){
 
     // Occlusion: the two warped samples disagree -> trust the temporally nearer one
     vec3 nearWarp = (u_t < 0.5) ? a : b;
-    col = mix(col, nearWarp, smoothstep(0.10, 0.25, length(a - b)));
+    col = mix(col, nearWarp, smoothstep(0.06, 0.16, length(a - b)));
 
     // Unreliable motion -> nearest real frame (judder instead of ghosting)
     vec3 nearReal = (u_t < 0.5) ? s0 : s1;
-    col = mix(col, nearReal, smoothstep(0.06, 0.12, err));
+    col = mix(col, nearReal, smoothstep(0.035, 0.08, err));
 
     // Pixels that did not change (HUD, still background) need no motion compensation
     col = mix(mix(s0, s1, u_t), col, smoothstep(0.02, 0.06, length(s0 - s1)));
@@ -274,6 +301,9 @@ void main(){
     o = vec4(s / 576.0, m, 0.0, 1.0);
 }`
 
+// Largest luma change in any sampled cell (0-1) that proves a frame is new, not a repeat.
+const MAX_LOCAL_CHANGE = 0.06
+
 export type SmootherState = 'interpolating' | 'standby' | 'off' | 'unavailable'
 
 export class MotionSmoother {
@@ -285,6 +315,7 @@ export class MotionSmoother {
 
     private _progLuma: WebGLProgram
     private _progCoarse: WebGLProgram
+    private _progCoarseLight: WebGLProgram | undefined
     private _progFine: WebGLProgram
     private _progMedian: WebGLProgram
     private _progCompose: WebGLProgram
@@ -320,6 +351,13 @@ export class MotionSmoother {
     private _duplicates = 0
     private _frameCount = 0
     private _haveField = false
+
+    // GPU self-timing: if motion estimation eats too much of the frame budget, use a lighter search
+    private _gpuName = ''
+    private _lightMode = false
+    private _slowProbes = 0
+    private _probeCounter = 0
+    private _probeMs = 0
 
     private _enabled = true
     private _interpolating = false
@@ -424,6 +462,11 @@ export class MotionSmoother {
         }
         this._gl = gl
 
+        const dbg = gl.getExtension('WEBGL_debug_renderer_info')
+        this._gpuName = dbg ? String(gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL)) : String(gl.getParameter(gl.RENDERER))
+        const compileStart = performance.now()
+        console.log('[motion smoothing] GPU:', this._gpuName)
+
         try {
             this._progLuma = this._program(FS_LUMA)
             this._progCoarse = this._program(FS_ME_COARSE)
@@ -432,6 +475,14 @@ export class MotionSmoother {
             this._progCompose = this._program(FS_COMPOSE)
             this._progSelect = this._program(FS_SELECT)
             this._progDiff = this._program(FS_DIFF)
+            const compileMs = performance.now() - compileStart
+            console.log('[motion smoothing] Shaders compiled in', compileMs.toFixed(0), 'ms')
+            // Direct3D shader compilers (ANGLE on Windows) can take very long on the unrolled search loops.
+            // Begin in light mode so streams don't start with a long freeze.
+            if (compileMs > 4000) {
+                console.warn('[motion smoothing] Slow shader compilation, using the light search')
+                this._lightMode = true
+            }
         } catch (error) {
             console.warn('[motion smoothing] Shader setup failed:', error)
             this._gl = null
@@ -544,8 +595,8 @@ export class MotionSmoother {
         this._he = Math.ceil(this._hq / 2)
         this._gcW = Math.ceil(this._we / 4)
         this._gcH = Math.ceil(this._he / 4)
-        this._gfW = Math.ceil(this._wq / 4)
-        this._gfH = Math.ceil(this._hq / 4)
+        this._gfW = Math.ceil(this._wq / 2)
+        this._gfH = Math.ceil(this._hq / 2)
 
         // Slot 0/1 hold the previous and current *distinct* frames; slot 2 receives new frames
         for (let i = 0; i < 3; i++) {
@@ -639,6 +690,7 @@ export class MotionSmoother {
         gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.FLOAT, this._diffPixel)
         gl.bindFramebuffer(gl.FRAMEBUFFER, null)
         const diff = this._diffPixel[0]
+        const maxDiff = this._diffPixel[1]
         this._diffHistory.push(diff)
         if (this._diffHistory.length > 30) this._diffHistory.shift()
 
@@ -647,6 +699,9 @@ export class MotionSmoother {
         // so slow pans in real 60 fps games aren't mistaken for repeats.
         const sorted = [...this._diffHistory].sort((x, y) => x - y)
         const high = sorted[Math.floor(sorted.length * 0.75)] || 0
+        // The average barely moves when only a small object changes (a distant car, a pedestrian),
+        // so a frame with a strong local change is never a repeat, whatever the average says.
+        if (maxDiff > MAX_LOCAL_CHANGE) return false
         if (diff < 0.0008) return true                        // practically identical
         if (this._diffHistory.length < 8) return false        // not enough history yet
         return diff < high * 0.25
@@ -711,12 +766,13 @@ export class MotionSmoother {
         gl.bindVertexArray(this._vao)
 
         // Coarse search
-        gl.useProgram(this._progCoarse)
+        const coarseProgram = this._coarseProgram()
+        gl.useProgram(coarseProgram)
         gl.bindFramebuffer(gl.FRAMEBUFFER, this._coarse.fb)
         gl.viewport(0, 0, this._gcW, this._gcH)
-        this._bindTex(this._progCoarse, 'u_cur', 0, cur.lumaE)
-        this._bindTex(this._progCoarse, 'u_prev', 1, prev.lumaE)
-        gl.uniform2i(this._u(this._progCoarse, 'u_size'), this._we, this._he)
+        this._bindTex(coarseProgram, 'u_cur', 0, cur.lumaE)
+        this._bindTex(coarseProgram, 'u_prev', 1, prev.lumaE)
+        gl.uniform2i(this._u(coarseProgram, 'u_size'), this._we, this._he)
         gl.drawArrays(gl.TRIANGLES, 0, 3)
 
         // Refinement
@@ -726,6 +782,10 @@ export class MotionSmoother {
         this._bindTex(this._progFine, 'u_cur', 0, cur.lumaQ)
         this._bindTex(this._progFine, 'u_prev', 1, prev.lumaQ)
         this._bindTex(this._progFine, 'u_coarse', 2, this._coarse.tex)
+        // _field still holds the previous frame's vectors here (the median pass overwrites it below)
+        this._bindTex(this._progFine, 'u_prevField', 3, this._field.tex)
+        gl.uniform2i(this._u(this._progFine, 'u_fieldSize'), this._gfW, this._gfH)
+        gl.uniform1i(this._u(this._progFine, 'u_usePrev'), this._haveField ? 1 : 0)
         gl.uniform2i(this._u(this._progFine, 'u_size'), this._wq, this._hq)
         gl.uniform2i(this._u(this._progFine, 'u_coarseSize'), this._gcW, this._gcH)
         gl.drawArrays(gl.TRIANGLES, 0, 3)
@@ -740,6 +800,46 @@ export class MotionSmoother {
 
         gl.bindFramebuffer(gl.FRAMEBUFFER, null)
         this._haveField = true
+        this._probeGpuTime()
+    }
+
+    private _coarseProgram(): WebGLProgram {
+        if (!this._lightMode) return this._progCoarse
+        if (!this._progCoarseLight) {
+            try {
+                this._progCoarseLight = this._program(FS_ME_COARSE_LIGHT)
+            } catch (error) {
+                console.warn('[motion smoothing] Light search unavailable:', error)
+                this._lightMode = false
+                return this._progCoarse
+            }
+        }
+        return this._progCoarseLight
+    }
+
+    // Every 60 source frames, force the GPU to finish and measure how long motion estimation took.
+    // Three slow probes in a row switch to the light search (it never switches back, to avoid flapping).
+    private _probeGpuTime() {
+        if (this._lightMode || ++this._probeCounter < 60) return
+        this._probeCounter = 0
+        const gl = this._gl
+        const start = performance.now()
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this._field.fb)
+        gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.FLOAT, this._diffPixel)
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null)
+        this._probeMs = performance.now() - start
+
+        // Budget: motion estimation should use well under half of the time between source frames
+        if (this._probeMs > this._intervalMs * 0.5) {
+            this._slowProbes++
+            console.warn('[motion smoothing] Slow GPU probe:', this._probeMs.toFixed(1), 'ms of', this._intervalMs.toFixed(1), 'ms (', this._slowProbes, '/ 3 )')
+            if (this._slowProbes >= 3) {
+                this._lightMode = true
+                console.warn('[motion smoothing] GPU is too slow for the full search, switching to the light search')
+            }
+        } else {
+            this._slowProbes = 0
+        }
     }
 
     private _bindTex(program: WebGLProgram, name: string, unit: number, tex: WebGLTexture) {
@@ -856,7 +956,8 @@ export class MotionSmoother {
     private _renderBadge() {
         const src = this._srcFps || Math.round(1000 / this._intervalMs)
         const game = this._gameFps || Math.round(1000 / this._intervalMs)
-        const res = this._h ? ` · ${this._w}×${this._h}` : ''
+        const codec = this._video.closest('#streamComponent')?.getAttribute('data-codec')
+        const res = (this._h ? ` · ${this._w}×${this._h}` : '') + (codec ? ` · ${codec}` : '') + (this._lightMode ? ' · light search' : '') + (this._gpuName ? ` · ${this._gpuName.replace(/ANGLE \(|\)$/g, '').slice(0, 60)}` : '')
         let text: string
         switch (this._computeState()) {
             case 'interpolating':

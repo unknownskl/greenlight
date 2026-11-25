@@ -16,22 +16,29 @@ function importAllLanguages(): Record<string, { translation: any }> {
 
 const resources = importAllLanguages();
 
-// Function to initialize i18n with language from settings
-export function initI18nWithLanguage(settings) {
-    console.log("[i18n] Initializing i18n with settings:", settings);
-  const initialLanguage = settings?.language || "en-US";
-  console.log("[i18n] Initializing i18n with language:", initialLanguage);
+// Initialise once, when this module is first imported (from _app.tsx), so the instance is
+// bound to React before the first render. Otherwise useTranslation() runs before init and
+// react-i18next warns "You will need to pass in an i18next instance".
+if (!i18n.isInitialized) {
   i18n.use(initReactI18next).init({
     resources,
-    lng: initialLanguage,
-    fallbackLng: initialLanguage,
+    lng: "en-US",
+    fallbackLng: "en-US",
     interpolation: {
       escapeValue: false,
     },
-  }).then(() => {
-    console.log("[i18n] i18n initialized. Current language:", i18n.language);
   }).catch((err) => {
     console.error("[i18n] i18n initialization error:", err);
+  });
+}
+
+// Apply the language from settings. Safe to call repeatedly: it only switches language.
+export function initI18nWithLanguage(settings) {
+  const language = settings?.language || "en-US";
+  if (i18n.language === language) return;
+  console.log("[i18n] Switching language to:", language);
+  i18n.changeLanguage(language).catch((err) => {
+    console.error("[i18n] Unable to switch language:", err);
   });
 }
 

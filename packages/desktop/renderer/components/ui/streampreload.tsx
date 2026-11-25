@@ -153,14 +153,13 @@ function StreamPreload({
                 </div>
 
                 <div id="component_streamcomponent_gamebar">
+                    {/* Same layout as the stream toolbar (streamcomponent.tsx), with only the exit controls */}
                     <div id="component_streamcomponent_gamebar_menu">
-                        <div style={{
-                            width: '25%',
-                        }}>
-                            <Button label={<span><i className="fa-solid fa-xmark"></i> {t("streamWindow.endStreamBtn")}</span>} title={t("streamWindow.endStreamBtn")} className='btn-cancel' onClick={ () => {
+                        <div className="gamebar-group">
+                            <Button label={<span><i className="fa-solid fa-xmark"></i> {t("streamWindow.endStreamBtn")}</span>} title={t("streamWindow.endStreamBtn")} className='btn-cancel gamebar-btn' onClick={ () => {
                                 endStream()
-                            } }></Button> &nbsp;
-                            <Button label={<span><i className="fa-solid fa-xmark"></i></span>} title={t("streamWindow.disconnectBtn")} className='btn' onClick={ () => {
+                            } }></Button>
+                            <Button label={<i className="fa-solid fa-right-from-bracket"></i>} title={t("streamWindow.disconnectBtn")} className='gamebar-btn gamebar-icon' onClick={ () => {
                                 streamDisconnect()
                             } }></Button>
                         </div>

@@ -38,7 +38,7 @@ export default class Http {
                         if(response.statusCode === 204){
                             // We have to retry..
                             setTimeout(() => {
-                                this.get(url, method).then((result) => {
+                                this.get(host, url, method).then((result) => {
                                     resolve(result)
 
                                 }).catch((error) => {

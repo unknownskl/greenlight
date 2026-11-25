@@ -12,6 +12,7 @@ import { installNetworkFilter, allowedAddresses, getSelectedRoute, NetworkMode }
 import { useTranslation } from 'react-i18next'
 import { addFramerateToSdp, FrameLimiter, VideoSize } from '../../lib/frameLimiter'
 import { MotionSmoother } from '../../lib/motionSmoother'
+import { applyCodecPreferences, getActiveCodec, getFramesDecoded, VideoCodecChoice } from '../../lib/videoCodec'
 
 function Stream() {
     const router = useRouter()
@@ -82,6 +83,40 @@ function Stream() {
             restore()
         }
     }, [networkMode])
+
+    // Warn if routes added by Settings > Network > Bypass VPN are no longer taking effect
+    React.useEffect(() => {
+        Ipc.send('network', 'getVpnBypass').then((state: any) => {
+            const stale = (state?.routes || []).filter((r: any) => r.viaVpn === true)
+            if (stale.length > 0) {
+                // The stream holder only exists once the player has started, so wait for it
+                let tries = 0
+                const timer = setInterval(() => {
+                    if (document.getElementById('streamComponent') || ++tries > 60) {
+                        clearInterval(timer)
+                        if (document.getElementById('streamComponent')) notify()
+                    }
+                }, 1000)
+            }
+            function notify() {
+                showStreamNotice(t('streamWindow.noticeBypassNotActive', {
+                    defaultValue: 'VPN bypass is set up but {{targets}} still routes through the VPN. Re-apply it in Settings > Network.',
+                    targets: stale.map((r: any) => r.target).join(', '),
+                }))
+            }
+        }).catch(() => undefined)
+    }, [])
+
+    // Short notice shown over the stream (below the toolbar) for ~12 seconds
+    function showStreamNotice(text: string) {
+        const holder = document.getElementById('streamComponent')
+        if (!holder) return
+        const notice = document.createElement('div')
+        notice.className = 'stream-notice'
+        notice.textContent = text
+        holder.appendChild(notice)
+        setTimeout(() => notice.remove(), 12000)
+    }
 
     function errorToText(error: any): string {
         if (error === undefined || error === null) return ''
@@ -159,7 +194,13 @@ function Stream() {
                 xPlayer.setVideoBitrate((streamType === 'cloud') ? settings.xcloud_bitrate : settings.xhome_bitrate)
             }
 
-            if(settings.video_profiles.length > 0){
+            // Settings > Video: preferred codec. H.264 always stays in the list as a fallback.
+            const videoCodec = (settings.video_codec || 'auto') as VideoCodecChoice
+            if(videoCodec !== 'auto'){
+                // Our own codec order (H.265 / AV1 first). The player's setCodecPreferences only
+                // supports a single codec type, so we don't use it here.
+                applyCodecPreferences(xPlayer._webrtcClient, videoCodec, settings.video_profiles || [])
+            } else if(settings.video_profiles.length > 0){
                 xPlayer.setCodecPreferences('video/H264', { profiles: settings.video_profiles || [] }) // 4d = high, 42e = mid, 420 = low
             }
 
@@ -248,6 +289,24 @@ function Stream() {
                             }
                         }
 
+                        // Log which codec the server picked (shown in the motion smoothing badge too)
+                        setTimeout(() => {
+                            getActiveCodec(xPlayer._webrtcClient).then((codec) => {
+                                console.log('[codec] Server is streaming with:', codec, '(requested:', settings.video_codec || 'auto', ')')
+                                if (codec) document.getElementById('streamComponent')?.setAttribute('data-codec', codec)
+                            }).catch(() => undefined)
+                        }, 2000)
+
+                        // H.265 is experimental: if it negotiated but no picture arrives, tell the user
+                        setTimeout(() => {
+                            Promise.all([getActiveCodec(xPlayer._webrtcClient), getFramesDecoded(xPlayer._webrtcClient)]).then(([codec, frames]) => {
+                                if (codec === 'H265' && frames === 0) {
+                                    console.warn('[codec] H.265 stream is connected but no frames were decoded')
+                                    alert(t('errors.codecNoVideo'))
+                                }
+                            }).catch(() => undefined)
+                        }, 6000)
+
                         // Record which network path the stream is using
                         getSelectedRoute(xPlayer._webrtcClient, allowedRef.current).then((route) => {
                             if (!route) return
@@ -259,6 +318,9 @@ function Stream() {
                             }
                             if (route.onSelectedInterface === false) {
                                 console.warn('[network] Stream is NOT using the selected interface:', networkMode, route)
+                                // Typical cause: a full-tunnel VPN (e.g. a company VPN) that routes all traffic,
+                                // including traffic from the Wi-Fi / LAN socket. Apps cannot override that.
+                                showStreamNotice(t('streamWindow.noticeNotOnSelectedNetwork', { type: t('settings.network.type.' + networkMode) }))
                             }
                         }).catch((error) => {
                             console.log('[network] Unable to read selected route:', error)
