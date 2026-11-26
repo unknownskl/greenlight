@@ -5,6 +5,11 @@ description: Changelogs
 
 ### Changelog
 
+## v2.4.3 - 2026-xx-xx
+- Add effect over xCloud title to show entitlement (credits to @davidcollom) #1670
+- Optimized catalog search, added caching of titles and game pass filter (credits to @vishalrao8) #1681
+- Added polish language (credits to @plfrmr) #1691
+
 ## v2.4.2 - 2026-04-24
 - Fix frontend error message when token was expired #1581
 - Added German language (credits to @crt0mega) #1567
