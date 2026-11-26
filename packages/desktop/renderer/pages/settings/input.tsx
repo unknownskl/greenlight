@@ -3,8 +3,10 @@ import Head from 'next/head'
 
 import SettingsSidebar from '../../components/settings/sidebar'
 import Card from '../../components/ui/card'
+import Button from '../../components/ui/button'
 
 import { useSettings } from '../../context/userContext'
+import { defaultSettings } from '../../context/userContext.defaults'
 
 import { useTranslation } from 'react-i18next'
 
@@ -154,6 +156,21 @@ function SettingsInput() {
         })
     }
 
+    function resetDefaults(){
+        if(!confirm(t('settings.common.resetDefaultsConfirm'))) return
+
+        const cfg = { ...defaultSettings.input_mousekeyboard_config }
+        setControllerKeys(cfg)
+        setSettings({
+            ...settings,
+            controller_vibration: defaultSettings.controller_vibration,
+            input_touch: defaultSettings.input_touch,
+            input_mousekeyboard: defaultSettings.input_mousekeyboard,
+            input_newgamepad: defaultSettings.input_newgamepad,
+            input_mousekeyboard_config: cfg,
+        })
+    }
+
     return (
         <React.Fragment>
             <Head>
@@ -166,31 +183,31 @@ function SettingsInput() {
 
                     <p>
                         <label>{t('settings.input.enableVibration')}</label>
-                        <label style={{ minWidth: 0 }}>
-                            <input type='checkbox' onChange={ setControllerVibration } checked={settings.controller_vibration} />&nbsp; ({ settings.controller_vibration ? t('settings.input.enabledLabel') : t('settings.input.disabledLabel')})
-                        </label>
+                        <span style={{ minWidth: 0 }}>
+                            <input type='checkbox' aria-label={t('settings.input.enableVibration')} onChange={ setControllerVibration } checked={settings.controller_vibration} />
+                        </span>
                     </p>
 
                     <p>
                         <label>{t('settings.input.enableTouch')}</label>
-                        <label style={{ minWidth: 0 }}>
-                            <input type='checkbox' onChange={ setTouchInput } checked={settings.input_touch} />&nbsp; ({ settings.input_touch ? t('settings.input.enabledLabel') : t('settings.input.disabledLabel')})
-                        </label>
+                        <span style={{ minWidth: 0 }}>
+                            <input type='checkbox' aria-label={t('settings.input.enableTouch')} onChange={ setTouchInput } checked={settings.input_touch} />
+                        </span>
                     </p>
 
                     <p>
                         <label>{t('settings.input.enableMouseKeyboard')}</label>
-                        <label style={{ minWidth: 0 }}>
-                            <input type='checkbox' onChange={ setMKBInput } checked={settings.input_mousekeyboard} />&nbsp; ({ settings.input_mousekeyboard ? t('settings.input.enabledLabel') : t('settings.input.disabledLabel')})
-                        </label> <br />
+                        <span style={{ minWidth: 0 }}>
+                            <input type='checkbox' aria-label={t('settings.input.enableMouseKeyboard')} onChange={ setMKBInput } checked={settings.input_mousekeyboard} />
+                        </span> <br />
                         { (!settings.input_newgamepad && settings.input_mousekeyboard) ? <small style={{ color: 'orange' }}>{t('settings.input.legacyWarning')}</small> : '' }
                     </p>
 
                     <p>
                         <label>{t('settings.input.enableLegacy')}</label>
-                        <label style={{ minWidth: 0 }}>
-                            <input type='checkbox' onChange={ setLegacyInput } checked={!settings.input_newgamepad} />&nbsp; ({ !settings.input_newgamepad ? t('settings.input.enabledLabel') : t('settings.input.disabledLabel')})
-                        </label><br />
+                        <span style={{ minWidth: 0 }}>
+                            <input type='checkbox' aria-label={t('settings.input.enableLegacy')} onChange={ setLegacyInput } checked={!settings.input_newgamepad} />
+                        </span><br />
                         <small>{t('settings.input.enableLegacyDescription')}</small>
                     </p>
                 </Card>
@@ -226,6 +243,10 @@ function SettingsInput() {
                         }
                     </p>
                 </Card>
+
+                <p style={{ textAlign: 'right' }}>
+                    <Button onClick={ resetDefaults } className='btn-small' label={ t('settings.common.resetDefaultsBtn') }></Button>
+                </p>
             </SettingsSidebar>
 
 

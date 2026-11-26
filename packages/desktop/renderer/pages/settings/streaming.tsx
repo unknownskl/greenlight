@@ -3,11 +3,13 @@ import Head from 'next/head'
 
 import SettingsSidebar from '../../components/settings/sidebar'
 import Card from '../../components/ui/card'
+import Button from '../../components/ui/button'
 import Ipc from '../../lib/ipc'
 
 import { useTranslation } from 'react-i18next'
 
 import { useSettings } from '../../context/userContext'
+import { defaultSettings } from '../../context/userContext.defaults'
 
 
 function SettingsStreaming() {
@@ -17,6 +19,19 @@ function SettingsStreaming() {
     React.useEffect(() => {
     //
     })
+
+    function resetDefaults(){
+        if(!confirm(t('settings.common.resetDefaultsConfirm'))) return
+
+        const keys = ['xcloud_bitrate', 'xhome_bitrate', 'xcloud_show_non_entitled', 'video_profiles', 'force_region_ip', 'preferred_game_language']
+        const reset = {}
+        keys.forEach((k) => { reset[k] = defaultSettings[k] })
+        setSettings({ ...settings, ...reset })
+
+        // Re-apply the side effects handled by the main process
+        Ipc.send('app', 'setForceRegionIp', { ip: defaultSettings.force_region_ip })
+        Ipc.send('app', 'setPreferredGameLanguage', { language: defaultSettings.preferred_game_language })
+    }
 
     function setxCloudBitrate(e){
         console.log('Set xCloud bitrate to:', e.target.value)
@@ -88,12 +103,12 @@ function SettingsStreaming() {
 
                         <label>{t('settings.streaming.xCloudStreamingBitrateLabel')}</label>
                         <input type="range" min="0" max="40960" step="1024" value={settings.xcloud_bitrate} onChange={ setxCloudBitrate } />
-                ({ settings.xcloud_bitrate === 0 ? t('settings.streaming.unlimitedLabel') : Math.floor(settings.xcloud_bitrate / 1024) + ' ' + t('settings.streaming.mbpsLabel') })
+                        <span style={{ display: 'block', marginTop: 4 }}>{ settings.xcloud_bitrate === 0 ? t('settings.streaming.unlimitedLabel') : Math.floor(settings.xcloud_bitrate / 1024) + ' ' + t('settings.streaming.mbpsLabel') }</span>
                     </p>
                     <p>
                         <label>{t('settings.streaming.xHomeStreamingBitrateLabel')}</label>
                         <input type="range" min="0" max="40960" step="1024" value={settings.xhome_bitrate} onChange={ setxHomeBitrate } />
-                ({ settings.xhome_bitrate === 0 ? t('settings.streaming.unlimitedLabel') : Math.floor(settings.xhome_bitrate / 1024) + ' ' + t('settings.streaming.mbpsLabel') })
+                        <span style={{ display: 'block', marginTop: 4 }}>{ settings.xhome_bitrate === 0 ? t('settings.streaming.unlimitedLabel') : Math.floor(settings.xhome_bitrate / 1024) + ' ' + t('settings.streaming.mbpsLabel') }</span>
                     </p>
 
                     <p>
@@ -109,6 +124,7 @@ function SettingsStreaming() {
                             <option value="42e">{t('settings.streaming.setH264ProfileValueMedium')}</option>
                             <option value="420">{t('settings.streaming.setH264ProfileValueLow')}</option>
                         </select>
+                        <br /><small>{t('settings.streaming.setH264ProfileDescription')}</small>
                     </p>
 
                 </Card>
@@ -127,6 +143,7 @@ function SettingsStreaming() {
                             <option value="203.253.64.1">{t('settings.streaming.setRegionValueKorea')}</option>
                             <option value="4.2.2.2">{t('settings.streaming.setRegionValueUS')}</option>
                         </select>
+                        <br /><small>{t('settings.streaming.setRegionDescription')}</small>
                     </p>
                     <p>
                         <label>{t('settings.streaming.preferredGameLanguageLabel')}</label>
@@ -172,6 +189,10 @@ function SettingsStreaming() {
                         })()}
                     </p>
                 </Card>
+
+                <p style={{ textAlign: 'right' }}>
+                    <Button onClick={ resetDefaults } className='btn-small' label={ t('settings.common.resetDefaultsBtn') }></Button>
+                </p>
             </SettingsSidebar>
 
 
