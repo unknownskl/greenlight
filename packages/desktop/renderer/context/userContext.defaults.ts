@@ -39,6 +39,7 @@ export const defaultSettings = {
 
     video_enabled: true,
     audio_enabled: true,
+    mic_device_id: '', // empty = system default microphone
 
     // WebUI
     webui_autostart: false,
