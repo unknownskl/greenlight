@@ -2,6 +2,7 @@ import React from 'react'
 import Loader from './loader'
 import Card from './card'
 import Button from './button'
+import ProgressBar from './progressbar'
 import { useTranslation } from 'react-i18next'
 
 interface StreamPreloadProps {
@@ -14,46 +15,23 @@ function StreamPreload({
     waitingTime = 0,
 }: StreamPreloadProps) {
     const { t } = useTranslation()
-    const [waitingSeconds, setWaitingSeconds] = React.useState(-1)
-    // console.log('outeffect', waitingTime, waitingSeconds)
+    const [waitingSeconds, setWaitingSeconds] = React.useState(waitingTime)
 
-    if(waitingSeconds < 0 && waitingTime > 0){
-        // console.log('setWaitingSeconds', waitingTime)
-        setWaitingSeconds(waitingTime)
-
-    } else if(waitingSeconds > 0){
-        // console.log('drawWaitingTimes', waitingSeconds)
-        drawWaitingTimes(waitingSeconds)
-    }
-
+    // One countdown per queue estimate (it used to start a new interval on every render)
     React.useEffect(() => {
-
-        return () => {
-
+        setWaitingSeconds(waitingTime)
+        if(waitingTime <= 0){
+            return
         }
-    }, [])
-
-    function drawWaitingTimes(seconds){
-        const formattedWaitingTime = formatWaitingTime(seconds)
-        const html = '<div>' + t("streamWindow.estimatedWaitingTimeMessage") + ' ' + '<span id="component_streamcomponent_waitingtimes_seconds">'+formattedWaitingTime+'</span></div>'
-
-        document.getElementById('component_streamcomponent_waitingtimes').innerHTML = html
 
         const secondsInterval = setInterval(() => {
-            seconds--
-            setWaitingSeconds(seconds)
-
-            if(document.getElementById('component_streamcomponent_waitingtimes_seconds') !== null){
-                document.getElementById('component_streamcomponent_waitingtimes_seconds').innerText = formatWaitingTime(seconds)
-            } else {
-                clearInterval(secondsInterval)
-            }
-
-            if(seconds === 0){
-                clearInterval(secondsInterval)
-            }
+            setWaitingSeconds((seconds) => Math.max(seconds - 1, 0))
         }, 1000)
-    }
+
+        return () => {
+            clearInterval(secondsInterval)
+        }
+    }, [waitingTime])
 
     function streamDisconnect(){
         window.history.back()
@@ -86,11 +64,13 @@ function StreamPreload({
         }
 
         if(seconds === 0){
-            formattedText += t('streamWindow.itsTakingALittleLonger')
+            formattedText += ' ' + t('streamWindow.itsTakingALittleLonger')
         }
 
         return formattedText
     }
+
+    const queueProgress = (waitingTime > 0) ? Math.round((waitingTime - waitingSeconds) / waitingTime * 100) : 0
 
     return (
         <React.Fragment>
@@ -107,7 +87,12 @@ function StreamPreload({
                         <p>{t("streamWindow.gettingStreamReadyMessage")}</p>
                         <p id="component_streamcomponent_connectionstatus"></p>
 
-                        <p id="component_streamcomponent_waitingtimes"></p>
+                        { waitingTime > 0 &&
+                            <div id="component_streamcomponent_waitingtimes">
+                                <p>{t("streamWindow.estimatedWaitingTimeMessage")} {formatWaitingTime(waitingSeconds)}</p>
+                                <ProgressBar value={ queueProgress }>{ queueProgress }%</ProgressBar>
+                            </div>
+                        }
                     </Card>
                 </div>
 
