@@ -35,9 +35,22 @@ function assetUrl(path: string): string {
 let closed = false
 const NOTHING: OcrResult = { text: '', confidence: 0, lines: [] }
 
-// Settles when the reader is shut down. The library does not settle a reading that is sent to a reader that has been shut down
-// (it only drops an error that nobody can catch: "Cannot read properties of null (reading 'postMessage')"), so a reading that is
-// waiting for the reader gives up when this settles, and the reader is not left in use for ever.
+// The calls into the library that are under way. The library's reader must not be shut down while there is one: recognize()
+// prepares the picture first (that takes a while) and only then writes to its worker, and when the worker is gone by then the
+// library drops an error that nobody can catch ("Cannot read properties of null (reading 'postMessage')") and never settles
+// the call. So the shutdown waits for them (see shutDownReader), at most this long.
+const running = new Set<Promise<unknown>>()
+const SHUTDOWN_WAIT = 20000
+
+function track<T>(call: Promise<T>): Promise<T> {
+    running.add(call)
+    const done = () => { running.delete(call) }
+    call.then(done, done)
+    return call
+}
+
+// Settles when the reader is shut down: a reading that is waiting for the reader gives up at once (its answer is not wanted
+// any more), and the reader is not left in use.
 type Abort = Promise<'aborted'>
 let abortReading: () => void = () => { /* replaced below */ }
 let aborted: Abort = new Promise((resolve) => { abortReading = () => resolve('aborted') })
@@ -54,8 +67,8 @@ function makeOcrWorker(language: string): Promise<Worker> {
     const code = SOURCE_LANGUAGES[language] ? language : 'en'
 
     if(workerPromise !== null && workerLanguage !== code){
-        // The reading language was changed: the old reader is not needed any more
-        void terminateOcr()
+        // The reading language was changed: the old reader is not needed any more (the reading goes on with a new one)
+        void shutDownReader()
     }
 
     if(workerPromise === null){
@@ -171,7 +184,7 @@ export async function recognizeCanvas(canvas: HTMLCanvasElement, language = 'en'
         }
 
         if(currentLayout !== layout){
-            const outcome = await Promise.race([worker.setParameters({ tessedit_pageseg_mode: (layout === 'page' ? '3' : '6') as any }), mine])
+            const outcome = await Promise.race([track(worker.setParameters({ tessedit_pageseg_mode: (layout === 'page' ? '3' : '6') as any })), mine])
             if(outcome === 'aborted' || mine !== aborted){
                 return NOTHING
             }
@@ -195,7 +208,7 @@ export async function recognizeCanvas(canvas: HTMLCanvasElement, language = 'en'
 }
 
 async function readCanvas(worker: Worker, canvas: HTMLCanvasElement, maxGap: number): Promise<OcrResult> {
-    const result = await worker.recognize(canvas, {}, { text: true, blocks: true })
+    const result = await track(worker.recognize(canvas, {}, { text: true, blocks: true }))
 
     const lines: OcrLine[] = []
 
@@ -258,8 +271,13 @@ async function readCanvas(worker: Worker, canvas: HTMLCanvasElement, maxGap: num
     return { text: lines.map(line => line.text).join('\n'), confidence, lines }
 }
 
-export async function terminateOcr(): Promise<void> {
+/** The stream is closed: nothing reads any more. */
+export function terminateOcr(): Promise<void> {
     closed = true
+    return shutDownReader()
+}
+
+async function shutDownReader(): Promise<void> {
     // The readings that wait for the reader give up (and the next reader starts with a clean slate)
     abortReading()
     renewAbort()
@@ -269,9 +287,14 @@ export async function terminateOcr(): Promise<void> {
 
     const pending = workerPromise
     workerPromise = null
+    // Taken now: what is under way on this reader (nothing new is started on it from here on)
+    const busy = Array.from(running).map(call => call.catch(() => undefined))
 
     try {
         const worker = await pending
+        let timer: ReturnType<typeof setTimeout> | undefined
+        await Promise.race([Promise.all(busy), new Promise((resolve) => { timer = setTimeout(resolve, SHUTDOWN_WAIT) })])
+        clearTimeout(timer)
         await worker.terminate()
     } catch(error) {
         // Nothing to clean up
