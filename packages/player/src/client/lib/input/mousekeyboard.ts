@@ -125,6 +125,8 @@ export default class MouseKeyboard {
         if ('keyboard' in navigator && 'lock' in (navigator.keyboard as any)) {
             document.body.requestFullscreen().then(() => {
                 (navigator as any).keyboard.lock()
+            }).catch((error) => {
+                console.error('[MKB] Failed to request fullscreen for the keyboard lock:', error)
             })
         } else {
             console.log('[MKB] Keyboard lock is not supported. Error:', 'NotSupportedError')

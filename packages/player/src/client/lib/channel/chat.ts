@@ -14,6 +14,8 @@ export default class ChatChannel extends Channel {
             permissionStatus.onchange = () => {
                 this._micPermissions = permissionStatus.state
             }
+        }).catch((error) => {
+            console.error('[ChatChannel] Failed to query the microphone permission:', error)
         })
     }
 

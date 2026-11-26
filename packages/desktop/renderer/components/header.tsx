@@ -77,7 +77,7 @@ function Header({
         return headerLinks.map((link, idx) => (
             <li key={idx}>
                 <Link legacyBehavior href={link.url} key={link.url}>
-                    <a title={link.title} onClick={() => setMenuActive(idx)} className={idx === activeIndex ? 'active' : ''}>{link.name}</a>
+                    <a href={link.url} title={link.title} onClick={() => setMenuActive(idx)} className={idx === activeIndex ? 'active' : ''}>{link.name}</a>
                 </Link>
             </li>
         ));
@@ -102,9 +102,9 @@ function Header({
     return (
         <React.Fragment>
             <div id="component_header" className={hidden === true ? 'disabled' : ''}>
-                <a onClick={ confirmQuit } id="actionBarLogo" title={t('header.home')}>
+                <button type="button" onClick={ confirmQuit } id="actionBarLogo" title={t('header.home')}>
                     <i className="fa-brands fa-xbox"></i>
-                </a>
+                </button>
 
                 <ul className="menu">
                     { drawMenu() }

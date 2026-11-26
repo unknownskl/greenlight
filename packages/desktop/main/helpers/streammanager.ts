@@ -193,6 +193,8 @@ export default class StreamManager {
                             this.getSession(sessionId).waitingTimes = waitingTimes
                             this.getSession(sessionId).playerState = 'queued'
 
+                        }).catch((error) => {
+                            console.log('Streammanager - error getting waiting times:', sessionId, error)
                         })
                     }
                     

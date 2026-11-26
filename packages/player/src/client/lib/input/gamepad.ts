@@ -403,7 +403,9 @@ export default class Gamepad {
             rumbleData.leftTrigger = 0
             rumbleData.rightTrigger = 0
 
-            gamepad.vibrationActuator?.playEffect('dual-rumble', rumbleData)
+            gamepad.vibrationActuator?.playEffect('dual-rumble', rumbleData).catch((error) => {
+                console.error('[Gamepad] Failed to play the rumble effect:', error)
+            })
 
             clearInterval(this._rumbleInterval)
             if(report.repeat > 0) {
@@ -415,7 +417,9 @@ export default class Gamepad {
                     }
 
                     if(gamepad.vibrationActuator !== undefined) {
-                        gamepad.vibrationActuator?.playEffect('dual-rumble', rumbleData)
+                        gamepad.vibrationActuator?.playEffect('dual-rumble', rumbleData).catch((error) => {
+                            console.error('[Gamepad] Failed to play the rumble effect:', error)
+                        })
                     }
                     repeatCount--
 
