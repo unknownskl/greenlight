@@ -5,8 +5,11 @@
 @import 'components/header.css';
 @import 'components/footer.css';
 @import 'components/auth.css';
+@import 'components/gamepadnav.css';
+@import 'components/console/console.css';
+@import 'components/translator/translator.css';
 
-/* 
+/*
  * UI Components
  */
 @import 'components/ui/button.css';
@@ -27,16 +30,48 @@
 
 @import 'components/settings/sidebar.css';
 
-/*  
+/*
  * Pages
  */
 
 @import 'pages/xcloud/info/[titleid].css';
 @import 'pages/settings/home.css';
 
+/*
+ * Design tokens (console look: dark surfaces, Xbox green accent, big rounded tiles)
+ */
+:root {
+    --header-h: 70px;
+    --hints-h: 52px;
+
+    --bg: #0a0c0f;
+    --surface: rgba(255, 255, 255, 0.05);
+    --surface-hover: rgba(255, 255, 255, 0.09);
+    --surface-strong: rgba(20, 24, 28, 0.82);
+    --border: rgba(255, 255, 255, 0.09);
+
+    --text: #ffffff;
+    --text-dim: rgba(255, 255, 255, 0.66);
+    --text-faint: rgba(255, 255, 255, 0.4);
+
+    --accent: #107c10;
+    --accent-hi: #2fd12f;
+    --accent-glow: rgba(47, 209, 47, 0.45);
+    --warn: #f5a524;
+    --danger: #d83b3b;
+
+    --focus: #ffffff;
+    --focus-glow: rgba(47, 209, 47, 0.55);
+
+    --radius: 16px;
+    --radius-sm: 10px;
+    --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
 body, * {
     padding: 0px;
     margin: 0px;
+    box-sizing: border-box;
 
     -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Safari */
@@ -50,11 +85,16 @@ body, * {
     text-rendering: optimizeLegibility;
 }
 
+html {
+    background: var(--bg);
+}
+
 body {
-    background: rgb(26, 27, 30);
+    background: var(--bg);
     font-family: "Segoe UI",SegoeUI,"Helvetica Neue",Helvetica,Arial,sans-serif;
-    color: #ffffff;
-    text-shadow: 0px 2px 2px rgba(0,0,0,0.5);
+    color: var(--text);
+    text-shadow: 0px 2px 2px rgba(0,0,0,0.4);
+    overflow: hidden;
 }
 
 a {
@@ -65,39 +105,55 @@ p {
     vertical-align: middle;
 }
 
-div#app_body {
-    /* position: fixed; */
-    /* padding-top: 70px; */
-    /* left: 0px; */
-    width: 70vw;
+/* Background of the whole app */
+div.app_shell {
+    width: 100vw;
     height: 100vh;
-    /* bottom: 0px; */
+    overflow: hidden;
+    background:
+        radial-gradient(1100px 520px at 12% -12%, rgba(47, 209, 47, 0.22), transparent 62%),
+        radial-gradient(900px 480px at 105% 108%, rgba(0, 120, 215, 0.14), transparent 60%),
+        linear-gradient(180deg, #0f1317 0%, #090b0e 100%);
+}
+
+/* Page area (the content scrolls here, the header stays on top) */
+div#app_body {
+    width: 100vw;
+    height: 100vh;
     overflow-y: auto;
+    overflow-x: hidden;
+    padding-bottom: var(--hints-h);
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
 }
 
-div#app_body_container{
-    padding-top: 70px;
-    /* position: relative; */
+div#app_body_container {
+    padding-top: var(--header-h);
+    min-height: 100%;
+    animation: page-fade 0.3s ease-out;
 }
 
-div#app_sidebar {
-    position: fixed;
-    top: 70px;
-    right: 0px;
-    width: 30vw;
-    bottom: 0px;
-    overflow-y: auto;
-
-    backdrop-filter: blur(20px);
-    background: rgba(0, 0, 0, 0.3);
+@keyframes page-fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
+@keyframes page-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    div#app_body_container { animation: none; }
+}
+
+/* Page titles */
 h2.title {
-    font-weight: 400;
-    padding-top: 15px;
-    padding-left: 10px;
+    font-weight: 600;
+    padding: 22px 32px 0 32px;
     margin: 0px;
-    font-size: 20px;
+    font-size: 22px;
+    letter-spacing: 0.2px;
 }
 
 input.h2-search {
@@ -105,19 +161,21 @@ input.h2-search {
 }
 
 input.text {
-    background: #000000;
-    border-radius: 5px;
-    padding: 10px;
+    background: rgba(0, 0, 0, 0.45);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
     display: block;
     outline: none;
-    color: #ffffff;
+    color: var(--text);
     margin-right: 10px;
     min-width: 200px;
-    border: 2px solid #000000;
+    border: 2px solid var(--border);
+    font-size: 15px;
+    transition: border-color 0.15s ease;
 }
 
 input.text:focus {
-    border: 2px solid green;
+    border-color: var(--accent-hi);
 }
 
 /**
@@ -137,10 +195,10 @@ input.text:focus {
     width: 64px;
     height: 64px;
     margin: 8px;
-    border: 8px solid green;
+    border: 8px solid var(--accent-hi);
     border-radius: 50%;
     animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-    border-color: green transparent transparent transparent;
+    border-color: var(--accent-hi) transparent transparent transparent;
 }
 .lds-ring div:nth-child(1) {
     animation-delay: -0.45s;

@@ -75,6 +75,19 @@ function SettingsVideo() {
                     </p>
 
                     <p>
+                        <label>{t('settings.videoAudio.fullscreenLabel')}</label>
+                        <select value={settings.app_fullscreen || 'auto'} onChange={(e) => {
+                            setSettings({ ...settings, app_fullscreen: e.target.value })
+                        }}>
+                            <option value='auto'>{t('settings.videoAudio.fullscreenAuto')}</option>
+                            <option value='on'>{t('settings.videoAudio.fullscreenOn')}</option>
+                            <option value='off'>{t('settings.videoAudio.fullscreenOff')}</option>
+                        </select><br />
+                        <small>{t('settings.videoAudio.fullscreenDescription')}</small><br />
+                        <small>{t('settings.videoAudio.screenInfo')}: {window.screen.width}x{window.screen.height}</small>
+                    </p>
+
+                    <p>
                         <label>{t('settings.videoAudio.forceLowResLabel')}</label>
                         <label style={{ minWidth: 0 }}>
                             <input type='checkbox' onChange={ forceLowResolution } checked={settings.app_lowresolution} />&nbsp; ({ settings.app_lowresolution ? t('settings.videoAudio.enabledLabel') : t('settings.videoAudio.disabledLabel')})

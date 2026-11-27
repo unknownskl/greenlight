@@ -7,6 +7,8 @@ import { useSettings } from '../../context/userContext'
 import StreamComponent from '../../components/ui/streamcomponent'
 import StreamPreload from '../../components/ui/streampreload'
 import Ipc from '../../lib/ipc'
+import GreenlightGamepadDriver from '../../lib/gamepad/driver'
+import applyMouseSensitivity from '../../lib/mousesensitivity'
 import { useTranslation } from 'react-i18next'
 
 function Stream() {
@@ -21,7 +23,18 @@ function Stream() {
     const [sessionId, setSessionId] = React.useState('')
     const [queueTime, setQueueTime] = React.useState(0)
 
+    // The settings are read through a ref: changing a setting while streaming (for example turning the
+    // translator on) must not restart this effect, because its cleanup closes the stream
+    const settingsRef = React.useRef(settings)
+    settingsRef.current = settings
+
     React.useEffect(() => {
+        const settings = settingsRef.current
+
+        if(router.query.serverid === undefined){
+            return
+        }
+
         // Detect stream type and title / server id
         let streamType = 'home'
         let serverId = router.query.serverid
@@ -171,15 +184,40 @@ function Stream() {
                             clearInterval(streamStateInterval)
 
                             // Start xPlayer interface
-                            setxPlayer(new xCloudPlayer('streamComponent', {
+                            // Custom gamepad driver: merges all connected controllers into one stable gamepad
+                            // and lets the user open the Greenlight menu with LB + RB + View + Menu (hold).
+                            const emulateKeyboardMouse = settings.input_kbm_emulation === true
+                            const gamepadDriver = new GreenlightGamepadDriver({
+                                keyboardMouse: emulateKeyboardMouse,
+                                sensitivity: settings.input_kbm_sensitivity,
+                                rumbleStrength: settings.input_rumble_strength,
+                            })
+                            gamepadDriver.onChord = () => {
+                                window.dispatchEvent(new Event('greenlight-gamepad-menu'))
+                            }
+                            gamepadDriver.onTranslatorToggle = () => {
+                                window.dispatchEvent(new Event('greenlight-translator-toggle'))
+                            }
+                            gamepadDriver.onTranslatorArea = () => {
+                                window.dispatchEvent(new Event('greenlight-translator-area'))
+                            }
+
+                            const player = new xCloudPlayer('streamComponent', {
                                 ui_systemui: [],
+                                input_driver: gamepadDriver,
                                 input_touch: settings.input_touch || false,
-                                input_mousekeyboard: settings.input_mousekeyboard || false,
+                                // The keyboard / mouse emulation handles every key itself, so the player's own mapping is switched off
+                                input_mousekeyboard: emulateKeyboardMouse ? false : (settings.input_mousekeyboard || false),
                                 input_legacykeyboard: (settings.input_newgamepad) ? false : true,
-                                input_mousekeyboard_config: settings.input_mousekeyboard_config !== undefined ? {
+                                input_mousekeyboard_config: emulateKeyboardMouse ? {
+                                    _keymapping: {},
+                                } as any : (settings.input_mousekeyboard_config !== undefined ? {
                                     _keymapping: settings.input_mousekeyboard_config,
-                                } : undefined as any,
-                            }))
+                                } : undefined as any),
+                            })
+                            // Speed of the mouse in the Mouse & Keyboard mode
+                            applyMouseSensitivity(player, settings.input_mouse_sensitivity)
+                            setxPlayer(player)
                             break
 
                         case 'failed':
@@ -229,7 +267,7 @@ function Stream() {
                 clearInterval(streamStateInterval)
             }
         }
-    })
+    }, [xPlayer, sessionId, router.query.serverid])
 
     function gamepadSend(button){
         console.log('Pressed button:', button)

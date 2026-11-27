@@ -1,28 +1,20 @@
+/* Top bar: logo, sections, profile and clock */
 #component_header {
-    backdrop-filter: blur(20px);
-
-    background: rgba(0, 0, 0, 0.1);
     position: fixed;
     top: 0px;
     left: 0px;
     right: 0px;
-    height: 70px;
-    overflow: hidden;
+    height: var(--header-h);
     z-index: 80;
-    opacity: 1;
 
-    -webkit-transition: all 0.3s ease-in-out;
-    -moz-transition: all 0.3s ease-in-out;
-    -ms-transition: all 0.3s ease-in-out;
-    -o-transition: all 0.3s ease-in-out;
-    transition: all 0.3s ease-in-out;
-    
-    /* -webkit-transition: all 1s linear;
-    -moz-transition: all 1s linear;
-    -o-transition: all 1s linear;
-    transition: all 1s linear; */
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 28px 0 12px;
 
-    box-shadow: 0px 10px 20px rgb(0 0 0 / 20%);
+    background: linear-gradient(180deg, rgba(8, 10, 12, 0.92) 0%, rgba(8, 10, 12, 0.7) 70%, rgba(8, 10, 12, 0) 100%);
+    backdrop-filter: blur(18px);
+    transition: opacity 0.3s ease-in-out;
 }
 
 #component_header.disabled {
@@ -30,76 +22,123 @@
 }
 
 #component_header a#actionBarLogo {
-    float: left;
-    color: #ffffff;
-}
-#component_header a#actionBarLogo svg {
-    fill: #ffffff;
-    padding: 19px;
-    opacity: 0.5;
-    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    color: var(--accent-hi);
     cursor: pointer;
+    flex: none;
+    transition: background 0.2s ease, transform 0.2s var(--ease);
 }
 
 #component_header a#actionBarLogo i {
-    fill: #ffffff;
-    padding: 19px;
-    opacity: 0.5;
-    transition: 0.3s;
-    font-size: 34px;
-    cursor: pointer;
+    font-size: 30px;
+    filter: drop-shadow(0 0 10px var(--accent-glow));
 }
 
-#component_header a#actionBarLogo:hover img, #component_header a#actionBarLogo:hover svg, #component_header a#actionBarLogo:hover i {
-    opacity: 1;
+#component_header a#actionBarLogo:hover {
+    background: var(--surface-hover);
+    transform: scale(1.06);
 }
 
-
-#component_header ul {
-    float: left;
+/* Sections */
+#component_header ul.menu {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    gap: 6px;
     margin: 0px;
     padding: 0px;
-    padding-top: 14px;
+    list-style: none;
 }
 
-#component_header ul.userProfile {
-    float: right;
-    margin: 0px;
-    padding: 0px;
-    padding-top: 14px;
+#component_header ul.menu li {
+    display: block;
 }
 
-#component_header ul li {
-    display: inline-block;
-    padding-right: 10px;
-}
-
-#component_header ul li a {
-    display: inline-block;
-    color: #ffffff;
+#component_header ul.menu li a {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 10px 20px;
+    border-radius: 999px;
+    color: var(--text-dim);
+    font-size: 16px;
+    font-weight: 600;
     text-decoration: none;
-    padding: 10px;
-    opacity: 0.7;
-    transition: 0.3s;
+    white-space: nowrap;
+    transition: background 0.2s ease, color 0.2s ease, transform 0.2s var(--ease);
 }
 
-#component_header ul li a.active {
-    opacity: 1;
-    border-bottom: 2px solid green;
+#component_header ul.menu li a i {
+    font-size: 15px;
+    opacity: 0.85;
 }
 
-#component_header ul li a:hover {
-    opacity: 1;
+#component_header ul.menu li a:hover {
+    color: var(--text);
+    background: var(--surface-hover);
 }
 
-#component_header ul.userProfile span.gamerscore {
-    color: #222222;
-    background: #ffcf40;
-    display: inline-block;
-    border-radius: 10px;
+#component_header ul.menu li a.active {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.14);
+    box-shadow: inset 0 -3px 0 var(--accent-hi);
+}
+
+/* Profile sits on the right side of the bar */
+#component_header ul.menu li.header-profile {
+    margin-left: auto;
+}
+
+#component_header ul.menu li.header-profile a {
+    padding: 5px 18px 5px 6px;
+}
+
+#component_header img.header-gamerpic {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    background: #222222;
+}
+
+/* Gamerscore + clock */
+#component_header div.header-status {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex: none;
+    padding-left: 6px;
+    font-size: 15px;
+    color: var(--text-dim);
+}
+
+#component_header span.header-gamerscore {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+#component_header span.header-gamerscore b {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     width: 20px;
     height: 20px;
-    text-align: center;
-    font-size: 15px;
-    font-weight: bold;
+    border-radius: 50%;
+    font-size: 12px;
+    color: #222222;
+    background: #ffcf40;
+    text-shadow: none;
+}
+
+#component_header span.header-clock {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    color: var(--text);
 }

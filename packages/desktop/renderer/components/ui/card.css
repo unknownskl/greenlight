@@ -1,20 +1,17 @@
 div.component_card {
-    margin-left: 20px;
-    margin-right: 20px;
-    margin-bottom: 20px;
+    margin: 0 28px 24px 28px;
 
-    padding-top: 20px;
-    padding-left: 20px;
-    padding-right: 20px;
-    border-radius: 20px;
+    padding: 24px 28px;
+    border-radius: var(--radius);
 
-    backdrop-filter: blur(20px);
-    background: rgba(0, 0, 0, 0.3);
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.03) 100%);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(14px);
     max-width: 100%;
 }
 
 div.component_card.padbottom {
-    padding-bottom: 20px;
+    padding-bottom: 24px;
 }
 
 div.component_card.fixedsize {
@@ -26,25 +23,26 @@ div.component_card.fullsize {
 }
 
 div.component_card h1 {
-    font-weight: normal;
+    font-weight: 600;
     font-size: 20px;
-    padding-bottom: 5px;
+    padding-bottom: 8px;
 }
 
 div.component_card h2 {
-    font-weight: normal;
+    font-weight: 600;
     font-size: 16px;
     padding-bottom: 5px;
 }
 
 div.component_card h2.grey {
-    opacity: 0.25;
+    opacity: 0.35;
 }
 
 div.component_card p {
     padding-bottom: 10px;
     font-size: 15px;
-    opacity: 0.7;
+    line-height: 1.45;
+    color: var(--text-dim);
 }
 
 div.component_card input.card_input_text_transparent {

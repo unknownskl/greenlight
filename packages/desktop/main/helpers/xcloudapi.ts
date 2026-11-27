@@ -306,7 +306,8 @@ export default class xCloudApi {
         })
     }
 
-    sendIce(sessionId:string, ice:any){
+    // remotePort: port on the public IP of the console's network that is forwarded to the console (default 9002).
+    sendIce(sessionId:string, ice:any, remotePort = 9002){
         return new Promise((resolve, reject) => {
             const postData = {
                 'messageType': 'iceCandidate',
@@ -329,7 +330,7 @@ export default class xCloudApi {
                             const teredo = address.inspectTeredo()
 
                             computedCandidates.push({
-                                candidate: 'a=candidate:10 1 UDP 1 '+teredo.client4+' 9002 typ host ',
+                                candidate: 'a=candidate:10 1 UDP 1 '+teredo.client4+' '+remotePort+' typ host ',
                                 messageType: 'iceCandidate',
                                 sdpMLineIndex: '0',
                                 sdpMid: '0',

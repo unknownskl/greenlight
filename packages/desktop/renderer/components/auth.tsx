@@ -1,5 +1,6 @@
 import React from 'react'
 import Ipc from '../lib/ipc'
+import { confirmDialog } from '../lib/gamepad/dialog'
 import Image from 'next/image'
 
 import Card from '../components/ui/card'
@@ -30,15 +31,19 @@ function Auth({
     }
 
     function logout(){
-        if(confirm(t('auth.logoutQuestion'))){
-            Ipc.send('app', 'clearData')
-        }
+        confirmDialog(t('auth.logoutQuestion'), t('gamepad.yes'), t('gamepad.no')).then((confirmed) => {
+            if(confirmed){
+                Ipc.send('app', 'clearData')
+            }
+        }).catch(() => undefined)
     }
 
     function clearData(){
-        if(confirm(t('auth.clearDataQuestion'))){
-            Ipc.send('app', 'clearData')
-        }
+        confirmDialog(t('auth.clearDataQuestion'), t('gamepad.yes'), t('gamepad.no')).then((confirmed) => {
+            if(confirmed){
+                Ipc.send('app', 'clearData')
+            }
+        }).catch(() => undefined)
     }
 
     return (

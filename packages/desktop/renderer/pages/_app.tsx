@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation'
 import Header from '../components/header'
 import Footer from '../components/footer'
 import Auth from '../components/auth'
-import SidebarFriends from '../components/sidebar/friends'
+import GamepadNav from '../components/gamepadnav'
 import '../lib/i18n'
 
 import { UserProvider } from '../context/userContext'
@@ -109,7 +109,7 @@ export default function MyApp({ Component, pageProps }) {
     if(loggedIn && prevUserState.gamertag !== ''){
         appBody = (
             <React.Fragment>
-                <Header gamertag={ prevUserState.gamertag } level={ parseInt(prevUserState.level) } />
+                <Header gamertag={ prevUserState.gamertag } gamerpic={ prevUserState.gamerpic } gamerscore={ prevUserState.gamerscore } level={ parseInt(prevUserState.level) } />
 
                 <div id="app_body">
                     <div id="app_body_container">
@@ -117,11 +117,6 @@ export default function MyApp({ Component, pageProps }) {
                     </div>
                 </div>
 
-                <div id="app_sidebar" style={{
-                    display: 'block',
-                }}>
-                    <SidebarFriends></SidebarFriends>
-                </div>
                 <Footer />
             </React.Fragment>)
 
@@ -138,18 +133,12 @@ export default function MyApp({ Component, pageProps }) {
                 <title>Greenlight</title>
             </Head>
 
-            <div style={ {
-                background: 'linear-gradient(0deg, rgba(26,27,30,1) 0%, rgba(26,27,30,1) 25%, rgba(0,212,255,0) 100%), url(\'/images/backgrounds/background1.jpeg\') fixed',
-                backgroundPosition: 'center',
-                backgroundRepeat: 'no-repeat',
-                backgroundSize: 'cover',
-                width: '100vw',
-                height: '100vh',
-            }}>
+            <div className="app_shell">
                 <QueryClientProvider client={queryClient}>
                     <LanguageProvider>
                         <UserProvider>
                             {appBody}
+                            <GamepadNav />
                         </UserProvider>
                     </LanguageProvider>
                 </QueryClientProvider>

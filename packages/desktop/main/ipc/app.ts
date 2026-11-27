@@ -1,6 +1,7 @@
 import IpcBase from './base'
 import { session } from 'electron'
 import electron from 'electron'
+import Translator, { TranslateArgs } from '../helpers/translator'
 
 interface setForceRegionIpArgs {
     ip:string;
@@ -11,6 +12,12 @@ interface setPreferredGameLanguageArgs {
 }
 
 export default class IpcApp extends IpcBase {
+    _translator = new Translator()
+
+    translateText(args:TranslateArgs){
+        return this._translator.translate(args)
+    }
+
     // _streamingSessions:any = {}
 
     loadCachedUser(){

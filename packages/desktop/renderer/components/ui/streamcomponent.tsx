@@ -6,12 +6,76 @@ import Loader from './loader'
 import Card from './card'
 import uPlot from 'uplot'
 import Ipc from '../../lib/ipc'
+import { gamepadState, pushBackHandler } from '../../lib/gamepad/state'
+import { confirmDialog } from '../../lib/gamepad/dialog'
 import { useTranslation } from 'react-i18next'
+import { useSettings } from '../../context/userContext'
+import TranslatorOverlay, { TRANSLATOR_EDIT_EVENT } from '../translator/translatoroverlay'
+import { getRegions, regionsToSettings } from '../../lib/translator/geometry'
+import { isLocalInstalled, subscribeLocal } from '../../lib/translator/local'
+import { localEngine, localMode } from '../../lib/translator/translate'
 
 interface StreamComponentProps {
     onDisconnect?: () => void;
     onMenu?: () => void;
     xPlayer: xPlayer;
+}
+
+function escapeHtml(text: string): string {
+    return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+}
+
+// A value of the statistics as text (some of them are objects, which would show up as "[object Object]")
+function formatStat(value: any): string {
+    if(value !== null && typeof value === 'object'){
+        try {
+            return JSON.stringify(value)
+        } catch(error) {
+            return '?'
+        }
+    }
+
+    if(typeof value === 'number' && !Number.isInteger(value)){
+        return String(Math.round(value * 1000) / 1000)
+    }
+
+    return String(value)
+}
+
+/** The text of the debug panel: the numbers that matter first, then every statistic of the video stream. */
+function describeStats(report: any, previous: { bytes: number; at: number } | null): string {
+    const lines: string[] = []
+
+    if(report.frameWidth && report.frameHeight){
+        lines.push('Resolution: ' + report.frameWidth + 'x' + report.frameHeight)
+    }
+    if(typeof report.framesPerSecond === 'number'){
+        lines.push('Frames per second: ' + report.framesPerSecond)
+    }
+    if(previous !== null && typeof report.bytesReceived === 'number' && report.timestamp > previous.at){
+        const mbit = (report.bytesReceived - previous.bytes) * 8 / ((report.timestamp - previous.at) / 1000) / 1000000
+        lines.push('Bit rate: ' + mbit.toFixed(1) + ' Mbit/s')
+    }
+    if(typeof report.jitter === 'number'){
+        lines.push('Jitter: ' + (report.jitter * 1000).toFixed(1) + ' ms')
+    }
+    if(typeof report.packetsLost === 'number'){
+        lines.push('Packets lost: ' + report.packetsLost)
+    }
+    if(typeof report.framesDropped === 'number'){
+        lines.push('Frames dropped: ' + report.framesDropped)
+    }
+
+    let output = lines.map(line => '<strong>' + escapeHtml(line) + '</strong><br>').join('\n')
+    if(output !== ''){
+        output += '<hr>\n'
+    }
+
+    Object.keys(report).sort((a, b) => a.localeCompare(b)).forEach((name) => {
+        output += '<strong>' + escapeHtml(name) + ':</strong> ' + escapeHtml(formatStat(report[name])) + '<br>\n'
+    })
+
+    return output
 }
 
 function StreamComponent({
@@ -20,18 +84,65 @@ function StreamComponent({
     xPlayer,
 }: StreamComponentProps) {
     const { t } = useTranslation()
+    const { settings, setSettings } = useSettings()
+
+    // The shortcuts of the gamepad driver are registered once, so they use the newest settings through a ref
+    const translatorRef = React.useRef({ settings, setSettings })
+    translatorRef.current = { settings, setSettings }
 
     function performance_now_seconds() {
         return performance.now() / 1000.0
     }
 
     let lastMovement = 0
+    // Bytes received at the previous update of the debug panel (the bit rate is the difference)
+    let lastStats: { bytes: number; at: number } | null = null
     // let gamebarElement = document.getElementById('component_streamcomponent_gamebar')
     let debugElement = document.getElementById('component_streamcomponent_debug')
     let webRtcStatsInterval
 
     const [micStatus, setMicStatus] = React.useState(false)
+    // The translator's extra buttons (windows, auto, screen, log, area) are folded behind one button
+    const [translatorMore, setTranslatorMore] = React.useState(false)
+    // The button that switches local / online only exists when a local model of the language pair is on the device
+    const [, setLocalTick] = React.useState(0)
+    React.useEffect(() => subscribeLocal(() => setLocalTick(tick => tick + 1)), [])
+    const localReady = isLocalInstalled(settings.translator_source_lang || 'en', settings.translator_target_lang || 'uk', localEngine(settings))
     const [waitingSeconds, setWaitingSeconds] = React.useState(0)
+
+    // Greenlight menu controlled with the gamepad (opened with LB + RB + View + Menu, held).
+    // While it is open the game receives no input and the game bar is navigated with the pad.
+    const padMenuRef = React.useRef(false)
+    const [padMenuOpen, setPadMenuOpen] = React.useState(false)
+
+    // What the keyboard and mouse emulation does with the mouse (see lib/gamepad/kbm.ts): a hint tells how to take it
+    const [mouseState, setMouseState] = React.useState<'unlocked' | 'locked' | 'free'>('unlocked')
+    const [mouseHintVisible, setMouseHintVisible] = React.useState(true)
+    React.useEffect(() => {
+        const onState = (event: Event) => {
+            setMouseState((event as CustomEvent).detail)
+        }
+
+        window.addEventListener('greenlight-kbm-state', onState)
+        return () => {
+            window.removeEventListener('greenlight-kbm-state', onState)
+        }
+    }, [])
+    React.useEffect(() => {
+        // The hint stays for a few seconds after the state changed
+        setMouseHintVisible(true)
+        const timer = setTimeout(() => setMouseHintVisible(false), mouseState === 'unlocked' ? 12000 : 3500)
+        return () => clearTimeout(timer)
+    }, [mouseState])
+
+    function setPadMenu(open: boolean) {
+        const driver = (xPlayer as any)._inputDriver
+
+        padMenuRef.current = open
+        setPadMenuOpen(open)
+        gamepadState.streamMenuOpen = open
+        driver?.setSuspended?.(open)
+    }
 
 
 
@@ -59,6 +170,8 @@ function StreamComponent({
     let framesDroppedBaseline = 0
     let packetsDroppedBaseline = 0
     let frameCountDomUpdate = 0
+    // The statistics are only collected while the debug panel is open (they are expensive and drain the battery)
+    let statsPaused = true
 
 
     function sliceData(data, start, end) {
@@ -172,12 +285,25 @@ function StreamComponent({
         }, droppedData, document.getElementById('component_streamcomponent_debug_webrtc_dropped'))
 
         webRtcStatsInterval = setInterval(() => {
+            const panel = document.getElementById('component_streamcomponent_debug')
+            if (panel === null || panel.className.includes('hidden')) {
+                statsPaused = true
+                return
+            }
+
             if (xPlayer._webrtcClient !== undefined) {
                 xPlayer._webrtcClient.getStats().then((stats) => {
                     let statsOutput = ''
 
                     stats.forEach((report) => {
                         if (report.type === 'inbound-rtp' && report.kind === 'video') {
+
+                            if (statsPaused) {
+                                // The panel was just opened: count the losses from now on
+                                packetsDroppedBaseline = report['packetsLost']
+                                framesDroppedBaseline = report['framesDropped']
+                                statsPaused = false
+                            }
 
                             if (jitterData[0].length > 1200) {
                                 jitterData = sliceData(jitterData, jitterData[0].length - 1200, jitterData[0].length)
@@ -198,10 +324,9 @@ function StreamComponent({
                             jitterUplot.setData(jitterData)
                             droppedUplot.setData(droppedData)
 
-                            if (frameCountDomUpdate >= 15) {
-                                Object.keys(report).forEach((statName) => {
-                                    statsOutput += `<strong>${statName}:</strong> ${report[statName]}<br>\n`
-                                })
+                            if (frameCountDomUpdate >= 1) {
+                                statsOutput = describeStats(report, lastStats)
+                                lastStats = { bytes: report['bytesReceived'], at: report['timestamp'] }
                                 document.querySelector('div#component_streamcomponent_debug_text').innerHTML = statsOutput
                                 frameCountDomUpdate = 0
                             } else {
@@ -213,7 +338,7 @@ function StreamComponent({
                     // document.querySelector('div#component_streamcomponent_debug_text').innerHTML = statsOutput;
                 })
             }
-        }, 33)
+        }, 250)
 
         // Gamebar menu mouse events
         const mouseEvent = () => {
@@ -228,7 +353,7 @@ function StreamComponent({
                 return
             }
 
-            if ((Date.now() - lastMovement) >= 2000) {
+            if (padMenuRef.current === false && (Date.now() - lastMovement) >= 2000) {
                 if (!gamebarElement.className.includes('hidden')) {
                     gamebarElement.className = 'hidden'
                 }
@@ -250,8 +375,40 @@ function StreamComponent({
         }
         window.addEventListener('keypress', keyboardPressEvent)
 
+        // Gamepad menu: toggled by the driver chord, closed with B
+        const padMenuEvent = () => setPadMenu(!padMenuRef.current)
+        window.addEventListener('greenlight-gamepad-menu', padMenuEvent)
+        const removeBackHandler = pushBackHandler(() => {
+            if (padMenuRef.current) {
+                setPadMenu(false)
+                return true
+            }
+            return false
+        })
+
+        // Translator shortcuts of the gamepad (LB + RB + Y / X)
+        const translatorToggleEvent = () => {
+            const current = translatorRef.current
+            current.setSettings({ ...current.settings, translator_enabled: !current.settings.translator_enabled })
+        }
+        const translatorAreaEvent = () => {
+            if(translatorRef.current.settings.translator_enabled){
+                setPadMenu(false)
+                window.dispatchEvent(new Event(TRANSLATOR_EDIT_EVENT))
+            }
+        }
+        window.addEventListener('greenlight-translator-toggle', translatorToggleEvent)
+        window.addEventListener('greenlight-translator-area', translatorAreaEvent)
+
         // cleanup this component
         return () => {
+            window.removeEventListener('greenlight-translator-toggle', translatorToggleEvent)
+            window.removeEventListener('greenlight-translator-area', translatorAreaEvent)
+            window.removeEventListener('greenlight-gamepad-menu', padMenuEvent)
+            removeBackHandler()
+            gamepadState.streamMenuOpen = false
+            xPlayer._inputDriver?.setSuspended?.(false)
+
             window.removeEventListener('mousemove', mouseEvent)
             window.removeEventListener('mousedown', mouseEvent)
             window.removeEventListener('keypress', keyboardPressEvent)
@@ -286,11 +443,60 @@ function StreamComponent({
     }
 
     function endStream() {
-        if (confirm(t("streamWindow.endStreamConfirmMessage"))) {
-            document.getElementById('streamComponentHolder').innerHTML = ''
-            onDisconnect()
-            xPlayer.close()
+        // The game must not receive the A / B presses that answer the question
+        const driver = (xPlayer as any)._inputDriver
+        driver?.setSuspended?.(true)
+
+        confirmDialog(t("streamWindow.endStreamConfirmMessage"), t("gamepad.yes"), t("gamepad.no")).then((confirmed) => {
+            if (confirmed) {
+                document.getElementById('streamComponentHolder').innerHTML = ''
+                onDisconnect()
+                xPlayer.close()
+            } else if (padMenuRef.current === false) {
+                driver?.setSuspended?.(false)
+            }
+        }).catch(() => driver?.setSuspended?.(false))
+    }
+
+    function toggleTranslator() {
+        setSettings({ ...settings, translator_enabled: !settings.translator_enabled })
+    }
+
+    function toggleTranslatorAuto() {
+        setSettings({ ...settings, translator_auto: settings.translator_auto !== true })
+    }
+
+    // Local (smart) <-> online: the model of the language pair has to be on the device for the local ones
+    function nextTranslatorMode() {
+        const from = settings.translator_source_lang || 'en'
+        const to = settings.translator_target_lang || 'uk'
+        if(!isLocalInstalled(from, to, localEngine(settings))){
+            return
         }
+        const order = ['smart', 'local', 'off']
+        const current = localMode(settings)
+        const next = order[(Math.max(0, order.indexOf(current === 'backup' ? 'off' : current)) + 1) % order.length]
+        setSettings({ ...settings, translator_local_mode: next })
+    }
+
+    function toggleTranslatorLog() {
+        setSettings({ ...settings, translator_log: settings.translator_log !== true })
+    }
+
+    function toggleTranslatorWindow(index: number) {
+        const list = getRegions(settings)
+        if(list[index] === undefined){
+            return
+        }
+
+        list[index] = { ...list[index], enabled: list[index].enabled === false }
+        setSettings({ ...settings, ...regionsToSettings(list) })
+    }
+
+    function editTranslatorArea() {
+        // The game must not receive input while the window is placed
+        setPadMenu(false)
+        window.dispatchEvent(new Event(TRANSLATOR_EDIT_EVENT))
     }
 
     function toggleDebug() {
@@ -374,25 +580,45 @@ function StreamComponent({
 
                 <div id="component_streamcomponent_gamebar">
                     <div id="component_streamcomponent_gamebar_menu">
-                        <div style={{
-                            width: '25%',
-                        }}>
-                            <Button label={<span><i className="fa-solid fa-xmark"></i> {t("streamWindow.endStreamBtn")}</span>} title={t("streamWindow.endStreamBtn")} className='btn-cancel' onClick={() => {
+                        <div className="gb-left">
+                            <Button label={<span><i className="fa-solid fa-xmark"></i> <span className="gb-label">{t("streamWindow.endStreamBtn")}</span></span>} title={t("streamWindow.endStreamBtn")} className='btn-cancel' onClick={() => {
                                 endStream()
-                            }}></Button> &nbsp;
+                            }}></Button>
                             <Button label={<span><i className="fa-solid fa-xmark"></i></span>} title={t("streamWindow.disconnectBtn")} className='btn' onClick={() => {
                                 streamDisconnect()
                             }}></Button>
                         </div>
 
-                        <div style={{
-                            marginLeft: 'auto',
-                            marginRight: 'auto',
-                        }}>
-                            <Button label={<span><i className="fa-brands fa-xbox"></i> {t("streamWindow.menuBtn")}</span>} title={t("streamWindow.menuTitle")} onClick={(e) => {
+                        <div className="gb-center">
+                            <Button label={<span><i className="fa-brands fa-xbox"></i> <span className="gb-label">{t("streamWindow.menuBtn")}</span></span>} title={t("streamWindow.menuTitle")} onClick={(e) => {
                                 e.target.blur(); onMenu()
-                            }}></Button> &nbsp;
-                            <Button label={(micStatus === false) ? <span><i className="fa-solid fa-microphone-slash"></i> {t("streamWindow.micMuted")}</span> : <span><i className="fa-solid fa-microphone"></i> {t("streamWindow.micActive")}</span>} title={(micStatus === false) ? t("streamWindow.enableMic") : t("streamWindow.disableMic")} className={(micStatus === false) ? 'btn-cancel' : 'btn-primary'} onClick={(e) => {
+                            }}></Button>
+                            <Button label={<span><i className="fa-solid fa-language"></i> <span className="gb-label gb-always">{settings.translator_enabled ? t("translator.btnOn") : t("translator.btnOff")}</span></span>} title={t("translator.btnTitle")} className={settings.translator_enabled ? 'btn-primary' : ''} onClick={(e) => {
+                                e.target.blur(); toggleTranslator()
+                            }}></Button>
+                            { settings.translator_enabled ? <Button label={<span><i className="fa-solid fa-wand-magic-sparkles"></i> <span className="gb-label">{t("translator.btnAuto")}</span></span>} title={t("translator.btnAutoTitle")} className={settings.translator_auto === true ? 'btn-primary' : ''} onClick={(e) => {
+                                e.target.blur(); toggleTranslatorAuto()
+                            }}></Button> : '' }
+                            { settings.translator_enabled ? <Button label={<span><i className={translatorMore ? 'fa-solid fa-angle-left' : 'fa-solid fa-angle-right'}></i></span>} title={t("translator.btnMoreTitle")} onClick={(e) => {
+                                e.target.blur(); setTranslatorMore(!translatorMore)
+                            }}></Button> : '' }
+                            { (settings.translator_enabled && translatorMore) ? <div className="gb-translator-row">
+                            { localReady ? <Button label={<span><i className="fa-solid fa-microchip"></i> <span className="gb-label gb-always">{t('translator.modeShort_' + (localMode(settings)))}</span></span>} title={t('translator.btnModeTitle')} className={localMode(settings) !== 'off' ? 'btn-primary' : ''} onClick={(e) => {
+                                e.target.blur(); nextTranslatorMode()
+                            }}></Button> : '' }
+                            { (settings.translator_enabled && getRegions(settings).length >= 1) ? getRegions(settings).map((win, index) => (
+                                <Button key={index} label={<span>{index + 1}</span>} title={t("translator.windowToggleTitle", { n: index + 1 })} className={win.enabled !== false ? 'btn-primary' : ''} onClick={(e) => {
+                                    e.target.blur(); toggleTranslatorWindow(index)
+                                }}></Button>
+                            )) : '' }
+                            { settings.translator_enabled ? <Button label={<span><i className="fa-solid fa-clock-rotate-left"></i> <span className="gb-label">{t("translator.btnLog")}</span></span>} title={t("translator.btnLogTitle")} className={settings.translator_log === true ? 'btn-primary' : ''} onClick={(e) => {
+                                e.target.blur(); toggleTranslatorLog()
+                            }}></Button> : '' }
+                            { settings.translator_enabled ? <Button label={<span><i className="fa-solid fa-crop-simple"></i> <span className="gb-label">{t("translator.btnArea")}</span></span>} title={t("translator.btnAreaTitle")} onClick={(e) => {
+                                e.target.blur(); editTranslatorArea()
+                            }}></Button> : '' }
+                            </div> : '' }
+                            <Button label={(micStatus === false) ? <span><i className="fa-solid fa-microphone-slash"></i> <span className="gb-label">{t("streamWindow.micMuted")}</span></span> : <span><i className="fa-solid fa-microphone"></i> <span className="gb-label">{t("streamWindow.micActive")}</span></span>} title={(micStatus === false) ? t("streamWindow.enableMic") : t("streamWindow.disableMic")} className={(micStatus === false) ? 'btn-cancel' : 'btn-primary'} onClick={(e) => {
                                 e.target.blur(); toggleMic()
                             }}></Button>
                         </div>
@@ -408,17 +634,23 @@ function StreamComponent({
                             svg={volumeIcon}
                         />
 
-                        <div style={{
-                            marginRight: 20,
-                            width: '25%',
-                            textAlign: 'right',
-                        }}>
+                        <div className="gb-right">
                             <Button label={<i className="fa-solid fa-bug"></i>} title={t("streamWindow.debugTitle")} onClick={(e) => {
                                 e.target.blur(); toggleDebug()
                             }}></Button>
                         </div>
                     </div>
+
+                    <div className="gp-stream-hint">
+                        { padMenuOpen ? t("gamepad.streamMenuOpenHint") : t("gamepad.streamMenuHint") }
+                    </div>
                 </div>
+
+                { (settings.input_kbm_emulation === true && mouseHintVisible && mouseState !== 'free' && !padMenuOpen) ? <div className="kbm-hint">
+                    <i className="fa-solid fa-computer-mouse"></i> { mouseState === 'locked' ? t("streamWindow.kbmHintLocked") : t("streamWindow.kbmHintClick") }
+                </div> : '' }
+
+                <TranslatorOverlay xPlayer={xPlayer} />
 
                 <div id="component_streamcomponent_debug" className='hidden'>
                     <p>{t("streamWindow.debugTitle")}:</p>

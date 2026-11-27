@@ -102,10 +102,36 @@ function SettingsInput() {
         }
     })
 
+    const [rumbleResults, setRumbleResults] = React.useState<Record<number, string>>({})
+
+    // Makes the controller vibrate for half a second and says what came of it
+    async function testRumble(pad: Gamepad){
+        const actuator: any = (pad as any).vibrationActuator
+        let result = t('settings.input.rumbleTestNone')
+
+        if(actuator !== null && actuator !== undefined){
+            try {
+                const outcome = await actuator.playEffect(actuator.type || 'dual-rumble', { startDelay: 0, duration: 500, weakMagnitude: 1, strongMagnitude: 1 })
+                result = outcome === 'complete' ? t('settings.input.rumbleTestOk') : t('settings.input.rumbleTestFailed', { reason: String(outcome) })
+            } catch(error: any) {
+                result = t('settings.input.rumbleTestFailed', { reason: error?.message ?? String(error) })
+            }
+        }
+
+        setRumbleResults(previous => ({ ...previous, [pad.index]: result }))
+    }
+
     function setControllerVibration(){
         setSettings({
             ...settings,
             controller_vibration: (! settings.controller_vibration),
+        })
+    }
+
+    function setGamepadNavigation(){
+        setSettings({
+            ...settings,
+            gamepad_navigation: (settings.gamepad_navigation === false),
         })
     }
 
@@ -171,6 +197,22 @@ function SettingsInput() {
                         </label>
                     </p>
 
+                    { settings.controller_vibration ? <p>
+                        <label>{t('settings.input.vibrationStrength')}</label>
+                        <input type="range" min={10} max={100} step={5} value={Math.round((settings.input_rumble_strength ?? 1) * 100)} onChange={(e) => {
+                            setSettings({ ...settings, input_rumble_strength: parseInt(e.target.value) / 100 })
+                        }} /> {Math.round((settings.input_rumble_strength ?? 1) * 100)}%
+                        <br /><small>{t('settings.input.vibrationStrengthHint')}</small>
+                    </p> : '' }
+
+                    <p>
+                        <label>{t('settings.input.gamepadNavigation')}</label>
+                        <label style={{ minWidth: 0 }}>
+                            <input type='checkbox' onChange={ setGamepadNavigation } checked={settings.gamepad_navigation !== false} />&nbsp; ({ settings.gamepad_navigation !== false ? t('settings.input.enabledLabel') : t('settings.input.disabledLabel')})
+                        </label><br />
+                        <small>{t('settings.input.gamepadNavigationDescription')}</small>
+                    </p>
+
                     <p>
                         <label>{t('settings.input.enableTouch')}</label>
                         <label style={{ minWidth: 0 }}>
@@ -186,6 +228,41 @@ function SettingsInput() {
                         { (!settings.input_newgamepad && settings.input_mousekeyboard) ? <small style={{ color: 'orange' }}>{t('settings.input.legacyWarning')}</small> : '' }
                     </p>
 
+                    { settings.input_mousekeyboard === true ? <p>
+                        <label>{t('settings.input.mouseSensitivity')}</label>
+                        <input type="range" min={10} max={200} step={5} value={Math.round((settings.input_mouse_sensitivity ?? 1) * 100)} onChange={(e) => {
+                            setSettings({ ...settings, input_mouse_sensitivity: parseInt(e.target.value) / 100 })
+                        }} /> {Math.round((settings.input_mouse_sensitivity ?? 1) * 100)}%
+                        <br /><small>{t('settings.input.mouseSensitivityHint')}</small>
+                    </p> : '' }
+
+                    <p>
+                        <label>{t('settings.input.altMenu')}</label>
+                        <label style={{ minWidth: 0 }} className="toggle-label">
+                            <input type='checkbox' onChange={(e) => {
+                                setSettings({ ...settings, app_menubar_alt: e.target.checked })
+                            }} checked={settings.app_menubar_alt === true} />
+                        </label><br />
+                        <small>{t('settings.input.altMenuHint')}</small>
+                    </p>
+
+                    <p>
+                        <label>{t('settings.input.kbmEmulation')}</label>
+                        <label style={{ minWidth: 0 }} className="toggle-label">
+                            <input type='checkbox' onChange={(e) => {
+                                setSettings({ ...settings, input_kbm_emulation: e.target.checked })
+                            }} checked={settings.input_kbm_emulation === true} />
+                        </label><br />
+                        <small>{t('settings.input.kbmEmulationDescription')}</small>
+                    </p>
+
+                    { settings.input_kbm_emulation === true ? <p>
+                        <label>{t('settings.input.kbmSensitivity')}</label>
+                        <input type="range" min={20} max={300} step={10} value={Math.round((settings.input_kbm_sensitivity || 1) * 100)} onChange={(e) => {
+                            setSettings({ ...settings, input_kbm_sensitivity: parseInt(e.target.value) / 100 })
+                        }} /> {Math.round((settings.input_kbm_sensitivity || 1) * 100)}%
+                    </p> : '' }
+
                     <p>
                         <label>{t('settings.input.enableLegacy')}</label>
                         <label style={{ minWidth: 0 }}>
@@ -199,6 +276,7 @@ function SettingsInput() {
                     <h1>{t('settings.input.controllerDetectedTitle')}</h1>
 
                     <p>{t('settings.input.controllerDetectedDescription')}</p>
+                    <p><small>{t('settings.input.rumbleHint')}</small></p>
 
                     <div>
                         {
@@ -208,9 +286,13 @@ function SettingsInput() {
                                 #{ index+1 } &nbsp;
 
                                         { (item) ?
-                                            item.id + ' ' + t('settings.input.axesLabel') + ': ' + item.axes.length + ', ' + t('settings.input.buttonsLabel') + ': ' + item.buttons.length + ', ' + t('settings.input.rumbleLabel') + ': ' + ((item.vibrationActuator !== null) ? (item.vibrationActuator as any).type : t('settings.input.notSupportedLabel'))
+                                            item.id + ' ' + t('settings.input.axesLabel') + ': ' + item.axes.length + ', ' + t('settings.input.buttonsLabel') + ': ' + item.buttons.length + ', ' + t('settings.input.rumbleLabel') + ': ' + ((item.vibrationActuator !== null && item.vibrationActuator !== undefined) ? (item.vibrationActuator as any).type : t('settings.input.notSupportedLabel'))
                                             : t('settings.input.noControllerDetected')
                                         }
+                                        { item ? <React.Fragment>
+                                            {' '}<button className="btn" onClick={() => { void testRumble(item) }}>{t('settings.input.rumbleTest')}</button>
+                                            {' '}{rumbleResults[item.index] ?? ''}
+                                        </React.Fragment> : '' }
                                     </p>
                                 )
                             })

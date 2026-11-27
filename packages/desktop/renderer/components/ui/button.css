@@ -1,55 +1,76 @@
 .btn {
-    padding: 0.7rem 1rem;
-    border-radius: 4px;
+    padding: 0.75rem 1.4rem;
+    border-radius: 999px;
     cursor: pointer;
 
-    background-color: #444444;
-    border: 2px solid #444444;
-    color: #ffffff;
-    text-transform: uppercase;
-    font-weight: bold;
+    background-color: rgba(255, 255, 255, 0.12);
+    border: 2px solid transparent;
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
 
-    transition: background-color 0.1s ease;
+    transition: background-color 0.15s ease, transform 0.15s var(--ease), box-shadow 0.15s ease;
 
-    align-items: flex-start;
+    align-items: center;
+    justify-content: center;
     display: inline-flex;
     flex-direction: column;
 }
 
 .btn:hover {
-    background-color: #6f6f6f;
+    background-color: rgba(255, 255, 255, 0.22);
 }
 
 .btn:disabled {
     cursor: default;
-    opacity: 0.5;
+    opacity: 0.45;
+}
+
+.btn:disabled:hover {
+    background-color: rgba(255, 255, 255, 0.12);
+}
+
+.btn.gp-focus {
+    transform: scale(1.06);
+    background-color: rgba(255, 255, 255, 0.24);
+    outline: none !important;
+    border-color: var(--focus);
+    border-radius: 999px;
+    box-shadow: 0 0 22px var(--focus-glow);
 }
 
 .btn-small {
-    padding: 0.4rem 0.7rem;
+    padding: 0.45rem 0.95rem;
     font-size: 12px;
 }
 
 .btn-large {
-    padding: 1.4rem 2rem;
-    font-size: 12px;
+    padding: 1.2rem 2rem;
     font-size: 16px;
 }
 
 .btn-primary {
-    background-color: #008746;
-    border-color: #005e31;
+    background-color: var(--accent);
+    box-shadow: 0 4px 14px rgba(16, 124, 16, 0.4);
 }
 
 .btn-primary:hover {
-    background-color: #005e31;
+    background-color: #139c13;
+}
+
+.btn-primary.gp-focus {
+    background-color: #1bb01b;
 }
 
 .btn-cancel {
-    background-color: rgb(195, 0, 0);
-    border-color: rgb(155, 0, 0);
+    background-color: var(--danger);
 }
 
 .btn-cancel:hover {
-    background-color: rgb(155, 0, 0);
+    background-color: #ef4a4a;
+}
+
+.btn-cancel.gp-focus {
+    background-color: #ef4a4a;
 }

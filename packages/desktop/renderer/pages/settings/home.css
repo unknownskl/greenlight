@@ -1,14 +1,9 @@
 div#component_settings_sidebar_content h1 {
-    padding-bottom: 20px;
-}
-
-div#component_settings_sidebar_content h2 {
-    /* padding: 20px; */
+    padding-bottom: 14px;
 }
 
 div#component_settings_sidebar_content p {
-    /* padding: 20px; */
-    padding-bottom: 20px;
+    padding-bottom: 16px;
 }
 
 div#component_settings_sidebar_content p a {
@@ -20,7 +15,6 @@ div#component_settings_sidebar_content ul.kv-list {
     margin: 0px;
     padding: 20px;
     padding-top: 0px;
-    /* column-count: 2; */
 }
 
 div#component_settings_sidebar_content ul.kv-list li {
@@ -31,39 +25,85 @@ div#component_settings_sidebar_content ul.kv-list li {
 }
 
 div#component_settings_sidebar_content label {
-    font-weight: bold;
-    min-width: 250px;
+    font-weight: 600;
+    color: var(--text);
+    min-width: 260px;
     display: inline-block;
 }
 
 div#component_settings_sidebar_content select {
-    background: rgba(0, 0, 0, 0.7);
-    border-radius: 5px;
-    padding: 10px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: var(--radius-sm);
+    padding: 11px 14px;
     display: inline-block;
-    border: 0px;
+    border: 2px solid var(--border);
     outline: none;
-    color: #ffffff;
+    color: var(--text);
+    font-size: 15px;
     margin-right: 10px;
-    min-width: 200px;
+    min-width: 220px;
+}
+
+div#component_settings_sidebar_content select:focus,
+div#component_settings_sidebar_content select.gp-focus {
+    border-color: var(--focus);
 }
 
 div#component_settings_sidebar_content input[type="range"] {
-    background: rgba(0, 0, 0, 0.7);
-    border-radius: 5px;
-    /* padding: 10px; */
-    display: inline-block;
-    border: 0px;
-    outline: none;
-    color: #ffffff;
+    accent-color: var(--accent-hi);
+    vertical-align: middle;
     margin-right: 10px;
-    min-width: 200px;
+    min-width: 220px;
+    height: 24px;
+    cursor: pointer;
 }
 
-div#component_settings_sidebar_content input[type='checkbox'] {
+/* Checkboxes look like toggle switches */
+div#component_settings_sidebar_content input[type='checkbox'],
+div#component_viewportgrid_options input[type='checkbox'],
+label.toggle-label input[type='checkbox'] {
+    appearance: none;
+    -webkit-appearance: none;
     position: relative;
     cursor: pointer;
-    width: 16px;
-    height: 16px;
+    width: 46px;
+    height: 26px;
+    top: 7px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.2);
+    transition: background 0.2s ease;
+}
+
+div#component_settings_sidebar_content input[type='checkbox']::after,
+label.toggle-label input[type='checkbox']::after {
+    content: '';
+    position: absolute;
     top: 3px;
+    left: 3px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #ffffff;
+    transition: transform 0.2s var(--ease);
+}
+
+div#component_settings_sidebar_content input[type='checkbox']:checked,
+label.toggle-label input[type='checkbox']:checked {
+    background: var(--accent);
+}
+
+div#component_settings_sidebar_content input[type='checkbox']:checked::after,
+label.toggle-label input[type='checkbox']:checked::after {
+    transform: translateX(20px);
+}
+
+div#component_settings_sidebar_content input.gp-focus,
+div#component_settings_sidebar_content select.gp-focus,
+label.toggle-label input.gp-focus {
+    outline: 3px solid var(--focus) !important;
+    outline-offset: 3px;
+}
+
+label.toggle-label input[type='checkbox'] {
+    top: 0;
 }
